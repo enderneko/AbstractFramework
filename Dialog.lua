@@ -7,7 +7,7 @@ local AW = _G.AbstractWidgets
 local dialog
 
 local function CreateDialog()
-    dialog = AW.CreateBorderedFrame(UIParent, 200, 100, nil, "accent")
+    dialog = AW.CreateBorderedFrame(AW.UIParent, nil, 200, 100, nil, "accent")
     dialog:Hide() -- for first OnShow
 
     dialog:EnableMouse(true)
@@ -201,7 +201,7 @@ end
 local notificationDialog
 
 local function CreateNotificationDialog()
-    notificationDialog = AW.CreateBorderedFrame(UIParent, 200, 100, nil, "accent")
+    notificationDialog = AW.CreateBorderedFrame(AW.UIParent, nil, 200, 100, nil, "accent")
     notificationDialog:Hide() -- for first OnShow
 
     notificationDialog:EnableMouse(true)

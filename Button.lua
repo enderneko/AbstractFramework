@@ -178,6 +178,7 @@ function AW.CreateButton(parent, text, color, width, height, template, noBorder,
         end
 
         b:SetScript("PostClick", function(self, button, down)
+            if self.noSound then return end
             if b._isSecure then
                 if down == GetCVarBool("ActionButtonUseKeyDown") then
                     PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
@@ -187,7 +188,16 @@ function AW.CreateButton(parent, text, color, width, height, template, noBorder,
             end
         end)
     else
-        b:SetScript("PostClick", function() PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON) end)
+        b:SetScript("PostClick", function()
+            if self.noSound then return end
+            PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
+        end)
+    end
+
+    function b:SlientClick()
+        b.noSound = true
+        b:Click()
+        b.noSound = nil
     end
 
     -- texture ----------------------------------
@@ -392,7 +402,7 @@ end
 ---------------------------------------------------------------------
 --- @param labels table {{["text"]=(string), ["value"]=(boolean/string/number), ["onClick"]=(function)}, ...}
 function AW.CreateSwitch(parent, width, height, labels)
-    local switch = AW.CreateBorderedFrame(parent, width, height, "widget")
+    local switch = AW.CreateBorderedFrame(parent, nil, width, height, "widget")
 
     switch.highlight = AW.CreateTexture(switch, nil, AW.GetColorTable("accent", 0.07))
     AW.SetPoint(switch.highlight, "TOPLEFT", 1, -1)

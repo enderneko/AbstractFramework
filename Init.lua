@@ -121,3 +121,11 @@ end
 function AW.Unpack4(t)
     return t[1], t[2], t[3], t[4]
 end
+
+function AW.Round(num, numDecimalPlaces)
+    if numDecimalPlaces and numDecimalPlaces >= 0 then
+        local mult = 10 ^ numDecimalPlaces
+        return floor(num * mult + 0.5) / mult
+    end
+    return floor(num + 0.5)
+end

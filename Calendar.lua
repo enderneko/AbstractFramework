@@ -94,7 +94,7 @@ local function FillDays(year, month)
 end
 
 local function CreateCalendar()
-    calendar = AW.CreateBorderedFrame(UIParent, 185, 167, nil, "accent")
+    calendar = AW.CreateBorderedFrame(AW.UIParent, nil, 185, 167, nil, "accent")
     calendar:SetClampedToScreen(true)
     calendar:EnableMouse(true)
 
@@ -171,7 +171,7 @@ local function CreateCalendar()
     local headers = {}
     calendar.headers = headers
     for i = 1, 7 do
-        headers[i] = AW.CreateBorderedFrame(calendar, 27, 20, "widget", "black")
+        headers[i] = AW.CreateBorderedFrame(calendar, nil, 27, 20, "widget", "black")
 
         local weekday
         if AW.FIRST_WEEKDAY+(i-1)>7 then

@@ -13,14 +13,6 @@ local AnchorPositionAdjustmentFrame, UpdateAndSave, UpdatePositionAdjustmentFram
 local isAnchorLocked = false
 local modified = {}
 
-local function Round(num, numDecimalPlaces)
-    if numDecimalPlaces and numDecimalPlaces >= 0 then
-        local mult = 10 ^ numDecimalPlaces
-        return floor(num * mult + 0.5) / mult
-    end
-    return floor(num + 0.5)
-end
-
 ---------------------------------------------------------------------
 -- base
 ---------------------------------------------------------------------
@@ -151,7 +143,7 @@ local function CreateMoverDialog()
      -- OnShow
      moverDialog:SetScript("OnShow", function()
         C_Timer.After(0, function()
-            AW.SetWidth(moverDialog, Round(max(desc:GetWidth(), tips:GetWidth()) + 20))
+            AW.SetWidth(moverDialog, AW.Round(max(desc:GetWidth(), tips:GetWidth()) + 20))
         end)
         AW.SetPoint(moverDialog, "BOTTOM", moverParent, "CENTER", 0, 100)
 
@@ -243,8 +235,8 @@ local function CalcPoint(owner)
 
     -- x = tonumber(string.format("%.2f", x))
     -- y = tonumber(string.format("%.2f", y))
-    x = Round(x, 1)
-    y = Round(y, 1)
+    x = AW.Round(x, 1)
+    y = AW.Round(y, 1)
 
     return point, x, y
 end
@@ -280,7 +272,7 @@ end
 -- position adjustment frame
 ---------------------------------------------------------------------
 local function CreatePositionAdjustmentFrame()
-    positionAdjustmentFrame = AW.CreateBorderedFrame(moverParent, nil, nil, nil, "accent")
+    positionAdjustmentFrame = AW.CreateBorderedFrame(moverParent, nil, nil, nil, nil, "accent")
     positionAdjustmentFrame:SetFrameLevel(FINE_TUNING_FRAME_LEVEL)
     positionAdjustmentFrame:EnableMouse(true)
     positionAdjustmentFrame:SetClampedToScreen(true)
@@ -430,8 +422,8 @@ UpdatePositionAdjustmentFrame = function(owner)
     positionAdjustmentFrame.tp:SetTitle(owner.mover.text:GetText())
 
     local p, _, _, x, y = owner:GetPoint()
-    x = Round(x, 1)
-    y = Round(y, 1)
+    x = AW.Round(x, 1)
+    y = AW.Round(y, 1)
 
     positionAdjustmentFrame.x:ClearFocus()
     positionAdjustmentFrame.y:ClearFocus()
@@ -560,7 +552,7 @@ function AW.CreateMover(owner, group, text, save)
 
     if not moverParent then CreateMoverParent() end
 
-    local mover = AW.CreateBorderedFrame(moverParent, nil, nil, nil, "accent")
+    local mover = AW.CreateBorderedFrame(moverParent, nil, nil, nil, nil, "accent")
     mover:SetBackdropColor(AW.GetColorRGB("background", 0.8))
 
     owner.mover = mover
@@ -665,8 +657,8 @@ function AW.CreateMover(owner, group, text, save)
         if mover.isDragging then return end
 
         local point, _, _, startX, startY = owner:GetPoint()
-        startX = Round(startX, 1)
-        startY = Round(startY, 1)
+        startX = AW.Round(startX, 1)
+        startY = AW.Round(startY, 1)
 
         mover.moved = true
 
@@ -727,7 +719,7 @@ function AW.CreateMover(owner, group, text, save)
     mover:SetScript("OnShow", function()
         if not mover._original then
             local p, _, _, x, y = owner:GetPoint()
-            mover._original = {p, Round(x, 1), Round(y, 1)}
+            mover._original = {p, AW.Round(x, 1), AW.Round(y, 1)}
         end
     end)
 end

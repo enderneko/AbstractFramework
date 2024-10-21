@@ -171,10 +171,10 @@ end
 ---------------------------------------------------------------------
 -- scroll edit box
 ---------------------------------------------------------------------
-function AW.CreateScrollEditBox(parent, label, width, height, scrollStep)
+function AW.CreateScrollEditBox(parent, name, label, width, height, scrollStep)
     scrollStep = scrollStep or 1
 
-    local frame = AW.CreateScrollFrame(parent, width, height, "none", "none")
+    local frame = AW.CreateScrollFrame(parent, name, width, height, "none", "none")
     AW.StylizeFrame(frame.scrollFrame, "widget")
     AW.StylizeFrame(frame.scrollBar)
 

@@ -7,10 +7,10 @@ local AW = _G.AbstractWidgets
 function AW.ConvertToRGB(r, g, b, a, saturation)
     a = a or 255
     saturation = saturation or 1
-    r = r / 255 * saturation
-    g = g / 255 * saturation
-    b = b / 255 * saturation
-    a = a / 255
+    r = AW.Round(r / 255 * saturation, 5)
+    g = AW.Round(g / 255 * saturation, 5)
+    b = AW.Round(b / 255 * saturation, 5)
+    a = AW.Round(a / 255, 5)
     return r, g, b, a
 end
 
@@ -234,6 +234,7 @@ local colors = {
     ["vividblue"] = {["hex"]="ff1e90ff", ["t"]={0.12, 0.56, 1, 1}},
     ["softblue"] = {["hex"]="ff5352ed", ["t"]={0.33, 0.32, 0.93, 1}},
     ["brightblue"] = {["hex"]="ff3742fa", ["t"]={0.22, 0.26, 0.98, 1}},
+    ["guild"] = {["hex"]="ff40ff40", ["t"]={0.25, 1, 0.25, 1}},
 
     -- class (data from RAID_CLASS_COLORS)
     ["DEATHKNIGHT"] = {["hex"]="ffc41e3a", ["t"]={0.7686275243759155, 0.1176470667123795, 0.2274509966373444}},
@@ -305,14 +306,89 @@ local colors = {
 }
 
 function AW.GetColorRGB(name, alpha, saturation)
-    -- assert(colors[name], "no such color:", name)
-    if not colors[name] then
-        return 1, 1, 1, 1
-    end
+    assert(colors[name], "no such color:", name)
+    -- if not colors[name] then
+    --     return 1, 1, 1, 1
+    -- end
 
     saturation = saturation or 1
     alpha = alpha or colors[name]["t"][4]
     return colors[name]["t"][1]*saturation, colors[name]["t"][2]*saturation, colors[name]["t"][3]*saturation, alpha
+end
+
+function AW.GetColorTable(name, alpha, saturation)
+    assert(colors[name], "no such color:", name)
+    -- if not colors[name] then
+    --     return AW.GetColorTable("white", alpha, saturation)
+    -- end
+
+    saturation = saturation or 1
+    alpha = alpha or colors[name]["t"][4]
+
+    return {colors[name]["t"][1]*saturation, colors[name]["t"][2]*saturation, colors[name]["t"][3]*saturation, alpha}
+end
+
+function AW.GetColorHex(name)
+    assert(colors[name], "no such color:", name)
+    if not colors[name]["hex"] then
+        colors[name]["hex"] = AW.ConvertRGB256ToHEX(AW.ConvertToRGB256(unpack(colors[name]["t"])))
+    end
+    return colors[name]["hex"]
+end
+
+local ADDONS = {}
+function AW.RegisterAddonForAccentColor(addon)
+    ADDONS[addon] = true
+end
+
+local function GetAddon()
+    for addon in string.gmatch(debugstack(2), "@Interface/AddOns/([^/]+)/") do
+        if ADDONS[addon] then
+            return addon
+        end
+    end
+end
+
+---@param color string|table
+---@param alias string?
+function AW.SetAccentColor(color, alias)
+    local addon = GetAddon()
+    assert(addon, "no registered addon found")
+
+    if type(color) == "string" then
+        if colors[color] then
+            colors[addon] = colors[color]
+        else
+            color = strlower(color)
+            local hex = strlen(color) == 6 and "ff" .. color or color
+            colors[addon] = {["hex"] = hex, ["t"] = {AW.ConvertHEXToRGB(hex)}}
+        end
+    elseif type(color) == "table" then
+        if #color == 3 then
+            color[4] = 1
+        end
+        colors[addon] = {["hex"] = AW.ConvertRGBToHEX(AW.UnpackColor(color)), ["t"] = color}
+    end
+
+    if alias then
+        colors[alias] = colors[addon]
+    end
+end
+
+function AW.GetAccentColorName()
+    return GetAddon() or "accent"
+end
+
+function AW.GetAccentColorTable()
+    return AW.GetColorTable(AW.GetAccentColorName())
+end
+
+function AW.GetAccentColorRGB()
+    return AW.GetColorRGB(AW.GetAccentColorName())
+end
+
+function AW.GetAccentColorHex()
+    return AW.GetColorHex(AW.GetAccentColorName())
 end
 
 function AW.GetClassColor(class, alpha, saturation)
@@ -358,22 +434,6 @@ function AW.GetPowerColor(power, unit, alpha, saturation)
     end
 
     return AW.GetColorRGB("MANA", alpha, saturation)
-end
-
-function AW.GetColorTable(name, alpha, saturation)
-    assert(colors[name], "no such color:", name)
-    saturation = saturation or 1
-    alpha = alpha or colors[name]["t"][4]
-
-    return {colors[name]["t"][1]*saturation, colors[name]["t"][2]*saturation, colors[name]["t"][3]*saturation, alpha}
-end
-
-function AW.GetColorHex(name)
-    assert(colors[name], "no such color:", name)
-    if not colors[name]["hex"] then
-        colors[name]["hex"] = AW.ConvertRGB256ToHEX(AW.ConvertToRGB256(unpack(colors[name]["t"])))
-    end
-    return colors[name]["hex"]
 end
 
 function AW.ColorFontString(fs, name)
