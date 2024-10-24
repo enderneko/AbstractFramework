@@ -60,7 +60,7 @@ function AW.SetWidth(region, width, minPixels)
     region._size_list_h = nil
     -- add new
     minPixels = minPixels or 0.001
-    region._size_normal = true
+    -- region._size_normal = true
     region._width = width
     region._minwidth = minPixels
     region:SetWidth(AW.GetNearestPixelSize(width, region:GetEffectiveScale(), minPixels))
@@ -72,24 +72,22 @@ function AW.SetHeight(region, height, minPixels)
     region._size_list_v = nil
     -- add new
     minPixels = minPixels or 0.001
-    region._size_normal = true
+    -- region._size_normal = true
     region._height = height
     region._minheight = minPixels
     region:SetHeight(AW.GetNearestPixelSize(height, region:GetEffectiveScale(), minPixels))
 end
 
--- NOTE: DO NOT USE WITH SetListHeight
 function AW.SetListWidth(region, itemNum, itemWidth, itemSpacing, extraWidth)
     -- clear conflicts
     region._size_grid = nil
-    region._size_list_v = nil
     region._width = nil
     region._minwidth = nil
     -- add new
     region._size_list_h = true
-    region._itemNum = itemNum
+    region._itemNumH = itemNum
     region._itemWidth = itemWidth
-    region._itemSpacing = itemSpacing
+    region._itemSpacingH = itemSpacing
     extraWidth = extraWidth or 0
     region._extraWidth = extraWidth
 
@@ -102,18 +100,16 @@ function AW.SetListWidth(region, itemNum, itemWidth, itemSpacing, extraWidth)
     end
 end
 
--- NOTE: DO NOT USE WITH SetListWidth
 function AW.SetListHeight(region, itemNum, itemHeight, itemSpacing, extraHeight)
     -- clear conflicts
     region._size_grid = nil
-    region._size_list_h = nil
     region._height = nil
     region._minheight = nil
     -- add new
     region._size_list_v = true
-    region._itemNum = itemNum
+    region._itemNumV = itemNum
     region._itemHeight = itemHeight
-    region._itemSpacing = itemSpacing
+    region._itemSpacingV = itemSpacing
     extraHeight = extraHeight or 0
     region._extraHeight = extraHeight
 
@@ -130,7 +126,7 @@ function AW.SetGridSize(region, gridWidth, gridHeight, gridSpacingH, gridSpacing
     -- clear conflicts
     region._size_list_h = nil
     region._size_list_v = nil
-    region._size_normal = nil
+    -- region._size_normal = nil
     -- add new
     region._size_grid = true
     region._gridWidth = gridWidth
@@ -246,22 +242,21 @@ end
 -- re-set
 ---------------------------------------------------------------------
 function AW.ReSize(region)
-    if region._size_normal then
+    if region._size_grid then
+        AW.SetGridSize(region, region._gridWidth, region._gridHeight, region._gridSpacingH, region._gridSpacingV, region._columns, region._rows)
+    else
         if region._width then
             AW.SetWidth(region, region._width, region._minwidth)
         end
         if region._height then
             AW.SetHeight(region, region._height, region._minheight)
         end
-
         if region._size_list_h then
-            AW.SetListWidth(region, region._itemNum, region._itemWidth, region._itemSpacing, region._extraWidth)
-        elseif region._size_list_v then
-            AW.SetListHeight(region, region._itemNum, region._itemHeight, region._itemSpacing, region._extraHeight)
+            AW.SetListWidth(region, region._itemNumH, region._itemWidth, region._itemSpacingH, region._extraWidth)
         end
-
-    elseif region._size_grid then
-        AW.SetGridSize(region, region._gridWidth, region._gridHeight, region._gridSpacingH, region._gridSpacingV, region._columns, region._rows)
+        if region._size_list_v then
+            AW.SetListHeight(region, region._itemNumV, region._itemHeight, region._itemSpacingV, region._extraHeight)
+        end
     end
 end
 

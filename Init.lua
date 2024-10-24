@@ -129,3 +129,31 @@ function AW.Round(num, numDecimalPlaces)
     end
     return floor(num + 0.5)
 end
+
+-- function AW.Copy(...)
+--     local newTbl = {}
+--     for i = 1, select("#", ...) do
+--         local t = select(i, ...)
+--         for k, v in pairs(t) do
+--             if type(v) == "table" then
+--                 newTbl[k] = AW.Copy(v)
+--             else
+--                 newTbl[k] = v
+--             end
+--         end
+--     end
+--     return newTbl
+-- end
+
+-- function AW.Merge(t, ...)
+--     for i = 1, select("#", ...) do
+--         local _t = select(i, ...)
+--         for k, v in pairs(_t) do
+--             if type(v) == "table" then
+--                 t[k] = AW.Copy(v)
+--             else
+--                 t[k] = v
+--             end
+--         end
+--     end
+-- end

@@ -6,17 +6,20 @@ local AW = _G.AbstractWidgets
 ---------------------------------------------------------------------
 local FONT_TITLE_NAME = "AW_FONT_TITLE"
 local FONT_NORMAL_NAME = "AW_FONT_NORMAL"
+local FONT_CHAT_NAME = "AW_FONT_CHAT"
 local FONT_OUTLINE_NAME = "AW_FONT_OUTLINE"
 local FONT_SMALL_NAME = "AW_FONT_SMALL"
 local FONT_CHINESE_NAME = "AW_FONT_CHINESE"
 
 local FONT_TITLE_SIZE = 14
 local FONT_NORMAL_SIZE = 13
+local FONT_CHAT_SIZE = 12
 local FONT_OUTLINE_SIZE = 13
 local FONT_SMALL_SIZE = 11
 local FONT_CHINESE_SIZE = 14
 
 local BASE_FONT = GameFontNormal:GetFont()
+local BASE_CHAT_FONT = ChatFontNormal:GetFont()
 
 local font_title = CreateFont(FONT_TITLE_NAME)
 font_title:SetFont(BASE_FONT, FONT_TITLE_SIZE, "")
@@ -31,6 +34,13 @@ font_normal:SetTextColor(1, 1, 1, 1)
 font_normal:SetShadowColor(0, 0, 0)
 font_normal:SetShadowOffset(1, -1)
 font_normal:SetJustifyH("CENTER")
+
+local font_chat = CreateFont(FONT_CHAT_NAME)
+font_chat:SetFont(BASE_CHAT_FONT, FONT_CHAT_SIZE, "")
+font_chat:SetTextColor(1, 1, 1, 1)
+font_chat:SetShadowColor(0, 0, 0)
+font_chat:SetShadowOffset(1, -1)
+font_chat:SetJustifyH("CENTER")
 
 local font_outline = CreateFont(FONT_OUTLINE_NAME)
 font_outline:SetFont(BASE_FONT, FONT_OUTLINE_SIZE, "OUTLINE")
@@ -56,8 +66,28 @@ font_chinese:SetJustifyH("CENTER")
 ---------------------------------------------------------------------
 -- create
 ---------------------------------------------------------------------
-function AW.CreateFonts(prefix, suffix, font, size, flags, shadow)
+function AW.CreateFont(name, font, size, flags, shadow, color)
+    local obj = CreateFont(name)
+    obj:SetFont(font, size, flags or "")
+    obj:SetJustifyH("CENTER")
 
+    if shadow then
+        obj:SetShadowColor(0, 0, 0, 1)
+        obj:SetShadowOffset(1, -1)
+    else
+        obj:SetShadowColor(0, 0, 0, 0)
+        obj:SetShadowOffset(0, 0)
+    end
+
+    if type(color) == "string" then
+        obj:SetTextColor(AW.GetColorRGB(color))
+    elseif type(color) == "table" then
+        obj:SetTextColor(AW.UnpackColor(color))
+    else
+        obj:SetTextColor(AW.GetColorRGB("white"))
+    end
+
+    AW.AddToFontSizeUpdater(obj, size)
 end
 
 ---------------------------------------------------------------------
@@ -74,6 +104,7 @@ function AW.UpdateFontSize(offset)
     AW.fontSizeOffset = offset
     font_title:SetFont(BASE_FONT, FONT_TITLE_SIZE + offset, "")
     font_normal:SetFont(BASE_FONT, FONT_NORMAL_SIZE + offset, "")
+    font_chat:SetFont(BASE_CHAT_FONT, FONT_CHAT_SIZE + offset, "")
     font_outline:SetFont(BASE_FONT, FONT_OUTLINE_SIZE + offset, "")
     font_small:SetFont(BASE_FONT, FONT_SMALL_SIZE + offset, "")
     font_chinese:SetFont(UNIT_NAME_FONT_CHINESE, FONT_CHINESE_SIZE + offset, "")
@@ -124,6 +155,8 @@ function AW.GetFontProps(font)
         return BASE_FONT, FONT_TITLE_SIZE + AW.fontSizeOffset, ""
     elseif font == "normal" then
         return BASE_FONT, FONT_NORMAL_SIZE + AW.fontSizeOffset, ""
+    elseif font == "chat" then
+        return BASE_CHAT_FONT, FONT_CHAT_SIZE + AW.fontSizeOffset, ""
     elseif font == "small" then
         return BASE_FONT, FONT_SMALL_SIZE + AW.fontSizeOffset, ""
     elseif font == "outline" then

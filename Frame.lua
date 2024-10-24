@@ -529,6 +529,7 @@ end
 function AW.CreateScrollList(parent, name, width, verticalMargins, horizontalMargins, slotNum, slotHeight, slotSpacing, color, borderColor)
     local scrollList = AW.CreateBorderedFrame(parent, name, width, nil, color, borderColor)
     AW.SetListHeight(scrollList, slotNum, slotHeight, slotSpacing, verticalMargins*2)
+    scrollList.slotNum = slotNum
 
     local slotFrame = CreateFrame("Frame", nil, scrollList)
     scrollList.slotFrame = slotFrame
@@ -542,19 +543,27 @@ function AW.CreateScrollList(parent, name, width, verticalMargins, horizontalMar
     AW.SetPoint(scrollBar, "BOTTOMRIGHT", 0, verticalMargins)
     scrollBar:Hide()
 
+
     -- scrollBar thumb
-    local scrollThumb = AW.CreateBorderedFrame(scrollBar, nil, 5, nil, AW.GetColorTable("accent", 0.8))
+    local scrollThumb = AW.CreateBorderedFrame(scrollBar, nil, 5, nil, AW.GetAccentColorTable(0.7))
     scrollList.scrollThumb = scrollThumb
+    scrollThumb.r, scrollThumb.g, scrollThumb.b = AW.GetAccentColorRGB()
     AW.SetPoint(scrollThumb, "TOP")
     scrollThumb:EnableMouse(true)
     scrollThumb:SetMovable(true)
     scrollThumb:SetHitRectInsets(-5, -5, 0, 0) -- Frame:SetHitRectInsets(left, right, top, bottom)
+    scrollThumb:SetScript("OnEnter", function()
+        scrollThumb:SetBackdropColor(scrollThumb.r, scrollThumb.g, scrollThumb.b, 0.9)
+    end)
+    scrollThumb:SetScript("OnLeave", function()
+        scrollThumb:SetBackdropColor(scrollThumb.r, scrollThumb.g, scrollThumb.b, 0.7)
+    end)
 
     -- slots
     local slots = {}
 
     local function UpdateSlots()
-        for i = 1, slotNum do
+        for i = 1, scrollList.slotNum do
             if not slots[i] then
                 slots[i] = AW.CreateFrame(slotFrame)
                 AW.SetHeight(slots[i], slotHeight)
@@ -568,7 +577,7 @@ function AW.CreateScrollList(parent, name, width, verticalMargins, horizontalMar
             slots[i]:Show()
         end
         -- hide unused slots
-        for i = slotNum+1, #slots do
+        for i = scrollList.slotNum+1, #slots do
             slots[i]:Hide()
         end
     end
@@ -576,11 +585,11 @@ function AW.CreateScrollList(parent, name, width, verticalMargins, horizontalMar
 
     -- NOTE: for dropdowns only
     function scrollList:SetSlotNum(newSlotNum)
-        slotNum = newSlotNum
-        if slotNum == 0 then
+        scrollList.slotNum = newSlotNum
+        if scrollList.slotNum == 0 then
             AW.SetHeight(scrollList, 5)
         else
-            AW.SetListHeight(scrollList, slotNum, slotHeight, slotSpacing, verticalMargins*2)
+            AW.SetListHeight(scrollList, scrollList.slotNum, slotHeight, slotSpacing, verticalMargins*2)
         end
         UpdateSlots()
     end
@@ -593,8 +602,8 @@ function AW.CreateScrollList(parent, name, width, verticalMargins, horizontalMar
         scrollList.widgetNum = #widgets
         scrollList:SetScroll(1)
 
-        if scrollList.widgetNum > slotNum then -- can scroll
-            local p = slotNum / scrollList.widgetNum
+        if scrollList.widgetNum > scrollList.slotNum then -- can scroll
+            local p = scrollList.slotNum / scrollList.widgetNum
             scrollThumb:SetHeight(scrollBar:GetHeight()*p)
             AW.SetPoint(slotFrame, "BOTTOMRIGHT", -7, verticalMargins)
             scrollBar:Show()
@@ -623,20 +632,21 @@ function AW.CreateScrollList(parent, name, width, verticalMargins, horizontalMar
 
     -- scroll: set start index of widgets
     function scrollList:SetScroll(startIndex)
-        assert(startIndex, "startIndex can not be nil!")
+        if not startIndex then return end
+        -- assert(startIndex, "startIndex can not be nil!")
 
         if startIndex <= 0 then startIndex = 1 end
         local total = scrollList.widgetNum
-        local from, to = startIndex, startIndex + slotNum - 1
+        local from, to = startIndex, startIndex + scrollList.slotNum - 1
 
         -- not enough widgets (fill from the first)
-        if total <= slotNum then
+        if total <= scrollList.slotNum then
             from = 1
             to = total
 
         -- have enough widgets, but result in empty slots, fix it
-        elseif total - startIndex + 1 < slotNum then
-            from = total - slotNum + 1 -- total > slotNum
+        elseif total - startIndex + 1 < scrollList.slotNum then
+            from = total - scrollList.slotNum + 1 -- total > slotNum
             to = total
         end
 
@@ -660,7 +670,7 @@ function AW.CreateScrollList(parent, name, width, verticalMargins, horizontalMar
         end
 
         -- reset empty slots
-        for i = slotIndex, slotNum do
+        for i = slotIndex, scrollList.slotNum do
             slots[i].widget = nil
             slots[slotIndex].widgetIndex = nil
         end
@@ -672,18 +682,23 @@ function AW.CreateScrollList(parent, name, width, verticalMargins, horizontalMar
         end
     end
 
+    function scrollList:ScrollToBottom()
+        scrollList:SetScroll(total - scrollList.slotNum + 1)
+    end
+
     -- get widget index on top (the first shown)
     function scrollList:GetScroll()
+        if scrollList.widgetNum == 0 then return end
         return slots[1].widgetIndex, slots[1].widget
     end
 
     function scrollList:GetScrollRange()
-        local range = scrollList.widgetNum - slotNum
+        local range = scrollList.widgetNum - scrollList.slotNum
         return range <= 0 and 0 or range
     end
 
     function scrollList:CanScroll()
-        return scrollList.widgetNum > slotNum
+        return scrollList.widgetNum > scrollList.slotNum
     end
 
     -- for mouse wheel ----------------------------------------------
@@ -695,6 +710,7 @@ function AW.CreateScrollList(parent, name, width, verticalMargins, horizontalMar
     -- enable mouse wheel scroll
     scrollList:EnableMouseWheel(true)
     scrollList:SetScript("OnMouseWheel", function(self, delta)
+        if scrollList.widgetNum == 0 then return end
         if delta == 1 then -- scroll up
             scrollList:SetScroll(scrollList:GetScroll() - step)
         elseif delta == -1 then -- scroll down

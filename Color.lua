@@ -202,6 +202,9 @@ local colors = {
     ["widget"] = {["hex"]="ff262626", ["t"]={0.15, 0.15, 0.15, 1}}, -- widget background
     ["disabled"] = {["hex"]="ff666666", ["t"]={0.4, 0.4, 0.4, 1}},
     ["none"] = {["hex"]="00000000", ["t"]={0, 0, 0, 0}},
+    ["sheet_bg"] = {["t"]={0.15, 0.15, 0.15, 0.9}},
+    ["sheet_cell_highlight"] = {["t"]={1, 1, 1, 0.1}},
+    ["sheet_row_highlight"] = {["t"]={0.7, 0.7, 0.7, 0.1}},
 
     -- common
     ["red"] = {["hex"]="ffff0000", ["t"]={1, 0, 0, 1}},
@@ -379,16 +382,16 @@ function AW.GetAccentColorName()
     return GetAddon() or "accent"
 end
 
-function AW.GetAccentColorTable()
-    return AW.GetColorTable(AW.GetAccentColorName())
+function AW.GetAccentColorTable(alpha)
+    return AW.GetColorTable(AW.GetAccentColorName(), alpha)
 end
 
-function AW.GetAccentColorRGB()
-    return AW.GetColorRGB(AW.GetAccentColorName())
+function AW.GetAccentColorRGB(alpha)
+    return AW.GetColorRGB(AW.GetAccentColorName(), alpha)
 end
 
-function AW.GetAccentColorHex()
-    return AW.GetColorHex(AW.GetAccentColorName())
+function AW.GetAccentColorHex(alpha)
+    return AW.GetColorHex(AW.GetAccentColorName(), alpha)
 end
 
 function AW.GetClassColor(class, alpha, saturation)
