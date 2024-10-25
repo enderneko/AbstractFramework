@@ -74,12 +74,17 @@ local function Header_Sort(self)
 end
 
 local function Sheet_Sort(self, keys)
-    local key, order = strsplit(":", keys)
-    if sheet.sortBy ~= key then
+    local key, order = strsplit(":", keys[1])
+    if self.sortBy ~= key then
+        if self.sortBy then
+            -- hide previous highlight
+            self.header[self.keyToIndex[self.sortBy]].highlightTexture:Hide()
+        end
         Sort(self, self.content.widgets, keys)
-        sheet.content:SetScroll(sheet.content:GetScroll())
+        self.content:SetScroll(self.content:GetScroll())
+        self.header[self.keyToIndex[key]].highlightTexture:Show()
     end
-    sheet.sortBy = key
+    self.sortBy = key
 end
 
 ---------------------------------------------------------------------

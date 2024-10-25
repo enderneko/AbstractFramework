@@ -120,7 +120,6 @@ end
 ----------------------------------------------------------------
 -- color picker frame
 ----------------------------------------------------------------
-local COLOR_PICKER_NAME = "AWColorPicker"
 local colorPickerFrame
 local currentPane, originalPane, saturationBrightnessPane, hueSlider, alphaSlider, picker
 local rEB, gEB, bEB, aEB, h_EB, s_EB, b_EB, hexEB
@@ -388,7 +387,7 @@ local preset3 = {
 -- CreateColorPickerFrame
 -------------------------------------------------
 local function CreateColorPickerFrame()
-    colorPickerFrame = AW.CreateHeaderedFrame(UIParent, COLOR_PICKER_NAME, _G.COLOR_PICKER, 269, 297, "DIALOG")
+    colorPickerFrame = AW.CreateHeaderedFrame(UIParent, "AWColorPicker", _G.COLOR_PICKER, 269, 297, "DIALOG")
     colorPickerFrame.header.closeBtn:Hide()
     -- AW.StylizeFrame(colorPickerFrame, nil, "accent")
     -- AW.StylizeFrame(colorPickerFrame.header, "header", "accent")
