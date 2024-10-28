@@ -105,9 +105,17 @@ function AW.CreateSeparator(parent, width, height, color)
     line:SetColorTexture(unpack(color))
 
     local shadow = parent:CreateTexture(nil, "ARTWORK", nil, -1)
-    AW.SetSize(shadow, width, height)
+    AW.SetSize(shadow, height)
     AW.SetPoint(shadow, "TOPLEFT", line, 1, -1)
+    AW.SetPoint(shadow, "TOPRIGHT", line, 1, -1)
     shadow:SetColorTexture(AW.GetColorRGB("black", color[4])) -- use line alpha
+
+    hooksecurefunc(line, "Show", function()
+        shadow:Show()
+    end)
+    hooksecurefunc(line, "Hide", function()
+        shadow:Hide()
+    end)
 
     function line:UpdatePixels()
         AW.ReSize(line)
