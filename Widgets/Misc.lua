@@ -13,7 +13,7 @@ function AF.CreateNetStatsPane(parent, anchorPoint, showBandwidth, showLatency, 
     layout = layout or "horizontal"
     layout = strlower(layout)
 
-    local f = AF.CreateFrame(parent, 20, 20)
+    local f = AF.CreateFrame(parent, nil, 20, 20)
 
     f.text = AF.CreateFontString(f, nil, "sand", "AF_FONT_SMALL")
     AF.SetPoint(f.text, anchorPoint)
@@ -85,7 +85,7 @@ function AF.CreateFPSPane(parent, anchorPoint)
     anchorPoint = anchorPoint or "LEFT"
     anchorPoint = strupper(anchorPoint)
 
-    local f = AF.CreateFrame(parent, 20, 20)
+    local f = AF.CreateFrame(parent, nil, 20, 20)
 
     f.text = AF.CreateFontString(f, nil, "sand", "AF_FONT_SMALL")
     AF.SetPoint(f.text, anchorPoint)

@@ -135,7 +135,7 @@ local function CreateMoverDialog()
     undo:SetScript("OnClick", AF.UndoMovers)
 
     -- dropdown
-    local moverGroups = AF.CreateDropdown(moverDialog, 20, 5)
+    local moverGroups = AF.CreateDropdown(moverDialog, 20, 7)
     AF.SetPoint(moverGroups, "BOTTOMLEFT", 7, 7)
     AF.SetPoint(moverGroups, "RIGHT", undo, "LEFT", -7, 0)
     local items = {}
@@ -143,7 +143,7 @@ local function CreateMoverDialog()
      -- OnShow
      moverDialog:SetScript("OnShow", function()
         C_Timer.After(0, function()
-            AF.SetWidth(moverDialog, AF.Round(max(desc:GetWidth(), tips:GetWidth()) + 20))
+            AF.SetWidth(moverDialog, AF.Round(max(desc:GetWidth(), tips:GetWidth()) + 40))
         end)
         AF.SetPoint(moverDialog, "BOTTOM", moverParent, "CENTER", 0, 100)
 

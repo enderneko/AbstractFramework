@@ -478,8 +478,12 @@ function AF.WrapTextInColor(text, name)
     return AF.WrapTextInColorCode(text, colors[name]["hex"])
 end
 
+function AF.WrapTextInColorRGB(text, r, g, b)
+    return AF.WrapTextInColorCode(text, AF.ConvertRGBToHEX(r, g, b, 1))
+end
+
 function AF.WrapTextInColorCode(text, colorHexString)
-    return ("|c%s%s|r"):format(colorHexString, text)
+    return format("|c%s%s|r", colorHexString, text)
 end
 
 function AF.Interpolate(start, stop, step, maxSteps)
