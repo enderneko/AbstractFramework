@@ -10,7 +10,7 @@ function AF.ShowDemo()
     -- ----------------------------------------------------------------------- --
     --                              headered frame                             --
     -- ----------------------------------------------------------------------- --
-    local demo = AF.CreateHeaderedFrame(AF.UIParent, "AF_DEMO", "Abstract Widgets Demo", 710, 500)
+    local demo = AF.CreateHeaderedFrame(AF.UIParent, "AF_DEMO", "AbstractFramework Demo", 710, 500)
     AF.SetPoint(demo, "BOTTOMLEFT", 500, 270)
     demo:SetFrameLevel(100)
     demo:SetTitleJustify("LEFT")
