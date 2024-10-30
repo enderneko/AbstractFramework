@@ -1,15 +1,15 @@
----@class AbstractWidgets
-local AW = _G.AbstractWidgets
+---@class AbstractFramework
+local AF = _G.AbstractFramework
 
 ---------------------------------------------------------------------
 -- fonts
 ---------------------------------------------------------------------
-local FONT_TITLE_NAME = "AW_FONT_TITLE"
-local FONT_NORMAL_NAME = "AW_FONT_NORMAL"
-local FONT_CHAT_NAME = "AW_FONT_CHAT"
-local FONT_OUTLINE_NAME = "AW_FONT_OUTLINE"
-local FONT_SMALL_NAME = "AW_FONT_SMALL"
-local FONT_CHINESE_NAME = "AW_FONT_CHINESE"
+local FONT_TITLE_NAME = "AF_FONT_TITLE"
+local FONT_NORMAL_NAME = "AF_FONT_NORMAL"
+local FONT_CHAT_NAME = "AF_FONT_CHAT"
+local FONT_OUTLINE_NAME = "AF_FONT_OUTLINE"
+local FONT_SMALL_NAME = "AF_FONT_SMALL"
+local FONT_CHINESE_NAME = "AF_FONT_CHINESE"
 
 local FONT_TITLE_SIZE = 14
 local FONT_NORMAL_SIZE = 13
@@ -44,7 +44,7 @@ font_chat:SetJustifyH("CENTER")
 
 local font_outline = CreateFont(FONT_OUTLINE_NAME)
 font_outline:SetFont(BASE_FONT, FONT_OUTLINE_SIZE, "OUTLINE")
-font_outline:SetTextColor(AW.GetColorRGB("accent"))
+font_outline:SetTextColor(AF.GetColorRGB("accent"))
 font_outline:SetShadowColor(0, 0, 0)
 font_outline:SetShadowOffset(0, 0)
 font_outline:SetJustifyH("CENTER")
@@ -66,7 +66,7 @@ font_chinese:SetJustifyH("CENTER")
 ---------------------------------------------------------------------
 -- create
 ---------------------------------------------------------------------
-function AW.CreateFont(name, font, size, flags, shadow, color)
+function AF.CreateFont(name, font, size, flags, shadow, color)
     local obj = CreateFont(name)
     obj:SetFont(font, size, flags or "")
     obj:SetJustifyH("CENTER")
@@ -80,28 +80,28 @@ function AW.CreateFont(name, font, size, flags, shadow, color)
     end
 
     if type(color) == "string" then
-        obj:SetTextColor(AW.GetColorRGB(color))
+        obj:SetTextColor(AF.GetColorRGB(color))
     elseif type(color) == "table" then
-        obj:SetTextColor(AW.UnpackColor(color))
+        obj:SetTextColor(AF.UnpackColor(color))
     else
-        obj:SetTextColor(AW.GetColorRGB("white"))
+        obj:SetTextColor(AF.GetColorRGB("white"))
     end
 
-    AW.AddToFontSizeUpdater(obj, size)
+    AF.AddToFontSizeUpdater(obj, size)
 end
 
 ---------------------------------------------------------------------
 -- update size for all used fonts
 ---------------------------------------------------------------------
 local fontStrings = {}
-function AW.AddToFontSizeUpdater(fs, originalSize)
+function AF.AddToFontSizeUpdater(fs, originalSize)
     fs.originalSize = originalSize
     tinsert(fontStrings, fs)
 end
 
-AW.fontSizeOffset = 0
-function AW.UpdateFontSize(offset)
-    AW.fontSizeOffset = offset
+AF.fontSizeOffset = 0
+function AF.UpdateFontSize(offset)
+    AF.fontSizeOffset = offset
     font_title:SetFont(BASE_FONT, FONT_TITLE_SIZE + offset, "")
     font_normal:SetFont(BASE_FONT, FONT_NORMAL_SIZE + offset, "")
     font_chat:SetFont(BASE_CHAT_FONT, FONT_CHAT_SIZE + offset, "")
@@ -116,9 +116,15 @@ function AW.UpdateFontSize(offset)
 end
 
 ---------------------------------------------------------------------
+-- update font
+---------------------------------------------------------------------
+function AF.SetFont(font)
+end
+
+---------------------------------------------------------------------
 -- get font by "type"
 ---------------------------------------------------------------------
--- function AW.GetFontName(font, isDisabled)
+-- function AF.GetFontName(font, isDisabled)
 --     if font == "title" then
 --         return isDisabled and FONT_TITLE_DISABLE_NAME or FONT_TITLE_NAME
 --     elseif font == "normal" then
@@ -134,7 +140,7 @@ end
 --     end
 -- end
 
--- function AW.GetFontObject(font, isDisabled)
+-- function AF.GetFontObject(font, isDisabled)
 --     if font == "title" then
 --         return isDisabled and font_title_disable or font_title
 --     elseif font == "normal" then
@@ -150,18 +156,18 @@ end
 --     end
 -- end
 
-function AW.GetFontProps(font)
+function AF.GetFontProps(font)
     if font == "title" then
-        return BASE_FONT, FONT_TITLE_SIZE + AW.fontSizeOffset, ""
+        return BASE_FONT, FONT_TITLE_SIZE + AF.fontSizeOffset, ""
     elseif font == "normal" then
-        return BASE_FONT, FONT_NORMAL_SIZE + AW.fontSizeOffset, ""
+        return BASE_FONT, FONT_NORMAL_SIZE + AF.fontSizeOffset, ""
     elseif font == "chat" then
-        return BASE_CHAT_FONT, FONT_CHAT_SIZE + AW.fontSizeOffset, ""
+        return BASE_CHAT_FONT, FONT_CHAT_SIZE + AF.fontSizeOffset, ""
     elseif font == "small" then
-        return BASE_FONT, FONT_SMALL_SIZE + AW.fontSizeOffset, ""
+        return BASE_FONT, FONT_SMALL_SIZE + AF.fontSizeOffset, ""
     elseif font == "outline" then
-        return BASE_FONT, FONT_OUTLINE_SIZE + AW.fontSizeOffset, "OUTLINE"
+        return BASE_FONT, FONT_OUTLINE_SIZE + AF.fontSizeOffset, "OUTLINE"
     else
-        return font, FONT_NORMAL_SIZE + AW.fontSizeOffset, ""
+        return font, FONT_NORMAL_SIZE + AF.fontSizeOffset, ""
     end
 end

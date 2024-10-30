@@ -1,28 +1,28 @@
----@class AbstractWidgets
-local AW = _G.AbstractWidgets
+---@class AbstractFramework
+local AF = _G.AbstractFramework
 
 ---------------------------------------------------------------------
 -- function
 ---------------------------------------------------------------------
 local f = CreateFrame("Frame")
-AW.FrameSetSize = f.SetSize
-AW.FrameSetHeight = f.SetHeight
-AW.FrameSetWidth = f.SetWidth
-AW.FrameGetSize = f.GetSize
-AW.FrameGetHeight = f.GetHeight
-AW.FrameGetWidth = f.GetWidth
-AW.FrameSetPoint = f.SetPoint
-AW.FrameSetFrameLevel = f.SetFrameLevel
-AW.FrameShow = f.Show
-AW.FrameHide = f.Hide
+AF.FrameSetSize = f.SetSize
+AF.FrameSetHeight = f.SetHeight
+AF.FrameSetWidth = f.SetWidth
+AF.FrameGetSize = f.GetSize
+AF.FrameGetHeight = f.GetHeight
+AF.FrameGetWidth = f.GetWidth
+AF.FrameSetPoint = f.SetPoint
+AF.FrameSetFrameLevel = f.SetFrameLevel
+AF.FrameShow = f.Show
+AF.FrameHide = f.Hide
 
 local c = CreateFrame("Cooldown")
-AW.FrameSetCooldown = c.SetCooldown
+AF.FrameSetCooldown = c.SetCooldown
 
 ---------------------------------------------------------------------
 -- frame level relative to parent
 ---------------------------------------------------------------------
-function AW.SetFrameLevel(frame, level, relativeTo)
+function AF.SetFrameLevel(frame, level, relativeTo)
     if relativeTo then
         frame:SetFrameLevel(relativeTo:GetFrameLevel() + level)
     else
@@ -35,18 +35,18 @@ end
 ---------------------------------------------------------------------
 --- @param color string|table color name defined in Color.lua or color table
 --- @param borderColor string|table color name defined in Color.lua or color table
-function AW.StylizeFrame(frame, color, borderColor)
+function AF.StylizeFrame(frame, color, borderColor)
     color = color or "background"
     borderColor = borderColor or "border"
 
-    AW.SetDefaultBackdrop(frame)
+    AF.SetDefaultBackdrop(frame)
     if type(color) == "string" then
-        frame:SetBackdropColor(AW.GetColorRGB(color))
+        frame:SetBackdropColor(AF.GetColorRGB(color))
     else
         frame:SetBackdropColor(unpack(color))
     end
     if type(borderColor) == "string" then
-        frame:SetBackdropBorderColor(AW.GetColorRGB(borderColor))
+        frame:SetBackdropBorderColor(AF.GetColorRGB(borderColor))
     else
         frame:SetBackdropBorderColor(unpack(borderColor))
     end
@@ -55,32 +55,32 @@ end
 ---------------------------------------------------------------------
 -- backdrop
 ---------------------------------------------------------------------
-function AW.SetDefaultBackdrop(frame, borderSize)
+function AF.SetDefaultBackdrop(frame, borderSize)
     if not frame.SetBackdrop then
         Mixin(frame, BackdropTemplateMixin)
     end
-    local n = AW.ConvertPixelsForRegion(borderSize or 1, frame)
-    frame:SetBackdrop({bgFile=AW.GetPlainTexture(), edgeFile=AW.GetPlainTexture(), edgeSize=n, insets={left=n, right=n, top=n, bottom=n}})
+    local n = AF.ConvertPixelsForRegion(borderSize or 1, frame)
+    frame:SetBackdrop({bgFile=AF.GetPlainTexture(), edgeFile=AF.GetPlainTexture(), edgeSize=n, insets={left=n, right=n, top=n, bottom=n}})
 end
 
-function AW.SetDefaultBackdrop_NoBackground(frame, borderSize)
+function AF.SetDefaultBackdrop_NoBackground(frame, borderSize)
     if not frame.SetBackdrop then
         Mixin(frame, BackdropTemplateMixin)
     end
-    frame:SetBackdrop({edgeFile=AW.GetPlainTexture(), edgeSize=AW.ConvertPixelsForRegion(borderSize or 1, frame)})
+    frame:SetBackdrop({edgeFile=AF.GetPlainTexture(), edgeSize=AF.ConvertPixelsForRegion(borderSize or 1, frame)})
 end
 
-function AW.SetDefaultBackdrop_NoBorder(frame)
+function AF.SetDefaultBackdrop_NoBorder(frame)
     if not frame.SetBackdrop then
         Mixin(frame, BackdropTemplateMixin)
     end
-    frame:SetBackdrop({bgFile=AW.GetPlainTexture()})
+    frame:SetBackdrop({bgFile=AF.GetPlainTexture()})
 end
 
 ---------------------------------------------------------------------
 -- drag
 ---------------------------------------------------------------------
-function AW.SetDraggable(frame, notUserPlaced)
+function AF.SetDraggable(frame, notUserPlaced)
     frame:RegisterForDrag("LeftButton")
     frame:SetMovable(true)
     frame:SetMouseClickEnabled(true)
@@ -94,16 +94,16 @@ end
 ---------------------------------------------------------------------
 -- normal frame
 ---------------------------------------------------------------------
-function AW.CreateFrame(parent, name, width, height)
+function AF.CreateFrame(parent, name, width, height)
     local f = CreateFrame("Frame", name, parent)
-    AW.SetSize(f, width, height)
+    AF.SetSize(f, width, height)
 
     function f:UpdatePixels()
-        AW.ReSize(f)
-        AW.RePoint(f)
+        AF.ReSize(f)
+        AF.RePoint(f)
     end
 
-    AW.AddToPixelUpdater(f)
+    AF.AddToPixelUpdater(f)
 
     return f
 end
@@ -112,11 +112,11 @@ end
 -- titled frame
 ---------------------------------------------------------------------
 local function HeaderedFrame_SetTitleBackgroundColor(self, color)
-    if type(color) == "string" then color = AW.GetColorTable(color) end
-    color = color or AW.GetColorTable("accent")
+    if type(color) == "string" then color = AF.GetColorTable(color) end
+    color = color or AF.GetColorTable("accent")
 end
 
-function AW.CreateHeaderedFrame(parent, name, title, width, height, frameStrata, frameLevel, notUserPlaced)
+function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata, frameLevel, notUserPlaced)
     local f = CreateFrame("Frame", name, parent, "BackdropTemplate")
     f:Hide()
     f:EnableMouse(true)
@@ -127,10 +127,10 @@ function AW.CreateHeaderedFrame(parent, name, title, width, height, frameStrata,
     f:SetFrameStrata(frameStrata or "HIGH")
     f:SetFrameLevel(frameLevel or 1)
     f:SetClampedToScreen(true)
-    f:SetClampRectInsets(0, 0, AW.ConvertPixelsForRegion(20, f), 0)
-    AW.SetSize(f, width, height)
+    f:SetClampRectInsets(0, 0, AF.ConvertPixelsForRegion(20, f), 0)
+    AF.SetSize(f, width, height)
     f:SetPoint("CENTER")
-    AW.StylizeFrame(f)
+    AF.StylizeFrame(f)
 
     -- header
     local header = CreateFrame("Frame", nil, f, "BackdropTemplate")
@@ -143,73 +143,74 @@ function AW.CreateHeaderedFrame(parent, name, title, width, height, frameStrata,
         if notUserPlaced then f:SetUserPlaced(false) end
     end)
     header:SetScript("OnDragStop", function() f:StopMovingOrSizing() end)
-    AW.SetPoint(header, "LEFT")
-    AW.SetPoint(header, "RIGHT")
-    AW.SetPoint(header, "BOTTOM", f, "TOP", 0, -1)
-    AW.SetHeight(header, 20)
-    AW.StylizeFrame(header, "header")
+    AF.SetPoint(header, "LEFT")
+    AF.SetPoint(header, "RIGHT")
+    AF.SetPoint(header, "BOTTOM", f, "TOP", 0, -1)
+    AF.SetHeight(header, 20)
+    AF.StylizeFrame(header, "header")
 
-    header.text = AW.CreateFontString(header, title, AW.GetAccentColorName(), "AW_FONT_TITLE")
+    header.text = AF.CreateFontString(header, title, AF.GetAccentColorName(), "AF_FONT_TITLE")
     header.text:SetPoint("CENTER")
 
     function f:SetTitleJustify(justify)
-        AW.ClearPoints(header.text)
+        AF.ClearPoints(header.text)
         if justify == "LEFT" then
-            AW.SetPoint(header.text, "LEFT", 7, 0)
+            AF.SetPoint(header.text, "LEFT", 7, 0)
         elseif justify == "RIGHT" then
-            AW.SetPoint(header.text, "RIGHT", header.closeBtn, "LEFT", -7, 0)
+            AF.SetPoint(header.text, "RIGHT", header.closeBtn, "LEFT", -7, 0)
         else
-            AW.SetPoint(header.text, "CENTER")
+            AF.SetPoint(header.text, "CENTER")
         end
     end
 
-    header.closeBtn = AW.CreateCloseButton(header, f, 20, 20)
+    header.closeBtn = AF.CreateCloseButton(header, f, 20, 20)
     header.closeBtn:SetPoint("TOPRIGHT")
+    AF.RemoveFromPixelUpdater(header.closeBtn)
 
-    local r, g, b = AW.GetAccentColorRGB()
+    local r, g, b = AF.GetAccentColorRGB()
 
     header.tex = header:CreateTexture(nil, "ARTWORK")
     header.tex:SetAllPoints(header)
     header.tex:SetColorTexture(r, g, b, 0.025)
 
-    -- header.tex = AW.CreateGradientTexture(header, "Horizontal", {r, g, b, 0.25})
-    -- AW.SetPoint(header.tex, "TOPLEFT", 1, -1)
-    -- AW.SetPoint(header.tex, "BOTTOMRIGHT", -1, 1)
+    -- header.tex = AF.CreateGradientTexture(header, "Horizontal", {r, g, b, 0.25})
+    -- AF.SetPoint(header.tex, "TOPLEFT", 1, -1)
+    -- AF.SetPoint(header.tex, "BOTTOMRIGHT", -1, 1)
 
-    -- header.tex = AW.CreateGradientTexture(header, "VERTICAL", nil, {r, g, b, 0.25})
-    -- AW.SetPoint(header.tex, "TOPLEFT", 1, -1)
-    -- AW.SetPoint(header.tex, "BOTTOMRIGHT", header, "RIGHT", -1, 0)
+    -- header.tex = AF.CreateGradientTexture(header, "VERTICAL", nil, {r, g, b, 0.25})
+    -- AF.SetPoint(header.tex, "TOPLEFT", 1, -1)
+    -- AF.SetPoint(header.tex, "BOTTOMRIGHT", header, "RIGHT", -1, 0)
 
-    -- header.tex2 = AW.CreateGradientTexture(header, "VERTICAL", {r, g, b, 0.25})
-    -- AW.SetPoint(header.tex2, "TOPLEFT", header, "LEFT", 1, 0)
-    -- AW.SetPoint(header.tex2, "BOTTOMRIGHT", -1, 1)
+    -- header.tex2 = AF.CreateGradientTexture(header, "VERTICAL", {r, g, b, 0.25})
+    -- AF.SetPoint(header.tex2, "TOPLEFT", header, "LEFT", 1, 0)
+    -- AF.SetPoint(header.tex2, "BOTTOMRIGHT", -1, 1)
 
-    -- header.tex = AW.CreateGradientTexture(header, "VERTICAL", nil, {r, g, b, 0.1})
-    -- AW.SetPoint(header.tex, "TOPLEFT", 1, -1)
-    -- AW.SetPoint(header.tex, "BOTTOMRIGHT", -1, 1)
+    -- header.tex = AF.CreateGradientTexture(header, "VERTICAL", nil, {r, g, b, 0.1})
+    -- AF.SetPoint(header.tex, "TOPLEFT", 1, -1)
+    -- AF.SetPoint(header.tex, "BOTTOMRIGHT", -1, 1)
 
-    -- header.tex2 = AW.CreateGradientTexture(header, "VERTICAL", {r, g, b, 0.1})
-    -- AW.SetPoint(header.tex2, "TOPLEFT", 1, -1)
-    -- AW.SetPoint(header.tex2, "BOTTOMRIGHT", -1, 1)
+    -- header.tex2 = AF.CreateGradientTexture(header, "VERTICAL", {r, g, b, 0.1})
+    -- AF.SetPoint(header.tex2, "TOPLEFT", 1, -1)
+    -- AF.SetPoint(header.tex2, "BOTTOMRIGHT", -1, 1)
 
-    -- header.tex = AW.CreateGradientTexture(header, "VERTICAL", {r, g, b, 0.1})
-    -- AW.SetPoint(header.tex, "TOPLEFT", 1, -1)
-    -- AW.SetPoint(header.tex, "BOTTOMRIGHT", -1, 1)
+    -- header.tex = AF.CreateGradientTexture(header, "VERTICAL", {r, g, b, 0.1})
+    -- AF.SetPoint(header.tex, "TOPLEFT", 1, -1)
+    -- AF.SetPoint(header.tex, "BOTTOMRIGHT", -1, 1)
 
     function f:UpdatePixels()
-        f:SetClampRectInsets(0, 0, AW.ConvertPixelsForRegion(20, f), 0)
-        AW.ReSize(f)
-        AW.RePoint(f)
-        AW.ReBorder(f)
-        AW.ReSize(header)
-        AW.RePoint(header)
-        AW.ReBorder(header)
-        AW.RePoint(header.tex)
-        AW.RePoint(header.text)
+        f:SetClampRectInsets(0, 0, AF.ConvertPixelsForRegion(20, f), 0)
+        AF.ReSize(f)
+        AF.RePoint(f)
+        AF.ReBorder(f)
+        AF.ReSize(header)
+        AF.RePoint(header)
+        AF.ReBorder(header)
+        AF.RePoint(header.tex)
+        AF.RePoint(header.text)
         header.closeBtn:UpdatePixels()
     end
 
-    AW.AddToPixelUpdater(f)
+    AF.AddToPixelUpdater(f)
 
     return f
 end
@@ -219,37 +220,37 @@ end
 ---------------------------------------------------------------------
 --- @param color string|table color name / table
 --- @param borderColor string|table color name / table
-function AW.CreateBorderedFrame(parent, name, width, height, color, borderColor)
+function AF.CreateBorderedFrame(parent, name, width, height, color, borderColor)
     local f = CreateFrame("Frame", name, parent, "BackdropTemplate")
-    AW.StylizeFrame(f, color, borderColor)
-    AW.SetSize(f, width, height)
+    AF.StylizeFrame(f, color, borderColor)
+    AF.SetSize(f, width, height)
 
     function f:SetTitle(title, fontColor, font, isInside)
         if not f.title then
-            f.title = AW.CreateFontString(f, title, fontColor or "accent", font)
+            f.title = AF.CreateFontString(f, title, fontColor or "accent", font)
             f.title:SetJustifyH("LEFT")
         else
             f.title:SetText(title)
         end
 
-        AW.ClearPoints(f.title)
+        AF.ClearPoints(f.title)
         if isInside then
-            AW.SetPoint(f.title, "TOPLEFT", 2, -2)
+            AF.SetPoint(f.title, "TOPLEFT", 2, -2)
         else
-            AW.SetPoint(f.title, "BOTTOMLEFT", f, "TOPLEFT", 2, 2)
+            AF.SetPoint(f.title, "BOTTOMLEFT", f, "TOPLEFT", 2, 2)
         end
     end
 
     function f:UpdatePixels()
-        AW.ReSize(f)
-        AW.RePoint(f)
-        AW.ReBorder(f)
+        AF.ReSize(f)
+        AF.RePoint(f)
+        AF.ReBorder(f)
         if f.title then
-            AW.RePoint(f.title)
+            AF.RePoint(f.title)
         end
     end
 
-    AW.AddToPixelUpdater(f)
+    AF.AddToPixelUpdater(f)
 
     return f
 end
@@ -258,7 +259,7 @@ end
 -- frame static glow
 ---------------------------------------------------------------------
 --- @param color string
-function AW.SetFrameStaticGlow(parent, size, color, alpha)
+function AF.SetFrameStaticGlow(parent, size, color, alpha)
     if not parent.staticGlow then
         parent.staticGlow = CreateFrame("Frame", nil, parent, "BackdropTemplate")
         -- parent.staticGlow:SetAllPoints()
@@ -268,9 +269,9 @@ function AW.SetFrameStaticGlow(parent, size, color, alpha)
     size = size or 5
     color = color or "accent"
 
-    parent.staticGlow:SetBackdrop({edgeFile=AW.GetIcon("StaticGlow"), edgeSize=AW.ConvertPixelsForRegion(size, parent)})
-    AW.SetOutside(parent.staticGlow, parent, size)
-    parent.staticGlow:SetBackdropBorderColor(AW.GetColorRGB(color, alpha))
+    parent.staticGlow:SetBackdrop({edgeFile=AF.GetIcon("StaticGlow"), edgeSize=AF.ConvertPixelsForRegion(size, parent)})
+    AF.SetOutside(parent.staticGlow, parent, size)
+    parent.staticGlow:SetBackdropBorderColor(AF.GetColorRGB(color, alpha))
 
     parent.staticGlow:Show()
 end
@@ -279,47 +280,47 @@ end
 -- titled pane
 ---------------------------------------------------------------------
 --- @param color string color name defined in Color.lua
-function AW.CreateTitledPane(parent, title, width, height, color)
+function AF.CreateTitledPane(parent, title, width, height, color)
     color = color or "accent"
 
     local pane = CreateFrame("Frame", nil, parent, "BackdropTemplate")
-    AW.SetSize(pane, width, height)
+    AF.SetSize(pane, width, height)
 
     -- underline
     local line = pane:CreateTexture()
     pane.line = line
-    line:SetColorTexture(AW.GetColorRGB(color, 0.8))
-    AW.SetHeight(line, 1)
-    AW.SetPoint(line, "TOPLEFT", pane, 0, -17)
-    AW.SetPoint(line, "TOPRIGHT", pane, 0, -17)
+    line:SetColorTexture(AF.GetColorRGB(color, 0.8))
+    AF.SetHeight(line, 1)
+    AF.SetPoint(line, "TOPLEFT", pane, 0, -17)
+    AF.SetPoint(line, "TOPRIGHT", pane, 0, -17)
 
     local shadow = pane:CreateTexture()
-    AW.SetHeight(shadow, 1)
+    AF.SetHeight(shadow, 1)
     shadow:SetColorTexture(0, 0, 0, 1)
-    AW.SetPoint(shadow, "TOPLEFT", line, 1, -1)
-    AW.SetPoint(shadow, "TOPRIGHT", line, 1, -1)
+    AF.SetPoint(shadow, "TOPLEFT", line, 1, -1)
+    AF.SetPoint(shadow, "TOPRIGHT", line, 1, -1)
 
     -- title
-    local text = AW.CreateFontString(pane, title, "accent")
+    local text = AF.CreateFontString(pane, title, "accent")
     pane.title = text
     text:SetJustifyH("LEFT")
-    AW.SetPoint(text, "BOTTOMLEFT", line, "TOPLEFT", 0, 2)
+    AF.SetPoint(text, "BOTTOMLEFT", line, "TOPLEFT", 0, 2)
 
     function pane:SetTitle(t)
         text:SetText(t)
     end
 
     function pane:UpdatePixels()
-        AW.ReSize(pane)
-        AW.RePoint(pane)
-        AW.ReSize(line)
-        AW.RePoint(line)
-        AW.ReSize(shadow)
-        AW.RePoint(shadow)
-        AW.RePoint(text)
+        AF.ReSize(pane)
+        AF.RePoint(pane)
+        AF.ReSize(line)
+        AF.RePoint(line)
+        AF.ReSize(shadow)
+        AF.RePoint(shadow)
+        AF.RePoint(text)
     end
 
-    AW.AddToPixelUpdater(pane)
+    AF.AddToPixelUpdater(pane)
 
     return pane
 end
@@ -327,39 +328,39 @@ end
 ---------------------------------------------------------------------
 -- scroll frame
 ---------------------------------------------------------------------
-function AW.CreateScrollFrame(parent, name, width, height, color, borderColor)
-    local scrollParent = AW.CreateBorderedFrame(parent, name, width, height, color, borderColor)
+function AF.CreateScrollFrame(parent, name, width, height, color, borderColor)
+    local scrollParent = AF.CreateBorderedFrame(parent, name, width, height, color, borderColor)
 
     local scrollFrame = CreateFrame("ScrollFrame", nil, scrollParent, "BackdropTemplate")
     scrollParent.scrollFrame = scrollFrame
-    AW.SetPoint(scrollFrame, "TOPLEFT")
-    AW.SetPoint(scrollFrame, "BOTTOMRIGHT")
+    AF.SetPoint(scrollFrame, "TOPLEFT")
+    AF.SetPoint(scrollFrame, "BOTTOMRIGHT")
 
     -- content
     local content = CreateFrame("Frame", nil, scrollFrame, "BackdropTemplate")
     scrollParent.scrollContent = content
-    AW.SetSize(content, width, 5)
+    AF.SetSize(content, width, 5)
     scrollFrame:SetScrollChild(content)
-    -- AW.SetPoint(content, "RIGHT") -- update width with scrollFrame
+    -- AF.SetPoint(content, "RIGHT") -- update width with scrollFrame
 
     -- scrollBar
-    local scrollBar = AW.CreateBorderedFrame(scrollParent, nil, 5, nil, color, borderColor)
+    local scrollBar = AF.CreateBorderedFrame(scrollParent, nil, 5, nil, color, borderColor)
     scrollParent.scrollBar = scrollBar
-    AW.SetPoint(scrollBar, "TOPRIGHT")
-    AW.SetPoint(scrollBar, "BOTTOMRIGHT")
+    AF.SetPoint(scrollBar, "TOPRIGHT")
+    AF.SetPoint(scrollBar, "BOTTOMRIGHT")
     scrollBar:Hide()
 
     -- scrollBar thumb
-    local scrollThumb = AW.CreateBorderedFrame(scrollBar, nil, 5, nil, AW.GetColorTable("accent", 0.8))
+    local scrollThumb = AF.CreateBorderedFrame(scrollBar, nil, 5, nil, AF.GetColorTable("accent", 0.8))
     scrollParent.scrollThumb = scrollThumb
-    AW.SetPoint(scrollThumb, "TOP")
+    AF.SetPoint(scrollThumb, "TOP")
     scrollThumb:EnableMouse(true)
     scrollThumb:SetMovable(true)
     scrollThumb:SetHitRectInsets(-5, -5, 0, 0) -- Frame:SetHitRectInsets(left, right, top, bottom)
 
     -- reset content height (reset scroll range)
     function scrollParent:ResetHeight()
-        AW.SetHeight(content, 5)
+        AF.SetHeight(content, 5)
     end
 
     -- reset scroll to top
@@ -394,9 +395,9 @@ function AW.CreateScrollFrame(parent, name, width, height, color, borderColor)
     function scrollParent:SetContentHeight(height, num, spacing, extraHeight)
         scrollParent:ResetScroll()
         if num and spacing then
-            AW.SetListHeight(content, num, height, spacing, extraHeight)
+            AF.SetListHeight(content, num, height, spacing, extraHeight)
         else
-            AW.SetHeight(content, height)
+            AF.SetHeight(content, height)
         end
     end
 
@@ -431,10 +432,10 @@ function AW.CreateScrollFrame(parent, name, width, height, color, borderColor)
         if p < 1 then -- can scroll
             scrollThumb:SetHeight(scrollBar:GetHeight()*p)
             -- space for scrollBar
-            AW.SetPoint(scrollFrame, "BOTTOMRIGHT", -7, 0)
+            AF.SetPoint(scrollFrame, "BOTTOMRIGHT", -7, 0)
             scrollBar:Show()
         else
-            AW.SetPoint(scrollFrame, "BOTTOMRIGHT")
+            AF.SetPoint(scrollFrame, "BOTTOMRIGHT")
             scrollBar:Hide()
             scrollFrame:SetVerticalScroll(0)
         end
@@ -465,13 +466,13 @@ function AW.CreateScrollFrame(parent, name, width, height, color, borderColor)
 
             -- even scrollThumb:SetPoint is already done in OnVerticalScroll, but it's useful in some cases.
             if newOffsetY >= 0 then -- top
-                AW.SetPoint(scrollThumb, "TOP")
+                AF.SetPoint(scrollThumb, "TOP")
                 newOffsetY = 0
             elseif (-newOffsetY) + scrollThumb:GetHeight() >= scrollBar:GetHeight() then -- bottom
-                AW.SetPoint(scrollThumb, "TOP", 0, -(scrollBar:GetHeight() - scrollThumb:GetHeight()))
+                AF.SetPoint(scrollThumb, "TOP", 0, -(scrollBar:GetHeight() - scrollThumb:GetHeight()))
                 newOffsetY = -(scrollBar:GetHeight() - scrollThumb:GetHeight())
             else
-                AW.SetPoint(scrollThumb, "TOP", 0, newOffsetY)
+                AF.SetPoint(scrollThumb, "TOP", 0, newOffsetY)
             end
             local vs = (-newOffsetY / (scrollBar:GetHeight()-scrollThumb:GetHeight())) * scrollFrame:GetVerticalScrollRange()
             scrollFrame:SetVerticalScroll(vs)
@@ -492,30 +493,30 @@ function AW.CreateScrollFrame(parent, name, width, height, color, borderColor)
     scrollParent:EnableMouseWheel(true)
     scrollParent:SetScript("OnMouseWheel", function(self, delta)
         if delta == 1 then -- scroll up
-            scrollParent:VerticalScroll(AW.ConvertPixelsForRegion(-step, scrollFrame))
+            scrollParent:VerticalScroll(AF.ConvertPixelsForRegion(-step, scrollFrame))
         elseif delta == -1 then -- scroll down
-            scrollParent:VerticalScroll(AW.ConvertPixelsForRegion(step, scrollFrame))
+            scrollParent:VerticalScroll(AF.ConvertPixelsForRegion(step, scrollFrame))
         end
     end)
 
     function scrollParent:UpdatePixels()
         -- scrollBar / scrollThumb / children already AddToPixelUpdater
         --! scrollParent's UpdatePixels is Overrided here
-        AW.ReSize(scrollParent)
-        AW.RePoint(scrollParent)
-        AW.ReBorder(scrollParent)
+        AF.ReSize(scrollParent)
+        AF.RePoint(scrollParent)
+        AF.ReBorder(scrollParent)
 
-        AW.RePoint(scrollFrame)
-        AW.ReBorder(scrollFrame)
+        AF.RePoint(scrollFrame)
+        AF.ReBorder(scrollFrame)
 
-        AW.ReSize(content) -- SetListHeight
+        AF.ReSize(content) -- SetListHeight
         content:SetWidth(scrollFrame:GetWidth())
 
         -- reset scroll
         scrollParent:ResetScroll()
     end
 
-    AW.AddToPixelUpdater(scrollParent)
+    AF.AddToPixelUpdater(scrollParent)
 
     return scrollParent
 end
@@ -526,29 +527,29 @@ end
 --- @param verticalMargins number top/bottom margin
 --- @param horizontalMargins number left/right margin
 --- @param slotSpacing number spacing between widgets next to each other
-function AW.CreateScrollList(parent, name, width, verticalMargins, horizontalMargins, slotNum, slotHeight, slotSpacing, color, borderColor)
-    local scrollList = AW.CreateBorderedFrame(parent, name, width, nil, color, borderColor)
-    AW.SetListHeight(scrollList, slotNum, slotHeight, slotSpacing, verticalMargins*2)
+function AF.CreateScrollList(parent, name, width, verticalMargins, horizontalMargins, slotNum, slotHeight, slotSpacing, color, borderColor)
+    local scrollList = AF.CreateBorderedFrame(parent, name, width, nil, color, borderColor)
+    AF.SetListHeight(scrollList, slotNum, slotHeight, slotSpacing, verticalMargins*2)
     scrollList.slotNum = slotNum
 
     local slotFrame = CreateFrame("Frame", nil, scrollList)
     scrollList.slotFrame = slotFrame
-    AW.SetPoint(slotFrame, "TOPLEFT", 0, -verticalMargins)
-    AW.SetPoint(slotFrame, "BOTTOMRIGHT", 0, verticalMargins)
+    AF.SetPoint(slotFrame, "TOPLEFT", 0, -verticalMargins)
+    AF.SetPoint(slotFrame, "BOTTOMRIGHT", 0, verticalMargins)
 
     -- scrollBar
-    local scrollBar = AW.CreateBorderedFrame(scrollList, nil, 5, nil, color, borderColor)
+    local scrollBar = AF.CreateBorderedFrame(scrollList, nil, 5, nil, color, borderColor)
     scrollList.scrollBar = scrollBar
-    AW.SetPoint(scrollBar, "TOPRIGHT", 0, -verticalMargins)
-    AW.SetPoint(scrollBar, "BOTTOMRIGHT", 0, verticalMargins)
+    AF.SetPoint(scrollBar, "TOPRIGHT", 0, -verticalMargins)
+    AF.SetPoint(scrollBar, "BOTTOMRIGHT", 0, verticalMargins)
     scrollBar:Hide()
 
 
     -- scrollBar thumb
-    local scrollThumb = AW.CreateBorderedFrame(scrollBar, nil, 5, nil, AW.GetAccentColorTable(0.7))
+    local scrollThumb = AF.CreateBorderedFrame(scrollBar, nil, 5, nil, AF.GetAccentColorTable(0.7))
     scrollList.scrollThumb = scrollThumb
-    scrollThumb.r, scrollThumb.g, scrollThumb.b = AW.GetAccentColorRGB()
-    AW.SetPoint(scrollThumb, "TOP")
+    scrollThumb.r, scrollThumb.g, scrollThumb.b = AF.GetAccentColorRGB()
+    AF.SetPoint(scrollThumb, "TOP")
     scrollThumb:EnableMouse(true)
     scrollThumb:SetMovable(true)
     scrollThumb:SetHitRectInsets(-5, -5, 0, 0) -- Frame:SetHitRectInsets(left, right, top, bottom)
@@ -565,13 +566,13 @@ function AW.CreateScrollList(parent, name, width, verticalMargins, horizontalMar
     local function UpdateSlots()
         for i = 1, scrollList.slotNum do
             if not slots[i] then
-                slots[i] = AW.CreateFrame(slotFrame)
-                AW.SetHeight(slots[i], slotHeight)
-                AW.SetPoint(slots[i], "RIGHT", -horizontalMargins, 0)
+                slots[i] = AF.CreateFrame(slotFrame)
+                AF.SetHeight(slots[i], slotHeight)
+                AF.SetPoint(slots[i], "RIGHT", -horizontalMargins, 0)
                 if i == 1 then
-                    AW.SetPoint(slots[i], "TOPLEFT", horizontalMargins, 0)
+                    AF.SetPoint(slots[i], "TOPLEFT", horizontalMargins, 0)
                 else
-                    AW.SetPoint(slots[i], "TOPLEFT", slots[i-1], "BOTTOMLEFT", 0, -slotSpacing)
+                    AF.SetPoint(slots[i], "TOPLEFT", slots[i-1], "BOTTOMLEFT", 0, -slotSpacing)
                 end
             end
             slots[i]:Show()
@@ -587,9 +588,9 @@ function AW.CreateScrollList(parent, name, width, verticalMargins, horizontalMar
     function scrollList:SetSlotNum(newSlotNum)
         scrollList.slotNum = newSlotNum
         if scrollList.slotNum == 0 then
-            AW.SetHeight(scrollList, 5)
+            AF.SetHeight(scrollList, 5)
         else
-            AW.SetListHeight(scrollList, scrollList.slotNum, slotHeight, slotSpacing, verticalMargins*2)
+            AF.SetListHeight(scrollList, scrollList.slotNum, slotHeight, slotSpacing, verticalMargins*2)
         end
         UpdateSlots()
     end
@@ -605,10 +606,10 @@ function AW.CreateScrollList(parent, name, width, verticalMargins, horizontalMar
         if scrollList.widgetNum > scrollList.slotNum then -- can scroll
             local p = scrollList.slotNum / scrollList.widgetNum
             scrollThumb:SetHeight(scrollBar:GetHeight()*p)
-            AW.SetPoint(slotFrame, "BOTTOMRIGHT", -7, verticalMargins)
+            AF.SetPoint(slotFrame, "BOTTOMRIGHT", -7, verticalMargins)
             scrollBar:Show()
         else
-            AW.SetPoint(slotFrame, "BOTTOMRIGHT", 0, verticalMargins)
+            AF.SetPoint(slotFrame, "BOTTOMRIGHT", 0, verticalMargins)
             scrollBar:Hide()
         end
     end
@@ -626,7 +627,7 @@ function AW.CreateScrollList(parent, name, width, verticalMargins, horizontalMar
             s.widgetIndex = nil
         end
         -- resize / repoint
-        AW.SetPoint(slotFrame, "BOTTOMRIGHT", 0, verticalMargins)
+        AF.SetPoint(slotFrame, "BOTTOMRIGHT", 0, verticalMargins)
         scrollBar:Hide()
     end
 
@@ -762,12 +763,12 @@ function AW.CreateScrollList(parent, name, width, verticalMargins, horizontalMar
     -----------------------------------------------------------------
 
     function scrollList:UpdatePixels()
-        AW.ReSize(scrollList)
-        AW.RePoint(scrollList)
-        AW.ReBorder(scrollList)
-        AW.RePoint(slotFrame)
-        -- do it again, even if already invoked by AW.UpdatePixels
-        AW.RePoint(scrollBar)
+        AF.ReSize(scrollList)
+        AF.RePoint(scrollList)
+        AF.ReBorder(scrollList)
+        AF.RePoint(slotFrame)
+        -- do it again, even if already invoked by AF.UpdatePixels
+        AF.RePoint(scrollBar)
         for _, s in ipairs(slots) do
             s:UpdatePixels()
             if s.widget and s.widget.UpdatePixels then
@@ -777,7 +778,7 @@ function AW.CreateScrollList(parent, name, width, verticalMargins, horizontalMar
         scrollList:SetScroll(1)
     end
 
-    AW.AddToPixelUpdater(scrollList)
+    AF.AddToPixelUpdater(scrollList)
 
     return scrollList
 end
@@ -789,10 +790,10 @@ end
 --- @param tlY number topleft y
 --- @param brX number bottomright x
 --- @param brY number bottomright y
-function AW.ShowMask(parent, text, tlX, tlY, brX, brY)
+function AF.ShowMask(parent, text, tlX, tlY, brX, brY)
     if not parent.mask then
-        parent.mask = AW.CreateBorderedFrame(parent, nil, nil, nil, AW.GetColorTable("widget", 0.7), "none")
-        AW.SetFrameLevel(parent.mask, 30, parent)
+        parent.mask = AF.CreateBorderedFrame(parent, nil, nil, nil, AF.GetColorTable("widget", 0.7), "none")
+        AF.SetFrameLevel(parent.mask, 30, parent)
         parent.mask:EnableMouse(true)
         -- parent.mask:EnableMouseWheel(true) -- not enough
         parent.mask:SetScript("OnMouseWheel", function(self, delta)
@@ -800,26 +801,26 @@ function AW.ShowMask(parent, text, tlX, tlY, brX, brY)
             -- print("OnMouseWheel", delta)
         end)
 
-        parent.mask.text = AW.CreateFontString(parent.mask, "", "firebrick")
-        AW.SetPoint(parent.mask.text, "LEFT", 5, 0)
-        AW.SetPoint(parent.mask.text, "RIGHT", -5, 0)
+        parent.mask.text = AF.CreateFontString(parent.mask, "", "firebrick")
+        AF.SetPoint(parent.mask.text, "LEFT", 5, 0)
+        AF.SetPoint(parent.mask.text, "RIGHT", -5, 0)
     end
 
     parent.mask.text:SetText(text)
 
-    AW.ClearPoints(parent.mask)
+    AF.ClearPoints(parent.mask)
     -- if tlX then
-        AW.SetPoint(parent.mask, "TOPLEFT", tlX, tlY)
-        AW.SetPoint(parent.mask, "BOTTOMRIGHT", brX, brY)
+        AF.SetPoint(parent.mask, "TOPLEFT", tlX, tlY)
+        AF.SetPoint(parent.mask, "BOTTOMRIGHT", brX, brY)
     -- else
-    --     AW.SetOnePixelInside(parent.mask, parent)
+    --     AF.SetOnePixelInside(parent.mask, parent)
     -- end
     parent.mask:Show()
 
     return parent.mask
 end
 
-function AW.HideMask(parent)
+function AF.HideMask(parent)
     if parent.mask then
         parent.mask:Hide()
     end
@@ -829,27 +830,27 @@ end
 -- combat mask (+100 frame level)
 ---------------------------------------------------------------------
 local function CreateCombatMask(parent, tlX, tlY, brX, brY)
-    parent.combatMask = AW.CreateBorderedFrame(parent, nil, nil, nil, AW.GetColorTable("darkred", 0.8), "none")
+    parent.combatMask = AF.CreateBorderedFrame(parent, nil, nil, nil, AF.GetColorTable("darkred", 0.8), "none")
 
-    AW.SetFrameLevel(parent.combatMask, 100, parent)
+    AF.SetFrameLevel(parent.combatMask, 100, parent)
     parent.combatMask:EnableMouse(true)
     parent.combatMask:SetScript("OnMouseWheel", function() end)
 
-    parent.combatMask.text = AW.CreateFontString(parent.combatMask, "", "firebrick")
-    AW.SetPoint(parent.combatMask.text, "LEFT", 5, 0)
-    AW.SetPoint(parent.combatMask.text, "RIGHT", -5, 0)
+    parent.combatMask.text = AF.CreateFontString(parent.combatMask, "", "firebrick")
+    AF.SetPoint(parent.combatMask.text, "LEFT", 5, 0)
+    AF.SetPoint(parent.combatMask.text, "RIGHT", -5, 0)
 
     -- HUD_EDIT_MODE_SETTING_ACTION_BAR_VISIBLE_SETTING_IN_COMBAT
     -- ERR_AFFECTING_COMBAT
     -- ERR_NOT_IN_COMBAT
     parent.combatMask.text:SetText(_G.ERR_AFFECTING_COMBAT)
 
-    AW.ClearPoints(parent.combatMask)
+    AF.ClearPoints(parent.combatMask)
     if tlX then
-        AW.SetPoint(parent.combatMask, "TOPLEFT", tlX, tlY)
-        AW.SetPoint(parent.combatMask, "BOTTOMRIGHT", brX, brY)
+        AF.SetPoint(parent.combatMask, "TOPLEFT", tlX, tlY)
+        AF.SetPoint(parent.combatMask, "BOTTOMRIGHT", brX, brY)
     else
-        AW.SetOnePixelInside(parent.combatMask, parent)
+        AF.SetOnePixelInside(parent.combatMask, parent)
     end
 
     parent.combatMask:Hide()
@@ -857,7 +858,7 @@ end
 
 -- show mask
 local protectedFrames = {}
-function AW.ApplyCombatProtectionToFrame(f, tlX, tlY, brX, brY)
+function AF.ApplyCombatProtectionToFrame(f, tlX, tlY, brX, brY)
     tinsert(protectedFrames, f)
 
     if not f.combatMask then
@@ -877,7 +878,7 @@ end
 
 -- disable widget
 local protectedWidgets = {}
-function AW.ApplyCombatProtectionToWidget(widget)
+function AF.ApplyCombatProtectionToWidget(widget)
     tinsert(protectedWidgets, widget)
 
     if InCombatLockdown() then

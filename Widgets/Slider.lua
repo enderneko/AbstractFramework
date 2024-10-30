@@ -1,22 +1,22 @@
----@class AbstractWidgets
-local AW = _G.AbstractWidgets
+---@class AbstractFramework
+local AF = _G.AbstractFramework
 
 -- NOTE: up to two decimal places value
 
 ---------------------------------------------------------------------
 -- slider
 ---------------------------------------------------------------------
-function AW.CreateSlider(parent, text, width, low, high, step, showPercentSign, hideLowHighText)
+function AF.CreateSlider(parent, text, width, low, high, step, showPercentSign, hideLowHighText)
     local slider = CreateFrame("Slider", nil, parent, "BackdropTemplate")
-    AW.StylizeFrame(slider, "widget")
+    AF.StylizeFrame(slider, "widget")
 
     slider:SetValueStep(step or 1)
     slider:SetObeyStepOnDrag(true)
     slider:SetOrientation("HORIZONTAL")
-    AW.SetSize(slider, width, 10)
+    AF.SetSize(slider, width, 10)
 
-    local label = AW.CreateFontString(slider, text)
-    AW.SetPoint(label, "BOTTOM", slider, "TOP", 0, 2)
+    local label = AF.CreateFontString(slider, text)
+    AF.SetPoint(label, "BOTTOM", slider, "TOP", 0, 2)
 
     function slider:SetLabel(n)
         label:SetText(n)
@@ -33,34 +33,34 @@ function AW.CreateSlider(parent, text, width, low, high, step, showPercentSign, 
     end
 
     -- low ----------------------------------------------------------
-    local lowText = AW.CreateFontString(slider, nil, "gray")
-    AW.SetPoint(lowText, "TOPLEFT", slider, "BOTTOMLEFT", 0, -2)
+    local lowText = AF.CreateFontString(slider, nil, "gray")
+    AF.SetPoint(lowText, "TOPLEFT", slider, "BOTTOMLEFT", 0, -2)
     -----------------------------------------------------------------
 
     -- high ---------------------------------------------------------
-    local highText = AW.CreateFontString(slider, nil, "gray")
-    AW.SetPoint(highText, "TOPRIGHT", slider, "BOTTOMRIGHT", 0, -2)
+    local highText = AF.CreateFontString(slider, nil, "gray")
+    AF.SetPoint(highText, "TOPRIGHT", slider, "BOTTOMRIGHT", 0, -2)
     -----------------------------------------------------------------
 
     -- thumb --------------------------------------------------------
-    local thumbBG = AW.CreateTexture(slider, nil, AW.GetColorTable("black"), "BACKGROUND", 3)
-    AW.SetSize(thumbBG, 10, 10)
+    local thumbBG = AF.CreateTexture(slider, nil, AF.GetColorTable("black"), "BACKGROUND", 3)
+    AF.SetSize(thumbBG, 10, 10)
     slider:SetThumbTexture(thumbBG)
 
-    local thumbBG2 =  AW.CreateTexture(slider, nil, AW.GetColorTable("accent", 0.25), "BACKGROUND", 2)
-    AW.SetPoint(thumbBG2, "TOPLEFT", 1, -1)
-    AW.SetPoint(thumbBG2, "BOTTOMRIGHT", thumbBG, "BOTTOMLEFT")
+    local thumbBG2 =  AF.CreateTexture(slider, nil, AF.GetColorTable("accent", 0.25), "BACKGROUND", 2)
+    AF.SetPoint(thumbBG2, "TOPLEFT", 1, -1)
+    AF.SetPoint(thumbBG2, "BOTTOMRIGHT", thumbBG, "BOTTOMLEFT")
 
-    local thumb = AW.CreateTexture(slider, nil, AW.GetColorTable("accent", 0.7), "OVERLAY", 7)
-    AW.SetPoint(thumb, "TOPLEFT", thumbBG, 1, -1)
-    AW.SetPoint(thumb, "BOTTOMRIGHT", thumbBG, -1, 1)
+    local thumb = AF.CreateTexture(slider, nil, AF.GetColorTable("accent", 0.7), "OVERLAY", 7)
+    AF.SetPoint(thumb, "TOPLEFT", thumbBG, 1, -1)
+    AF.SetPoint(thumb, "BOTTOMRIGHT", thumbBG, -1, 1)
     -----------------------------------------------------------------
 
     local oldValue, valueBeforeClick
 
     -- editbox ------------------------------------------------------
-    local eb = AW.CreateEditBox(slider, nil, 48, 14)
-    AW.SetPoint(eb, "TOPLEFT", slider, "BOTTOMLEFT", math.ceil(width / 2 - 24), -1)
+    local eb = AF.CreateEditBox(slider, nil, 48, 14)
+    AF.SetPoint(eb, "TOPLEFT", slider, "BOTTOMLEFT", math.ceil(width / 2 - 24), -1)
     eb:SetJustifyH("CENTER")
 
     eb:SetScript("OnEnterPressed", function(self)
@@ -86,8 +86,8 @@ function AW.CreateSlider(parent, text, width, low, high, step, showPercentSign, 
     -----------------------------------------------------------------
 
     local unit = showPercentSign and "%" or ""
-    local percentSign = AW.CreateFontString(slider, "%", "gray")
-    AW.SetPoint(percentSign, "LEFT", eb, "RIGHT", 2, 0)
+    local percentSign = AF.CreateFontString(slider, "%", "gray")
+    AF.SetPoint(percentSign, "LEFT", eb, "RIGHT", 2, 0)
     percentSign:Hide()
 
     if hideLowHighText then
@@ -99,9 +99,9 @@ function AW.CreateSlider(parent, text, width, low, high, step, showPercentSign, 
     end
 
     -- highlight ----------------------------------------------------
-    local highlight = AW.CreateTexture(slider, nil, AW.GetColorTable("accent", 0.05), "BACKGROUND", 1)
-    AW.SetPoint(highlight, "TOPLEFT", 1, -1)
-    AW.SetPoint(highlight, "BOTTOMRIGHT", -1, 1)
+    local highlight = AF.CreateTexture(slider, nil, AF.GetColorTable("accent", 0.05), "BACKGROUND", 1)
+    AF.SetPoint(highlight, "TOPLEFT", 1, -1)
+    AF.SetPoint(highlight, "BOTTOMRIGHT", -1, 1)
     highlight:Hide()
     -----------------------------------------------------------------
 
@@ -126,7 +126,7 @@ function AW.CreateSlider(parent, text, width, low, high, step, showPercentSign, 
 
     -- OnLeave ------------------------------------------------------
     local function OnLeave()
-        thumb:SetColor(AW.GetColorTable("accent", 0.7))
+        thumb:SetColor(AF.GetColorTable("accent", 0.7))
         highlight:Hide()
     end
     slider:SetScript("OnLeave", OnLeave)
@@ -189,29 +189,29 @@ function AW.CreateSlider(parent, text, width, low, high, step, showPercentSign, 
     slider:SetScript("OnDisable", function()
         label:SetColor("disabled")
         eb:SetEnabled(false)
-        thumb:SetColor(AW.GetColorTable("disabled", 0.7))
-        thumbBG:SetColor(AW.GetColorTable("black", 0.7))
-        thumbBG2:SetColor(AW.GetColorTable("disabled", 0.25))
+        thumb:SetColor(AF.GetColorTable("disabled", 0.7))
+        thumbBG:SetColor(AF.GetColorTable("black", 0.7))
+        thumbBG2:SetColor(AF.GetColorTable("disabled", 0.25))
         lowText:SetColor("disabled")
         highText:SetColor("disabled")
         percentSign:SetColor("disabled")
         slider:SetScript("OnEnter", nil)
         slider:SetScript("OnLeave", nil)
-        slider:SetBackdropBorderColor(AW.GetColorRGB("black", 0.7))
+        slider:SetBackdropBorderColor(AF.GetColorRGB("black", 0.7))
     end)
 
     slider:SetScript("OnEnable", function()
         label:SetColor("white")
         eb:SetEnabled(true)
-        thumb:SetColor(AW.GetColorTable("accent", 0.7))
-        thumbBG:SetColor(AW.GetColorTable("black", 1))
-        thumbBG2:SetColor(AW.GetColorTable("accent", 0.25))
+        thumb:SetColor(AF.GetColorTable("accent", 0.7))
+        thumbBG:SetColor(AF.GetColorTable("black", 1))
+        thumbBG2:SetColor(AF.GetColorTable("accent", 0.25))
         lowText:SetColor("gray")
         highText:SetColor("gray")
         percentSign:SetColor("gray")
         slider:SetScript("OnEnter", OnEnter)
         slider:SetScript("OnLeave", OnLeave)
-        slider:SetBackdropBorderColor(AW.GetColorRGB("black", 1))
+        slider:SetBackdropBorderColor(AF.GetColorRGB("black", 1))
     end)
 
     function slider:UpdateMinMaxValues(minV, maxV)
@@ -224,12 +224,12 @@ function AW.CreateSlider(parent, text, width, low, high, step, showPercentSign, 
     slider:UpdateMinMaxValues(low, high)
 
     function slider:UpdatePixels()
-        AW.ReSize(slider)
-        AW.RePoint(slider)
-        AW.ReBorder(slider)
+        AF.ReSize(slider)
+        AF.RePoint(slider)
+        AF.ReBorder(slider)
     end
 
-    AW.AddToPixelUpdater(slider)
+    AF.AddToPixelUpdater(slider)
 
     return slider
 end
@@ -237,17 +237,17 @@ end
 ---------------------------------------------------------------------
 -- vertical slider
 ---------------------------------------------------------------------
-function AW.CreateVerticalSlider(parent, text, height, low, high, step, isPercentage, showLowHighText)
+function AF.CreateVerticalSlider(parent, text, height, low, high, step, isPercentage, showLowHighText)
     local slider = CreateFrame("Slider", nil, parent, "BackdropTemplate")
-    AW.StylizeFrame(slider, "widget")
+    AF.StylizeFrame(slider, "widget")
 
     slider:SetValueStep(step or 1)
     slider:SetObeyStepOnDrag(true)
     slider:SetOrientation("VERTICAL")
-    AW.SetSize(slider, 10, height)
+    AF.SetSize(slider, 10, height)
 
-    local label = AW.CreateFontString(slider, text)
-    AW.SetPoint(label, "TOP", slider, "BOTTOM", 0, -2)
+    local label = AF.CreateFontString(slider, text)
+    AF.SetPoint(label, "TOP", slider, "BOTTOM", 0, -2)
 
     function slider:SetLabel(n)
         label:SetText(n)
@@ -278,17 +278,17 @@ function AW.CreateVerticalSlider(parent, text, height, low, high, step, isPercen
     end
 
     -- low ----------------------------------------------------------
-    local lowText = AW.CreateFontString(slider, nil, "gray")
-    AW.SetPoint(lowText, "TOPLEFT", slider, "TOPRIGHT", 2, 0)
+    local lowText = AF.CreateFontString(slider, nil, "gray")
+    AF.SetPoint(lowText, "TOPLEFT", slider, "TOPRIGHT", 2, 0)
     lowText:Hide()
-    AW.CreateFadeInOutAnimation(lowText)
+    AF.CreateFadeInOutAnimation(lowText)
     -----------------------------------------------------------------
 
     -- high ---------------------------------------------------------
-    local highText = AW.CreateFontString(slider, nil, "gray")
-    AW.SetPoint(highText, "BOTTOMLEFT", slider, "BOTTOMRIGHT", 2, 0)
+    local highText = AF.CreateFontString(slider, nil, "gray")
+    AF.SetPoint(highText, "BOTTOMLEFT", slider, "BOTTOMRIGHT", 2, 0)
     highText:Hide()
-    AW.CreateFadeInOutAnimation(highText)
+    AF.CreateFadeInOutAnimation(highText)
     -----------------------------------------------------------------
 
     if showLowHighText then
@@ -297,31 +297,31 @@ function AW.CreateVerticalSlider(parent, text, height, low, high, step, isPercen
     end
 
     -- thumb --------------------------------------------------------
-    local thumbBG = AW.CreateTexture(slider, nil, AW.GetColorTable("black"), "BACKGROUND", 3)
-    AW.SetSize(thumbBG, 10, 10)
+    local thumbBG = AF.CreateTexture(slider, nil, AF.GetColorTable("black"), "BACKGROUND", 3)
+    AF.SetSize(thumbBG, 10, 10)
     slider:SetThumbTexture(thumbBG)
 
-    local thumbBG2 =  AW.CreateTexture(slider, nil, AW.GetColorTable("accent", 0.25), "BACKGROUND", 2)
-    AW.SetPoint(thumbBG2, "TOPLEFT", thumbBG, "BOTTOMLEFT")
-    AW.SetPoint(thumbBG2, "BOTTOMRIGHT", -1, 1)
+    local thumbBG2 =  AF.CreateTexture(slider, nil, AF.GetColorTable("accent", 0.25), "BACKGROUND", 2)
+    AF.SetPoint(thumbBG2, "TOPLEFT", thumbBG, "BOTTOMLEFT")
+    AF.SetPoint(thumbBG2, "BOTTOMRIGHT", -1, 1)
 
-    local thumb = AW.CreateTexture(slider, nil, AW.GetColorTable("accent", 0.7), "OVERLAY", 7)
-    AW.SetPoint(thumb, "TOPLEFT", thumbBG, 1, -1)
-    AW.SetPoint(thumb, "BOTTOMRIGHT", thumbBG, -1, 1)
+    local thumb = AF.CreateTexture(slider, nil, AF.GetColorTable("accent", 0.7), "OVERLAY", 7)
+    AF.SetPoint(thumb, "TOPLEFT", thumbBG, 1, -1)
+    AF.SetPoint(thumb, "BOTTOMRIGHT", thumbBG, -1, 1)
 
-    local thumbText = AW.CreateFontString(slider, nil, "accent")
-    AW.SetPoint(thumbText, "RIGHT", thumbBG, "LEFT", -2, 0)
+    local thumbText = AF.CreateFontString(slider, nil, "accent")
+    AF.SetPoint(thumbText, "RIGHT", thumbBG, "LEFT", -2, 0)
     thumbText:Hide()
-    AW.CreateFadeInOutAnimation(thumbText)
+    AF.CreateFadeInOutAnimation(thumbText)
     -----------------------------------------------------------------
 
     local oldValue, valueBeforeClick
     local unit = isPercentage and "%" or ""
 
     -- highlight ----------------------------------------------------
-    local highlight = AW.CreateTexture(slider, nil, AW.GetColorTable("accent", 0.05), "BACKGROUND", 1)
-    AW.SetPoint(highlight, "TOPLEFT", 1, -1)
-    AW.SetPoint(highlight, "BOTTOMRIGHT", -1, 1)
+    local highlight = AF.CreateTexture(slider, nil, AF.GetColorTable("accent", 0.05), "BACKGROUND", 1)
+    AF.SetPoint(highlight, "TOPLEFT", 1, -1)
+    AF.SetPoint(highlight, "BOTTOMRIGHT", -1, 1)
     highlight:Hide()
     -----------------------------------------------------------------
 
@@ -355,7 +355,7 @@ function AW.CreateVerticalSlider(parent, text, height, low, high, step, isPercen
 
     -- OnLeave ------------------------------------------------------
     local function OnLeave()
-        thumb:SetColor(AW.GetColorTable("accent", 0.7))
+        thumb:SetColor(AF.GetColorTable("accent", 0.7))
         highlight:Hide()
     end
     slider:SetScript("OnLeave", OnLeave)
@@ -412,26 +412,26 @@ function AW.CreateVerticalSlider(parent, text, height, low, high, step, isPercen
 
     slider:SetScript("OnDisable", function()
         label:SetColor("disabled")
-        thumb:SetColor(AW.GetColorTable("disabled", 0.7))
-        thumbBG:SetColor(AW.GetColorTable("black", 0.7))
-        thumbBG2:SetColor(AW.GetColorTable("disabled", 0.25))
+        thumb:SetColor(AF.GetColorTable("disabled", 0.7))
+        thumbBG:SetColor(AF.GetColorTable("black", 0.7))
+        thumbBG2:SetColor(AF.GetColorTable("disabled", 0.25))
         lowText:SetColor("disabled")
         highText:SetColor("disabled")
         slider:SetScript("OnEnter", nil)
         slider:SetScript("OnLeave", nil)
-        slider:SetBackdropBorderColor(AW.GetColorRGB("black", 0.7))
+        slider:SetBackdropBorderColor(AF.GetColorRGB("black", 0.7))
     end)
 
     slider:SetScript("OnEnable", function()
         label:SetColor("white")
-        thumb:SetColor(AW.GetColorTable("accent", 0.7))
-        thumbBG:SetColor(AW.GetColorTable("black", 1))
-        thumbBG2:SetColor(AW.GetColorTable("accent", 0.25))
+        thumb:SetColor(AF.GetColorTable("accent", 0.7))
+        thumbBG:SetColor(AF.GetColorTable("black", 1))
+        thumbBG2:SetColor(AF.GetColorTable("accent", 0.25))
         lowText:SetColor("gray")
         highText:SetColor("gray")
         slider:SetScript("OnEnter", OnEnter)
         slider:SetScript("OnLeave", OnLeave)
-        slider:SetBackdropBorderColor(AW.GetColorRGB("black", 1))
+        slider:SetBackdropBorderColor(AF.GetColorRGB("black", 1))
     end)
 
     function slider:UpdateMinMaxValues(minV, maxV)
@@ -444,13 +444,13 @@ function AW.CreateVerticalSlider(parent, text, height, low, high, step, isPercen
     slider:UpdateMinMaxValues(low, high)
 
     function slider:UpdatePixels()
-        AW.ReSize(slider)
-        AW.RePoint(slider)
-        AW.ReBorder(slider)
+        AF.ReSize(slider)
+        AF.RePoint(slider)
+        AF.ReBorder(slider)
         slider:UpdateWordWrap(label._wordWrapStartAt)
     end
 
-    AW.AddToPixelUpdater(slider)
+    AF.AddToPixelUpdater(slider)
 
     return slider
 end

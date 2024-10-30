@@ -1,5 +1,5 @@
----@class AbstractWidgets
-local AW = _G.AbstractWidgets
+---@class AbstractFramework
+local AF = _G.AbstractFramework
 
 local parent, mover
 local popups = {}
@@ -22,28 +22,28 @@ local notificationPool, confirmPool, progressPool
 ---------------------------------------------------------------------
 local function CreateParent()
     -- parent
-    parent = CreateFrame("Frame", "AWPopupParent", AW.UIParent)
-    -- parent:SetBackdrop({edgeFile=AW.GetPlainTexture(), edgeSize=AW.GetOnePixelForRegion(parent)})
-    -- parent:SetBackdropBorderColor(AW.GetColorRGB("black"))
-    AW.SetSize(parent, DEFAULT_WIDTH, 60)
-    AW.SetPoint(parent, "BOTTOMLEFT", 0, 420)
+    parent = CreateFrame("Frame", "AFPopupParent", AF.UIParent)
+    -- parent:SetBackdrop({edgeFile=AF.GetPlainTexture(), edgeSize=AF.GetOnePixelForRegion(parent)})
+    -- parent:SetBackdropBorderColor(AF.GetColorRGB("black"))
+    AF.SetSize(parent, DEFAULT_WIDTH, 60)
+    AF.SetPoint(parent, "BOTTOMLEFT", 0, 420)
     parent:SetFrameStrata("DIALOG")
     parent:SetFrameLevel(666)
     parent:SetClampedToScreen(true)
 
     function parent:UpdatePixels()
-        AW.ReSize(parent)
+        AF.ReSize(parent)
     end
 
-    AW.AddToPixelUpdater(parent)
+    AF.AddToPixelUpdater(parent)
 end
 
 ---------------------------------------------------------------------
 -- mover
 ---------------------------------------------------------------------
-function AW.CreatePopupMover(group, text)
+function AF.CreatePopupMover(group, text)
     if not parent then CreateParent() end
-    AW.CreateMover(parent, group, text, function(p, x, y)
+    AF.CreateMover(parent, group, text, function(p, x, y)
         settings["position"] = p..","..x..","..y
     end)
 end
@@ -72,11 +72,11 @@ local function ShowPopups(stopMoving)
             offset = -DEFAULT_OFFSET
         end
 
-        AW.ClearPoints(popups[i])
+        AF.ClearPoints(popups[i])
         if i == 1 then
-            AW.SetPoint(popups[i], point)
+            AF.SetPoint(popups[i], point)
         else
-            AW.SetPoint(popups[i], point, popups[i-1], relativePoint, 0, offset)
+            AF.SetPoint(popups[i], point, popups[i-1], relativePoint, 0, offset)
         end
     end
 end
@@ -84,7 +84,7 @@ end
 ---------------------------------------------------------------------
 -- orientation
 ---------------------------------------------------------------------
-function AW.SetPopupOrientation(orientation)
+function AF.SetPopupOrientation(orientation)
     settings["orientation"] = strlower(orientation)
     ShowPopups()
 end
@@ -92,7 +92,7 @@ end
 ---------------------------------------------------------------------
 -- position
 ---------------------------------------------------------------------
-function AW.SetPopupSettingsTable(t)
+function AF.SetPopupSettingsTable(t)
     assert(type(t)=="table")
 
     -- validate
@@ -102,7 +102,7 @@ function AW.SetPopupSettingsTable(t)
     settings = t -- save reference
 
     -- load position
-    AW.LoadPosition(parent, t["position"])
+    AF.LoadPosition(parent, t["position"])
 end
 
 ---------------------------------------------------------------------
@@ -185,7 +185,7 @@ end
 -- animation
 ---------------------------------------------------------------------
 local function CreateAnimation(p)
-    AW.CreateFadeInOutAnimation(p)
+    AF.CreateFadeInOutAnimation(p)
 
     local move_ag = p:CreateAnimationGroup()
     local move_a = move_ag:CreateAnimation("Translation")
@@ -218,26 +218,26 @@ end
 -- notificationPool
 ---------------------------------------------------------------------
 local npCreationFn = function()
-    local p = AW.CreateBorderedFrame(parent)
+    local p = AF.CreateBorderedFrame(parent)
     p:Hide()
 
     CreateAnimation(p)
     p:EnableMouse(true)
 
     -- text ------------------------------------------------------------------ --
-    local text = AW.CreateFontString(p)
+    local text = AF.CreateFontString(p)
     p.text = text
-    AW.SetPoint(p.text, "LEFT", 7, 0)
-    AW.SetPoint(p.text, "RIGHT", -7, 0)
+    AF.SetPoint(p.text, "LEFT", 7, 0)
+    AF.SetPoint(p.text, "RIGHT", -7, 0)
 
     -- timerBar -------------------------------------------------------------- --
     local timerBar = CreateFrame("StatusBar", nil, p)
     p.timerBar = timerBar
-    timerBar:SetStatusBarTexture(AW.GetPlainTexture())
-    timerBar:SetStatusBarColor(AW.GetColorRGB("accent"))
-    AW.SetPoint(timerBar, "BOTTOMLEFT", 1, 1)
-    AW.SetPoint(timerBar, "BOTTOMRIGHT", -1, 1)
-    AW.SetHeight(timerBar, 1)
+    timerBar:SetStatusBarTexture(AF.GetPlainTexture())
+    timerBar:SetStatusBarColor(AF.GetColorRGB("accent"))
+    AF.SetPoint(timerBar, "BOTTOMLEFT", 1, 1)
+    AF.SetPoint(timerBar, "BOTTOMRIGHT", -1, 1)
+    AF.SetHeight(timerBar, 1)
 
     -- OnMouseUp ------------------------------------------------------------- --
     p:SetScript("OnMouseUp", function(self, button)
@@ -266,7 +266,7 @@ local npCreationFn = function()
                 p:SetScript("OnUpdate", nil)
             end)
             -- play sound
-            PlaySoundFile(AW.GetSound("pop"))
+            PlaySoundFile(AF.GetSound("pop"))
             -- timer bar
             p.timer = C_Timer.NewTimer(timeout, function()
                 p.timer = nil
@@ -283,11 +283,11 @@ local npCreationFn = function()
     end
 
     function p:UpdatePixels()
-        AW.ReSize(p)
-        AW.RePoint(p)
-        AW.ReBorder(p)
-        AW.ReSize(timerBar)
-        AW.RePoint(timerBar)
+        AF.ReSize(p)
+        AF.RePoint(p)
+        AF.ReBorder(p)
+        AF.ReSize(timerBar)
+        AF.RePoint(timerBar)
     end
 
     return p
@@ -298,40 +298,40 @@ notificationPool = CreateObjectPool(npCreationFn)
 -- confirmPool
 ---------------------------------------------------------------------
 local cpCreationFn = function()
-    local p = AW.CreateBorderedFrame(parent)
+    local p = AF.CreateBorderedFrame(parent)
     p:Hide()
 
     CreateAnimation(p)
     p:EnableMouse(true)
 
     -- text ------------------------------------------------------------------ --
-    local text = AW.CreateFontString(p)
+    local text = AF.CreateFontString(p)
     p.text = text
-    AW.SetPoint(p.text, "LEFT", 7, 5)
-    AW.SetPoint(p.text, "RIGHT", -7, 5)
+    AF.SetPoint(p.text, "LEFT", 7, 5)
+    AF.SetPoint(p.text, "RIGHT", -7, 5)
 
     -- button ---------------------------------------------------------------- --
-    local no = AW.CreateButton(p, _G.NO, "red", 40, 15, nil, nil, nil, "AW_FONT_SMALL")
+    local no = AF.CreateButton(p, _G.NO, "red", 40, 15, nil, nil, nil, "AF_FONT_SMALL")
     p.no = no
-    AW.SetPoint(no, "BOTTOMRIGHT")
+    AF.SetPoint(no, "BOTTOMRIGHT")
     no:SetScript("OnClick", function()
         if p.onCancel then p.onCancel() end
-        AW.Disable(p.yes, p.no)
+        AF.Disable(p.yes, p.no)
         AddToHidingQueue(p)
     end)
 
-    local yes = AW.CreateButton(p, _G.YES, "green", 40, 15, nil, nil, nil, "AW_FONT_SMALL")
+    local yes = AF.CreateButton(p, _G.YES, "green", 40, 15, nil, nil, nil, "AF_FONT_SMALL")
     p.yes = yes
-    AW.SetPoint(yes, "BOTTOMRIGHT", no, "BOTTOMLEFT", 1, 0)
+    AF.SetPoint(yes, "BOTTOMRIGHT", no, "BOTTOMLEFT", 1, 0)
     yes:SetScript("OnClick", function()
         if p.onConfirm then p.onConfirm() end
-        AW.Disable(p.yes, p.no)
+        AF.Disable(p.yes, p.no)
         AddToHidingQueue(p)
     end)
 
     -- OnShow ---------------------------------------------------------------- --
     p:SetScript("OnShow", function()
-        AW.Enable(yes, no)
+        AF.Enable(yes, no)
         -- update height
         p:SetScript("OnUpdate", function()
             p.text:SetWidth(Round(p:GetWidth()-14))
@@ -339,7 +339,7 @@ local cpCreationFn = function()
             p:SetScript("OnUpdate", nil)
         end)
         -- play sound
-        PlaySoundFile(AW.GetSound("pop"))
+        PlaySoundFile(AF.GetSound("pop"))
     end)
 
     -- OnHide --------------------------------------------------------------- --
@@ -357,27 +357,27 @@ confirmPool = CreateObjectPool(cpCreationFn)
 -- progressPool
 ---------------------------------------------------------------------
 local ppCreationFn = function()
-    local p = AW.CreateBorderedFrame(parent)
+    local p = AF.CreateBorderedFrame(parent)
     p:Hide()
 
     CreateAnimation(p)
     p:EnableMouse(true)
 
     -- text ------------------------------------------------------------------ --
-    local text = AW.CreateFontString(p)
+    local text = AF.CreateFontString(p)
     p.text = text
-    AW.SetPoint(p.text, "LEFT", 7, 0)
-    AW.SetPoint(p.text, "RIGHT", -7, 0)
+    AF.SetPoint(p.text, "LEFT", 7, 0)
+    AF.SetPoint(p.text, "RIGHT", -7, 0)
 
     -- progressBar ----------------------------------------------------------- --
-    local bar = AW.CreateStatusBar(p, nil, nil, 5, 5, "accent", nil, "percentage")
+    local bar = AF.CreateStatusBar(p, nil, nil, 5, 5, "accent", nil, "percentage")
     p.bar = bar
-    AW.SetPoint(bar, "BOTTOMLEFT")
-    AW.SetPoint(bar, "BOTTOMRIGHT")
+    AF.SetPoint(bar, "BOTTOMLEFT")
+    AF.SetPoint(bar, "BOTTOMRIGHT")
 
-    AW.ClearPoints(bar.progressText)
-    AW.SetPoint(bar.progressText, "BOTTOMRIGHT", -1, 1)
-    bar.progressText:SetFontObject("AW_FONT_SMALL")
+    AF.ClearPoints(bar.progressText)
+    AF.SetPoint(bar.progressText, "BOTTOMRIGHT", -1, 1)
+    bar.progressText:SetFontObject("AF_FONT_SMALL")
 
     p.callback = function(value)
         if p.isSmoothedBar then
@@ -403,7 +403,7 @@ local ppCreationFn = function()
             p:SetScript("OnUpdate", nil)
         end)
         -- play sound
-        PlaySoundFile(AW.GetSound("pop"))
+        PlaySoundFile(AF.GetSound("pop"))
         -- check if is done
         if bar:GetValue() >= bar.maxValue then
             C_Timer.After(DEFAULT_PROGRESS_TIMEOUT, function()
@@ -426,13 +426,13 @@ progressPool = CreateObjectPool(ppCreationFn)
 ---------------------------------------------------------------------
 -- notification popup
 ---------------------------------------------------------------------
-function AW.ShowNotificationPopup(text, timeout, width, justify)
+function AF.ShowNotificationPopup(text, timeout, width, justify)
     local p = notificationPool:Acquire()
     p.text:SetText(text)
-    AW.SetWidth(p, width or DEFAULT_WIDTH)
+    AF.SetWidth(p, width or DEFAULT_WIDTH)
     p:SetTimeout(timeout or DEFAULT_NOTIFICATION_TIMEOUT)
     p.text:SetJustifyH("CENTER" or justify)
-    -- AW.StylizeFrame(p, color, borderColor)
+    -- AF.StylizeFrame(p, color, borderColor)
 
     tinsert(popups, p)
     p.index = #popups
@@ -442,12 +442,12 @@ end
 ---------------------------------------------------------------------
 -- confirm popup
 ---------------------------------------------------------------------
-function AW.ShowConfirmPopup(text, onConfirm, onCancel, width, justify)
+function AF.ShowConfirmPopup(text, onConfirm, onCancel, width, justify)
     local p = confirmPool:Acquire()
     p.text:SetText(text)
     p.onConfirm = onConfirm
     p.onCancel = onCancel
-    AW.SetWidth(p, width or DEFAULT_WIDTH)
+    AF.SetWidth(p, width or DEFAULT_WIDTH)
     p.text:SetJustifyH("CENTER" or justify)
 
     tinsert(popups, p)
@@ -458,9 +458,9 @@ end
 ---------------------------------------------------------------------
 -- progress popup
 ---------------------------------------------------------------------
-function AW.ShowProgressPopup(text, maxValue, isSmoothedBar, width, justify)
+function AF.ShowProgressPopup(text, maxValue, isSmoothedBar, width, justify)
     local p = progressPool:Acquire()
-    AW.SetWidth(p, width or DEFAULT_WIDTH)
+    AF.SetWidth(p, width or DEFAULT_WIDTH)
     p.text:SetText(text)
     p.text:SetJustifyH("CENTER" or justify)
     p.bar:SetMinMaxValues(0, maxValue)

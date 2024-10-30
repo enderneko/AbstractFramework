@@ -1,26 +1,26 @@
----@class AbstractWidgets
-local AW = _G.AbstractWidgets
+---@class AbstractFramework
+local AF = _G.AbstractFramework
 
 ---------------------------------------------------------------------
 -- edit box
 ---------------------------------------------------------------------
-function AW.CreateEditBox(parent, label, width, height, isMultiLine, isNumeric, font)
+function AF.CreateEditBox(parent, label, width, height, isMultiLine, isNumeric, font)
     local eb = CreateFrame("EditBox", nil, parent, "BackdropTemplate")
 
-    AW.StylizeFrame(eb, "widget")
-    AW.SetWidth(eb, width or 40)
-    AW.SetHeight(eb, height or 20)
+    AF.StylizeFrame(eb, "widget")
+    AF.SetWidth(eb, width or 40)
+    AF.SetHeight(eb, height or 20)
 
-    eb.label = AW.CreateFontString(eb, label, nil, font)
+    eb.label = AF.CreateFontString(eb, label, nil, font)
     eb.label:SetPoint("LEFT", 4, 0)
     eb.label:SetPoint("RIGHT", -4, 0)
     eb.label:SetJustifyH("LEFT")
     eb.label:SetWordWrap(false)
-    eb.label:SetTextColor(AW.GetColorRGB("disabled"))
+    eb.label:SetTextColor(AF.GetColorRGB("disabled"))
 
     eb:SetMultiLine(isMultiLine)
     eb:SetNumeric(isNumeric)
-    eb:SetFontObject(font or "AW_FONT_NORMAL")
+    eb:SetFontObject(font or "AF_FONT_CHAT")
     eb:SetMaxLetters(0)
     eb:SetJustifyH("LEFT")
     eb:SetJustifyV("MIDDLE")
@@ -48,7 +48,7 @@ function AW.CreateEditBox(parent, label, width, height, isMultiLine, isNumeric, 
     end)
 
     eb:SetScript("OnDisable", function()
-        eb:SetTextColor(AW.GetColorRGB("disabled"))
+        eb:SetTextColor(AF.GetColorRGB("disabled"))
         eb:SetBackdropBorderColor(0, 0, 0, 0.7)
     end)
 
@@ -57,9 +57,9 @@ function AW.CreateEditBox(parent, label, width, height, isMultiLine, isNumeric, 
         eb:SetBackdropBorderColor(0, 0, 0, 1)
     end)
 
-    eb.highlight = AW.CreateTexture(eb, nil, AW.GetColorTable("accent", 0.07))
-    AW.SetPoint(eb.highlight, "TOPLEFT", 1, -1)
-    AW.SetPoint(eb.highlight, "BOTTOMRIGHT", -1, 1)
+    eb.highlight = AF.CreateTexture(eb, nil, AF.GetColorTable("accent", 0.07))
+    AF.SetPoint(eb.highlight, "TOPLEFT", 1, -1)
+    AF.SetPoint(eb.highlight, "BOTTOMRIGHT", -1, 1)
     eb.highlight:Hide()
 
     eb:SetScript("OnEnter", function()
@@ -105,17 +105,17 @@ function AW.CreateEditBox(parent, label, width, height, isMultiLine, isNumeric, 
 
     -- confirm button -----------------------------------------------
     function eb:SetConfirmButton(func, isOutside, text, width)
-        eb.confirmBtn = AW.CreateButton(eb, text, "accent", width or 30, 20)
+        eb.confirmBtn = AF.CreateButton(eb, text, "accent", width or 30, 20)
         eb.confirmBtn:Hide()
 
         if not text then
-            eb.confirmBtn:SetTexture(AW.GetIcon("Tick"), {16, 16}, {"CENTER", 0, 0})
+            eb.confirmBtn:SetTexture(AF.GetIcon("Tick"), {16, 16}, {"CENTER", 0, 0})
         end
 
         if isOutside then
-            AW.SetPoint(eb.confirmBtn, "TOPLEFT", eb, "TOPRIGHT", -1, 0)
+            AF.SetPoint(eb.confirmBtn, "TOPLEFT", eb, "TOPRIGHT", -1, 0)
         else
-            AW.SetPoint(eb.confirmBtn, "TOPRIGHT")
+            AF.SetPoint(eb.confirmBtn, "TOPRIGHT")
         end
 
         eb.confirmBtn:SetScript("OnHide", function()
@@ -157,13 +157,13 @@ function AW.CreateEditBox(parent, label, width, height, isMultiLine, isNumeric, 
     end
 
     function eb:UpdatePixels()
-        AW.ReSize(eb)
-        AW.RePoint(eb)
-        AW.ReBorder(eb)
+        AF.ReSize(eb)
+        AF.RePoint(eb)
+        AF.ReBorder(eb)
         -- eb.confirmBtn:UpdatePixels() already called in pixel updater
     end
 
-    AW.AddToPixelUpdater(eb)
+    AF.AddToPixelUpdater(eb)
 
     return eb
 end
@@ -171,17 +171,17 @@ end
 ---------------------------------------------------------------------
 -- scroll edit box
 ---------------------------------------------------------------------
-function AW.CreateScrollEditBox(parent, name, label, width, height, scrollStep)
+function AF.CreateScrollEditBox(parent, name, label, width, height, scrollStep)
     scrollStep = scrollStep or 1
 
-    local frame = AW.CreateScrollFrame(parent, name, width, height, "none", "none")
-    AW.StylizeFrame(frame.scrollFrame, "widget")
-    AW.StylizeFrame(frame.scrollBar)
+    local frame = AF.CreateScrollFrame(parent, name, width, height, "none", "none")
+    AF.StylizeFrame(frame.scrollFrame, "widget")
+    AF.StylizeFrame(frame.scrollBar)
 
     -- highlight
-    local highlight = AW.CreateTexture(frame.scrollFrame, nil, AW.GetColorTable("accent", 0.07))
-    AW.SetPoint(highlight, "TOPLEFT", 1, -1)
-    AW.SetPoint(highlight, "BOTTOMRIGHT", -1, 1)
+    local highlight = AF.CreateTexture(frame.scrollFrame, nil, AF.GetColorTable("accent", 0.07))
+    AF.SetPoint(highlight, "TOPLEFT", 1, -1)
+    AF.SetPoint(highlight, "BOTTOMRIGHT", -1, 1)
     highlight:Hide()
 
     frame.scrollFrame:SetScript("OnEnter", function()
@@ -195,7 +195,7 @@ function AW.CreateScrollEditBox(parent, name, label, width, height, scrollStep)
     end)
 
     -- edit box
-    local eb = AW.CreateEditBox(frame.scrollContent, label, 10, 20, true)
+    local eb = AF.CreateEditBox(frame.scrollContent, label, 10, 20, true)
     frame.eb = eb
     eb.UpdatePixels = function() end
     eb:ClearBackdrop()
@@ -273,15 +273,15 @@ function AW.CreateScrollEditBox(parent, name, label, width, height, scrollStep)
         frame:EnableMouseWheel(enabled)
         frame.scrollThumb:EnableMouse(enabled)
         if enabled then
-            frame.scrollThumb:SetBackdropColor(AW.GetColorRGB("accent"))
-            frame.scrollThumb:SetBackdropBorderColor(AW.GetColorRGB("black"))
-            frame.scrollBar:SetBackdropBorderColor(AW.GetColorRGB("black"))
-            frame.scrollFrame:SetBackdropBorderColor(AW.GetColorRGB("black"))
+            frame.scrollThumb:SetBackdropColor(AF.GetColorRGB("accent"))
+            frame.scrollThumb:SetBackdropBorderColor(AF.GetColorRGB("black"))
+            frame.scrollBar:SetBackdropBorderColor(AF.GetColorRGB("black"))
+            frame.scrollFrame:SetBackdropBorderColor(AF.GetColorRGB("black"))
         else
-            frame.scrollThumb:SetBackdropColor(AW.GetColorRGB("disabled", 0.7))
-            frame.scrollThumb:SetBackdropBorderColor(AW.GetColorRGB("black", 0.7))
-            frame.scrollBar:SetBackdropBorderColor(AW.GetColorRGB("black", 0.7))
-            frame.scrollFrame:SetBackdropBorderColor(AW.GetColorRGB("black", 0.7))
+            frame.scrollThumb:SetBackdropColor(AF.GetColorRGB("disabled", 0.7))
+            frame.scrollThumb:SetBackdropBorderColor(AF.GetColorRGB("black", 0.7))
+            frame.scrollBar:SetBackdropBorderColor(AF.GetColorRGB("black", 0.7))
+            frame.scrollFrame:SetBackdropBorderColor(AF.GetColorRGB("black", 0.7))
         end
     end
 

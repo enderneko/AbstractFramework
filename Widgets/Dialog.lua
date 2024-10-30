@@ -1,5 +1,5 @@
----@class AbstractWidgets
-local AW = _G.AbstractWidgets
+---@class AbstractFramework
+local AF = _G.AbstractFramework
 
 ---------------------------------------------------------------------
 -- dialog
@@ -7,50 +7,50 @@ local AW = _G.AbstractWidgets
 local dialog
 
 local function CreateDialog()
-    dialog = AW.CreateBorderedFrame(AW.UIParent, nil, 200, 100, nil, "accent")
+    dialog = AF.CreateBorderedFrame(AF.UIParent, nil, 200, 100, nil, "accent")
     dialog:Hide() -- for first OnShow
 
     dialog:EnableMouse(true)
     dialog:SetClampedToScreen(true)
 
     -- text holder
-    local textHolder = AW.CreateFrame(dialog)
+    local textHolder = AF.CreateFrame(dialog)
     dialog.textHolder = textHolder
-    AW.SetPoint(textHolder, "TOPLEFT", 7, -7)
-    AW.SetPoint(textHolder, "TOPRIGHT", -7, -7)
+    AF.SetPoint(textHolder, "TOPLEFT", 7, -7)
+    AF.SetPoint(textHolder, "TOPRIGHT", -7, -7)
 
-    local text = AW.CreateFontString(textHolder)
+    local text = AF.CreateFontString(textHolder)
     dialog.text = text
-    AW.SetPoint(text, "TOPLEFT")
-    AW.SetPoint(text, "TOPRIGHT")
+    AF.SetPoint(text, "TOPLEFT")
+    AF.SetPoint(text, "TOPRIGHT")
     text:SetWordWrap(true)
     text:SetSpacing(3)
 
     -- frame holder
-    local contentHolder = AW.CreateFrame(dialog)
+    local contentHolder = AF.CreateFrame(dialog)
     dialog.contentHolder = contentHolder
-    AW.SetPoint(contentHolder, "TOPLEFT", textHolder, "BOTTOMLEFT", 7, -7)
-    AW.SetPoint(contentHolder, "TOPRIGHT", textHolder, "BOTTOMRIGHT", -7, -7)
+    AF.SetPoint(contentHolder, "TOPLEFT", textHolder, "BOTTOMLEFT", 7, -7)
+    AF.SetPoint(contentHolder, "TOPRIGHT", textHolder, "BOTTOMRIGHT", -7, -7)
 
     -- no
-    local no = AW.CreateButton(dialog, _G.NO, "red", 50, 17)
+    local no = AF.CreateButton(dialog, _G.NO, "red", 50, 17)
     dialog.no = no
-    AW.SetPoint(no, "BOTTOMRIGHT")
-    no:SetBackdropBorderColor(AW.GetColorRGB("accent"))
-    AW.ClearPoints(no.text)
-    AW.SetPoint(no.text, "CENTER")
+    AF.SetPoint(no, "BOTTOMRIGHT")
+    no:SetBackdropBorderColor(AF.GetColorRGB("accent"))
+    AF.ClearPoints(no.text)
+    AF.SetPoint(no.text, "CENTER")
     no:SetScript("OnClick", function()
         if dialog.onCancel then dialog.onCancel() end
         dialog:Hide()
     end)
 
     -- yes
-    local yes = AW.CreateButton(dialog, _G.YES, "green", 50, 17)
+    local yes = AF.CreateButton(dialog, _G.YES, "green", 50, 17)
     dialog.yes = yes
-    AW.SetPoint(yes, "BOTTOMRIGHT", no, "BOTTOMLEFT", 1, 0)
-    yes:SetBackdropBorderColor(AW.GetColorRGB("accent"))
-    AW.ClearPoints(yes.text)
-    AW.SetPoint(yes.text, "CENTER")
+    AF.SetPoint(yes, "BOTTOMRIGHT", no, "BOTTOMLEFT", 1, 0)
+    yes:SetBackdropBorderColor(AF.GetColorRGB("accent"))
+    AF.ClearPoints(yes.text)
+    AF.SetPoint(yes.text, "CENTER")
     yes:SetScript("OnClick", function()
         if dialog.onConfirm then dialog.onConfirm() end
         dialog:Hide()
@@ -80,9 +80,9 @@ local function CreateDialog()
         -- reset button
         yes:SetEnabled(true)
         yes:SetText(_G.YES)
-        AW.SetWidth(yes, 50)
+        AF.SetWidth(yes, 50)
         no:SetText(_G.NO)
-        AW.SetWidth(no, 50)
+        AF.SetWidth(no, 50)
 
         -- hide mask
         if dialog.shownMask then
@@ -109,27 +109,27 @@ local function CreateDialog()
 
     -- update pixels
     function dialog:UpdatePixels()
-        AW.ReSize(dialog)
-        AW.RePoint(dialog)
-        AW.ReBorder(dialog)
+        AF.ReSize(dialog)
+        AF.RePoint(dialog)
+        AF.ReBorder(dialog)
 
         if dialog:IsShown() then
             dialog:GetScript("OnShow")()
         end
 
         if dialog.minButtonWidth then
-            AW.ResizeDialogButtonToFitText(dialog.minButtonWidth)
+            AF.ResizeDialogButtonToFitText(dialog.minButtonWidth)
         end
     end
 end
 
 -- show
-function AW.ShowDialog(parent, text, width, yesText, noText, showMask, content, yesDisabled)
+function AF.ShowDialog(parent, text, width, yesText, noText, showMask, content, yesDisabled)
     if not dialog then CreateDialog() end
 
     dialog:SetParent(parent)
-    AW.SetFrameLevel(dialog, 50, parent)
-    AW.SetWidth(dialog, width)
+    AF.SetFrameLevel(dialog, 50, parent)
+    AF.SetWidth(dialog, width)
 
     dialog.text:SetText(text)
 
@@ -137,7 +137,7 @@ function AW.ShowDialog(parent, text, width, yesText, noText, showMask, content, 
     if noText then dialog.no:SetText(noText) end
 
     if showMask then
-        dialog.shownMask = AW.ShowMask(parent)
+        dialog.shownMask = AF.ShowMask(parent)
     end
 
     if content then
@@ -157,13 +157,13 @@ function AW.ShowDialog(parent, text, width, yesText, noText, showMask, content, 
 end
 
 -- point
-function AW.SetDialogPoint(...)
-    AW.ClearPoints(dialog)
-    AW.SetPoint(dialog, ...)
+function AF.SetDialogPoint(...)
+    AF.ClearPoints(dialog)
+    AF.SetPoint(dialog, ...)
 end
 
 -- resize yes/no
-function AW.ResizeDialogButtonToFitText(minWidth)
+function AF.ResizeDialogButtonToFitText(minWidth)
     dialog.minButtonWidth = minWidth or 0
     local yesWidth = Round(dialog.yes.text:GetWidth())+10
     local noWidth = Round(dialog.no.text:GetWidth())+10
@@ -176,22 +176,22 @@ function AW.ResizeDialogButtonToFitText(minWidth)
 end
 
 -- content in contentHolder
-function AW.CreateDialogContent(height)
+function AF.CreateDialogContent(height)
     assert(height, "height is required")
     if not dialog then CreateDialog() end
-    local f = AW.CreateFrame(dialog.contentHolder)
-    AW.SetHeight(f, height)
+    local f = AF.CreateFrame(dialog.contentHolder)
+    AF.SetHeight(f, height)
     f.dialog = dialog
     return f
 end
 
 -- onConfirm
-function AW.SetDialogOnConfirm(fn)
+function AF.SetDialogOnConfirm(fn)
     dialog.onConfirm = fn
 end
 
 -- onCancel
-function AW.SetDialogOnCancel(fn)
+function AF.SetDialogOnCancel(fn)
     dialog.onCancel = fn
 end
 
@@ -201,30 +201,30 @@ end
 local notificationDialog
 
 local function CreateNotificationDialog()
-    notificationDialog = AW.CreateBorderedFrame(AW.UIParent, nil, 200, 100, nil, "accent")
+    notificationDialog = AF.CreateBorderedFrame(AF.UIParent, nil, 200, 100, nil, "accent")
     notificationDialog:Hide() -- for first OnShow
 
     notificationDialog:EnableMouse(true)
     notificationDialog:SetClampedToScreen(true)
 
     -- text holder
-    local textHolder = AW.CreateFrame(notificationDialog)
+    local textHolder = AF.CreateFrame(notificationDialog)
     notificationDialog.textHolder = textHolder
-    AW.SetPoint(textHolder, "TOPLEFT", 7, -7)
-    AW.SetPoint(textHolder, "TOPRIGHT", -7, -7)
+    AF.SetPoint(textHolder, "TOPLEFT", 7, -7)
+    AF.SetPoint(textHolder, "TOPRIGHT", -7, -7)
 
-    local text = AW.CreateFontString(textHolder)
+    local text = AF.CreateFontString(textHolder)
     notificationDialog.text = text
-    AW.SetPoint(text, "TOPLEFT")
-    AW.SetPoint(text, "TOPRIGHT")
+    AF.SetPoint(text, "TOPLEFT")
+    AF.SetPoint(text, "TOPRIGHT")
     text:SetWordWrap(true)
     text:SetSpacing(3)
 
     -- close
-    local close = AW.CreateButton(notificationDialog, _G.HELP_TIP_BUTTON_GOT_IT, "accent", 17, 17)
+    local close = AF.CreateButton(notificationDialog, _G.HELP_TIP_BUTTON_GOT_IT, "accent", 17, 17)
     notificationDialog.close = close
-    AW.SetPoint(close, "BOTTOMLEFT", 5, 5)
-    AW.SetPoint(close, "BOTTOMRIGHT", -5, 5)
+    AF.SetPoint(close, "BOTTOMLEFT", 5, 5)
+    AF.SetPoint(close, "BOTTOMRIGHT", -5, 5)
     close:SetScript("OnClick", function()
         notificationDialog:Hide()
     end)
@@ -265,9 +265,9 @@ local function CreateNotificationDialog()
 
     -- update pixels
     function notificationDialog:UpdatePixels()
-        AW.ReSize(notificationDialog)
-        AW.RePoint(notificationDialog)
-        AW.ReBorder(notificationDialog)
+        AF.ReSize(notificationDialog)
+        AF.RePoint(notificationDialog)
+        AF.ReBorder(notificationDialog)
 
         if notificationDialog:IsShown() then
             notificationDialog:GetScript("OnShow")()
@@ -276,17 +276,17 @@ local function CreateNotificationDialog()
 end
 
 -- show
-function AW.ShowNotificationDialog(parent, text, width, showMask, countdown)
+function AF.ShowNotificationDialog(parent, text, width, showMask, countdown)
     if not notificationDialog then CreateNotificationDialog() end
 
     notificationDialog:SetParent(parent)
-    AW.SetFrameLevel(notificationDialog, 50, parent)
-    AW.SetWidth(notificationDialog, width)
+    AF.SetFrameLevel(notificationDialog, 50, parent)
+    AF.SetWidth(notificationDialog, width)
 
     notificationDialog.text:SetText(text)
 
     if showMask then
-        notificationDialog.shownMask = AW.ShowMask(parent)
+        notificationDialog.shownMask = AF.ShowMask(parent)
     end
 
     if countdown then
@@ -312,7 +312,7 @@ function AW.ShowNotificationDialog(parent, text, width, showMask, countdown)
 end
 
 -- point
-function AW.SetNotificationDialogPoint(...)
-    AW.ClearPoints(notificationDialog)
-    AW.SetPoint(notificationDialog, ...)
+function AF.SetNotificationDialogPoint(...)
+    AF.ClearPoints(notificationDialog)
+    AF.SetPoint(notificationDialog, ...)
 end

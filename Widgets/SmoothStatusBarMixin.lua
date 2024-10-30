@@ -1,5 +1,5 @@
----@class AbstractWidgets
-local AW = _G.AbstractWidgets
+---@class AbstractFramework
+local AF = _G.AbstractFramework
 
 local FrameDeltaLerp = FrameDeltaLerp
 
@@ -30,9 +30,9 @@ end
 
 C_Timer.NewTicker(0, ProcessSmoothStatusBars)
 
-AW.SmoothStatusBarMixin = {}
+AF.SmoothStatusBarMixin = {}
 
-function AW.SmoothStatusBarMixin:ResetSmoothedValue(value) --If nil, tries to set to the last target value
+function AF.SmoothStatusBarMixin:ResetSmoothedValue(value) --If nil, tries to set to the last target value
     local targetValue = g_updatingBars[self]
     if targetValue then
         g_updatingBars[self] = nil
@@ -42,11 +42,11 @@ function AW.SmoothStatusBarMixin:ResetSmoothedValue(value) --If nil, tries to se
     end
 end
 
-function AW.SmoothStatusBarMixin:SetSmoothedValue(value)
+function AF.SmoothStatusBarMixin:SetSmoothedValue(value)
     g_updatingBars[self] = value
 end
 
-function AW.SmoothStatusBarMixin:SetMinMaxSmoothedValue(min, max)
+function AF.SmoothStatusBarMixin:SetMinMaxSmoothedValue(min, max)
     self:SetMinMaxValues(min, max)
 
     local targetValue = g_updatingBars[self]

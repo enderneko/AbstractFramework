@@ -1,5 +1,5 @@
----@class AbstractWidgets
-local AW = _G.AbstractWidgets
+---@class AbstractFramework
+local AF = _G.AbstractFramework
 
 ---------------------------------------------------------------------
 -- forked from ElvUI
@@ -65,7 +65,7 @@ local function FrameFade(frame, info)
     end
 end
 
-function AW.FrameFadeIn(frame, timeToFade, startAlpha, endAlpha)
+function AF.FrameFadeIn(frame, timeToFade, startAlpha, endAlpha)
     if frame.fade then
         frame.fade.fadeTimer = nil
     else
@@ -83,7 +83,7 @@ function AW.FrameFadeIn(frame, timeToFade, startAlpha, endAlpha)
     end
 end
 
-function AW.FrameFadeOut(frame, timeToFade, startAlpha, endAlpha)
+function AF.FrameFadeOut(frame, timeToFade, startAlpha, endAlpha)
     if frame.fade then
         frame.fade.fadeTimer = nil
     else
@@ -132,7 +132,7 @@ local fade_in_out = {
     end,
 }
 
-function AW.CreateFadeInOutAnimation(region, duration, noHide)
+function AF.CreateFadeInOutAnimation(region, duration, noHide)
     duration = duration or 0.25
 
     local in_ag = region:CreateAnimationGroup()
@@ -183,7 +183,7 @@ function AW.CreateFadeInOutAnimation(region, duration, noHide)
     -----------------------------------------------------------------
 end
 
-function AW.SetFadeInOutAnimationDuration(region, duration)
+function AF.SetFadeInOutAnimationDuration(region, duration)
     if not (duration and region.fadeIn and region.fadeOut) then return end
 
     region.fadeIn.alpha:SetDuration(duration)
@@ -197,7 +197,7 @@ local function FadeInOut(region)
     region.fade:Restart()
 end
 
-function AW.CreateContinualFadeInOutAnimation(region, duration, delay)
+function AF.CreateContinualFadeInOutAnimation(region, duration, delay)
     duration = duration or 0.25
     delay = delay or 1
 
@@ -236,7 +236,7 @@ end
 ---------------------------------------------------------------------
 -- blink
 ---------------------------------------------------------------------
-function AW.CreateBlinkAnimation(region, duration)
+function AF.CreateBlinkAnimation(region, duration)
     local blink = region:CreateAnimationGroup()
     region.blink = blink
 
@@ -255,27 +255,27 @@ end
 ---------------------------------------------------------------------
 --- @param steps number total steps to final size
 --- @param anchorPoint string TOPLEFT|TOPRIGHT|BOTTOMLEFT|BOTTOMRIGHT
-function AW.AnimatedResize(frame, targetWidth, targetHeight, frequency, steps, onStart, onFinish, onChange, anchorPoint)
+function AF.AnimatedResize(frame, targetWidth, targetHeight, frequency, steps, onStart, onFinish, onChange, anchorPoint)
     frequency = frequency or 0.015
     steps = steps or 7
 
     if anchorPoint then
         -- anchorPoint is only for those frames of which the direct parent is UIParent
-        assert(frame:GetParent() == AW.UIParent)
+        assert(frame:GetParent() == AF.UIParent)
         local left = Round(frame:GetLeft())
         local right = Round(frame:GetRight())
         local top = Round(frame:GetTop())
         local bottom = Round(frame:GetBottom())
 
-        AW.ClearPoints(frame)
+        AF.ClearPoints(frame)
         if anchorPoint == "TOPLEFT" then
-            frame:SetPoint("TOPLEFT", AW.UIParent, "BOTTOMLEFT", left, top)
+            frame:SetPoint("TOPLEFT", AF.UIParent, "BOTTOMLEFT", left, top)
         elseif anchorPoint == "TOPRIGHT" then
-            frame:SetPoint("TOPRIGHT", AW.UIParent, "BOTTOMLEFT", right, top)
+            frame:SetPoint("TOPRIGHT", AF.UIParent, "BOTTOMLEFT", right, top)
         elseif anchorPoint == "BOTTOMLEFT" then
-            frame:SetPoint("BOTTOMLEFT", AW.UIParent, "BOTTOMLEFT", left, bottom)
+            frame:SetPoint("BOTTOMLEFT", AF.UIParent, "BOTTOMLEFT", left, bottom)
         elseif anchorPoint == "BOTTOMRIGHT" then
-            frame:SetPoint("BOTTOMRIGHT", AW.UIParent, "BOTTOMLEFT", right, bottom)
+            frame:SetPoint("BOTTOMRIGHT", AF.UIParent, "BOTTOMLEFT", right, bottom)
         end
     end
 
@@ -297,7 +297,7 @@ function AW.AnimatedResize(frame, targetWidth, targetHeight, frequency, steps, o
             else
                 currentWidth = math.max(currentWidth + diffW, targetWidth)
             end
-            AW.SetWidth(frame, currentWidth)
+            AF.SetWidth(frame, currentWidth)
         end
 
         if diffH ~= 0 then
@@ -306,7 +306,7 @@ function AW.AnimatedResize(frame, targetWidth, targetHeight, frequency, steps, o
             else
                 currentHeight = math.max(currentHeight + diffH, targetHeight)
             end
-            AW.SetHeight(frame, currentHeight)
+            AF.SetHeight(frame, currentHeight)
         end
 
         if onChange then
@@ -385,7 +385,7 @@ local function FrameZoom(frame, info)
     end
 end
 
-function AW.FrameZoomIn(frame, timeToZoom, startScale, endScale)
+function AF.FrameZoomIn(frame, timeToZoom, startScale, endScale)
     if frame.zoom then
         frame.zoom.zoomTimer = nil
     else
@@ -401,7 +401,7 @@ function AW.FrameZoomIn(frame, timeToZoom, startScale, endScale)
     FrameZoom(frame, frame.zoom)
 end
 
-function AW.FrameZoomOut(frame, timeToZoom, startScale, endScale)
+function AF.FrameZoomOut(frame, timeToZoom, startScale, endScale)
     if frame.zoom then
         frame.zoom.zoomTimer = nil
     else
@@ -417,7 +417,7 @@ function AW.FrameZoomOut(frame, timeToZoom, startScale, endScale)
     FrameZoom(frame, frame.zoom)
 end
 
-function AW.FrameZoomTo(frame, timeToZoom, endScale)
+function AF.FrameZoomTo(frame, timeToZoom, endScale)
     if frame.zoom then
         frame.zoom.zoomTimer = nil
     else

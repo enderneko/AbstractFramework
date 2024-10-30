@@ -1,15 +1,15 @@
----@class AbstractWidgets
-local AW = _G.AbstractWidgets
+---@class AbstractFramework
+local AF = _G.AbstractFramework
 
 ---------------------------------------------------------------------
 -- blizzard
 ---------------------------------------------------------------------
 --- @param color string color name defined in Color.lua
 --- @param borderColor string color name defined in Color.lua
-function AW.CreateStatusBar(parent, minValue, maxValue, width, height, color, borderColor, progressTextType)
+function AF.CreateStatusBar(parent, minValue, maxValue, width, height, color, borderColor, progressTextType)
     local bar = CreateFrame("StatusBar", nil, parent, "BackdropTemplate")
-    AW.StylizeFrame(bar, AW.GetColorTable(color, 0.9, 0.1), borderColor)
-    AW.SetSize(bar, width, height)
+    AF.StylizeFrame(bar, AF.GetColorTable(color, 0.9, 0.1), borderColor)
+    AF.SetSize(bar, width, height)
 
     minValue = minValue or 1
     maxValue = maxValue or 1
@@ -22,18 +22,18 @@ function AW.CreateStatusBar(parent, minValue, maxValue, width, height, color, bo
     end
     bar:SetMinMaxValues(minValue, maxValue)
 
-    bar:SetStatusBarTexture(AW.GetPlainTexture())
-    bar:SetStatusBarColor(AW.GetColorRGB(color, 0.7))
+    bar:SetStatusBarTexture(AF.GetPlainTexture())
+    bar:SetStatusBarColor(AF.GetColorRGB(color, 0.7))
     bar:GetStatusBarTexture():SetDrawLayer("BORDER", -7)
 
-    bar.tex = AW.CreateGradientTexture(bar, "HORIZONTAL", "none", AW.GetColorTable(color, 0.2), nil, "BORDER", -6)
+    bar.tex = AF.CreateGradientTexture(bar, "HORIZONTAL", "none", AF.GetColorTable(color, 0.2), nil, "BORDER", -6)
     bar.tex:SetBlendMode("ADD")
     bar.tex:SetPoint("TOPLEFT", bar:GetStatusBarTexture())
     bar.tex:SetPoint("BOTTOMRIGHT", bar:GetStatusBarTexture())
 
     if progressTextType then
-        bar.progressText = AW.CreateFontString(bar)
-        AW.SetPoint(bar.progressText, "CENTER")
+        bar.progressText = AF.CreateFontString(bar)
+        AF.SetPoint(bar.progressText, "CENTER")
         if progressTextType == "percentage" then
             bar:SetScript("OnValueChanged", function()
                 bar.progressText:SetFormattedText("%d%%", (bar:GetValue()-bar.minValue)/bar.maxValue*100)
@@ -52,21 +52,21 @@ function AW.CreateStatusBar(parent, minValue, maxValue, width, height, color, bo
     bar:SetValue(minValue)
 
     function bar:SetBarValue(v)
-        AW.SetStatusBarValue(bar, v)
+        AF.SetStatusBarValue(bar, v)
     end
 
     Mixin(bar, SmoothStatusBarMixin) -- SetSmoothedValue
 
     function bar:UpdatePixels()
-        AW.ReSize(bar)
-        AW.RePoint(bar)
-        AW.ReBorder(bar)
+        AF.ReSize(bar)
+        AF.RePoint(bar)
+        AF.ReBorder(bar)
         if bar.progressText then
-            AW.RePoint(bar.progressText)
+            AF.RePoint(bar.progressText)
         end
     end
 
-    AW.AddToPixelUpdater(bar)
+    AF.AddToPixelUpdater(bar)
 
     return bar
 end
@@ -104,7 +104,7 @@ local prototype = {
         self.fg:SetVertexColor(r, g, b, a)
     end,
     SetGradientColor = function(self, startColor, endColor)
-        self.fg:SetGradient("HORIZONTAL", CreateColor(AW.UnpackColor(startColor)), CreateColor(AW.UnpackColor(endColor)))
+        self.fg:SetGradient("HORIZONTAL", CreateColor(AF.UnpackColor(startColor)), CreateColor(AF.UnpackColor(endColor)))
     end,
     SetLossColor = function(self, r, g, b, a)
         self.loss:SetVertexColor(r, g, b, a)
@@ -117,26 +117,26 @@ local prototype = {
     end,
     SnapTextureToEdge = function(self, noGaps)
         self.noGaps = noGaps
-        AW.ClearPoints(self.fg)
-        AW.ClearPoints(self.loss)
+        AF.ClearPoints(self.fg)
+        AF.ClearPoints(self.loss)
         if noGaps then
-            AW.SetPoint(self.bg, "TOPLEFT")
-            AW.SetPoint(self.bg, "BOTTOMRIGHT")
-            AW.SetPoint(self.fg, "TOPLEFT")
-            AW.SetPoint(self.fg, "BOTTOMLEFT")
-            AW.SetPoint(self.loss, "TOPLEFT", self.fg, "TOPRIGHT")
-            AW.SetPoint(self.loss, "BOTTOMLEFT", self.fg, "BOTTOMRIGHT")
-            AW.SetPoint(self.loss, "TOPRIGHT")
-            AW.SetPoint(self.loss, "BOTTOMRIGHT")
+            AF.SetPoint(self.bg, "TOPLEFT")
+            AF.SetPoint(self.bg, "BOTTOMRIGHT")
+            AF.SetPoint(self.fg, "TOPLEFT")
+            AF.SetPoint(self.fg, "BOTTOMLEFT")
+            AF.SetPoint(self.loss, "TOPLEFT", self.fg, "TOPRIGHT")
+            AF.SetPoint(self.loss, "BOTTOMLEFT", self.fg, "BOTTOMRIGHT")
+            AF.SetPoint(self.loss, "TOPRIGHT")
+            AF.SetPoint(self.loss, "BOTTOMRIGHT")
         else
-            AW.SetPoint(self.bg, "TOPLEFT", 1, -1)
-            AW.SetPoint(self.bg, "BOTTOMRIGHT", -1, 1)
-            AW.SetPoint(self.fg, "TOPLEFT", 1, -1)
-            AW.SetPoint(self.fg, "BOTTOMLEFT", 1, 1)
-            AW.SetPoint(self.loss, "TOPLEFT", self.fg, "TOPRIGHT")
-            AW.SetPoint(self.loss, "BOTTOMLEFT", self.fg, "BOTTOMRIGHT")
-            AW.SetPoint(self.loss, "TOPRIGHT", -1, -1)
-            AW.SetPoint(self.loss, "BOTTOMRIGHT", -1, 1)
+            AF.SetPoint(self.bg, "TOPLEFT", 1, -1)
+            AF.SetPoint(self.bg, "BOTTOMRIGHT", -1, 1)
+            AF.SetPoint(self.fg, "TOPLEFT", 1, -1)
+            AF.SetPoint(self.fg, "BOTTOMLEFT", 1, 1)
+            AF.SetPoint(self.loss, "TOPLEFT", self.fg, "TOPRIGHT")
+            AF.SetPoint(self.loss, "BOTTOMLEFT", self.fg, "BOTTOMRIGHT")
+            AF.SetPoint(self.loss, "TOPRIGHT", -1, -1)
+            AF.SetPoint(self.loss, "BOTTOMRIGHT", -1, 1)
         end
     end,
 
@@ -182,16 +182,16 @@ local prototype = {
 
     -- pixel perfect
     UpdatePixels = function(self)
-        AW.ReSize(self)
-        AW.RePoint(self)
-        AW.ReBorder(self)
-        AW.ReSize(self.fg)
-        AW.RePoint(self.fg)
-        AW.RePoint(self.loss)
+        AF.ReSize(self)
+        AF.RePoint(self)
+        AF.ReBorder(self)
+        AF.ReSize(self.fg)
+        AF.RePoint(self.fg)
+        AF.RePoint(self.loss)
     end,
 }
 
-function AW.CreateSimpleBar(parent, name, noBackdrop)
+function AF.CreateSimpleBar(parent, name, noBackdrop)
     local bar
 
     if noBackdrop then
@@ -203,7 +203,7 @@ function AW.CreateSimpleBar(parent, name, noBackdrop)
         end
     else
         bar = CreateFrame("Frame", name, parent, "BackdropTemplate")
-        AW.SetDefaultBackdrop(bar)
+        AF.SetDefaultBackdrop(bar)
         for k, v in pairs(prototype) do
             bar[k] = v
         end
@@ -215,7 +215,7 @@ function AW.CreateSimpleBar(parent, name, noBackdrop)
     bar.value = 0
 
     -- smooth
-    Mixin(bar, AW.SmoothStatusBarMixin)
+    Mixin(bar, AF.SmoothStatusBarMixin)
     bar:SetSmoothing(false)
 
     -- foreground texture
@@ -238,7 +238,7 @@ function AW.CreateSimpleBar(parent, name, noBackdrop)
 
     -- pixel perfect
     -- NOTE: UpdatePixels() added in prototype, remember to use it
-    -- AW.AddToPixelUpdater(bar)
+    -- AF.AddToPixelUpdater(bar)
 
     return bar
 end

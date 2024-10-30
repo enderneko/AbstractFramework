@@ -1,5 +1,5 @@
----@class AbstractWidgets
-local AW = _G.AbstractWidgets
+---@class AbstractFramework
+local AF = _G.AbstractFramework
 
 local list, horizontalList
 
@@ -7,23 +7,23 @@ local list, horizontalList
 -- list
 ---------------------------------------------------------------------
 local function CreateListFrame()
-    list = AW.CreateScrollList(AW.UIParent, nil, 10, 1, 1, 10, 18, 0, "widget")
+    list = AF.CreateScrollList(AF.UIParent, nil, 10, 1, 1, 10, 18, 0, "widget")
     list:SetClampedToScreen(true)
     list:Hide()
 
     -- adjust scrollBar points
-    AW.SetPoint(list.scrollBar, "TOPRIGHT")
-    AW.SetPoint(list.scrollBar, "BOTTOMRIGHT")
+    AF.SetPoint(list.scrollBar, "TOPRIGHT")
+    AF.SetPoint(list.scrollBar, "BOTTOMRIGHT")
 
     -- make list closable by pressing ESC
-    _G["AWDropdownList"] = list
-    tinsert(UISpecialFrames, "AWDropdownList")
+    _G["AFDropdownList"] = list
+    tinsert(UISpecialFrames, "AFDropdownList")
 
     -- store created buttons
     list.buttons = {}
 
     -- highlight
-    local highlight = AW.CreateBorderedFrame(list, nil, 100, 100, "none", "accent")
+    local highlight = AF.CreateBorderedFrame(list, nil, 100, 100, "none", "accent")
     highlight:Hide()
 
     function list:SetHighlightItem(i)
@@ -54,13 +54,13 @@ end
 -- horizontalList
 ---------------------------------------------------------------------
 local function CreateHorizontalList()
-    horizontalList = AW.CreateBorderedFrame(AW.UIParent, nil, 10, 20, "widget")
+    horizontalList = AF.CreateBorderedFrame(AF.UIParent, nil, 10, 20, "widget")
     horizontalList:SetClampedToScreen(true)
     horizontalList:Hide()
 
     -- make list closable by pressing ESC
-    _G["AWMiniDropdownList"] = horizontalList
-    tinsert(UISpecialFrames, "AWMiniDropdownList")
+    _G["AFMiniDropdownList"] = horizontalList
+    tinsert(UISpecialFrames, "AFMiniDropdownList")
 
     -- store created buttons
     horizontalList.buttons = {}
@@ -72,7 +72,7 @@ local function CreateHorizontalList()
     end
 
     -- highlight
-    local highlight = AW.CreateBorderedFrame(horizontalList, nil, 100, 100, "none", "accent")
+    local highlight = AF.CreateBorderedFrame(horizontalList, nil, 100, 100, "none", "accent")
     highlight:Hide()
 
     function horizontalList:SetHighlightItem(i)
@@ -102,31 +102,31 @@ end
 ---------------------------------------------------------------------
 -- close dropdown
 ---------------------------------------------------------------------
-function AW.CloseDropdown()
+function AF.CloseDropdown()
     list:Hide()
     horizontalList:Hide()
     if list.menu and not list.menu.isMini then
-        list.menu.button:SetTexture(AW.GetIcon("ArrowDown"))
+        list.menu.button:SetTexture(AF.GetIcon("ArrowDown"))
     end
 end
 
-function AW.RegisterForCloseDropdown(f)
+function AF.RegisterForCloseDropdown(f)
     assert(f and f.HasScript and f:HasScript("OnMouseDown"), "no OnMouseDown for this region!")
-    f:HookScript("OnMouseDown", AW.CloseDropdown)
+    f:HookScript("OnMouseDown", AF.CloseDropdown)
 end
 
 ---------------------------------------------------------------------
 -- dropdown menu
 ---------------------------------------------------------------------
 --- @param maxSlots number max items per "page"
-function AW.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHorizontal, justify, textureAlpha)
+function AF.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHorizontal, justify, textureAlpha)
     if not list then CreateListFrame() end
     if not horizontalList then CreateHorizontalList() end
 
     maxSlots = maxSlots or 10
     textureAlpha = textureAlpha or 0.75
 
-    local menu = AW.CreateBorderedFrame(parent, nil, width, 20, "widget")
+    local menu = AF.CreateBorderedFrame(parent, nil, width, 20, "widget")
     menu:EnableMouse(true)
 
     local currentList = (isMini and isHorizontal) and horizontalList or list
@@ -134,8 +134,8 @@ function AW.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
 
     -- label
     function menu:SetLabel(label, color, font)
-        menu.label = AW.CreateFontString(menu, label, color, font)
-        AW.SetPoint(menu.label, "BOTTOMLEFT", menu, "TOPLEFT", 2, 2)
+        menu.label = AF.CreateFontString(menu, label, color, font)
+        AF.SetPoint(menu.label, "BOTTOMLEFT", menu, "TOPLEFT", 2, 2)
         menu.label:SetText(label)
 
         hooksecurefunc(menu, "SetEnabled", function(self, enabled)
@@ -149,33 +149,33 @@ function AW.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
 
     -- button: open/close menu list
     if isMini then
-        menu.button = AW.CreateButton(menu, nil, "accent_transparent", 20, 20)
+        menu.button = AF.CreateButton(menu, nil, "accent_transparent", 20, 20)
         menu.button:SetAllPoints(menu)
         -- selected item
-        menu.text = AW.CreateFontString(menu.button)
-        AW.SetPoint(menu.text, "LEFT", 1, 0)
-        AW.SetPoint(menu.text, "RIGHT", -1, 0)
+        menu.text = AF.CreateFontString(menu.button)
+        AF.SetPoint(menu.text, "LEFT", 1, 0)
+        AF.SetPoint(menu.text, "RIGHT", -1, 0)
         menu.text:SetJustifyH("CENTER")
     else
-        menu.button = AW.CreateButton(menu, nil, "accent_hover", 18, 20)
+        menu.button = AF.CreateButton(menu, nil, "accent_hover", 18, 20)
         menu.button:SetPoint("TOPRIGHT")
         menu.button:SetPoint("BOTTOMRIGHT")
-        menu.button:SetTexture(AW.GetIcon("ArrowDown"), {16, 16}, {"CENTER", 0, 0})
-        -- menu.button:SetBackdropColor(AW.GetColorRGB("none"))
-        -- menu.button._color = AW.GetColorTable("none")
+        menu.button:SetTexture(AF.GetIcon("ArrowDown"), {16, 16}, {"CENTER", 0, 0})
+        -- menu.button:SetBackdropColor(AF.GetColorRGB("none"))
+        -- menu.button._color = AF.GetColorTable("none")
         -- selected item
-        menu.text = AW.CreateFontString(menu)
-        AW.SetPoint(menu.text, "LEFT", 5, 0)
-        AW.SetPoint(menu.text, "RIGHT", menu.button, "LEFT", -5, 0)
+        menu.text = AF.CreateFontString(menu)
+        AF.SetPoint(menu.text, "LEFT", 5, 0)
+        AF.SetPoint(menu.text, "RIGHT", menu.button, "LEFT", -5, 0)
         menu.text:SetJustifyH("LEFT")
     end
 
-    AW.AddToFontSizeUpdater(menu.text)
+    AF.AddToFontSizeUpdater(menu.text)
 
     -- highlight
-    -- menu.highlight = AW.CreateTexture(menu, nil, AW.GetColorTable("accent", 0.07))
-    -- AW.SetPoint(menu.highlight, "TOPLEFT", 1, -1)
-    -- AW.SetPoint(menu.highlight, "BOTTOMRIGHT", -1, 1)
+    -- menu.highlight = AF.CreateTexture(menu, nil, AF.GetColorTable("accent", 0.07))
+    -- AF.SetPoint(menu.highlight, "TOPLEFT", 1, -1)
+    -- AF.SetPoint(menu.highlight, "BOTTOMRIGHT", -1, 1)
     -- menu.highlight:Hide()
 
     -- hook for tooltips
@@ -194,14 +194,14 @@ function AW.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
     menu.text:SetWordWrap(false)
 
     if dropdownType == "texture" then
-        menu.texture = AW.CreateTexture(isMini and menu.button or menu)
-        AW.SetPoint(menu.texture, "TOPLEFT", 1, -1)
+        menu.texture = AF.CreateTexture(isMini and menu.button or menu)
+        AF.SetPoint(menu.texture, "TOPLEFT", 1, -1)
         if isMini then
-            AW.SetPoint(menu.texture, "BOTTOMRIGHT", -1, 1)
+            AF.SetPoint(menu.texture, "BOTTOMRIGHT", -1, 1)
         else
-            AW.SetPoint(menu.texture, "BOTTOMRIGHT", menu.button, "BOTTOMLEFT", -1, 1)
+            AF.SetPoint(menu.texture, "BOTTOMRIGHT", menu.button, "BOTTOMLEFT", -1, 1)
         end
-        menu.texture:SetVertexColor(AW.GetColorRGB("white", textureAlpha))
+        menu.texture:SetVertexColor(AF.GetColorRGB("white", textureAlpha))
         menu.texture:Hide()
     end
 
@@ -232,7 +232,7 @@ function AW.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
                     menu.texture:SetTexture(item.texture)
                     menu.texture:Show()
                 elseif dropdownType == "font" then
-                    menu.text:SetFont(AW.GetFontProps(item.font))
+                    menu.text:SetFont(AF.GetFontProps(item.font))
                 end
                 break
             end
@@ -325,16 +325,16 @@ function AW.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
             local b
             if not currentList.buttons[i] then
                 -- create new button
-                b = AW.CreateButton(isHorizontal and currentList or currentList.slotFrame, item.text, "accent_transparent", 18 ,18, nil, true) --! width is not important
+                b = AF.CreateButton(isHorizontal and currentList or currentList.slotFrame, item.text, "accent_transparent", 18 ,18, nil, true) --! width is not important
                 table.insert(currentList.buttons, b)
 
-                b.bgTexture = AW.CreateTexture(b)
-                AW.SetPoint(b.bgTexture, "TOPLEFT", 1, -1)
-                AW.SetPoint(b.bgTexture, "BOTTOMRIGHT", -1, 1)
-                b.bgTexture:SetVertexColor(AW.GetColorRGB("white", textureAlpha))
+                b.bgTexture = AF.CreateTexture(b)
+                AF.SetPoint(b.bgTexture, "TOPLEFT", 1, -1)
+                AF.SetPoint(b.bgTexture, "BOTTOMRIGHT", -1, 1)
+                b.bgTexture:SetVertexColor(AF.GetColorRGB("white", textureAlpha))
                 b.bgTexture:Hide()
 
-                AW.AddToFontSizeUpdater(b.text)
+                AF.AddToFontSizeUpdater(b.text)
             else
                 -- re-use button
                 b = currentList.buttons[i]
@@ -348,14 +348,14 @@ function AW.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
             local fs = b.text
             if isMini then
                 fs:SetJustifyH(justify or "CENTER")
-                AW.ClearPoints(fs)
-                AW.SetPoint(fs, "LEFT", 1, 0)
-                AW.SetPoint(fs, "RIGHT", -1, 0)
+                AF.ClearPoints(fs)
+                AF.SetPoint(fs, "LEFT", 1, 0)
+                AF.SetPoint(fs, "RIGHT", -1, 0)
             else
                 fs:SetJustifyH(justify or "LEFT")
-                AW.ClearPoints(fs)
-                AW.SetPoint(fs, "LEFT", 5, 0)
-                AW.SetPoint(fs, "RIGHT", -5, 0)
+                AF.ClearPoints(fs)
+                AF.SetPoint(fs, "LEFT", 5, 0)
+                AF.SetPoint(fs, "RIGHT", -5, 0)
             end
 
             -- texture
@@ -369,10 +369,10 @@ function AW.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
             -- font
             if item.font then
                 -- set
-                b:SetFont(AW.GetFontProps(item.font))
+                b:SetFont(AF.GetFontProps(item.font))
             else
                 -- restore
-                b:SetFont(AW.GetFontProps("normal"))
+                b:SetFont(AF.GetFontProps("normal"))
                 b.Update = nil
             end
 
@@ -396,16 +396,16 @@ function AW.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
                 elseif menu.onClick then
                     menu.onClick(item.value)
                 end
-                if not isMini then menu.button:SetTexture(AW.GetIcon("ArrowDown")) end
+                if not isMini then menu.button:SetTexture(AF.GetIcon("ArrowDown")) end
             end)
 
             -- update point
             if isMini and isHorizontal then
-                AW.SetWidth(b, width)
+                AF.SetWidth(b, width)
                 if i == 1 then
-                    AW.SetPoint(b, "TOPLEFT", 1, -1)
+                    AF.SetPoint(b, "TOPLEFT", 1, -1)
                 else
-                    AW.SetPoint(b, "TOPLEFT", currentList.buttons[i-1], "TOPRIGHT")
+                    AF.SetPoint(b, "TOPLEFT", currentList.buttons[i-1], "TOPRIGHT")
                 end
             end
         end
@@ -413,23 +413,23 @@ function AW.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
         -- update list size / point
         currentList.menu = menu -- check for menu's OnHide -> list:Hide
         currentList:SetParent(menu)
-        AW.SetFrameLevel(currentList, 10, menu)
-        AW.ClearPoints(currentList)
+        AF.SetFrameLevel(currentList, 10, menu)
+        AF.ClearPoints(currentList)
 
         if isMini and isHorizontal then
-            AW.SetPoint(currentList, "TOPLEFT", menu, "TOPRIGHT", 2, 0)
-            AW.SetHeight(currentList, 20)
+            AF.SetPoint(currentList, "TOPLEFT", menu, "TOPRIGHT", 2, 0)
+            AF.SetHeight(currentList, 20)
 
             if #menu.items == 0 then
-                AW.SetWidth(currentList, 5)
+                AF.SetWidth(currentList, 5)
             else
-                AW.SetListWidth(currentList, #menu.items, width, 0, 2)
+                AF.SetListWidth(currentList, #menu.items, width, 0, 2)
             end
 
         else -- using scroll list
-            AW.SetPoint(currentList, "TOPLEFT", menu, "BOTTOMLEFT", 0, -2)
-            AW.SetPoint(currentList, "TOPRIGHT", menu, "BOTTOMRIGHT", 0, -2)
-            -- AW.SetWidth(currentList, width)
+            AF.SetPoint(currentList, "TOPLEFT", menu, "BOTTOMLEFT", 0, -2)
+            AF.SetPoint(currentList, "TOPRIGHT", menu, "BOTTOMRIGHT", 0, -2)
+            -- AF.SetWidth(currentList, width)
 
             currentList:SetSlotNum(min(#buttons, maxSlots))
             currentList:SetWidgets(buttons)
@@ -451,7 +451,7 @@ function AW.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
     menu:SetScript("OnHide", function()
         if currentList.menu == menu then
             currentList:Hide()
-            if not isMini then menu.button:SetTexture(AW.GetIcon("ArrowDown")) end
+            if not isMini then menu.button:SetTexture(AF.GetIcon("ArrowDown")) end
         end
     end)
 
@@ -465,15 +465,15 @@ function AW.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
         if currentList.menu ~= menu then -- list shown by other dropdown
             if currentList.menu and not currentList.menu.isMini then
                 -- restore previous menu's button texture
-                currentList.menu.button:SetTexture(AW.GetIcon("ArrowDown"))
+                currentList.menu.button:SetTexture(AF.GetIcon("ArrowDown"))
             end
             LoadItems()
             currentList:Show()
-            if not isMini then menu.button:SetTexture(AW.GetIcon("ArrowUp")) end
+            if not isMini then menu.button:SetTexture(AF.GetIcon("ArrowUp")) end
 
         elseif currentList:IsShown() then -- list showing by this, hide it
             currentList:Hide()
-            if not isMini then menu.button:SetTexture(AW.GetIcon("ArrowDown")) end
+            if not isMini then menu.button:SetTexture(AF.GetIcon("ArrowDown")) end
 
         else
             if menu.reloadRequired then
@@ -485,7 +485,7 @@ function AW.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
                 end
             end
             currentList:Show()
-            if not isMini then menu.button:SetTexture(AW.GetIcon("ArrowUp")) end
+            if not isMini then menu.button:SetTexture(AF.GetIcon("ArrowUp")) end
         end
     end)
 

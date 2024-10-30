@@ -1,25 +1,25 @@
----@class AbstractWidgets
-local AW = _G.AbstractWidgets
+---@class AbstractFramework
+local AF = _G.AbstractFramework
 
 ---------------------------------------------------------------------
 -- font string
 ---------------------------------------------------------------------
 --- @param color string color name defined in Color.lua
 --- @param font string color name defined in Font.lua
-function AW.CreateFontString(parent, text, color, font, layer)
-    local fs = parent:CreateFontString(nil, layer or "OVERLAY", font or "AW_FONT_NORMAL")
-    if color then AW.ColorFontString(fs, color) end
+function AF.CreateFontString(parent, text, color, font, layer)
+    local fs = parent:CreateFontString(nil, layer or "OVERLAY", font or "AF_FONT_NORMAL")
+    if color then AF.ColorFontString(fs, color) end
     fs:SetText(text)
 
     function fs:SetColor(color)
-        AW.ColorFontString(fs, color)
+        AF.ColorFontString(fs, color)
     end
 
     -- function fs:UpdatePixels()
-    --     AW.RePoint(fs)
+    --     AF.RePoint(fs)
     -- end
 
-    AW.AddToPixelUpdater(fs)
+    AF.AddToPixelUpdater(fs)
 
     return fs
 end
@@ -30,8 +30,8 @@ end
 local pool
 
 local function creationFunc()
-    -- NOTE: do not use AW.CreateFontString, since we don't need UpdatePixels() for it
-    local fs = UIParent:CreateFontString(nil, "OVERLAY", "AW_FONT_NORMAL")
+    -- NOTE: do not use AF.CreateFontString, since we don't need UpdatePixels() for it
+    local fs = UIParent:CreateFontString(nil, "OVERLAY", "AF_FONT_NORMAL")
     fs:Hide()
 
     fs:SetWordWrap(true) -- multiline allowed
@@ -79,7 +79,7 @@ end
 
 pool = CreateObjectPool(creationFunc, resetterFunc)
 
-function AW.ShowNotificationText(text, color, width, hideDelay, point, relativeTo, relativePoint, offsetX, offsetY)
+function AF.ShowNotificationText(text, color, width, hideDelay, point, relativeTo, relativePoint, offsetX, offsetY)
     assert(relativeTo, "parent can not be nil!")
     if relativeTo._notificationString then
         relativeTo._notificationString:HideOut(relativeTo)
@@ -88,7 +88,7 @@ function AW.ShowNotificationText(text, color, width, hideDelay, point, relativeT
     local fs = pool:Acquire()
     fs:SetParent(relativeTo) --! IMPORTANT, if parent is nil, then game will crash (The memory could not be "read")
     fs:SetText(text)
-    AW.ColorFontString(fs, color or "red")
+    AF.ColorFontString(fs, color or "red")
     if width then fs:SetWidth(width) end
 
     -- alignment
@@ -107,7 +107,7 @@ end
 ---------------------------------------------------------------------
 -- scroll text
 ---------------------------------------------------------------------
-function AW.CreateScrollText(parent, frequency, step, startDelay, endDelay)
+function AF.CreateScrollText(parent, frequency, step, startDelay, endDelay)
     -- vars -------------------------------------
     frequency = frequency or 0.02
     step = step or 1
@@ -118,13 +118,13 @@ function AW.CreateScrollText(parent, frequency, step, startDelay, endDelay)
     ---------------------------------------------
 
     local holder = CreateFrame("ScrollFrame", nil, parent)
-    AW.SetHeight(holder, 20)
+    AF.SetHeight(holder, 20)
 
     local content = CreateFrame("Frame", nil, holder)
     content:SetSize(20, 20)
     holder:SetScrollChild(content)
 
-    local text = AW.CreateFontString(content)
+    local text = AF.CreateFontString(content)
     text:SetWordWrap(false)
     text:SetPoint("LEFT")
 
@@ -205,21 +205,21 @@ function AW.CreateScrollText(parent, frequency, step, startDelay, endDelay)
     end)
 
     function holder:SetText(str, color)
-        text:SetText(color and AW.WrapTextInColor(str, color) or str)
+        text:SetText(color and AF.WrapTextInColor(str, color) or str)
         if holder:IsVisible() then
             holder:GetScript("OnShow")()
         end
     end
 
     function holder:UpdatePixels()
-        AW.ReSize(holder)
-        AW.RePoint(holder)
+        AF.ReSize(holder)
+        AF.RePoint(holder)
         if holder:IsVisible() then
             holder:GetScript("OnShow")()
         end
     end
 
-    AW.AddToPixelUpdater(holder)
+    AF.AddToPixelUpdater(holder)
 
     return holder
 end
@@ -228,7 +228,7 @@ end
 -- SetText with length
 ---------------------------------------------------------------------
 --- @param fs FontString
-function AW.SetText(fs, text, length, suffix)
+function AF.SetText(fs, text, length, suffix)
     if length > 0 then
         if length <= 1 then
             local width = fs:GetParent():GetWidth() - 2

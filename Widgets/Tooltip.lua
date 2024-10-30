@@ -1,5 +1,5 @@
----@class AbstractWidgets
-local AW = _G.AbstractWidgets
+---@class AbstractFramework
+local AF = _G.AbstractFramework
 
 ---------------------------------------------------------------------
 -- show / hide
@@ -11,8 +11,8 @@ local anchorOverride = {
     ["BOTTOMRIGHT"] = "TOPRIGHT",
 }
 
-function AW.ShowTooltips(widget, anchor, x, y, content)
-    local tooltip = _G["AWTooltip"]
+function AF.ShowTooltips(widget, anchor, x, y, content)
+    local tooltip = _G["AFTooltip"]
 
     if type(content) ~= "table" or #content == 0 then
         tooltip:Hide()
@@ -20,10 +20,10 @@ function AW.ShowTooltips(widget, anchor, x, y, content)
     end
 
     tooltip:SetParent(widget)
-    AW.ReBorder(tooltip)
+    AF.ReBorder(tooltip)
 
-    x = AW.ConvertPixelsForRegion(x, tooltip)
-    y = AW.ConvertPixelsForRegion(y, tooltip)
+    x = AF.ConvertPixelsForRegion(x, tooltip)
+    y = AF.ConvertPixelsForRegion(y, tooltip)
 
     tooltip:ClearLines()
 
@@ -35,7 +35,7 @@ function AW.ShowTooltips(widget, anchor, x, y, content)
         tooltip:SetOwner(widget, anchor or "ANCHOR_TOP", x or 0, y or 0)
     end
 
-    tooltip:AddLine(content[1], AW.GetColorRGB("accent"))
+    tooltip:AddLine(content[1], AF.GetColorRGB("accent"))
     for i = 2, #content do
         if content[i] then
             tooltip:AddLine(content[i], 1, 1, 1)
@@ -47,7 +47,7 @@ function AW.ShowTooltips(widget, anchor, x, y, content)
     tooltip:Show()
 end
 
-function AW.SetTooltips(widget, anchor, x, y, ...)
+function AF.SetTooltips(widget, anchor, x, y, ...)
     if type(select(1, ...)) == "table" then
         widget._tooltips = ...
     else
@@ -61,45 +61,45 @@ function AW.SetTooltips(widget, anchor, x, y, ...)
         widget._tooltipsInited = true
 
         widget:HookScript("OnEnter", function()
-            AW.ShowTooltips(widget, anchor, x, y, widget._tooltips)
+            AF.ShowTooltips(widget, anchor, x, y, widget._tooltips)
         end)
         widget:HookScript("OnLeave", function()
-            _G["AWTooltip"]:Hide()
+            _G["AFTooltip"]:Hide()
         end)
     end
 end
 
-function AW.ClearTooltips(widget)
+function AF.ClearTooltips(widget)
     widget._tooltips = nil
 end
 
-function AW.HideTooltips()
-    _G["AWTooltip"]:Hide()
+function AF.HideTooltips()
+    _G["AFTooltip"]:Hide()
 end
 
 ---------------------------------------------------------------------
 -- create
 ---------------------------------------------------------------------
 local function CreateTooltip(name, hasIcon)
-    local tooltip = CreateFrame("GameTooltip", name, AW.UIParent, "AWTooltipTemplate,BackdropTemplate")
-    -- local tooltip = CreateFrame("GameTooltip", name, AW.UIParent, "SharedTooltipTemplate,BackdropTemplate")
-    AW.SetDefaultBackdrop(tooltip)
+    local tooltip = CreateFrame("GameTooltip", name, AF.UIParent, "AFTooltipTemplate,BackdropTemplate")
+    -- local tooltip = CreateFrame("GameTooltip", name, AF.UIParent, "SharedTooltipTemplate,BackdropTemplate")
+    AF.SetDefaultBackdrop(tooltip)
     tooltip:SetBackdropColor(0.1, 0.1, 0.1, 0.9)
-    tooltip:SetBackdropBorderColor(AW.GetColorRGB("accent"))
-    tooltip:SetOwner(AW.UIParent, "ANCHOR_NONE")
+    tooltip:SetBackdropBorderColor(AF.GetColorRGB("accent"))
+    tooltip:SetOwner(AF.UIParent, "ANCHOR_NONE")
 
     if hasIcon then
         local iconBG = tooltip:CreateTexture(nil, "BACKGROUND")
         tooltip.iconBG = iconBG
-        AW.SetSize(iconBG, 35, 35)
-        AW.SetPoint(iconBG, "TOPRIGHT", tooltip, "TOPLEFT", -1, 0)
-        iconBG:SetColorTexture(AW.GetColorRGB("accent"))
+        AF.SetSize(iconBG, 35, 35)
+        AF.SetPoint(iconBG, "TOPRIGHT", tooltip, "TOPLEFT", -1, 0)
+        iconBG:SetColorTexture(AF.GetColorRGB("accent"))
         iconBG:Hide()
 
         local icon = tooltip:CreateTexture(nil, "ARTWORK")
         tooltip.icon = icon
-        AW.SetPoint(icon, "TOPLEFT", iconBG, 1, -1)
-        AW.SetPoint(icon, "BOTTOMRIGHT", iconBG, -1, 1)
+        AF.SetPoint(icon, "TOPLEFT", iconBG, 1, -1)
+        AF.SetPoint(icon, "BOTTOMRIGHT", iconBG, -1, 1)
         icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
         icon:Hide()
 
@@ -112,7 +112,7 @@ local function CreateTooltip(name, hasIcon)
         end)
     end
 
-    if AW.isRetail then
+    if AF.isRetail then
         tooltip:RegisterEvent("TOOLTIP_DATA_UPDATE")
         tooltip:SetScript("OnEvent", function()
             if tooltip:IsVisible() then
@@ -131,7 +131,7 @@ local function CreateTooltip(name, hasIcon)
         tooltip:SetPadding(0, 0, 0, 0)
 
         -- reset border color
-        tooltip:SetBackdropBorderColor(AW.GetColorRGB("accent"))
+        tooltip:SetBackdropBorderColor(AF.GetColorRGB("accent"))
 
         -- SetX with invalid data may or may not clear the tooltip's contents.
         tooltip:ClearLines()
@@ -143,15 +143,15 @@ local function CreateTooltip(name, hasIcon)
     end)
 
     function tooltip:UpdatePixels()
-        AW.ReBorder(self)
+        AF.ReBorder(self)
         if hasIcon then
-            AW.RePoint(self.iconBG)
-            AW.RePoint(self.icon)
+            AF.RePoint(self.iconBG)
+            AF.RePoint(self.icon)
         end
     end
 
-    AW.AddToPixelUpdater(tooltip)
+    AF.AddToPixelUpdater(tooltip)
 end
 
-CreateTooltip("AWTooltip")
-CreateTooltip("AWSpellTooltip", true)
+CreateTooltip("AFTooltip")
+CreateTooltip("AFSpellTooltip", true)

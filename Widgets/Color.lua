@@ -1,24 +1,24 @@
----@class AbstractWidgets
-local AW = _G.AbstractWidgets
+---@class AbstractFramework
+local AF = _G.AbstractFramework
 
 ---------------------------------------------------------------------
 -- color utils
 ---------------------------------------------------------------------
-function AW.ConvertToRGB(r, g, b, a, saturation)
+function AF.ConvertToRGB(r, g, b, a, saturation)
     a = a or 255
     saturation = saturation or 1
-    r = AW.Round(r / 255 * saturation, 5)
-    g = AW.Round(g / 255 * saturation, 5)
-    b = AW.Round(b / 255 * saturation, 5)
-    a = AW.Round(a / 255, 5)
+    r = AF.Round(r / 255 * saturation, 5)
+    g = AF.Round(g / 255 * saturation, 5)
+    b = AF.Round(b / 255 * saturation, 5)
+    a = AF.Round(a / 255, 5)
     return r, g, b, a
 end
 
-function AW.ConvertToRGB256(r, g, b, a)
+function AF.ConvertToRGB256(r, g, b, a)
     return floor(r * 255), floor(g * 255), floor(b * 255), a and floor(a * 255)
 end
 
-function AW.ConvertRGB256ToHEX(r, g, b, a)
+function AF.ConvertRGB256ToHEX(r, g, b, a)
     local result = ""
 
     local t = a and {a, r, g, b} or {r, g, b}
@@ -45,11 +45,11 @@ function AW.ConvertRGB256ToHEX(r, g, b, a)
     return result
 end
 
-function AW.ConvertRGBToHEX(r, g, b, a)
-    return AW.ConvertRGB256ToHEX(AW.ConvertToRGB256(r, g, b, a))
+function AF.ConvertRGBToHEX(r, g, b, a)
+    return AF.ConvertRGB256ToHEX(AF.ConvertToRGB256(r, g, b, a))
 end
 
-function AW.ConvertHEXToRGB256(hex)
+function AF.ConvertHEXToRGB256(hex)
     hex = hex:gsub("#","")
     if strlen(hex) == 6 then
         return tonumber("0x"..hex:sub(1,2)), tonumber("0x"..hex:sub(3,4)), tonumber("0x"..hex:sub(5,6))
@@ -58,12 +58,12 @@ function AW.ConvertHEXToRGB256(hex)
     end
 end
 
-function AW.ConvertHEXToRGB(hex)
-    return AW.ConvertToRGB(AW.ConvertHEXToRGB256(hex))
+function AF.ConvertHEXToRGB(hex)
+    return AF.ConvertToRGB(AF.ConvertHEXToRGB256(hex))
 end
 
 -- https://warcraft.wiki.gg/wiki/ColorGradient
-function AW.ColorGradient(perc, r1,g1,b1, r2,g2,b2, r3,g3,b3)
+function AF.ColorGradient(perc, r1,g1,b1, r2,g2,b2, r3,g3,b3)
     perc = perc or 1
     if perc >= 1 then
         return r3, g3, b3
@@ -88,7 +88,7 @@ end
         S = Saturation [0, 1]
         B = Brightness [0, 1]
 ]]--
-function AW.ConvertRGBToHSB(r, g, b)
+function AF.ConvertRGBToHSB(r, g, b)
     local colorMax = max(r, g, b)
     local colorMin = min(r, g, b)
     local delta = colorMax - colorMin
@@ -140,7 +140,7 @@ end
         G = Green [0,1]
         B = Blue [0,1]
 ]]--
-function AW.ConvertHSBToRGB(h, s, b)
+function AF.ConvertHSBToRGB(h, s, b)
     local chroma = b * s
     local prime = (h / 60) % 6
     local X = chroma * (1 - abs((prime % 2) - 1))
@@ -193,7 +193,8 @@ local UnitReaction = UnitReaction
 
 local colors = {
     -- accent
-    ["accent"] = {["hex"]="ffff6600", ["t"]={1, 0.4, 0, 1}, ["normal"]={1, 0.4, 0, 0.3}, ["hover"]={1, 0.4, 0, 0.6}}, -- orangered
+    ["accent"] = {["hex"]="ffff6600", ["t"]={1, 0.4, 0, 1}, ["normal"]={1, 0.4, 0, 0.3}, ["hover"]={1, 0.4, 0, 0.6}},
+    ["accent_alt"] = {["hex"]="ffff0066", ["t"]={1, 0, 0.4, 1}, ["normal"]={1, 0, 0.4, 0.3}, ["hover"]={1, 0, 0.4, 0.6}},
 
     -- for regions
     ["background"] = {["hex"]="e61a1a1a", ["t"]={0.1, 0.1, 0.1, 0.9}},
@@ -308,7 +309,11 @@ local colors = {
     ["WoWToken"] = {["hex"]="ff00ccff", ["t"]={0, 0.8, 1, 1}}, -- ITEM_QUALITY8_DESC
 }
 
-function AW.GetColorRGB(name, alpha, saturation)
+function AF.HasColor(name)
+    return colors[name] and true or false
+end
+
+function AF.GetColorRGB(name, alpha, saturation)
     assert(colors[name], "no such color:", name)
     -- if not colors[name] then
     --     return 1, 1, 1, 1
@@ -319,10 +324,10 @@ function AW.GetColorRGB(name, alpha, saturation)
     return colors[name]["t"][1]*saturation, colors[name]["t"][2]*saturation, colors[name]["t"][3]*saturation, alpha
 end
 
-function AW.GetColorTable(name, alpha, saturation)
+function AF.GetColorTable(name, alpha, saturation)
     assert(colors[name], "no such color:", name)
     -- if not colors[name] then
-    --     return AW.GetColorTable("white", alpha, saturation)
+    --     return AF.GetColorTable("white", alpha, saturation)
     -- end
 
     saturation = saturation or 1
@@ -331,16 +336,16 @@ function AW.GetColorTable(name, alpha, saturation)
     return {colors[name]["t"][1]*saturation, colors[name]["t"][2]*saturation, colors[name]["t"][3]*saturation, alpha}
 end
 
-function AW.GetColorHex(name)
+function AF.GetColorHex(name)
     assert(colors[name], "no such color:", name)
     if not colors[name]["hex"] then
-        colors[name]["hex"] = AW.ConvertRGB256ToHEX(AW.ConvertToRGB256(unpack(colors[name]["t"])))
+        colors[name]["hex"] = AF.ConvertRGB256ToHEX(AF.ConvertToRGB256(unpack(colors[name]["t"])))
     end
     return colors[name]["hex"]
 end
 
 local ADDONS = {}
-function AW.RegisterAddonForAccentColor(addon)
+function AF.RegisterAddonForAccentColor(addon)
     ADDONS[addon] = true
 end
 
@@ -354,7 +359,7 @@ end
 
 ---@param color string|table
 ---@param alias string?
-function AW.SetAccentColor(color, alias)
+function AF.SetAccentColor(color, alias)
     local addon = GetAddon()
     assert(addon, "no registered addon found")
 
@@ -364,13 +369,13 @@ function AW.SetAccentColor(color, alias)
         else
             color = strlower(color)
             local hex = strlen(color) == 6 and "ff" .. color or color
-            colors[addon] = {["hex"] = hex, ["t"] = {AW.ConvertHEXToRGB(hex)}}
+            colors[addon] = {["hex"] = hex, ["t"] = {AF.ConvertHEXToRGB(hex)}}
         end
     elseif type(color) == "table" then
         if #color == 3 then
             color[4] = 1
         end
-        colors[addon] = {["hex"] = AW.ConvertRGBToHEX(AW.UnpackColor(color)), ["t"] = color}
+        colors[addon] = {["hex"] = AF.ConvertRGBToHEX(AF.UnpackColor(color)), ["t"] = color}
     end
 
     if alias then
@@ -378,27 +383,27 @@ function AW.SetAccentColor(color, alias)
     end
 end
 
-function AW.GetAccentColorName()
+function AF.GetAccentColorName()
     return GetAddon() or "accent"
 end
 
-function AW.GetAccentColorTable(alpha)
-    return AW.GetColorTable(AW.GetAccentColorName(), alpha)
+function AF.GetAccentColorTable(alpha)
+    return AF.GetColorTable(AF.GetAccentColorName(), alpha)
 end
 
-function AW.GetAccentColorRGB(alpha)
-    return AW.GetColorRGB(AW.GetAccentColorName(), alpha)
+function AF.GetAccentColorRGB(alpha)
+    return AF.GetColorRGB(AF.GetAccentColorName(), alpha)
 end
 
-function AW.GetAccentColorHex(alpha)
-    return AW.GetColorHex(AW.GetAccentColorName(), alpha)
+function AF.GetAccentColorHex(alpha)
+    return AF.GetColorHex(AF.GetAccentColorName(), alpha)
 end
 
-function AW.GetClassColor(class, alpha, saturation)
+function AF.GetClassColor(class, alpha, saturation)
     saturation = saturation or 1
 
     if colors[class] then
-        return AW.GetColorRGB(class, alpha, saturation)
+        return AF.GetColorRGB(class, alpha, saturation)
     end
 
     if RAID_CLASS_COLORS[class] then
@@ -406,27 +411,27 @@ function AW.GetClassColor(class, alpha, saturation)
         return r*saturation, g*saturation, b*saturation, alpha
     end
 
-    return AW.GetColorRGB("UNKNOWN")
+    return AF.GetColorRGB("UNKNOWN")
 end
 
-function AW.GetReactionColor(unit, alpha, saturation)
+function AF.GetReactionColor(unit, alpha, saturation)
     --! reaction to player, MUST use UnitReaction(unit, "player")
     --! NOT UnitReaction("player", unit)
     local reaction = UnitReaction(unit, "player") or 0
     if reaction <= 2 then
-        return AW.GetColorRGB("HOSTILE", alpha, saturation)
+        return AF.GetColorRGB("HOSTILE", alpha, saturation)
     elseif reaction <= 4 then
-        return AW.GetColorRGB("NEUTRAL", alpha, saturation)
+        return AF.GetColorRGB("NEUTRAL", alpha, saturation)
     else
-        return AW.GetColorRGB("FRIENDLY", alpha, saturation)
+        return AF.GetColorRGB("FRIENDLY", alpha, saturation)
     end
 end
 
-function AW.GetPowerColor(power, unit, alpha, saturation)
+function AF.GetPowerColor(power, unit, alpha, saturation)
     saturation = saturation or 1
 
     if colors[power] then
-        return AW.GetColorRGB(power, alpha, saturation)
+        return AF.GetColorRGB(power, alpha, saturation)
     end
 
     if unit then
@@ -436,42 +441,87 @@ function AW.GetPowerColor(power, unit, alpha, saturation)
         end
     end
 
-    return AW.GetColorRGB("MANA", alpha, saturation)
+    return AF.GetColorRGB("MANA", alpha, saturation)
 end
 
-function AW.ColorFontString(fs, name)
+function AF.AddColor(name, color)
+    colors[name] = {["t"] = color, ["hex"] = AF.ConvertRGBToHEX(AF.UnpackColor(color))}
+end
+
+function AF.AddColors(t)
+    for k, v in pairs(t) do
+        AF.AddColor(k, v)
+    end
+end
+
+function AF.UnpackColor(t, alpha)
+    return t[1], t[2], t[3], alpha or t[4]
+end
+
+function AF.ExtractColor(t, alpha)
+    return t.r, t.g, t.b, alpha or t.a
+end
+
+---------------------------------------------------------------------
+-- coloring
+---------------------------------------------------------------------
+function AF.ColorFontString(fs, name)
     assert(colors[name], "no such color:", name)
     fs:SetTextColor(colors[name]["t"][1], colors[name]["t"][2], colors[name]["t"][3])
 end
 
-function AW.WrapTextInColor(text, name)
+function AF.WrapTextInColor(text, name)
     -- assert(colors[name], "no such color:", name)
     if not colors[name] then
         return text
     end
-    return AW.WrapTextInColorCode(text, colors[name]["hex"])
+    return AF.WrapTextInColorCode(text, colors[name]["hex"])
 end
 
-function AW.WrapTextInColorCode(text, colorHexString)
+function AF.WrapTextInColorCode(text, colorHexString)
     return ("|c%s%s|r"):format(colorHexString, text)
 end
 
-function AW.AddColor(name, color)
-    colors[name] = {["t"] = color, ["hex"] = AW.ConvertRGBToHEX(AW.UnpackColor(color))}
+function AF.Interpolate(start, stop, step, maxSteps)
+    return start + (stop - start) * step / maxSteps
 end
 
-function AW.AddColors(t)
-    for k, v in pairs(t) do
-        AW.AddColor(k, v)
+
+---@param text string
+---@param startColor string colorName or hexColor
+---@param endColor string colorName or hexColor
+---@return string: colored text
+function AF.GetGradientText(text, startColor, endColor)
+    local gradient = ""
+    local length = #text
+    local r1, g1, b1, r2, g2, b2
+
+    if colors[startColor] then
+        r1, g1, b1 = AF.ConvertHEXToRGB256(AF.GetColorHex(startColor))
+    else
+        r1, g1, b1 = AF.ConvertHEXToRGB256(startColor)
     end
-end
 
-function AW.UnpackColor(t, alpha)
-    return t[1], t[2], t[3], alpha or t[4]
-end
+    if colors[endColor] then
+        r2, g2, b2 = AF.ConvertHEXToRGB256(AF.GetColorHex(endColor))
+    else
+        r2, g2, b2 = AF.ConvertHEXToRGB256(endColor)
+    end
 
-function AW.ExtractColor(t, alpha)
-    return t.r, t.g, t.b, alpha or t.a
+    print(r1, g1, b1)
+    print(r2, g2, b2)
+
+    local r, g, b, hex
+    for i = 0, length - 1 do
+        r = AF.Interpolate(r1, r2, i, length - 1)
+        g = AF.Interpolate(g1, g2, i, length - 1)
+        b = AF.Interpolate(b1, b2, i, length - 1)
+        hex = AF.ConvertRGB256ToHEX(r, g, b)
+        print(hex)
+        gradient = gradient .. "|cff" .. hex .. text:sub(i + 1, i + 1) .. "|r"
+    end
+
+    return gradient
 end
 
 ---------------------------------------------------------------------
@@ -497,22 +547,22 @@ local buttonColors = {
     ["lavender"] = {["normal"]={0.96, 0.73, 1, 0.35}, ["hover"]={0.96, 0.73, 1, 0.65}},
 }
 
-function AW.GetButtonNormalColor(name)
+function AF.GetButtonNormalColor(name)
     assert(buttonColors[name], "no such button color:", name)
     return buttonColors[name]["normal"]
 end
 
-function AW.GetButtonHoverColor(name)
+function AF.GetButtonHoverColor(name)
     assert(buttonColors[name], "no such button color:", name)
     return buttonColors[name]["hover"]
 end
 
-function AW.AddButtonColor(name, normalColor, hoverColor)
+function AF.AddButtonColor(name, normalColor, hoverColor)
     buttonColors[name] = {["normal"] = normalColor, ["hover"] = hoverColor}
 end
 
-function AW.AddButtonColors(t)
+function AF.AddButtonColors(t)
     for k, v in pairs(t) do
-        AW.AddColor(k, v.normalColor, v.hoverColor)
+        AF.AddColor(k, v.normalColor, v.hoverColor)
     end
 end

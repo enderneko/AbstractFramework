@@ -1,5 +1,5 @@
----@class AbstractWidgets
-local AW = _G.AbstractWidgets
+---@class AbstractFramework
+local AF = _G.AbstractFramework
 
 --TODO: adjust text colors
 
@@ -7,16 +7,16 @@ local AW = _G.AbstractWidgets
 -- net stats
 ---------------------------------------------------------------------
 --- @param layout string "horizontal|vertical"
-function AW.CreateNetStatsPane(parent, anchorPoint, showBandwidth, showLatency, layout)
+function AF.CreateNetStatsPane(parent, anchorPoint, showBandwidth, showLatency, layout)
     anchorPoint = anchorPoint or "LEFT"
     anchorPoint = strupper(anchorPoint)
     layout = layout or "horizontal"
     layout = strlower(layout)
 
-    local f = AW.CreateFrame(parent, 20, 20)
+    local f = AF.CreateFrame(parent, 20, 20)
 
-    f.text = AW.CreateFontString(f, nil, "sand", "AW_FONT_SMALL")
-    AW.SetPoint(f.text, anchorPoint)
+    f.text = AF.CreateFontString(f, nil, "sand", "AF_FONT_SMALL")
+    AF.SetPoint(f.text, anchorPoint)
     if strfind(anchorPoint, "LEFT$") then
         f.text:SetJustifyH("LEFT")
     elseif strfind(anchorPoint, "RIGHT$") then
@@ -28,13 +28,13 @@ function AW.CreateNetStatsPane(parent, anchorPoint, showBandwidth, showLatency, 
     local str = ""
 
     if showBandwidth then
-        str = str .. AW.GetIconString("Upload") .. "%sKB/s_"
-        str = str .. AW.GetIconString("Download") .. "%sKB/s_"
+        str = str .. AF.GetIconString("Upload") .. "%sKB/s_"
+        str = str .. AF.GetIconString("Download") .. "%sKB/s_"
     end
 
     if showLatency then
-        str = str .. AW.GetIconString("Home") .. "%sms_"
-        str = str .. AW.GetIconString("World") .. "%sms_"
+        str = str .. AF.GetIconString("Home") .. "%sms_"
+        str = str .. AF.GetIconString("World") .. "%sms_"
     end
 
     if layout == "horizontal" then
@@ -81,14 +81,14 @@ end
 ---------------------------------------------------------------------
 -- fps
 ---------------------------------------------------------------------
-function AW.CreateFPSPane(parent, anchorPoint)
+function AF.CreateFPSPane(parent, anchorPoint)
     anchorPoint = anchorPoint or "LEFT"
     anchorPoint = strupper(anchorPoint)
 
-    local f = AW.CreateFrame(parent, 20, 20)
+    local f = AF.CreateFrame(parent, 20, 20)
 
-    f.text = AW.CreateFontString(f, nil, "sand", "AW_FONT_SMALL")
-    AW.SetPoint(f.text, anchorPoint)
+    f.text = AF.CreateFontString(f, nil, "sand", "AF_FONT_SMALL")
+    AF.SetPoint(f.text, anchorPoint)
     if strfind(anchorPoint, "LEFT$") then
         f.text:SetJustifyH("LEFT")
     elseif strfind(anchorPoint, "RIGHT$") then

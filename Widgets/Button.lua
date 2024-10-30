@@ -1,5 +1,5 @@
----@class AbstractWidgets
-local AW = _G.AbstractWidgets
+---@class AbstractFramework
+local AF = _G.AbstractFramework
 
 ---------------------------------------------------------------------
 -- button
@@ -23,32 +23,32 @@ end
 --- @param color string if strfind(color, "transparent"), border is transparent, but still exists
 --- @param noBorder boolean no edgeFile for backdrop
 --- @param noBackground boolean remove background texture, not background color
-function AW.CreateButton(parent, text, color, width, height, template, noBorder, noBackground, font)
+function AF.CreateButton(parent, text, color, width, height, template, noBorder, noBackground, font)
     local b = CreateFrame("Button", nil, parent, template and template..",BackdropTemplate" or "BackdropTemplate")
-    if parent then AW.SetFrameLevel(b, 1) end
-    AW.SetSize(b, width, height)
+    if parent then AF.SetFrameLevel(b, 1) end
+    AF.SetSize(b, width, height)
 
     RegisterMouseDownUp(b)
 
     -- keep color & hoverColor ------------------
-    b._color = AW.GetButtonNormalColor(color)
-    b._hoverColor = AW.GetButtonHoverColor(color)
+    b._color = AF.GetButtonNormalColor(color)
+    b._hoverColor = AF.GetButtonHoverColor(color)
 
     -- text -------------------------------------
-    b.text = AW.CreateFontString(b, text, nil, font)
+    b.text = AF.CreateFontString(b, text, nil, font)
     b.text:SetWordWrap(false)
-    AW.SetPoint(b.text, "LEFT", 2, 0)
-    AW.SetPoint(b.text, "RIGHT", -2, 0)
+    AF.SetPoint(b.text, "LEFT", 2, 0)
+    AF.SetPoint(b.text, "RIGHT", -2, 0)
     b.text:SetText(text)
 
     b.onMouseDownText = function()
         if b._disableTextPushEffect then return end
-        b.text:AdjustPointsOffset(0, -AW.GetOnePixelForRegion(b))
+        b.text:AdjustPointsOffset(0, -AF.GetOnePixelForRegion(b))
     end
 
     b.onMouseUpText = function()
         if b._disableTextPushEffect then return end
-        AW.RePoint(b.text)
+        AF.RePoint(b.text)
     end
 
     b:SetScript("OnEnable", function()
@@ -110,21 +110,21 @@ function AW.CreateButton(parent, text, color, width, height, template, noBorder,
 
     -- border -----------------------------------
     if noBorder then
-        AW.SetDefaultBackdrop_NoBorder(b)
+        AF.SetDefaultBackdrop_NoBorder(b)
     else
-        AW.SetDefaultBackdrop(b)
-        -- local n = AW.GetOnePixelForRegion(b)
-        -- b:SetBackdrop({bgFile=AW.GetPlainTexture(), edgeFile=AW.GetPlainTexture(), edgeSize=n, insets={left=n, right=n, top=n, bottom=n}})
+        AF.SetDefaultBackdrop(b)
+        -- local n = AF.GetOnePixelForRegion(b)
+        -- b:SetBackdrop({bgFile=AF.GetPlainTexture(), edgeFile=AF.GetPlainTexture(), edgeSize=n, insets={left=n, right=n, top=n, bottom=n}})
     end
 
     --- @param color string|nil
     function b:SetBorderHighlightColor(color)
         if color then
             b.highlightBorder = function()
-                b:SetBackdropBorderColor(AW.GetColorRGB(color))
+                b:SetBackdropBorderColor(AF.GetColorRGB(color))
             end
             b.unhighlightBorder = function()
-                b:SetBackdropBorderColor(AW.GetColorRGB("black"))
+                b:SetBackdropBorderColor(AF.GetColorRGB("black"))
             end
         else
             b.highlightBorder = nil
@@ -138,9 +138,9 @@ function AW.CreateButton(parent, text, color, width, height, template, noBorder,
         b._disableTextPushEffect = true
         b:SetBackdropBorderColor(0, 0, 0, 0) -- make border transparent, but still exists
         b.text:SetJustifyH("LEFT")
-        AW.ClearPoints(b.text)
-        AW.SetPoint(b.text, "LEFT", 5, 0)
-        AW.SetPoint(b.text, "RIGHT", -5, 0)
+        AF.ClearPoints(b.text)
+        AF.SetPoint(b.text, "LEFT", 5, 0)
+        AF.SetPoint(b.text, "RIGHT", -5, 0)
     elseif color == "none" then -- transparent color, border, background
         b:SetBackdropBorderColor(0, 0, 0, 0)
     else
@@ -149,7 +149,7 @@ function AW.CreateButton(parent, text, color, width, height, template, noBorder,
             bg:SetDrawLayer("BACKGROUND", -8)
             b.bg = bg
             bg:SetAllPoints(b)
-            bg:SetColorTexture(AW.GetColorRGB("widget"))
+            bg:SetColorTexture(AF.GetColorRGB("widget"))
         end
 
         b:SetBackdropBorderColor(0, 0, 0, 1)
@@ -170,7 +170,7 @@ function AW.CreateButton(parent, text, color, width, height, template, noBorder,
     end)
 
     -- click sound ------------------------------
-    if not AW.isVanilla then
+    if not AF.isVanilla then
         if template and strfind(template, "SecureActionButtonTemplate") then
             b._isSecure = true
             -- NOTE: ActionButtonUseKeyDown will affect OnClick
@@ -207,27 +207,27 @@ function AW.CreateButton(parent, text, color, width, height, template, noBorder,
             -- enable / disable
             b:HookScript("OnEnable", function()
                 b.texture:SetDesaturated(false)
-                b.texture:SetVertexColor(AW.GetColorRGB("white"))
+                b.texture:SetVertexColor(AF.GetColorRGB("white"))
             end)
             b:HookScript("OnDisable", function()
                 b.texture:SetDesaturated(true)
-                b.texture:SetVertexColor(AW.GetColorRGB("disabled"))
+                b.texture:SetVertexColor(AF.GetColorRGB("disabled"))
             end)
 
             assert(#point==3, "point format error! should be something like {\"CENTER\", 0, 0}")
-            AW.SetPoint(b.texture, unpack(point))
-            AW.SetSize(b.texture, unpack(size))
+            AF.SetPoint(b.texture, unpack(point))
+            AF.SetSize(b.texture, unpack(size))
 
             -- update fontstring point
-            AW.ClearPoints(b.text)
-            AW.SetPoint(b.text, "LEFT", b.texture, "RIGHT", 2, 0)
-            AW.SetPoint(b.text, "RIGHT", -2, 0)
+            AF.ClearPoints(b.text)
+            AF.SetPoint(b.text, "LEFT", b.texture, "RIGHT", 2, 0)
+            AF.SetPoint(b.text, "RIGHT", -2, 0)
             -- push effect
             b._disableTextPushEffect = true
             if not noPushDownEffect then
                 b.onMouseDownTexture = function()
                     b.texture:ClearAllPoints()
-                    b.texture:SetPoint(point[1], point[2], point[3]-AW.GetOnePixelForRegion(b))
+                    b.texture:SetPoint(point[1], point[2], point[3]-AF.GetOnePixelForRegion(b))
                 end
                 b.onMouseUpTexture = function()
                     b.texture:ClearAllPoints()
@@ -244,21 +244,21 @@ function AW.CreateButton(parent, text, color, width, height, template, noBorder,
     end
 
     function b:UpdatePixels()
-        AW.ReSize(b)
-        AW.RePoint(b)
-        AW.RePoint(b.text)
+        AF.ReSize(b)
+        AF.RePoint(b)
+        AF.RePoint(b.text)
 
         if not noBorder then
-            AW.ReBorder(b)
+            AF.ReBorder(b)
         end
 
         if b.texture then
-            AW.ReSize(b.texture)
-            AW.RePoint(b.texture)
+            AF.ReSize(b.texture)
+            AF.RePoint(b.texture)
         end
     end
 
-    AW.AddToPixelUpdater(b)
+    AF.AddToPixelUpdater(b)
 
     return b
 end
@@ -266,29 +266,29 @@ end
 ---------------------------------------------------------------------
 -- button group
 ---------------------------------------------------------------------
-function AW.CreateButtonGroup(buttons, onClick, selectedFn, unselectedFn, onEnter, onLeave)
+function AF.CreateButtonGroup(buttons, onClick, selectedFn, unselectedFn, onEnter, onLeave)
     local function HighlightButton(id)
         for _, b in pairs(buttons) do
             if id == b.id then
                 b:SetBackdropColor(unpack(b._hoverColor))
                 b:SetScript("OnEnter", function()
-                    if b._tooltips then AW.ShowTooltips(b, b._tooltipsAnchor, b._tooltipsX, b._tooltipsY, b._tooltips) end
+                    if b._tooltips then AF.ShowTooltips(b, b._tooltipsAnchor, b._tooltipsX, b._tooltipsY, b._tooltips) end
                     if onEnter then onEnter(b) end
                 end)
                 b:SetScript("OnLeave", function()
-                    AW.HideTooltips()
+                    AF.HideTooltips()
                     if onLeave then onLeave(b) end
                 end)
                 if selectedFn then selectedFn(b.id, b) end
             else
                 b:SetBackdropColor(unpack(b._color))
                 b:SetScript("OnEnter", function()
-                    if b._tooltips then AW.ShowTooltips(b, b._tooltipsAnchor, b._tooltipsX, b._tooltipsY, b._tooltips) end
+                    if b._tooltips then AF.ShowTooltips(b, b._tooltipsAnchor, b._tooltipsX, b._tooltipsY, b._tooltips) end
                     b:SetBackdropColor(unpack(b._hoverColor))
                     if onEnter then onEnter(b) end
                 end)
                 b:SetScript("OnLeave", function()
-                    AW.HideTooltips()
+                    AF.HideTooltips()
                     b:SetBackdropColor(unpack(b._color))
                     if onLeave then onLeave(b) end
                 end)
@@ -310,10 +310,11 @@ end
 ---------------------------------------------------------------------
 -- close button
 ---------------------------------------------------------------------
-function AW.CreateCloseButton(parent, frameToHide, width, height, offset)
-    local b = AW.CreateButton(parent, nil, "red", width, height)
-    offset = offset or 6
-    b:SetTexture(AW.GetIcon("Close"), {width-offset, height-offset}, {"CENTER", 0, 0})
+function AF.CreateCloseButton(parent, frameToHide, width, height, padding)
+    padding = padding or 6
+
+    local b = AF.CreateButton(parent, nil, "red", width, height)
+    b:SetTexture(AF.GetIcon("Close"), {width - padding, height - padding}, {"CENTER", 0, 0})
     b:SetScript("OnClick", function()
         if frameToHide then
             frameToHide:Hide()
@@ -325,14 +326,58 @@ function AW.CreateCloseButton(parent, frameToHide, width, height, offset)
 end
 
 ---------------------------------------------------------------------
+-- icon button
+---------------------------------------------------------------------
+---@param color string|table?
+---@param hoverColor string|table?
+function AF.CreateIconButton(parent, icon, width, height, padding, color, hoverColor, noPushDownEffect, filterMode)
+    padding = padding or 0
+
+    local b = CreateFrame("Button", nil, parent)
+    AF.SetSize(b, width, height)
+
+    b.icon = b:CreateTexture(nil, "ARTWORK")
+    b.icon:SetPoint("CENTER")
+    AF.SetSize(b.icon, width - padding, height - padding)
+    b.icon:SetTexture(icon, nil, nil, filterMode)
+
+    b.color = type(color) == "string" and AF.GetColorTable(color) or (color or AF.GetColorTable("white"))
+    b.hoverColor = type(hoverColor) == "string" and AF.GetColorTable(hoverColor) or (hoverColor or AF.GetColorTable("white"))
+    b.icon:SetVertexColor(AF.UnpackColor(b.color))
+
+    b:SetScript("OnEnter", function()
+        b.icon:SetVertexColor(AF.UnpackColor(b.hoverColor))
+    end)
+    b:SetScript("OnLeave", function()
+        b.icon:SetVertexColor(AF.UnpackColor(b.color))
+    end)
+
+    if not noPushDownEffect then
+        RegisterMouseDownUp(b)
+        b.onMouseDownTexture = function()
+            b.icon:ClearAllPoints()
+            b.icon:SetPoint("CENTER", 0, -AF.GetOnePixelForRegion(b))
+        end
+        b.onMouseUpTexture = function()
+            b.icon:ClearAllPoints()
+            b.icon:SetPoint("CENTER")
+        end
+    end
+
+    AF.AddToPixelUpdater(b)
+
+    return b
+end
+
+---------------------------------------------------------------------
 -- check button
 ---------------------------------------------------------------------
-function AW.CreateCheckButton(parent, label, onClick)
+function AF.CreateCheckButton(parent, label, onClick)
     -- InterfaceOptionsCheckButtonTemplate --> FrameXML\InterfaceOptionsPanels.xml line 19
     -- OptionsBaseCheckButtonTemplate -->  FrameXML\OptionsPanelTemplates.xml line 10
 
     local cb = CreateFrame("CheckButton", nil, parent, "BackdropTemplate")
-    AW.SetSize(cb, 14, 14)
+    AF.SetSize(cb, 14, 14)
 
     cb.onClick = onClick
     cb:SetScript("OnClick", function(self)
@@ -340,7 +385,7 @@ function AW.CreateCheckButton(parent, label, onClick)
         if self.onClick then self.onClick(self:GetChecked() and true or false, self) end
     end)
 
-    cb.label = cb:CreateFontString(nil, "OVERLAY", "AW_FONT_NORMAL")
+    cb.label = cb:CreateFontString(nil, "OVERLAY", "AF_FONT_NORMAL")
     cb.label:SetPoint("LEFT", cb, "RIGHT", 5, 0)
 
     function cb:SetText(text)
@@ -354,19 +399,19 @@ function AW.CreateCheckButton(parent, label, onClick)
 
     cb:SetText(label)
 
-    AW.SetDefaultBackdrop(cb)
-    cb:SetBackdropColor(AW.GetColorRGB("widget"))
+    AF.SetDefaultBackdrop(cb)
+    cb:SetBackdropColor(AF.GetColorRGB("widget"))
     cb:SetBackdropBorderColor(0, 0, 0, 1)
 
     local checkedTexture = cb:CreateTexture(nil, "ARTWORK")
-    checkedTexture:SetColorTexture(AW.GetColorRGB("accent", 0.7))
-    AW.SetPoint(checkedTexture, "TOPLEFT", 1, -1)
-    AW.SetPoint(checkedTexture, "BOTTOMRIGHT", -1, 1)
+    checkedTexture:SetColorTexture(AF.GetColorRGB("accent", 0.7))
+    AF.SetPoint(checkedTexture, "TOPLEFT", 1, -1)
+    AF.SetPoint(checkedTexture, "BOTTOMRIGHT", -1, 1)
 
     local highlightTexture = cb:CreateTexture(nil, "ARTWORK")
-    highlightTexture:SetColorTexture(AW.GetColorRGB("accent", 0.1))
-    AW.SetPoint(highlightTexture, "TOPLEFT", 1, -1)
-    AW.SetPoint(highlightTexture, "BOTTOMRIGHT", -1, 1)
+    highlightTexture:SetColorTexture(AF.GetColorRGB("accent", 0.1))
+    AF.SetPoint(highlightTexture, "TOPLEFT", 1, -1)
+    AF.SetPoint(highlightTexture, "BOTTOMRIGHT", -1, 1)
 
     cb:SetCheckedTexture(checkedTexture)
     cb:SetHighlightTexture(highlightTexture, "ADD")
@@ -374,25 +419,25 @@ function AW.CreateCheckButton(parent, label, onClick)
 
     cb:SetScript("OnEnable", function()
         cb.label:SetTextColor(1, 1, 1)
-        checkedTexture:SetColorTexture(AW.GetColorRGB("accent", 0.7))
+        checkedTexture:SetColorTexture(AF.GetColorRGB("accent", 0.7))
         cb:SetBackdropBorderColor(0, 0, 0, 1)
     end)
 
     cb:SetScript("OnDisable", function()
-        cb.label:SetTextColor(AW.GetColorRGB("disabled"))
-        checkedTexture:SetColorTexture(AW.GetColorRGB("disabled", 0.7))
+        cb.label:SetTextColor(AF.GetColorRGB("disabled"))
+        checkedTexture:SetColorTexture(AF.GetColorRGB("disabled", 0.7))
         cb:SetBackdropBorderColor(0, 0, 0, 0.7)
     end)
 
     function cb:UpdatePixels()
-        AW.ReSize(cb)
-        AW.RePoint(cb)
-        AW.ReBorder(cb)
-        AW.RePoint(checkedTexture)
-        AW.RePoint(highlightTexture)
+        AF.ReSize(cb)
+        AF.RePoint(cb)
+        AF.ReBorder(cb)
+        AF.RePoint(checkedTexture)
+        AF.RePoint(highlightTexture)
     end
 
-    AW.AddToPixelUpdater(cb)
+    AF.AddToPixelUpdater(cb)
 
     return cb
 end
@@ -401,12 +446,12 @@ end
 -- switch
 ---------------------------------------------------------------------
 --- @param labels table {{["text"]=(string), ["value"]=(boolean/string/number), ["onClick"]=(function)}, ...}
-function AW.CreateSwitch(parent, width, height, labels)
-    local switch = AW.CreateBorderedFrame(parent, nil, width, height, "widget")
+function AF.CreateSwitch(parent, width, height, labels)
+    local switch = AF.CreateBorderedFrame(parent, nil, width, height, "widget")
 
-    switch.highlight = AW.CreateTexture(switch, nil, AW.GetColorTable("accent", 0.07))
-    AW.SetPoint(switch.highlight, "TOPLEFT", 1, -1)
-    AW.SetPoint(switch.highlight, "BOTTOMRIGHT", -1, 1)
+    switch.highlight = AF.CreateTexture(switch, nil, AF.GetColorTable("accent", 0.07))
+    AF.SetPoint(switch.highlight, "TOPLEFT", 1, -1)
+    AF.SetPoint(switch.highlight, "BOTTOMRIGHT", -1, 1)
     switch.highlight:Hide()
 
     switch:SetScript("OnEnter", function()
@@ -423,41 +468,41 @@ function AW.CreateSwitch(parent, width, height, labels)
     -- buttons
     local buttons = {}
     for i, l in pairs(labels) do
-        buttons[i] = AW.CreateButton(switch, labels[i].text, "none", buttonWidth, height)
+        buttons[i] = AF.CreateButton(switch, labels[i].text, "none", buttonWidth, height)
         buttons[i].value = labels[i].value or labels[i].text
         buttons[i].isSelected = false
 
-        buttons[i].highlight = AW.CreateTexture(buttons[i], nil, AW.GetColorTable("accent", 0.8))
-        AW.SetPoint(buttons[i].highlight, "BOTTOMLEFT", 1, 1)
-        AW.SetPoint(buttons[i].highlight, "BOTTOMRIGHT", -1, 1)
-        AW.SetHeight(buttons[i].highlight, 1)
+        buttons[i].highlight = AF.CreateTexture(buttons[i], nil, AF.GetColorTable("accent", 0.8))
+        AF.SetPoint(buttons[i].highlight, "BOTTOMLEFT", 1, 1)
+        AF.SetPoint(buttons[i].highlight, "BOTTOMRIGHT", -1, 1)
+        AF.SetHeight(buttons[i].highlight, 1)
 
         -- fill animation -------------------------------------------
         local fill = buttons[i].highlight:CreateAnimationGroup()
         buttons[i].fill = fill
 
         fill.t = fill:CreateAnimation("Translation")
-        fill.t:SetOffset(0, AW.ConvertPixelsForRegion(height/2-1, buttons[i]))
+        fill.t:SetOffset(0, AF.ConvertPixelsForRegion(height/2-1, buttons[i]))
         fill.t:SetSmoothing("IN")
         fill.t:SetDuration(0.1)
 
         fill.s = fill:CreateAnimation("Scale")
-        fill.s:SetScaleTo(1, AW.ConvertPixelsForRegion(height-2, buttons[i]))
+        fill.s:SetScaleTo(1, AF.ConvertPixelsForRegion(height-2, buttons[i]))
         fill.s:SetDuration(0.1)
         fill.s:SetSmoothing("IN")
 
         fill:SetScript("OnPlay", function()
-            AW.ClearPoints(buttons[i].highlight)
-            AW.SetPoint(buttons[i].highlight, "BOTTOMLEFT", 1, 1)
-            AW.SetPoint(buttons[i].highlight, "BOTTOMRIGHT", -1, 1)
+            AF.ClearPoints(buttons[i].highlight)
+            AF.SetPoint(buttons[i].highlight, "BOTTOMLEFT", 1, 1)
+            AF.SetPoint(buttons[i].highlight, "BOTTOMRIGHT", -1, 1)
         end)
 
         fill:SetScript("OnFinished", function()
-            AW.SetHeight(buttons[i].highlight, height-2)
+            AF.SetHeight(buttons[i].highlight, height-2)
             -- to ensure highlight always fill the whole button exactly
-            AW.ClearPoints(buttons[i].highlight)
-            AW.SetPoint(buttons[i].highlight, "TOPLEFT", 1, -1)
-            AW.SetPoint(buttons[i].highlight, "BOTTOMRIGHT", -1, 1)
+            AF.ClearPoints(buttons[i].highlight)
+            AF.SetPoint(buttons[i].highlight, "TOPLEFT", 1, -1)
+            AF.SetPoint(buttons[i].highlight, "BOTTOMRIGHT", -1, 1)
         end)
         -------------------------------------------------------------
 
@@ -466,23 +511,23 @@ function AW.CreateSwitch(parent, width, height, labels)
         buttons[i].empty = empty
 
         empty.t = empty:CreateAnimation("Translation")
-        empty.t:SetOffset(0, -AW.ConvertPixelsForRegion(height/2-1, buttons[i]))
+        empty.t:SetOffset(0, -AF.ConvertPixelsForRegion(height/2-1, buttons[i]))
         empty.t:SetSmoothing("IN")
         empty.t:SetDuration(0.1)
 
         empty.s = empty:CreateAnimation("Scale")
-        empty.s:SetScaleTo(1, 1/AW.ConvertPixelsForRegion(height-2, buttons[i]))
+        empty.s:SetScaleTo(1, 1/AF.ConvertPixelsForRegion(height-2, buttons[i]))
         empty.s:SetDuration(0.1)
         empty.s:SetSmoothing("IN")
 
         empty:SetScript("OnPlay", function()
-            AW.ClearPoints(buttons[i].highlight)
-            AW.SetPoint(buttons[i].highlight, "BOTTOMLEFT", 1, 1)
-            AW.SetPoint(buttons[i].highlight, "BOTTOMRIGHT", -1, 1)
+            AF.ClearPoints(buttons[i].highlight)
+            AF.SetPoint(buttons[i].highlight, "BOTTOMLEFT", 1, 1)
+            AF.SetPoint(buttons[i].highlight, "BOTTOMRIGHT", -1, 1)
         end)
 
         empty:SetScript("OnFinished", function()
-            AW.SetHeight(buttons[i].highlight, 1)
+            AF.SetHeight(buttons[i].highlight, 1)
         end)
         -------------------------------------------------------------
 
@@ -515,12 +560,12 @@ function AW.CreateSwitch(parent, width, height, labels)
         end)
 
         if i == 1 then
-            AW.SetPoint(buttons[i], "TOPLEFT")
+            AF.SetPoint(buttons[i], "TOPLEFT")
         elseif i == n then
-            AW.SetPoint(buttons[i], "TOPLEFT", buttons[i-1], "TOPRIGHT", -1, 0)
-            AW.SetPoint(buttons[i], "TOPRIGHT")
+            AF.SetPoint(buttons[i], "TOPLEFT", buttons[i-1], "TOPRIGHT", -1, 0)
+            AF.SetPoint(buttons[i], "TOPRIGHT")
         else
-            AW.SetPoint(buttons[i], "TOPLEFT", buttons[i-1], "TOPRIGHT", -1, 0)
+            AF.SetPoint(buttons[i], "TOPLEFT", buttons[i-1], "TOPRIGHT", -1, 0)
         end
     end
 
@@ -541,19 +586,19 @@ function AW.CreateSwitch(parent, width, height, labels)
     end
 
     function switch:UpdatePixels()
-        AW.ReSize(switch)
-        AW.RePoint(switch)
-        AW.ReBorder(switch)
-        AW.RePoint(switch.highlight)
+        AF.ReSize(switch)
+        AF.RePoint(switch)
+        AF.ReBorder(switch)
+        AF.RePoint(switch.highlight)
 
         -- update highlights
         -- for _, b in ipairs(buttons) do
-        --     AW.ReSize(b.highlight)
-        --     AW.RePoint(b.highlight)
+        --     AF.ReSize(b.highlight)
+        --     AF.RePoint(b.highlight)
         -- end
     end
 
-    AW.AddToPixelUpdater(switch)
+    AF.AddToPixelUpdater(switch)
 
     return switch
 end

@@ -3,28 +3,32 @@
     <Script file="Init.lua"/>
     <Script file="Locales.lua"/>
     <Script file="utf8.lua"/>
-    <Script file="PixelUtil.lua"/>
-    <Script file="Color.lua"/>
-    <Script file="Texture.lua"/>
-    <Script file="Font.lua"/>
-    <Script file="Animation.lua"/>
-    <Script file="Media.lua"/>
-    <Script file="Frame.lua"/>
-    <Include file="TooltipTemplate.xml"/>
-    <Script file="Tooltip.lua"/>
-    <Script file="Mover.lua"/>
-    <Script file="FontString.lua"/>
-    <Script file="Button.lua"/>
-    <Script file="EditBox.lua"/>
-    <Script file="Slider.lua"/>
-    <Script file="SmoothStatusBarMixin.lua"/>
-    <Script file="StatusBar.lua"/>
-    <Script file="Dropdown.lua"/>
-    <Script file="ColorPicker.lua"/>
-    <Script file="Dialog.lua"/>
-    <Script file="Popup.lua"/>
-    <Script file="Calendar.lua"/>
-    <Script file="Misc.lua"/>
-    <Script file="Sheet.lua"/>
+
+    <!-- widgets -->
+    <Script file="Widgets\PixelUtil.lua"/>
+    <Script file="Widgets\Color.lua"/>
+    <Script file="Widgets\Texture.lua"/>
+    <Script file="Widgets\Font.lua"/>
+    <Script file="Widgets\Animation.lua"/>
+    <Script file="Widgets\Media.lua"/>
+    <Script file="Widgets\Frame.lua"/>
+    <Include file="Widgets\TooltipTemplate.xml"/>
+    <Script file="Widgets\Tooltip.lua"/>
+    <Script file="Widgets\Mover.lua"/>
+    <Script file="Widgets\FontString.lua"/>
+    <Script file="Widgets\Button.lua"/>
+    <Script file="Widgets\EditBox.lua"/>
+    <Script file="Widgets\Slider.lua"/>
+    <Script file="Widgets\SmoothStatusBarMixin.lua"/>
+    <Script file="Widgets\StatusBar.lua"/>
+    <Script file="Widgets\Dropdown.lua"/>
+    <Script file="Widgets\ColorPicker.lua"/>
+    <Script file="Widgets\Dialog.lua"/>
+    <Script file="Widgets\Popup.lua"/>
+    <Script file="Widgets\Calendar.lua"/>
+    <Script file="Widgets\Sheet.lua"/>
+    <Script file="Widgets\Misc.lua"/>
+
+    <!-- demo -->
     <Script file="Demo.lua"/>
 </Ui>

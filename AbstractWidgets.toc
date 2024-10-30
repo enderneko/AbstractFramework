@@ -1,7 +1,0 @@
-## Interface: 110002,110005
-## Title: |cffFF6600A|r|cffFF5E07b|r|cffFF570Es|r|cffFF5015t|r|cffFF481Dr|r|cffFF4124a|r|cffFF3A2Bc|r|cffFF3333t|r|cffFF2B3AW|r|cffFF2441i|r|cffFF1D48d|r|cffFF1550g|r|cffFF0E57e|r|cffFF075Et|r|cffFF0066s|r
-## Author: enderneko
-## Version: r1
-## DefaultState: enabled
-
-Load.xml

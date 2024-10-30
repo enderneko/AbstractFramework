@@ -1,21 +1,21 @@
----@class AbstractWidgets
-local AW = _G.AbstractWidgets
+---@class AbstractFramework
+local AF = _G.AbstractFramework
 
 -- Interface\SharedXML\PixelUtil.lua
 ---------------------------------------------------------------------
 -- pixel perfect
 ---------------------------------------------------------------------
-function AW.GetPixelFactor()
+function AF.GetPixelFactor()
     local physicalWidth, physicalHeight = GetPhysicalScreenSize()
     return 768.0 / physicalHeight
 end
 
-function AW.GetNearestPixelSize(uiUnitSize, layoutScale, minPixels)
+function AF.GetNearestPixelSize(uiUnitSize, layoutScale, minPixels)
     if uiUnitSize == 0 and (not minPixels or minPixels == 0) then
         return 0
     end
 
-    local uiUnitFactor = AW.GetPixelFactor()
+    local uiUnitFactor = AF.GetPixelFactor()
     local numPixels = Round((uiUnitSize * layoutScale) / uiUnitFactor)
     if minPixels then
         if uiUnitSize < 0.0 then
@@ -32,29 +32,29 @@ function AW.GetNearestPixelSize(uiUnitSize, layoutScale, minPixels)
     return numPixels * uiUnitFactor / layoutScale
 end
 
--- function AW.ConvertPixels(desiredPixels, layoutScale)
---     return AW.GetNearestPixelSize(desiredPixels, layoutScale)
+-- function AF.ConvertPixels(desiredPixels, layoutScale)
+--     return AF.GetNearestPixelSize(desiredPixels, layoutScale)
 -- end
 
-function AW.ConvertPixels(desiredPixels)
-    return AW.GetNearestPixelSize(desiredPixels, AW.UIParent:GetEffectiveScale())
+function AF.ConvertPixels(desiredPixels)
+    return AF.GetNearestPixelSize(desiredPixels, AF.UIParent:GetEffectiveScale())
 end
 
-function AW.ConvertPixelsForRegion(desiredPixels, region)
-    return AW.GetNearestPixelSize(desiredPixels, region:GetEffectiveScale())
+function AF.ConvertPixelsForRegion(desiredPixels, region)
+    return AF.GetNearestPixelSize(desiredPixels, region:GetEffectiveScale())
 end
 
 ---------------------------------------------------------------------
 -- 1 pixel
 ---------------------------------------------------------------------
-function AW.GetOnePixelForRegion(region)
-    return AW.GetNearestPixelSize(1, region:GetEffectiveScale())
+function AF.GetOnePixelForRegion(region)
+    return AF.GetNearestPixelSize(1, region:GetEffectiveScale())
 end
 
 ---------------------------------------------------------------------
 -- size
 ---------------------------------------------------------------------
-function AW.SetWidth(region, width, minPixels)
+function AF.SetWidth(region, width, minPixels)
     -- clear conflicts
     region._size_grid = nil
     region._size_list_h = nil
@@ -63,10 +63,10 @@ function AW.SetWidth(region, width, minPixels)
     -- region._size_normal = true
     region._width = width
     region._minwidth = minPixels
-    region:SetWidth(AW.GetNearestPixelSize(width, region:GetEffectiveScale(), minPixels))
+    region:SetWidth(AF.GetNearestPixelSize(width, region:GetEffectiveScale(), minPixels))
 end
 
-function AW.SetHeight(region, height, minPixels)
+function AF.SetHeight(region, height, minPixels)
     -- clear conflicts
     region._size_grid = nil
     region._size_list_v = nil
@@ -75,10 +75,10 @@ function AW.SetHeight(region, height, minPixels)
     -- region._size_normal = true
     region._height = height
     region._minheight = minPixels
-    region:SetHeight(AW.GetNearestPixelSize(height, region:GetEffectiveScale(), minPixels))
+    region:SetHeight(AF.GetNearestPixelSize(height, region:GetEffectiveScale(), minPixels))
 end
 
-function AW.SetListWidth(region, itemNum, itemWidth, itemSpacing, extraWidth)
+function AF.SetListWidth(region, itemNum, itemWidth, itemSpacing, extraWidth)
     -- clear conflicts
     region._size_grid = nil
     region._width = nil
@@ -94,13 +94,13 @@ function AW.SetListWidth(region, itemNum, itemWidth, itemSpacing, extraWidth)
     if itemNum == 0 then
         region:SetWidth(0.001)
     else
-        region:SetWidth(AW.GetNearestPixelSize(itemWidth, region:GetEffectiveScale())*itemNum
-            + AW.GetNearestPixelSize(itemSpacing, region:GetEffectiveScale())*(itemNum-1)
-            + AW.GetNearestPixelSize(extraWidth, region:GetEffectiveScale()))
+        region:SetWidth(AF.GetNearestPixelSize(itemWidth, region:GetEffectiveScale())*itemNum
+            + AF.GetNearestPixelSize(itemSpacing, region:GetEffectiveScale())*(itemNum-1)
+            + AF.GetNearestPixelSize(extraWidth, region:GetEffectiveScale()))
     end
 end
 
-function AW.SetListHeight(region, itemNum, itemHeight, itemSpacing, extraHeight)
+function AF.SetListHeight(region, itemNum, itemHeight, itemSpacing, extraHeight)
     -- clear conflicts
     region._size_grid = nil
     region._height = nil
@@ -116,13 +116,13 @@ function AW.SetListHeight(region, itemNum, itemHeight, itemSpacing, extraHeight)
     if itemNum == 0 then
         region:SetHeight(0.001)
     else
-        region:SetHeight(AW.GetNearestPixelSize(itemHeight, region:GetEffectiveScale())*itemNum
-            + AW.GetNearestPixelSize(itemSpacing, region:GetEffectiveScale())*(itemNum-1)
-            + AW.GetNearestPixelSize(extraHeight, region:GetEffectiveScale()))
+        region:SetHeight(AF.GetNearestPixelSize(itemHeight, region:GetEffectiveScale())*itemNum
+            + AF.GetNearestPixelSize(itemSpacing, region:GetEffectiveScale())*(itemNum-1)
+            + AF.GetNearestPixelSize(extraHeight, region:GetEffectiveScale()))
     end
 end
 
-function AW.SetGridSize(region, gridWidth, gridHeight, gridSpacingH, gridSpacingV, columns, rows)
+function AF.SetGridSize(region, gridWidth, gridHeight, gridSpacingH, gridSpacingV, columns, rows)
     -- clear conflicts
     region._size_list_h = nil
     region._size_list_v = nil
@@ -139,28 +139,28 @@ function AW.SetGridSize(region, gridWidth, gridHeight, gridSpacingH, gridSpacing
     if columns == 0 then
         region:SetWidth(0.001)
     else
-        region:SetWidth(AW.GetNearestPixelSize(gridWidth, region:GetEffectiveScale())*columns
-            + AW.GetNearestPixelSize(gridSpacingH, region:GetEffectiveScale())*(columns-1))
+        region:SetWidth(AF.GetNearestPixelSize(gridWidth, region:GetEffectiveScale())*columns
+            + AF.GetNearestPixelSize(gridSpacingH, region:GetEffectiveScale())*(columns-1))
     end
 
     if rows == 0 then
         region:SetHeight(0.001)
     else
-        region:SetHeight(AW.GetNearestPixelSize(gridHeight, region:GetEffectiveScale())*rows
-            + AW.GetNearestPixelSize(gridSpacingV, region:GetEffectiveScale())*(rows-1))
+        region:SetHeight(AF.GetNearestPixelSize(gridHeight, region:GetEffectiveScale())*rows
+            + AF.GetNearestPixelSize(gridSpacingV, region:GetEffectiveScale())*(rows-1))
     end
 end
 
-function AW.SetSize(region, width, height)
+function AF.SetSize(region, width, height)
     -- height = height or width
-    if width then AW.SetWidth(region, width) end
-    if height then AW.SetHeight(region, height) end
+    if width then AF.SetWidth(region, width) end
+    if height then AF.SetHeight(region, height) end
 end
 
 ---------------------------------------------------------------------
 -- point
 ---------------------------------------------------------------------
-function AW.SetPoint(region, ...)
+function AF.SetPoint(region, ...)
     if not region._points then region._points = {} end
     local point, relativeTo, relativePoint, offsetX, offsetY
 
@@ -170,7 +170,7 @@ function AW.SetPoint(region, ...)
     elseif n == 3 then
         if type(select(2, ...)) == "number" then -- "TOPLEFT", 0, 0
             point, offsetX, offsetY = ...
-        else -- "TOPLEFT", AW.UIParent, "TOPRIGHT"
+        else -- "TOPLEFT", AF.UIParent, "TOPRIGHT"
             point, relativeTo, relativePoint = ...
         end
     elseif n == 4 then
@@ -188,35 +188,39 @@ function AW.SetPoint(region, ...)
     if region._useOriginalPoints then
         region:SetPoint(points[1], points[2], points[3], points[4], points[5])
     else
-        region:SetPoint(points[1], points[2], points[3], AW.GetNearestPixelSize(points[4], region:GetEffectiveScale()), AW.GetNearestPixelSize(points[5], region:GetEffectiveScale()))
+        region:SetPoint(points[1], points[2], points[3], AF.GetNearestPixelSize(points[4], region:GetEffectiveScale()), AF.GetNearestPixelSize(points[5], region:GetEffectiveScale()))
     end
 end
 
-function AW.SetOnePixelInside(region, relativeTo)
-    AW.ClearPoints(region)
-    AW.SetPoint(region, "TOPLEFT", relativeTo, "TOPLEFT", 1, -1)
-    AW.SetPoint(region, "BOTTOMRIGHT", relativeTo, "BOTTOMRIGHT", -1, 1)
+function AF.SetOnePixelInside(region, relativeTo)
+    relativeTo = relativeTo or region:GetParent()
+    AF.ClearPoints(region)
+    AF.SetPoint(region, "TOPLEFT", relativeTo, "TOPLEFT", 1, -1)
+    AF.SetPoint(region, "BOTTOMRIGHT", relativeTo, "BOTTOMRIGHT", -1, 1)
 end
 
-function AW.SetOnePixelOutside(region, relativeTo)
-    AW.ClearPoints(region)
-    AW.SetPoint(region, "TOPLEFT", relativeTo, "TOPLEFT", -1, 1)
-    AW.SetPoint(region, "BOTTOMRIGHT", relativeTo, "BOTTOMRIGHT", 1, -1)
+function AF.SetOnePixelOutside(region, relativeTo)
+    relativeTo = relativeTo or region:GetParent()
+    AF.ClearPoints(region)
+    AF.SetPoint(region, "TOPLEFT", relativeTo, "TOPLEFT", -1, 1)
+    AF.SetPoint(region, "BOTTOMRIGHT", relativeTo, "BOTTOMRIGHT", 1, -1)
 end
 
-function AW.SetInside(region, relativeTo, size)
-    AW.ClearPoints(region)
-    AW.SetPoint(region, "TOPLEFT", relativeTo, "TOPLEFT", size, -size)
-    AW.SetPoint(region, "BOTTOMRIGHT", relativeTo, "BOTTOMRIGHT", -size, size)
+function AF.SetInside(region, relativeTo, size)
+    relativeTo = relativeTo or region:GetParent()
+    AF.ClearPoints(region)
+    AF.SetPoint(region, "TOPLEFT", relativeTo, "TOPLEFT", size, -size)
+    AF.SetPoint(region, "BOTTOMRIGHT", relativeTo, "BOTTOMRIGHT", -size, size)
 end
 
-function AW.SetOutside(region, relativeTo, size)
-    AW.ClearPoints(region)
-    AW.SetPoint(region, "TOPLEFT", relativeTo, "TOPLEFT", -size, size)
-    AW.SetPoint(region, "BOTTOMRIGHT", relativeTo, "BOTTOMRIGHT", size, -size)
+function AF.SetOutside(region, relativeTo, size)
+    relativeTo = relativeTo or region:GetParent()
+    AF.ClearPoints(region)
+    AF.SetPoint(region, "TOPLEFT", relativeTo, "TOPLEFT", -size, size)
+    AF.SetPoint(region, "BOTTOMRIGHT", relativeTo, "BOTTOMRIGHT", size, -size)
 end
 
-function AW.ClearPoints(region)
+function AF.ClearPoints(region)
     region:ClearAllPoints()
     if region._points then wipe(region._points) end
 end
@@ -224,14 +228,14 @@ end
 ---------------------------------------------------------------------
 -- backdrop
 ---------------------------------------------------------------------
-function AW.SetBackdrop(region, backdropInfo)
+function AF.SetBackdrop(region, backdropInfo)
     region._edge_size = backdropInfo.edgeSize
-    backdropInfo.edgeSize = AW.ConvertPixelsForRegion(region._edge_size, region)
+    backdropInfo.edgeSize = AF.ConvertPixelsForRegion(region._edge_size, region)
 
     if backdropInfo.insets then
         region._inset_size = next(backdropInfo.insets)
         for k in pairs(backdropInfo.insets) do
-            backdropInfo.insets[k] = AW.ConvertPixelsForRegion(region._inset_size, region)
+            backdropInfo.insets[k] = AF.ConvertPixelsForRegion(region._inset_size, region)
         end
     end
 
@@ -241,21 +245,21 @@ end
 ---------------------------------------------------------------------
 -- re-set
 ---------------------------------------------------------------------
-function AW.ReSize(region)
+function AF.ReSize(region)
     if region._size_grid then
-        AW.SetGridSize(region, region._gridWidth, region._gridHeight, region._gridSpacingH, region._gridSpacingV, region._columns, region._rows)
+        AF.SetGridSize(region, region._gridWidth, region._gridHeight, region._gridSpacingH, region._gridSpacingV, region._columns, region._rows)
     else
         if region._width then
-            AW.SetWidth(region, region._width, region._minwidth)
+            AF.SetWidth(region, region._width, region._minwidth)
         end
         if region._height then
-            AW.SetHeight(region, region._height, region._minheight)
+            AF.SetHeight(region, region._height, region._minheight)
         end
         if region._size_list_h then
-            AW.SetListWidth(region, region._itemNumH, region._itemWidth, region._itemSpacingH, region._extraWidth)
+            AF.SetListWidth(region, region._itemNumH, region._itemWidth, region._itemSpacingH, region._extraWidth)
         end
         if region._size_list_v then
-            AW.SetListHeight(region, region._itemNumV, region._itemHeight, region._itemSpacingV, region._extraHeight)
+            AF.SetListHeight(region, region._itemNumV, region._itemHeight, region._itemSpacingV, region._extraHeight)
         end
     end
 end
@@ -268,7 +272,7 @@ local function IsEmpty(t)
     return true
 end
 
-function AW.RePoint(region)
+function AF.RePoint(region)
     if IsEmpty(region._points) then return end
     region:ClearAllPoints()
     for _, t in pairs(region._points) do
@@ -277,14 +281,14 @@ function AW.RePoint(region)
             x = t[4]
             y = t[5]
         else
-            x = AW.ConvertPixelsForRegion(t[4], region)
-            y = AW.ConvertPixelsForRegion(t[5], region)
+            x = AF.ConvertPixelsForRegion(t[4], region)
+            y = AF.ConvertPixelsForRegion(t[5], region)
         end
         region:SetPoint(t[1], t[2], t[3], x, y)
     end
 end
 
-function AW.ReBorder(region)
+function AF.ReBorder(region)
     if not region.GetBackdrop then return end
 
     local backdropInfo = region:GetBackdrop()
@@ -293,17 +297,17 @@ function AW.ReBorder(region)
     local r, g, b, a = region:GetBackdropColor()
     local br, bg, bb, ba = region:GetBackdropBorderColor()
 
-    local n = AW.GetOnePixelForRegion(region)
+    local n = AF.GetOnePixelForRegion(region)
     if backdropInfo.edgeSize then
         if region._edge_size then
-            backdropInfo.edgeSize = AW.ConvertPixelsForRegion(region._edge_size, region)
+            backdropInfo.edgeSize = AF.ConvertPixelsForRegion(region._edge_size, region)
         else
             backdropInfo.edgeSize = n
         end
     end
     if backdropInfo.insets then
         if region._inset_size then
-            n = AW.ConvertPixelsForRegion(region._inset_size, region)
+            n = AF.ConvertPixelsForRegion(region._inset_size, region)
         end
         backdropInfo.insets.left = n
         backdropInfo.insets.right = n
@@ -320,26 +324,26 @@ end
 -- pixel updater
 ---------------------------------------------------------------------
 local function DefaultUpdatePixels(self)
-    AW.ReSize(self)
-    AW.RePoint(self)
-    AW.ReBorder(self)
+    AF.ReSize(self)
+    AF.RePoint(self)
+    AF.ReBorder(self)
 end
-AW.DefaultUpdatePixels = DefaultUpdatePixels
+AF.DefaultUpdatePixels = DefaultUpdatePixels
 
 local regions = {}
-AW.regions = regions
+AF.regions = regions
 
 --- @param fn function
-function AW.AddToPixelUpdater(r, fn)
+function AF.AddToPixelUpdater(r, fn)
     r.UpdatePixels = fn or r.UpdatePixels or DefaultUpdatePixels
     regions[r] = r:GetName() or true
 end
 
-function AW.RemoveFromPixelUpdater(r)
+function AF.RemoveFromPixelUpdater(r)
     regions[r] = nil
 end
 
-function AW.UpdatePixels()
+function AF.UpdatePixels()
     for r in next, regions do
         r:UpdatePixels()
     end
@@ -348,17 +352,17 @@ end
 ---------------------------------------------------------------------
 -- pixel perfect point
 ---------------------------------------------------------------------
-function AW.PixelPerfectPoint(region)
+function AF.PixelPerfectPoint(region)
     local left = Round(region:GetLeft())
     local bottom = Round(region:GetBottom())
-    AW.ClearPoints(region)
-    AW.SetPoint(region, "BOTTOMLEFT", left, bottom)
+    AF.ClearPoints(region)
+    AF.SetPoint(region, "BOTTOMLEFT", left, bottom)
 end
 
 ---------------------------------------------------------------------
 -- update text container size
 ---------------------------------------------------------------------
-function AW.SetSizeToFitText(frame, fontString, padding)
+function AF.SetSizeToFitText(frame, fontString, padding)
     padding = padding or 0
     local width = ceil(fontString:GetWidth() + padding)
     local height = ceil(fontString:GetHeight() + padding)
@@ -368,7 +372,7 @@ end
 ---------------------------------------------------------------------
 -- statusbar
 ---------------------------------------------------------------------
-function AW.SetStatusBarValue(statusBar, value)
+function AF.SetStatusBarValue(statusBar, value)
     local width = statusBar:GetWidth()
     if width and width > 0.0 then
         local min, max = statusBar:GetMinMaxValues()
@@ -376,7 +380,7 @@ function AW.SetStatusBarValue(statusBar, value)
         if percent == 0.0 or percent == 1.0 then
             statusBar:SetValue(value)
         else
-            local numPixels = AW.GetNearestPixelSize(statusBar:GetWidth() * percent, statusBar:GetEffectiveScale())
+            local numPixels = AF.GetNearestPixelSize(statusBar:GetWidth() * percent, statusBar:GetEffectiveScale())
             local roundedValue = Lerp(min, max, numPixels / width)
             statusBar:SetValue(roundedValue)
         end
@@ -388,15 +392,15 @@ end
 ---------------------------------------------------------------------
 -- load widget position
 ---------------------------------------------------------------------
-function AW.LoadWidgetPosition(widget, pos, relativeTo)
-    AW.ClearPoints(widget)
-    AW.SetPoint(widget, pos[1], relativeTo or widget:GetParent(), pos[2], pos[3], pos[4])
+function AF.LoadWidgetPosition(widget, pos, relativeTo)
+    AF.ClearPoints(widget)
+    AF.SetPoint(widget, pos[1], relativeTo or widget:GetParent(), pos[2], pos[3], pos[4])
 end
 
 ---------------------------------------------------------------------
 -- load text position
 ---------------------------------------------------------------------
-function AW.LoadTextPosition(text, pos, relativeTo)
+function AF.LoadTextPosition(text, pos, relativeTo)
     if strfind(pos[1], "LEFT$") then
         text:SetJustifyH("LEFT")
     elseif strfind(pos[1], "RIGHT$") then
@@ -415,14 +419,14 @@ function AW.LoadTextPosition(text, pos, relativeTo)
 
     -- NOTE: text positioning is a pain!
     text._useOriginalPoints = true
-    AW.ClearPoints(text)
-    AW.SetPoint(text, pos[1], relativeTo or text:GetParent(), pos[2], pos[3], pos[4])
+    AF.ClearPoints(text)
+    AF.SetPoint(text, pos[1], relativeTo or text:GetParent(), pos[2], pos[3], pos[4])
 end
 
 ---------------------------------------------------------------------
 -- get anchor points
 ---------------------------------------------------------------------
-function AW.GetAnchorPoints_Simple(anchor, orientation, spacingH, spacingV)
+function AF.GetAnchorPoints_Simple(anchor, orientation, spacingH, spacingV)
     local point, relativePoint, newLineRelativePoint -- normal
     local x, y, newLineX, newLineY -- normal
     local headerPoint
@@ -505,7 +509,7 @@ function AW.GetAnchorPoints_Simple(anchor, orientation, spacingH, spacingV)
     return point, relativePoint, newLineRelativePoint, x, y, newLineX, newLineY, headerPoint
 end
 
-function AW.GetAnchorPoints_Complex(orientation, spacingH, spacingV)
+function AF.GetAnchorPoints_Complex(orientation, spacingH, spacingV)
     local point, relativePoint, newLineRelativePoint
     local x, y, newLineX, newLineY
 
@@ -578,7 +582,7 @@ function AW.GetAnchorPoints_Complex(orientation, spacingH, spacingV)
     return point, relativePoint, newLineRelativePoint, x, y, newLineX, newLineY
 end
 
-function AW.GetAnchorPoints_GroupHeader(orientation, spacingH, spacingV)
+function AF.GetAnchorPoints_GroupHeader(orientation, spacingH, spacingV)
     local point, relativePoint, x, y -- normal
     local headerPoint, columnAnchorPoint, columnSpacing -- SecureGroupHeader
 
@@ -654,24 +658,24 @@ end
 -- load position
 ---------------------------------------------------------------------
 --- @param pos table
-function AW.LoadPosition(region, pos)
+function AF.LoadPosition(region, pos)
     region._useOriginalPoints = true
-    AW.ClearPoints(region)
+    AF.ClearPoints(region)
     if type(pos) == "string" then
         pos = string.gsub(pos, " ", "")
         local point, x, y = strsplit(",", pos)
         x = tonumber(x)
         y = tonumber(y)
-        AW.SetPoint(region, point, x, y)
+        AF.SetPoint(region, point, x, y)
     elseif type(pos) == "table" then
-        AW.SetPoint(region, unpack(pos))
+        AF.SetPoint(region, unpack(pos))
     end
 end
 
 ---------------------------------------------------------------------
 -- save position
 ---------------------------------------------------------------------
-function AW.SavePositionAsTable(region, t)
+function AF.SavePositionAsTable(region, t)
     if t then
         wipe(t)
         t[1], t[2], t[3], t[4], t[5] = region:GetPoint()
@@ -680,7 +684,7 @@ function AW.SavePositionAsTable(region, t)
     end
 end
 
--- function AW.SavePositionAsString(region, t, i)
+-- function AF.SavePositionAsString(region, t, i)
 --     t[i] = table.concat({region:GetPoint()}, ",")
 -- end
 

@@ -1,17 +1,17 @@
----@class AbstractWidgets
-local AW = _G.AbstractWidgets
+---@class AbstractFramework
+local AF = _G.AbstractFramework
 
-function AW.ShowDemo()
-    if _G.AW_DEMO then
-        _G.AW_DEMO:Show()
+function AF.ShowDemo()
+    if _G.AF_DEMO then
+        _G.AF_DEMO:Show()
         return
     end
 
     -- ----------------------------------------------------------------------- --
     --                              headered frame                             --
     -- ----------------------------------------------------------------------- --
-    local demo = AW.CreateHeaderedFrame(AW.UIParent, "AW_DEMO", "Abstract Widgets Demo", 710, 500)
-    AW.SetPoint(demo, "BOTTOMLEFT", 500, 270)
+    local demo = AF.CreateHeaderedFrame(AF.UIParent, "AF_DEMO", "Abstract Widgets Demo", 710, 500)
+    AF.SetPoint(demo, "BOTTOMLEFT", 500, 270)
     demo:SetFrameLevel(100)
     demo:SetTitleJustify("LEFT")
 
@@ -21,7 +21,7 @@ function AW.ShowDemo()
     demo:SetScript("OnShow", function()
         if not THE_BACKGROUND then
             THE_BACKGROUND = CreateFrame("Frame", "THE_BACKGROUND", nil, "BackdropTemplate")
-            AW.SetDefaultBackdrop_NoBorder(THE_BACKGROUND)
+            AF.SetDefaultBackdrop_NoBorder(THE_BACKGROUND)
             THE_BACKGROUND:SetBackdropColor(0.3, 0.3, 0.3, 1)
             THE_BACKGROUND:SetAllPoints(UIParent)
             THE_BACKGROUND:SetFrameStrata("BACKGROUND")
@@ -45,148 +45,148 @@ function AW.ShowDemo()
     demo:Show()
 
     -- netstats
-    local ns = AW.CreateNetStatsPane(demo.header, "RIGHT", true, true)
-    AW.SetPoint(ns, "RIGHT", demo.header.closeBtn, "LEFT", -5, 0)
+    local ns = AF.CreateNetStatsPane(demo.header, "RIGHT", true, true)
+    AF.SetPoint(ns, "RIGHT", demo.header.closeBtn, "LEFT", -5, 0)
 
     -- fps
-    local fps = AW.CreateFPSPane(demo.header, "RIGHT")
-    AW.SetPoint(fps, "RIGHT", ns, "LEFT", -230, 0)
+    local fps = AF.CreateFPSPane(demo.header, "RIGHT")
+    AF.SetPoint(fps, "RIGHT", ns, "LEFT", -230, 0)
 
 
     -- ----------------------------------------------------------------------- --
     --                         apply combat protection                         --
     -- ----------------------------------------------------------------------- --
-    AW.ApplyCombatProtectionToFrame(demo)
+    AF.ApplyCombatProtectionToFrame(demo)
 
 
     -- ----------------------------------------------------------------------- --
     --                                  button                                 --
     -- ----------------------------------------------------------------------- --
-    local b1 = AW.CreateButton(demo, "Button A", "accent", 100, 20)
-    AW.SetPoint(b1, "TOPLEFT", 10, -10)
-    AW.SetTooltips(b1, "ANCHOR_TOPLEFT", 0, 2, "Tooltip Title", "This is a tooltip")
+    local b1 = AF.CreateButton(demo, "Button A", "accent", 100, 20)
+    AF.SetPoint(b1, "TOPLEFT", 10, -10)
+    AF.SetTooltips(b1, "ANCHOR_TOPLEFT", 0, 2, "Tooltip Title", "This is a tooltip")
 
-    local b2 = AW.CreateButton(demo, "Button B", "green", 100, 20)
-    AW.SetPoint(b2, "TOPLEFT", b1, "TOPRIGHT", 10, 0)
+    local b2 = AF.CreateButton(demo, "Button B", "green", 100, 20)
+    AF.SetPoint(b2, "TOPLEFT", b1, "TOPRIGHT", 10, 0)
     b2:SetEnabled(false)
 
-    local b3 = AW.CreateButton(demo, "Button C", "border_only", 100, 20)
-    AW.SetPoint(b3, "TOPLEFT", b2, "TOPRIGHT", 10, 0)
-    AW.SetTooltips(b3, "ANCHOR_TOPLEFT", 0, 2, "Another Style", "SetTextHighlightColor", "SetBorderHighlightColor")
+    local b3 = AF.CreateButton(demo, "Button C", "border_only", 100, 20)
+    AF.SetPoint(b3, "TOPLEFT", b2, "TOPRIGHT", 10, 0)
+    AF.SetTooltips(b3, "ANCHOR_TOPLEFT", 0, 2, "Another Style", "SetTextHighlightColor", "SetBorderHighlightColor")
     b3:SetTextHighlightColor("accent")
     b3:SetBorderHighlightColor("accent")
 
-    local b4 = AW.CreateButton(demo, "Button D", "red", 100, 20)
+    local b4 = AF.CreateButton(demo, "Button D", "red", 100, 20)
     b4:SetTexture("classicon-"..strlower(PlayerUtil.GetClassFile()), {16, 16}, {"LEFT", 2, 0}, true)
-    AW.SetPoint(b4, "TOPLEFT", b3, "TOPRIGHT", 10, 0)
+    AF.SetPoint(b4, "TOPLEFT", b3, "TOPRIGHT", 10, 0)
 
-    local b5 = AW.CreateButton(demo, nil, "accent", 20, 20)
+    local b5 = AF.CreateButton(demo, nil, "accent", 20, 20)
     b5:SetTexture("classicon-"..strlower(PlayerUtil.GetClassFile()), {16, 16}, {"CENTER", 0, 0}, true, true)
-    AW.SetPoint(b5, "TOPLEFT", b4, "TOPRIGHT", 10, 0)
+    AF.SetPoint(b5, "TOPLEFT", b4, "TOPRIGHT", 10, 0)
 
-    local b6 = AW.CreateButton(demo, nil, "accent", 20, 20)
+    local b6 = AF.CreateButton(demo, nil, "accent", 20, 20)
     b6:SetTexture("classicon-"..strlower(PlayerUtil.GetClassFile()), {16, 16}, {"CENTER", 0, 0}, true, true)
-    AW.SetPoint(b6, "TOPLEFT", b5, "TOPRIGHT", 10, 0)
+    AF.SetPoint(b6, "TOPLEFT", b5, "TOPRIGHT", 10, 0)
     b6:SetEnabled(false)
 
 
     -- ----------------------------------------------------------------------- --
     --                               check button                              --
     -- ----------------------------------------------------------------------- --
-    local cb1 = AW.CreateCheckButton(demo, "Check boxes")
-    AW.SetPoint(cb1, "TOPLEFT", b1, "BOTTOMLEFT", 0, -10)
-    AW.SetTooltips(cb1, "ANCHOR_TOPLEFT", 0, 3, "Check Button", "The hit rectangle of these check buttons are different")
+    local cb1 = AF.CreateCheckButton(demo, "Check boxes")
+    AF.SetPoint(cb1, "TOPLEFT", b1, "BOTTOMLEFT", 0, -10)
+    AF.SetTooltips(cb1, "ANCHOR_TOPLEFT", 0, 3, "Check Button", "The hit rectangle of these check buttons are different")
 
-    local cb2 = AW.CreateCheckButton(demo, "With")
-    AW.SetPoint(cb2, "TOPLEFT", cb1, "BOTTOMLEFT", 0, -7)
+    local cb2 = AF.CreateCheckButton(demo, "With")
+    AF.SetPoint(cb2, "TOPLEFT", cb1, "BOTTOMLEFT", 0, -7)
     cb2:SetEnabled(false)
 
-    local cb3 = AW.CreateCheckButton(demo, "Different label lengths", function(checked)
+    local cb3 = AF.CreateCheckButton(demo, "Different label lengths", function(checked)
         cb2:SetChecked(checked)
     end)
-    AW.SetPoint(cb3, "TOPLEFT", cb2, "BOTTOMLEFT", 0, -7)
+    AF.SetPoint(cb3, "TOPLEFT", cb2, "BOTTOMLEFT", 0, -7)
 
 
     -- ----------------------------------------------------------------------- --
     --                                 edit box                                --
     -- ----------------------------------------------------------------------- --
-    local eb1 = AW.CreateEditBox(demo, "Edit Box", 200, 20)
-    AW.SetPoint(eb1, "TOPLEFT", cb3, "BOTTOMLEFT", 0, -10)
+    local eb1 = AF.CreateEditBox(demo, "Edit Box", 200, 20)
+    AF.SetPoint(eb1, "TOPLEFT", cb3, "BOTTOMLEFT", 0, -10)
     eb1:SetOnTextChanged(function(text)
         print("TextChanged:", text)
     end)
     eb1:SetText("Hello!")
 
-    local eb2 = AW.CreateEditBox(demo, "Number Only", 200, 20, false, true)
-    AW.SetPoint(eb2, "TOPLEFT", eb1, "BOTTOMLEFT", 0, -10)
+    local eb2 = AF.CreateEditBox(demo, "Number Only", 200, 20, false, true)
+    AF.SetPoint(eb2, "TOPLEFT", eb1, "BOTTOMLEFT", 0, -10)
     eb2:SetConfirmButton(function(text)
         print("ConfirmButtonClicked:", text)
     end)
 
-    local eb3 = AW.CreateEditBox(demo, "Edit Box", 200, 20)
-    AW.SetPoint(eb3, "TOPLEFT", eb2, "BOTTOMLEFT", 0, -10)
+    local eb3 = AF.CreateEditBox(demo, "Edit Box", 200, 20)
+    AF.SetPoint(eb3, "TOPLEFT", eb2, "BOTTOMLEFT", 0, -10)
     eb3:SetText("Disabled Edit Box")
     eb3:SetEnabled(false)
 
-    local eb4 = AW.CreateScrollEditBox(demo, nil, "Scroll Edit Box", 100, 110)
-    AW.SetPoint(eb4, "TOPLEFT", eb3, "BOTTOMLEFT", 0, -10)
+    local eb4 = AF.CreateScrollEditBox(demo, nil, "Scroll Edit Box", 100, 110)
+    AF.SetPoint(eb4, "TOPLEFT", eb3, "BOTTOMLEFT", 0, -10)
     eb4:SetText("1 First\n2 Second\n3 Third\n4 Fourth\n5 Fifth\n6 Sixth\n7 Seventh\n8 Eighth\n9 Ninth\n10 Tenth")
 
-    local cb4 = AW.CreateCheckButton(demo, nil, function(checked, self)
+    local cb4 = AF.CreateCheckButton(demo, nil, function(checked, self)
         eb4:SetEnabled(checked)
     end)
-    AW.SetPoint(cb4, "BOTTOMLEFT", eb4, "BOTTOMRIGHT", 2, 0)
+    AF.SetPoint(cb4, "BOTTOMLEFT", eb4, "BOTTOMRIGHT", 2, 0)
     cb4:SetChecked(true)
 
 
     -- ----------------------------------------------------------------------- --
     --                              bordered frame                             --
     -- ----------------------------------------------------------------------- --
-    local bf1 = AW.CreateBorderedFrame(demo, nil, 150, 150, nil, "accent")
-    AW.SetPoint(bf1, "TOPLEFT", b3, "BOTTOMLEFT", 0, -10)
+    local bf1 = AF.CreateBorderedFrame(demo, nil, 150, 150, nil, "accent")
+    AF.SetPoint(bf1, "TOPLEFT", b3, "BOTTOMLEFT", 0, -10)
 
 
     -- ----------------------------------------------------------------------- --
     --                               font string                               --
     -- ----------------------------------------------------------------------- --
-    local fs1 = AW.CreateFontString(bf1, "Bordered Frame", "gray")
-    AW.SetPoint(fs1, "TOPLEFT", 5, -5)
+    local fs1 = AF.CreateFontString(bf1, "Bordered Frame", "gray")
+    AF.SetPoint(fs1, "TOPLEFT", 5, -5)
 
 
     -- ----------------------------------------------------------------------- --
     --                               titled pane                               --
     -- ----------------------------------------------------------------------- --
-    local tp1 = AW.CreateTitledPane(demo, "Titled Pane", 140, 100)
-    AW.SetPoint(tp1, "TOPLEFT", bf1, 5, -30)
+    local tp1 = AF.CreateTitledPane(demo, "Titled Pane", 140, 100)
+    AF.SetPoint(tp1, "TOPLEFT", bf1, 5, -30)
 
 
     -- ----------------------------------------------------------------------- --
     --                               button group                              --
     -- ----------------------------------------------------------------------- --
-    local bf2 = AW.CreateBorderedFrame(demo, nil, 100)
+    local bf2 = AF.CreateBorderedFrame(demo, nil, 100)
     bf2:SetTitle("Button Group")
-    AW.SetPoint(bf2, "TOPLEFT", eb4, "BOTTOMLEFT", 0, -27)
-    AW.SetListHeight(bf2, 3, 20, -1)
+    AF.SetPoint(bf2, "TOPLEFT", eb4, "BOTTOMLEFT", 0, -27)
+    AF.SetListHeight(bf2, 3, 20, -1)
 
-    local b6 = AW.CreateButton(bf2, "Item A", "accent_transparent", 100, 20)
+    local b6 = AF.CreateButton(bf2, "Item A", "accent_transparent", 100, 20)
     b6.id = "b6"
-    AW.SetPoint(b6, "TOPLEFT")
-    AW.SetPoint(b6, "RIGHT")
-    AW.SetTooltips(b6, "LEFT", -2, 0, "Item A")
+    AF.SetPoint(b6, "TOPLEFT")
+    AF.SetPoint(b6, "RIGHT")
+    AF.SetTooltips(b6, "LEFT", -2, 0, "Item A")
 
-    local b7 = AW.CreateButton(bf2, "Item B", "accent_transparent", 100, 20)
+    local b7 = AF.CreateButton(bf2, "Item B", "accent_transparent", 100, 20)
     b7.id = "b7"
-    AW.SetPoint(b7, "TOPLEFT", b6, "BOTTOMLEFT", 0, 1)
-    AW.SetPoint(b7, "RIGHT")
-    AW.SetTooltips(b7, "LEFT", -2, 0, "Item B")
+    AF.SetPoint(b7, "TOPLEFT", b6, "BOTTOMLEFT", 0, 1)
+    AF.SetPoint(b7, "RIGHT")
+    AF.SetTooltips(b7, "LEFT", -2, 0, "Item B")
 
-    local b8 = AW.CreateButton(bf2, "Item C", "accent_transparent", 100, 20)
+    local b8 = AF.CreateButton(bf2, "Item C", "accent_transparent", 100, 20)
     b8.id = "b8"
-    AW.SetPoint(b8, "TOPLEFT", b7, "BOTTOMLEFT", 0, 1)
-    AW.SetPoint(b8, "RIGHT")
-    AW.SetTooltips(b8, "LEFT", -2, 0, "Item C")
+    AF.SetPoint(b8, "TOPLEFT", b7, "BOTTOMLEFT", 0, 1)
+    AF.SetPoint(b8, "RIGHT")
+    AF.SetTooltips(b8, "LEFT", -2, 0, "Item C")
 
-    AW.CreateButtonGroup({b6, b7, b8}, function(id)
+    AF.CreateButtonGroup({b6, b7, b8}, function(id)
         print("selected", id)
     end)
 
@@ -194,17 +194,17 @@ function AW.ShowDemo()
     -- ----------------------------------------------------------------------- --
     --                               scroll frame                              --
     -- ----------------------------------------------------------------------- --
-    local sf1 = AW.CreateScrollFrame(demo, nil, 150, 150)
-    AW.SetPoint(sf1, "TOPLEFT", bf1, "BOTTOMLEFT", 0, -10)
-    -- AW.SetPoint(sf1, "TOPRIGHT", bf1, "BOTTOMRIGHT", 0, -10)
+    local sf1 = AF.CreateScrollFrame(demo, nil, 150, 150)
+    AF.SetPoint(sf1, "TOPLEFT", bf1, "BOTTOMLEFT", 0, -10)
+    -- AF.SetPoint(sf1, "TOPRIGHT", bf1, "BOTTOMRIGHT", 0, -10)
 
-    sf1.tex = AW.CreateGradientTexture(sf1.scrollContent, "VERTICAL", {0.96, 0.26, 0.41, 1}, {0.24, 0.23, 0.57, 1})
-    AW.SetPoint(sf1.tex, "TOPLEFT", sf1.scrollContent, 1, -1)
-    AW.SetPoint(sf1.tex, "BOTTOMRIGHT", sf1.scrollContent, -1, 1)
+    sf1.tex = AF.CreateGradientTexture(sf1.scrollContent, "VERTICAL", {0.96, 0.26, 0.41, 1}, {0.24, 0.23, 0.57, 1})
+    AF.SetPoint(sf1.tex, "TOPLEFT", sf1.scrollContent, 1, -1)
+    AF.SetPoint(sf1.tex, "BOTTOMRIGHT", sf1.scrollContent, -1, 1)
 
-    sf1.b1 = AW.CreateButton(sf1.scrollContent, "Entry", "blue", 20, 20)
-    AW.SetPoint(sf1.b1, "TOPLEFT")
-    AW.SetPoint(sf1.b1, "RIGHT")
+    sf1.b1 = AF.CreateButton(sf1.scrollContent, "Entry", "blue", 20, 20)
+    AF.SetPoint(sf1.b1, "TOPLEFT")
+    AF.SetPoint(sf1.b1, "RIGHT")
 
     sf1:SetContentHeight(20)
 
@@ -212,7 +212,7 @@ function AW.ShowDemo()
     -- ----------------------------------------------------------------------- --
     --                                  switch                                 --
     -- ----------------------------------------------------------------------- --
-    local sw1 = AW.CreateSwitch(demo, 150, 20, {
+    local sw1 = AF.CreateSwitch(demo, 150, 20, {
         {
             ["text"] = "20",
             ["value"] = 20,
@@ -242,23 +242,23 @@ function AW.ShowDemo()
             end,
         }
     })
-    AW.SetPoint(sw1, "TOPLEFT", sf1, "BOTTOMLEFT", 0, -10)
+    AF.SetPoint(sw1, "TOPLEFT", sf1, "BOTTOMLEFT", 0, -10)
     sw1:SetSelectedValue(20)
 
 
     -- ----------------------------------------------------------------------- --
     --                                  slider                                 --
     -- ----------------------------------------------------------------------- --
-    local sl1 = AW.CreateSlider(tp1, "Scale", 130, 0.5, 2, 0.1)
-    AW.SetPoint(sl1, "TOPLEFT", 5, -40)
-    AW.SetTooltips(sl1, "TOPLEFT", 0, 20, "Set scale of AW.UIParent", "If AW.UIParent:GetEffectiveScale() < 0.43, there can be errors")
-    sl1:SetValue(AW.GetScale())
+    local sl1 = AF.CreateSlider(tp1, "Scale", 130, 0.5, 2, 0.1)
+    AF.SetPoint(sl1, "TOPLEFT", 5, -40)
+    AF.SetTooltips(sl1, "TOPLEFT", 0, 20, "Set scale of AF.UIParent", "If AF.UIParent:GetEffectiveScale() < 0.43, there can be errors")
+    sl1:SetValue(AF.GetScale())
     sl1:SetAfterValueChanged(function(value)
-        AW.SetScale(value)
+        AF.SetScale(value)
     end)
 
-    local sl2 = AW.CreateSlider(demo, "Enabled", 100, 50, 500, 10, true, true)
-    AW.SetPoint(sl2, "TOPLEFT", eb4, "TOPRIGHT", 10, -25)
+    local sl2 = AF.CreateSlider(demo, "Enabled", 100, 50, 500, 10, true, true)
+    AF.SetPoint(sl2, "TOPLEFT", eb4, "TOPRIGHT", 10, -25)
     sl2:SetValue(1 * 100) -- for percentage, set value * 100
     sl2:SetOnValueChanged(function(value)
         print("OnSliderValueChanged:", value / 100) -- for percentage, get value / 100
@@ -267,16 +267,16 @@ function AW.ShowDemo()
         print("AfterSliderValueChanged:", value / 100) -- for percentage, get value / 100
     end)
 
-    local cb5 = AW.CreateCheckButton(demo, nil, function(checked, self)
+    local cb5 = AF.CreateCheckButton(demo, nil, function(checked, self)
         sl2:SetEnabled(checked)
         sl2:SetLabel(checked and "Enabled" or "Disabled")
-        AW.ShowNotificationText(checked and "Enabled" or "Disabled", "red", nil, nil, "BOTTOMLEFT", self, "TOPLEFT", 0, 3)
+        AF.ShowNotificationText(checked and "Enabled" or "Disabled", "red", nil, nil, "BOTTOMLEFT", self, "TOPLEFT", 0, 3)
     end)
-    AW.SetPoint(cb5, "BOTTOMLEFT", sl2, "TOPLEFT", 0, 1)
+    AF.SetPoint(cb5, "BOTTOMLEFT", sl2, "TOPLEFT", 0, 1)
     cb5:SetChecked(true)
 
-    local sl3 = AW.CreateVerticalSlider(demo, "Vertical Slider", 100, 0, 100, 1, true)
-    AW.SetPoint(sl3, "TOPLEFT", sl2, "BOTTOMLEFT", 45, -30)
+    local sl3 = AF.CreateVerticalSlider(demo, "Vertical Slider", 100, 0, 100, 1, true)
+    AF.SetPoint(sl3, "TOPLEFT", sl2, "BOTTOMLEFT", 45, -30)
     sl3:UpdateWordWrap()
     sl3:SetValue(0 * 100) -- for percentage, set value * 100
     sl3:SetOnValueChanged(function(value)
@@ -286,22 +286,22 @@ function AW.ShowDemo()
         print("VERTICAL_AfterSliderValueChanged:", value / 100) -- for percentage, get value / 100
     end)
 
-    local sl4 = AW.CreateSlider(tp1, "Font Size", 130, -5, 5, 1)
-    AW.SetPoint(sl4, "TOPLEFT", sl1, 0, -50)
+    local sl4 = AF.CreateSlider(tp1, "Font Size", 130, -5, 5, 1)
+    AF.SetPoint(sl4, "TOPLEFT", sl1, 0, -50)
     sl4:SetValue(0)
     sl4:SetAfterValueChanged(function(value)
-        AW.UpdateFontSize(value)
+        AF.UpdateFontSize(value)
     end)
 
 
     -- ----------------------------------------------------------------------- --
     --                               scroll list                               --
     -- ----------------------------------------------------------------------- --
-    local slist1 = AW.CreateScrollList(demo, nil, 150, 5, 5, 7, 20, 5)
-    AW.SetPoint(slist1, "TOPLEFT", bf1, "TOPRIGHT", 10, 0)
+    local slist1 = AF.CreateScrollList(demo, nil, 150, 5, 5, 7, 20, 5)
+    AF.SetPoint(slist1, "TOPLEFT", bf1, "TOPRIGHT", 10, 0)
     local widgets = {}
     for i = 1, 20 do
-        tinsert(widgets, AW.CreateButton(slist1.slotFrame, "Item "..i, "accent_hover", 20, 20))
+        tinsert(widgets, AF.CreateButton(slist1.slotFrame, "Item "..i, "accent_hover", 20, 20))
     end
     slist1:SetWidgets(widgets)
 
@@ -310,9 +310,9 @@ function AW.ShowDemo()
     --                                 dropdown                                --
     -- ----------------------------------------------------------------------- --
     -- normal dropdown (items <= 10)
-    local dd1 = AW.CreateDropdown(demo, 150)
-    AW.SetPoint(dd1, "TOPLEFT", slist1, "TOPRIGHT", 10, 0)
-    AW.SetTooltips(dd1, "TOPLEFT", 0, 2, "Normal Dropdown 1")
+    local dd1 = AF.CreateDropdown(demo, 150)
+    AF.SetPoint(dd1, "TOPLEFT", slist1, "TOPRIGHT", 10, 0)
+    AF.SetTooltips(dd1, "TOPLEFT", 0, 2, "Normal Dropdown 1")
     dd1:SetLabel("Normal Dropdown 1")
     dd1:SetOnClick(function(value)
         print("NormalDropdown1 Selected:", value)
@@ -324,9 +324,9 @@ function AW.ShowDemo()
     dd1:SetItems(items)
 
     -- normal dropdown (items > 10)
-    local dd2 = AW.CreateDropdown(demo, 150)
-    AW.SetPoint(dd2, "TOPLEFT", dd1, "BOTTOMLEFT", 0, -30)
-    AW.SetTooltips(dd2, "TOPLEFT", 0, 2, "Normal Dropdown 2")
+    local dd2 = AF.CreateDropdown(demo, 150)
+    AF.SetPoint(dd2, "TOPLEFT", dd1, "BOTTOMLEFT", 0, -30)
+    AF.SetTooltips(dd2, "TOPLEFT", 0, 2, "Normal Dropdown 2")
     dd2:SetLabel("Normal Dropdown 2")
     dd2:SetOnClick(function(value)
         print("NormalDropdown2 Selected:", value)
@@ -338,13 +338,13 @@ function AW.ShowDemo()
     dd2:SetItems(items)
 
     -- empty dropdown
-    local dd3 = AW.CreateDropdown(demo, 150)
-    AW.SetPoint(dd3, "TOPLEFT", dd2, "BOTTOMLEFT", 0, -30)
+    local dd3 = AF.CreateDropdown(demo, 150)
+    AF.SetPoint(dd3, "TOPLEFT", dd2, "BOTTOMLEFT", 0, -30)
     dd3:SetLabel("Empty Dropdown")
 
     -- disabled dropdown
-    local dd4 = AW.CreateDropdown(demo, 150)
-    AW.SetPoint(dd4, "TOPLEFT", dd3, "BOTTOMLEFT", 0, -30)
+    local dd4 = AF.CreateDropdown(demo, 150)
+    AF.SetPoint(dd4, "TOPLEFT", dd3, "BOTTOMLEFT", 0, -30)
     dd4:SetLabel("Disabled Dropdown")
     dd4:SetEnabled(false)
     dd4:SetItems({
@@ -357,10 +357,10 @@ function AW.ShowDemo()
     -- dd4:SetSelectedValue("item0")
 
     -- font dropdown
-    local dd5 = AW.CreateDropdown(demo, 150, 10, "font")
-    AW.SetPoint(dd5, "TOPLEFT", dd4, "BOTTOMLEFT", 0, -30)
+    local dd5 = AF.CreateDropdown(demo, 150, 10, "font")
+    AF.SetPoint(dd5, "TOPLEFT", dd4, "BOTTOMLEFT", 0, -30)
     dd5:SetLabel("Font Dropdown")
-    AW.SetTooltips(dd5, "TOPLEFT", 0, 2, "Font Dropdown", "LibSharedMedia is required")
+    AF.SetTooltips(dd5, "TOPLEFT", 0, 2, "Font Dropdown", "LibSharedMedia is required")
 
     local LSM = LibStub("LibSharedMedia-3.0", true)
     if LSM then
@@ -376,10 +376,10 @@ function AW.ShowDemo()
     end
 
     -- texture dropdown
-    local dd6 = AW.CreateDropdown(demo, 150, 10, "texture")
-    AW.SetPoint(dd6, "TOPLEFT", dd5, "BOTTOMLEFT", 0, -30)
+    local dd6 = AF.CreateDropdown(demo, 150, 10, "texture")
+    AF.SetPoint(dd6, "TOPLEFT", dd5, "BOTTOMLEFT", 0, -30)
     dd6:SetLabel("Texture Dropdown")
-    AW.SetTooltips(dd6, "TOPLEFT", 0, 2, "Texture Dropdown", "LibSharedMedia is required")
+    AF.SetTooltips(dd6, "TOPLEFT", 0, 2, "Texture Dropdown", "LibSharedMedia is required")
 
     if LSM then
         local items = {}
@@ -394,8 +394,8 @@ function AW.ShowDemo()
     end
 
     -- vertical mini dropdown
-    local dd7 = AW.CreateDropdown(demo, 100, 10, nil, true)
-    AW.SetPoint(dd7, "TOPLEFT", dd6, "BOTTOMLEFT", 0, -30)
+    local dd7 = AF.CreateDropdown(demo, 100, 10, nil, true)
+    AF.SetPoint(dd7, "TOPLEFT", dd6, "BOTTOMLEFT", 0, -30)
     dd7:SetLabel("Mini Dropdown (V)")
     local items = {}
     for i = 1, 5 do
@@ -406,8 +406,8 @@ function AW.ShowDemo()
     dd7:SetItems(items)
 
     -- horizontal mini dropdown
-    local dd8 = AW.CreateDropdown(demo, 100, 10, nil, true, true)
-    AW.SetPoint(dd8, "TOPLEFT", dd7, "BOTTOMLEFT", 0, -30)
+    local dd8 = AF.CreateDropdown(demo, 100, 10, nil, true, true)
+    AF.SetPoint(dd8, "TOPLEFT", dd7, "BOTTOMLEFT", 0, -30)
     dd8:SetLabel("Mini Dropdown (H)")
     local items = {}
     for i = 1, 3 do
@@ -421,34 +421,34 @@ function AW.ShowDemo()
     -- ----------------------------------------------------------------------- --
     --                               color picker                              --
     -- ----------------------------------------------------------------------- --
-    local cp1 = AW.CreateColorPicker(demo, "Color Picker", true, function(r, g, b, a)
+    local cp1 = AF.CreateColorPicker(demo, "Color Picker", true, function(r, g, b, a)
         print("ColorPicker1_OnChange:", r, g, b, a)
     end, function(r, g, b, a)
         print("ColorPicker1_OnConfirm:", r, g, b, a)
     end)
-    AW.SetPoint(cp1, "TOPLEFT", slist1, "BOTTOMLEFT", 0, -10)
-    cp1:SetColor(AW.GetColorRGB("pink", 0.7))
+    AF.SetPoint(cp1, "TOPLEFT", slist1, "BOTTOMLEFT", 0, -10)
+    cp1:SetColor(AF.GetColorRGB("pink", 0.7))
 
-    local cp2 = AW.CreateColorPicker(demo, "CP No Alpha")
-    AW.SetPoint(cp2, "TOPLEFT", cp1, "BOTTOMLEFT", 0, -7)
-    cp2:SetColor(AW.GetColorRGB("skyblue"))
+    local cp2 = AF.CreateColorPicker(demo, "CP No Alpha")
+    AF.SetPoint(cp2, "TOPLEFT", cp1, "BOTTOMLEFT", 0, -7)
+    cp2:SetColor(AF.GetColorRGB("skyblue"))
 
-    local cp3 = AW.CreateColorPicker(demo, "CP Disabled")
-    AW.SetPoint(cp3, "TOPLEFT", cp2, "BOTTOMLEFT", 0, -7)
-    cp3:SetColor(AW.GetColorTable("purple"))
+    local cp3 = AF.CreateColorPicker(demo, "CP Disabled")
+    AF.SetPoint(cp3, "TOPLEFT", cp2, "BOTTOMLEFT", 0, -7)
+    cp3:SetColor(AF.GetColorTable("purple"))
     cp3:SetEnabled(false)
 
 
     -- ----------------------------------------------------------------------- --
     --                                 dialog1                                 --
     -- ----------------------------------------------------------------------- --
-    local b7 = AW.CreateButton(demo, "Dialog1", "accent_hover", 150, 20)
-    AW.SetPoint(b7, "TOPLEFT", cp3, "BOTTOMLEFT", 0, -10)
+    local b7 = AF.CreateButton(demo, "Dialog1", "accent_hover", 150, 20)
+    AF.SetPoint(b7, "TOPLEFT", cp3, "BOTTOMLEFT", 0, -10)
     b7:SetScript("OnClick", function()
-        local text = AW.WrapTextInColor("Test Message", "firebrick").."\nReload UI now?\n"..AW.WrapTextInColor("The quick brown fox jumps over the lazy dog", "gray")
-        AW.ShowDialog(demo, text, 200, nil, nil, true)
-        AW.SetDialogPoint("TOPLEFT", 255, -170)
-        AW.SetDialogOnConfirm(function()
+        local text = AF.WrapTextInColor("Test Message", "firebrick").."\nReload UI now?\n"..AF.WrapTextInColor("The quick brown fox jumps over the lazy dog", "gray")
+        AF.ShowDialog(demo, text, 200, nil, nil, true)
+        AF.SetDialogPoint("TOPLEFT", 255, -170)
+        AF.SetDialogOnConfirm(function()
             C_UI.Reload()
         end)
     end)
@@ -457,21 +457,21 @@ function AW.ShowDemo()
     -- ----------------------------------------------------------------------- --
     --                                 dialog2                                 --
     -- ----------------------------------------------------------------------- --
-    local b8 = AW.CreateButton(demo, "Dialog2", "accent_hover", 150, 20)
-    AW.SetPoint(b8, "TOPLEFT", b7, "BOTTOMLEFT", 0, -7)
+    local b8 = AF.CreateButton(demo, "Dialog2", "accent_hover", 150, 20)
+    AF.SetPoint(b8, "TOPLEFT", b7, "BOTTOMLEFT", 0, -7)
 
     -- content
-    local form = AW.CreateDialogContent(50)
+    local form = AF.CreateDialogContent(50)
 
     -- NOTE: use WIDTH for pixel perfect
 
-    local eb5 = AW.CreateEditBox(form, "type somthing", 172, 20)
-    AW.SetPoint(eb5, "TOPLEFT")
-    -- AW.SetPoint(eb5, "TOPRIGHT")
+    local eb5 = AF.CreateEditBox(form, "type somthing", 172, 20)
+    AF.SetPoint(eb5, "TOPLEFT")
+    -- AF.SetPoint(eb5, "TOPRIGHT")
 
-    local dd9 = AW.CreateDropdown(form, 172)
-    AW.SetPoint(dd9, "TOPLEFT", eb5, "BOTTOMLEFT", 0, -7)
-    -- AW.SetPoint(dd9, "TOPRIGHT", eb5, "BOTTOMRIGHT", 0, -7)
+    local dd9 = AF.CreateDropdown(form, 172)
+    AF.SetPoint(dd9, "TOPLEFT", eb5, "BOTTOMLEFT", 0, -7)
+    -- AF.SetPoint(dd9, "TOPRIGHT", eb5, "BOTTOMRIGHT", 0, -7)
     local items = {}
     for i = 1, 7 do
         tinsert(items, {["text"] = "Item "..i})
@@ -494,10 +494,10 @@ function AW.ShowDemo()
     end)
 
     b8:SetScript("OnClick", function()
-        AW.ShowDialog(demo, AW.WrapTextInColor("Test Form", "yellow"), 200, _G.OKAY, _G.CANCEL, true, form, true)
-        AW.SetDialogPoint("TOPLEFT", 255, -170)
-        AW.ResizeDialogButtonToFitText(70)
-        AW.SetDialogOnConfirm(function()
+        AF.ShowDialog(demo, AF.WrapTextInColor("Test Form", "yellow"), 200, _G.OKAY, _G.CANCEL, true, form, true)
+        AF.SetDialogPoint("TOPLEFT", 255, -170)
+        AF.ResizeDialogButtonToFitText(70)
+        AF.SetDialogOnConfirm(function()
             print("Dialog Confirmed:", form.value1, form.value2)
         end)
     end)
@@ -506,44 +506,44 @@ function AW.ShowDemo()
     -- ----------------------------------------------------------------------- --
     --                            notificator dialog                           --
     -- ----------------------------------------------------------------------- --
-    local b9 = AW.CreateButton(demo, "NotificationDialog", "accent_hover", 150, 20)
-    AW.SetPoint(b9, "TOPLEFT", b8, "BOTTOMLEFT", 0, -7)
+    local b9 = AF.CreateButton(demo, "NotificationDialog", "accent_hover", 150, 20)
+    AF.SetPoint(b9, "TOPLEFT", b8, "BOTTOMLEFT", 0, -7)
     b9:SetScript("OnClick", function()
-        local text = AW.WrapTextInColor("NOTICE", "orange").."\n".."One day, when what has happened behind the scene could be told, developers and gamers will have a whole new level understanding of how much damage a jerk can make."
-        local dialog = AW.ShowNotificationDialog(demo, text, 200, true, 3)
-        AW.SetFrameStaticGlow(dialog)
-        AW.SetNotificationDialogPoint("TOPLEFT", 255, -120)
+        local text = AF.WrapTextInColor("NOTICE", "orange").."\n".."One day, when what has happened behind the scene could be told, developers and gamers will have a whole new level understanding of how much damage a jerk can make."
+        local dialog = AF.ShowNotificationDialog(demo, text, 200, true, 3)
+        AF.SetFrameStaticGlow(dialog)
+        AF.SetNotificationDialogPoint("TOPLEFT", 255, -120)
     end)
 
 
     -- ----------------------------------------------------------------------- --
     --                               scroll text                               --
     -- ----------------------------------------------------------------------- --
-    local bf3 = AW.CreateBorderedFrame(demo, nil, 530, 20)
-    AW.SetPoint(bf3, "TOPLEFT", bf2, "BOTTOMLEFT", 0, -10)
+    local bf3 = AF.CreateBorderedFrame(demo, nil, 530, 20)
+    AF.SetPoint(bf3, "TOPLEFT", bf2, "BOTTOMLEFT", 0, -10)
 
-    local st = AW.CreateScrollText(bf3, 0.01)
-    AW.SetPoint(st, "TOPLEFT", 4, 0)
-    AW.SetPoint(st, "TOPRIGHT", -4, 0)
+    local st = AF.CreateScrollText(bf3, 0.01)
+    AF.SetPoint(st, "TOPLEFT", 4, 0)
+    AF.SetPoint(st, "TOPRIGHT", -4, 0)
     st:SetText("World of Warcraft, often abbreviated as WoW, is a massively multiplayer online roleplaying game (MMORPG) developed by Blizzard Entertainment and released on November 23, 2004, on the 10th anniversary of the Warcraft franchise, three years after its announcement on September 2, 2001. It is the fourth released game set in the Warcraft universe, and takes place four years after the events of Warcraft III: The Frozen Throne.", "gold")
 
 
     -- ----------------------------------------------------------------------- --
     --                             animated resize                             --
     -- ----------------------------------------------------------------------- --
-    local b10 = AW.CreateButton(demo, "Animated Resize", "accent_hover", 150, 20)
-    AW.SetPoint(b10, "TOPLEFT", bf3, "BOTTOMLEFT", 0, -10)
+    local b10 = AF.CreateButton(demo, "Animated Resize", "accent_hover", 150, 20)
+    AF.SetPoint(b10, "TOPLEFT", bf3, "BOTTOMLEFT", 0, -10)
 
-    local bf4 = AW.CreateBorderedFrame(demo, nil, 120, 78, nil, "hotpink")
-    AW.SetFrameLevel(bf4, 50)
+    local bf4 = AF.CreateBorderedFrame(demo, nil, 120, 78, nil, "hotpink")
+    AF.SetFrameLevel(bf4, 50)
     bf4:Hide()
-    AW.SetPoint(bf4, "BOTTOMLEFT", b10, "TOPLEFT", 0, 10)
+    AF.SetPoint(bf4, "BOTTOMLEFT", b10, "TOPLEFT", 0, 10)
 
-    bf4.widthText = AW.CreateFontString(bf4, "120", "hotpink")
-    AW.SetPoint(bf4.widthText, "BOTTOMLEFT", bf4, "TOPLEFT", 0, 2)
+    bf4.widthText = AF.CreateFontString(bf4, "120", "hotpink")
+    AF.SetPoint(bf4.widthText, "BOTTOMLEFT", bf4, "TOPLEFT", 0, 2)
 
-    bf4.heightText = AW.CreateFontString(bf4, "78", "hotpink")
-    AW.SetPoint(bf4.heightText, "BOTTOMLEFT", bf4, "BOTTOMRIGHT", 2, 0)
+    bf4.heightText = AF.CreateFontString(bf4, "78", "hotpink")
+    AF.SetPoint(bf4.heightText, "BOTTOMLEFT", bf4, "BOTTOMRIGHT", 2, 0)
 
     local function UpdateSizeText(width, height)
         bf4.widthText:SetText(Round(width))
@@ -552,47 +552,47 @@ function AW.ShowDemo()
 
     b10:SetScript("OnClick", function()
         if bf4:IsShown() then
-            AW.HideMask(demo)
-            AW.SetFrameLevel(b10, 1)
+            AF.HideMask(demo)
+            AF.SetFrameLevel(b10, 1)
             bf4:Hide()
         else
-            AW.ShowMask(demo)
-            AW.SetFrameLevel(b10, 50)
+            AF.ShowMask(demo)
+            AF.SetFrameLevel(b10, 50)
             bf4:Show()
         end
     end)
 
     -- both
-    local b11 = AW.CreateButton(bf4, "Both+", "hotpink", 100, 20)
-    AW.SetPoint(b11, "BOTTOMLEFT", 10, 10)
+    local b11 = AF.CreateButton(bf4, "Both+", "hotpink", 100, 20)
+    AF.SetPoint(b11, "BOTTOMLEFT", 10, 10)
 
     -- height
-    local b12 = AW.CreateButton(bf4, "Height+", "hotpink", 100, 20)
-    AW.SetPoint(b12, "BOTTOMLEFT", b11, "TOPLEFT", 0, -1)
+    local b12 = AF.CreateButton(bf4, "Height+", "hotpink", 100, 20)
+    AF.SetPoint(b12, "BOTTOMLEFT", b11, "TOPLEFT", 0, -1)
 
     -- width
-    local b13 = AW.CreateButton(bf4, "Width+", "hotpink", 100, 20)
-    AW.SetPoint(b13, "BOTTOMLEFT", b12, "TOPLEFT", 0, -1)
+    local b13 = AF.CreateButton(bf4, "Width+", "hotpink", 100, 20)
+    AF.SetPoint(b13, "BOTTOMLEFT", b12, "TOPLEFT", 0, -1)
 
     local maxWidth, maxHeight
 
     b11:SetScript("OnClick", function()
         if not maxWidth or not maxHeight then
-            AW.AnimatedResize(bf4, 300, 200, nil, nil, function()
-                AW.Disable(b11, b12, b13)
+            AF.AnimatedResize(bf4, 300, 200, nil, nil, function()
+                AF.Disable(b11, b12, b13)
             end, function()
                 maxWidth, maxHeight = true, true
-                AW.Enable(b11, b12, b13)
+                AF.Enable(b11, b12, b13)
                 b11:SetText("Both-")
                 b12:SetText("Height-")
                 b13:SetText("Width-")
             end, UpdateSizeText)
         else
-            AW.AnimatedResize(bf4, 120, 78, nil, nil, function()
-                AW.Disable(b11, b12, b13)
+            AF.AnimatedResize(bf4, 120, 78, nil, nil, function()
+                AF.Disable(b11, b12, b13)
             end, function()
                 maxWidth, maxHeight = false, false
-                AW.Enable(b11, b12, b13)
+                AF.Enable(b11, b12, b13)
                 b11:SetText("Both+")
                 b12:SetText("Height+")
                 b13:SetText("Width+")
@@ -602,20 +602,20 @@ function AW.ShowDemo()
 
     b12:SetScript("OnClick", function()
         if not maxHeight then
-            AW.AnimatedResize(bf4, nil, 200, nil, nil, function()
-                AW.Disable(b11, b12, b13)
+            AF.AnimatedResize(bf4, nil, 200, nil, nil, function()
+                AF.Disable(b11, b12, b13)
             end, function()
                 maxHeight = true
-                AW.Enable(b11, b12, b13)
+                AF.Enable(b11, b12, b13)
                 b12:SetText("Height-")
                 if maxWidth then b11:SetText("Both-") end
             end, UpdateSizeText)
         else
-            AW.AnimatedResize(bf4, nil, 78, nil, nil, function()
-                AW.Disable(b11, b12, b13)
+            AF.AnimatedResize(bf4, nil, 78, nil, nil, function()
+                AF.Disable(b11, b12, b13)
             end, function()
                 maxHeight = false
-                AW.Enable(b11, b12, b13)
+                AF.Enable(b11, b12, b13)
                 b12:SetText("Height+")
                 b11:SetText("Both+")
             end, UpdateSizeText)
@@ -624,20 +624,20 @@ function AW.ShowDemo()
 
     b13:SetScript("OnClick", function()
         if not maxWidth then
-            AW.AnimatedResize(bf4, 300, nil, nil, nil, function()
-                AW.Disable(b11, b12, b13)
+            AF.AnimatedResize(bf4, 300, nil, nil, nil, function()
+                AF.Disable(b11, b12, b13)
             end, function()
                 maxWidth = true
-                AW.Enable(b11, b12, b13)
+                AF.Enable(b11, b12, b13)
                 b13:SetText("Width-")
                 if maxHeight then b11:SetText("Both-") end
             end, UpdateSizeText)
         else
-            AW.AnimatedResize(bf4, 120, nil, nil, nil, function()
-                AW.Disable(b11, b12, b13)
+            AF.AnimatedResize(bf4, 120, nil, nil, nil, function()
+                AF.Disable(b11, b12, b13)
             end, function()
                 maxWidth = false
-                AW.Enable(b11, b12, b13)
+                AF.Enable(b11, b12, b13)
                 b13:SetText("Width+")
                 b11:SetText("Both+")
             end, UpdateSizeText)
@@ -668,19 +668,19 @@ function AW.ShowDemo()
         end
     end
 
-    local bar1 = AW.CreateStatusBar(demo, 0, 100, 100, 20, "skyblue", nil, "percentage")
-    AW.SetPoint(bar1, "TOPLEFT", b10, "BOTTOMLEFT", 0, -10)
+    local bar1 = AF.CreateStatusBar(demo, 0, 100, 100, 20, "skyblue", nil, "percentage")
+    AF.SetPoint(bar1, "TOPLEFT", b10, "BOTTOMLEFT", 0, -10)
 
-    local bar2 = AW.CreateStatusBar(demo, 0, 100, 100, 20, "hotpink", nil, "value")
-    AW.SetPoint(bar2, "TOPLEFT", bar1, "TOPRIGHT", 10, 0)
+    local bar2 = AF.CreateStatusBar(demo, 0, 100, 100, 20, "hotpink", nil, "value")
+    AF.SetPoint(bar2, "TOPLEFT", bar1, "TOPRIGHT", 10, 0)
     bar2:SetScript("OnUpdate", OnUpdate)
 
-    local bar3 = AW.CreateStatusBar(demo, 0, 100, 100, 20, "lime", nil, "value-max")
-    AW.SetPoint(bar3, "TOPLEFT", bar2, "TOPRIGHT", 10, 0)
+    local bar3 = AF.CreateStatusBar(demo, 0, 100, 100, 20, "lime", nil, "value-max")
+    AF.SetPoint(bar3, "TOPLEFT", bar2, "TOPRIGHT", 10, 0)
     bar3:SetScript("OnUpdate", OnUpdate)
 
-    local bar4 = AW.CreateStatusBar(demo, 0, 100, 320, 7, "accent")
-    AW.SetPoint(bar4, "TOPLEFT", bar1, "BOTTOMLEFT", 0, -5)
+    local bar4 = AF.CreateStatusBar(demo, 0, 100, 320, 7, "accent")
+    AF.SetPoint(bar4, "TOPLEFT", bar1, "BOTTOMLEFT", 0, -5)
 
     bar1:SetScript("OnUpdate", function(self, elapsed)
         OnUpdate(self, elapsed)
@@ -697,19 +697,19 @@ function AW.ShowDemo()
     -- ----------------------------------------------------------------------- --
     --                                  popups                                 --
     -- ----------------------------------------------------------------------- --
-    AW.CreatePopupMover("general", "Popups")
+    AF.CreatePopupMover("general", "Popups")
 
-    local bf5 = AW.CreateBorderedFrame(demo, nil, 370, 20)
-    AW.SetPoint(bf5, "BOTTOMLEFT", b10, "BOTTOMRIGHT", 10, 0)
+    local bf5 = AF.CreateBorderedFrame(demo, nil, 370, 20)
+    AF.SetPoint(bf5, "BOTTOMLEFT", b10, "BOTTOMRIGHT", 10, 0)
 
-    local fs2 = AW.CreateFontString(bf5, "Popups", "accent")
-    AW.SetPoint(fs2, "LEFT", bf5, 10, 0)
+    local fs2 = AF.CreateFontString(bf5, "Popups", "accent")
+    AF.SetPoint(fs2, "LEFT", bf5, 10, 0)
 
-    local b14 = AW.CreateButton(bf5, "PPopup+", "accent", 95, 20)
-    AW.SetPoint(b14, "BOTTOMRIGHT")
-    AW.SetTooltips(b14, "ANCHOR_TOPLEFT", 0, 2, "Progress Popup", "With progress bar", "Hide in 5 sec after completion")
+    local b14 = AF.CreateButton(bf5, "PPopup+", "accent", 95, 20)
+    AF.SetPoint(b14, "BOTTOMRIGHT")
+    AF.SetTooltips(b14, "ANCHOR_TOPLEFT", 0, 2, "Progress Popup", "With progress bar", "Hide in 5 sec after completion")
     b14:SetScript("OnClick", function()
-        local callback = AW.ShowProgressPopup("In Progress...", 100, true)
+        local callback = AF.ShowProgressPopup("In Progress...", 100, true)
         local v = 0
         C_Timer.NewTicker(2, function()
             v = v + 25
@@ -717,12 +717,12 @@ function AW.ShowDemo()
         end, 4)
     end)
 
-    local b15 = AW.CreateButton(bf5, "CPopup+", "accent", 95, 20)
-    AW.SetPoint(b15, "BOTTOMRIGHT", b14, "BOTTOMLEFT", 1, 0)
-    AW.SetTooltips(b15, "ANCHOR_TOPLEFT", 0, 2, "Confirm Popup", "With \"Yes\" & \"No\" buttons", "Won't hide automatically")
+    local b15 = AF.CreateButton(bf5, "CPopup+", "accent", 95, 20)
+    AF.SetPoint(b15, "BOTTOMRIGHT", b14, "BOTTOMLEFT", 1, 0)
+    AF.SetTooltips(b15, "ANCHOR_TOPLEFT", 0, 2, "Confirm Popup", "With \"Yes\" & \"No\" buttons", "Won't hide automatically")
     b15:SetScript("OnClick", function()
         for i = 1, 3 do
-            AW.ShowConfirmPopup("Confirm "..i, function()
+            AF.ShowConfirmPopup("Confirm "..i, function()
                 print("Confirm "..i, "yes")
             end, function()
                 print("Confirm "..i, "no")
@@ -730,21 +730,21 @@ function AW.ShowDemo()
         end
     end)
 
-    local b16 = AW.CreateButton(bf5, "NPopup+", "accent", 95, 20)
-    AW.SetPoint(b16, "BOTTOMRIGHT", b15, "BOTTOMLEFT", 1, 0)
-    AW.SetTooltips(b16, "ANCHOR_TOPLEFT", 0, 2, "Notification Popup", "With timeout", "Right-Click to hide")
+    local b16 = AF.CreateButton(bf5, "NPopup+", "accent", 95, 20)
+    AF.SetPoint(b16, "BOTTOMRIGHT", b15, "BOTTOMLEFT", 1, 0)
+    AF.SetTooltips(b16, "ANCHOR_TOPLEFT", 0, 2, "Notification Popup", "With timeout", "Right-Click to hide")
     b16:SetScript("OnClick", function()
         for i = 1, 3 do
             local timeout = random(2, 7)
-            AW.ShowNotificationPopup("Notification "..AW.WrapTextInColor(timeout.."sec", "gray"), timeout)
+            AF.ShowNotificationPopup("Notification "..AF.WrapTextInColor(timeout.."sec", "gray"), timeout)
         end
     end)
 
     -- ----------------------------------------------------------------------- --
     --                                 calendar                                --
     -- ----------------------------------------------------------------------- --
-    local dw = AW.CreateDateWidget(demo, time())
-    AW.SetPoint(dw, "TOPLEFT", bf5, "TOPRIGHT", 10, 0)
+    local dw = AF.CreateDateWidget(demo, time())
+    AF.SetPoint(dw, "TOPLEFT", bf5, "TOPRIGHT", 10, 0)
     local niceDays = {}
     local colors = {"firebrick", "hotpink", "chartreuse", "vividblue"}
     local today = date("*t")
@@ -762,63 +762,63 @@ function AW.ShowDemo()
     -- ----------------------------------------------------------------------- --
     --                                  mover                                  --
     -- ----------------------------------------------------------------------- --
-    local mbf = AW.CreateBorderedFrame(demo, nil, 290, 20)
-    AW.SetPoint(mbf, "TOPLEFT", bar3, "TOPRIGHT", 10, 0)
+    local mbf = AF.CreateBorderedFrame(demo, nil, 290, 20)
+    AF.SetPoint(mbf, "TOPLEFT", bar3, "TOPRIGHT", 10, 0)
 
-    local fs3 = AW.CreateFontString(mbf, "Movers", "accent")
-    AW.SetPoint(fs3, "LEFT", mbf, 10, 0)
+    local fs3 = AF.CreateFontString(mbf, "Movers", "accent")
+    AF.SetPoint(fs3, "LEFT", mbf, 10, 0)
 
     local mDropdown
 
-    local undoBtn = AW.CreateButton(mbf, "Undo", "accent", 60, 20)
-    AW.SetPoint(undoBtn, "TOPRIGHT")
+    local undoBtn = AF.CreateButton(mbf, "Undo", "accent", 60, 20)
+    AF.SetPoint(undoBtn, "TOPRIGHT")
     undoBtn:SetScript("OnClick", function()
-        AW.UndoMovers()
+        AF.UndoMovers()
     end)
 
-    local hmBtn = AW.CreateButton(mbf, "Hide", "accent", 60, 20)
-    AW.SetPoint(hmBtn, "TOPRIGHT", undoBtn, "TOPLEFT", 1, 0)
+    local hmBtn = AF.CreateButton(mbf, "Hide", "accent", 60, 20)
+    AF.SetPoint(hmBtn, "TOPRIGHT", undoBtn, "TOPLEFT", 1, 0)
     hmBtn:SetScript("OnClick", function()
-        AW.HideMovers()
+        AF.HideMovers()
         mDropdown:ClearSelected()
     end)
 
-    mDropdown = AW.CreateDropdown(mbf, 85, 10, nil, true)
-    AW.SetPoint(mDropdown, "TOPRIGHT", hmBtn, "TOPLEFT", 1, 0)
-    AW.SetTooltips(mDropdown, "TOPLEFT", 0, 2, "Mover Tips", "- Drag to move", "- Use (shift) mouse wheel to move frame by 1 pixel", "- Right-Click to open fine-tuning frame", "- Shift+Right-Click to hide a mover")
+    mDropdown = AF.CreateDropdown(mbf, 85, 10, nil, true)
+    AF.SetPoint(mDropdown, "TOPRIGHT", hmBtn, "TOPLEFT", 1, 0)
+    AF.SetTooltips(mDropdown, "TOPLEFT", 0, 2, "Mover Tips", "- Drag to move", "- Use (shift) mouse wheel to move frame by 1 pixel", "- Right-Click to open fine-tuning frame", "- Shift+Right-Click to hide a mover")
     mDropdown:SetItems({
         {
             ["text"] = "All",
             ["onClick"] = function()
-                AW.ShowMovers()
+                AF.ShowMovers()
             end,
         },
         {
             ["text"] = "General",
             ["onClick"] = function()
-                AW.ShowMovers("general")
+                AF.ShowMovers("general")
             end,
         },
         {
             ["text"] = "Group 1",
             ["onClick"] = function()
-                AW.ShowMovers("group1")
+                AF.ShowMovers("group1")
             end,
         },
         {
             ["text"] = "Group 2",
             ["onClick"] = function()
-                AW.ShowMovers("group2")
+                AF.ShowMovers("group2")
             end,
         },
     })
 
     local function CreateMoverTestFrame(id, group, point)
-        local f = AW.CreateBorderedFrame(AW.UIParent, nil, 170, 120)
+        local f = AF.CreateBorderedFrame(AF.UIParent, nil, 170, 120)
         tinsert(moverTestFrames, f)
-        AW.SetPoint(f, point)
+        AF.SetPoint(f, point)
         f:SetTitle("Mover Test Frame "..id.."\n"..point, "hotpink", nil, true)
-        AW.CreateMover(f, group, "Test Mover "..id, function(p,x,y) print("MTF"..id..":", p, x, y) end)
+        AF.CreateMover(f, group, "Test Mover "..id, function(p,x,y) print("MTF"..id..":", p, x, y) end)
     end
 
     -- group1

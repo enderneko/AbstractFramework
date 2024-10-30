@@ -1,15 +1,15 @@
----@class AbstractWidgets
-local AW = _G.AbstractWidgets
+---@class AbstractFramework
+local AF = _G.AbstractFramework
 
 ---------------------------------------------------------------------
 -- texture
 ---------------------------------------------------------------------
 --- @param color table|string
-function AW.CreateTexture(parent, texture, color, drawLayer, subLevel, wrapModeHorizontal, wrapModeVertical, filterMode)
+function AF.CreateTexture(parent, texture, color, drawLayer, subLevel, wrapModeHorizontal, wrapModeVertical, filterMode)
     local tex = parent:CreateTexture(nil, drawLayer or "ARTWORK", nil, subLevel)
 
     function tex:SetColor(c)
-        if type(c) == "string" then c = AW.GetColorTable(c) end
+        if type(c) == "string" then c = AF.GetColorTable(c) end
         c = c or {1, 1, 1, 1}
         if texture then
             tex:SetTexture(texture, wrapModeHorizontal, wrapModeVertical, filterMode)
@@ -22,11 +22,11 @@ function AW.CreateTexture(parent, texture, color, drawLayer, subLevel, wrapModeH
     tex:SetColor(color)
 
     -- function tex:UpdatePixels()
-    --     AW.ReSize(tex)
-    --     AW.RePoint(tex)
+    --     AF.ReSize(tex)
+    --     AF.RePoint(tex)
     -- end
 
-    AW.AddToPixelUpdater(tex)
+    AF.AddToPixelUpdater(tex)
 
     return tex
 end
@@ -34,7 +34,7 @@ end
 ---------------------------------------------------------------------
 -- calc texcoord
 ---------------------------------------------------------------------
-function AW.CalcTexCoordPreCrop(width, height, aspectRatio, crop)
+function AF.CalcTexCoordPreCrop(width, height, aspectRatio, crop)
     -- apply cropping to initial texCoord
     local texCoord = {
         crop, crop,          -- ULx, ULy
@@ -57,7 +57,7 @@ function AW.CalcTexCoordPreCrop(width, height, aspectRatio, crop)
     return texCoord
 end
 
-function AW.CalcScale(baseOriginalWidth, baseOriginalHeight, baseNewWidth, baseNewHeight, crop)
+function AF.CalcScale(baseOriginalWidth, baseOriginalHeight, baseNewWidth, baseNewHeight, crop)
     local effectiveBaseWidth = baseOriginalWidth * (1 - 2 * crop)
     local effectiveBaseHeight = baseOriginalHeight * (1 - 2 * crop)
 
@@ -72,10 +72,10 @@ end
 ---------------------------------------------------------------------
 --- @param color1 table|string
 --- @param color2 table|string
-function AW.CreateGradientTexture(parent, orientation, color1, color2, texture, drawLayer, subLevel)
-    texture = texture or AW.GetPlainTexture()
-    if type(color1) == "string" then color1 = AW.GetColorTable(color1) end
-    if type(color2) == "string" then color2 = AW.GetColorTable(color2) end
+function AF.CreateGradientTexture(parent, orientation, color1, color2, texture, drawLayer, subLevel)
+    texture = texture or AF.GetPlainTexture()
+    if type(color1) == "string" then color1 = AF.GetColorTable(color1) end
+    if type(color2) == "string" then color2 = AF.GetColorTable(color2) end
     color1 = color1 or {0, 0, 0, 0}
     color2 = color2 or {0, 0, 0, 0}
 
@@ -84,11 +84,11 @@ function AW.CreateGradientTexture(parent, orientation, color1, color2, texture, 
     tex:SetGradient(orientation, CreateColor(unpack(color1)), CreateColor(unpack(color2)))
 
     function tex:UpdatePixels()
-        AW.ReSize(tex)
-        AW.RePoint(tex)
+        AF.ReSize(tex)
+        AF.RePoint(tex)
     end
 
-    AW.AddToPixelUpdater(tex)
+    AF.AddToPixelUpdater(tex)
 
     return tex
 end
@@ -96,19 +96,19 @@ end
 ---------------------------------------------------------------------
 -- line
 ---------------------------------------------------------------------
-function AW.CreateSeparator(parent, width, height, color)
-    if type(color) == "string" then color = AW.GetColorTable(color) end
-    color = color or AW.GetColorTable("accent")
+function AF.CreateSeparator(parent, width, height, color)
+    if type(color) == "string" then color = AF.GetColorTable(color) end
+    color = color or AF.GetColorTable("accent")
 
     local line = parent:CreateTexture(nil, "ARTWORK", nil, 0)
-    AW.SetSize(line, width, height)
+    AF.SetSize(line, width, height)
     line:SetColorTexture(unpack(color))
 
     local shadow = parent:CreateTexture(nil, "ARTWORK", nil, -1)
-    AW.SetSize(shadow, height)
-    AW.SetPoint(shadow, "TOPLEFT", line, 1, -1)
-    AW.SetPoint(shadow, "TOPRIGHT", line, 1, -1)
-    shadow:SetColorTexture(AW.GetColorRGB("black", color[4])) -- use line alpha
+    AF.SetSize(shadow, height)
+    AF.SetPoint(shadow, "TOPLEFT", line, 1, -1)
+    AF.SetPoint(shadow, "TOPRIGHT", line, 1, -1)
+    shadow:SetColorTexture(AF.GetColorRGB("black", color[4])) -- use line alpha
 
     hooksecurefunc(line, "Show", function()
         shadow:Show()
@@ -118,13 +118,13 @@ function AW.CreateSeparator(parent, width, height, color)
     end)
 
     function line:UpdatePixels()
-        AW.ReSize(line)
-        AW.RePoint(line)
-        AW.ReSize(shadow)
-        AW.RePoint(shadow)
+        AF.ReSize(line)
+        AF.RePoint(line)
+        AF.ReSize(shadow)
+        AF.RePoint(shadow)
     end
 
-    AW.AddToPixelUpdater(line)
+    AF.AddToPixelUpdater(line)
 
     return line
 end
