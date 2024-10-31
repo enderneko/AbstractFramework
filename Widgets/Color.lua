@@ -512,16 +512,12 @@ function AF.GetGradientText(text, startColor, endColor)
         r2, g2, b2 = AF.ConvertHEXToRGB256(endColor)
     end
 
-    print(r1, g1, b1)
-    print(r2, g2, b2)
-
     local r, g, b, hex
     for i = 0, length - 1 do
         r = AF.Interpolate(r1, r2, i, length - 1)
         g = AF.Interpolate(g1, g2, i, length - 1)
         b = AF.Interpolate(b1, b2, i, length - 1)
         hex = AF.ConvertRGB256ToHEX(r, g, b)
-        print(hex)
         gradient = gradient .. "|cff" .. hex .. text:sub(i + 1, i + 1) .. "|r"
     end
 
