@@ -228,7 +228,7 @@ local colors = {
     ["coral"] = {["hex"]="ffff7f50", ["t"]={1, 0.5, 0.31, 1}},
     ["tomato"] = {["hex"]="ffff6348", ["t"]={1, 0.39, 0.28, 1}},
     ["lightred"] = {["hex"]="ffff4757", ["t"]={1, 0.28, 0.34, 1}},
-    ["classicrose"] = {["hex"]="fffbcce7", ["t"]={1, 0.98, 0.8, 0.91}},
+    ["classicrose"] = {["hex"]="fffbcce7", ["t"]={0.98, 0.8, 0.91, 1}},
     ["pink"] = {["hex"]="ffff6b81", ["t"]={1, 0.42, 0.51, 1}},
     ["hotpink"] = {["hex"]="ffff4466", ["t"]={1, 0.27, 0.4, 1}},
     ["lime"] = {["hex"]="ff7bed9f", ["t"]={0.48, 0.93, 0.62, 1}},
@@ -238,7 +238,7 @@ local colors = {
     ["vividblue"] = {["hex"]="ff1e90ff", ["t"]={0.12, 0.56, 1, 1}},
     ["softblue"] = {["hex"]="ff5352ed", ["t"]={0.33, 0.32, 0.93, 1}},
     ["brightblue"] = {["hex"]="ff3742fa", ["t"]={0.22, 0.26, 0.98, 1}},
-    ["guild"] = {["hex"]="ff40ff40", ["t"]={0.25, 1, 0.25, 1}},
+    ["guild"] = {["hex"]="ff40ff40", ["t"]={0.251, 1, 0.251, 1}},
 
     -- class (data from RAID_CLASS_COLORS)
     ["DEATHKNIGHT"] = {["hex"]="ffc41e3a", ["t"]={0.7686275243759155, 0.1176470667123795, 0.2274509966373444}},
@@ -257,8 +257,8 @@ local colors = {
     ["UNKNOWN"] = {["hex"]="ff666666", ["t"]={0.4, 0.4, 0.4}},
 
     -- faction
-    ["Horde"] = {["hex"]="c60000", ["t"]={0.78, 0, 0}},
-    ["Alliance"] = {["hex"]="c60000", ["t"]={0.1, 0.5, 1}},
+    ["Horde"] = {["hex"]="ffc70000", ["t"]={0.78, 0, 0}},
+    ["Alliance"] = {["hex"]="ff1a80ff", ["t"]={0.1, 0.5, 1}},
 
     -- role
     ["TANK"] = {["hex"]="ff627ee2", ["t"]={0.38, 0.49, 0.89}},
@@ -475,7 +475,7 @@ function AF.WrapTextInColor(text, name)
     if not colors[name] then
         return text
     end
-    return AF.WrapTextInColorCode(text, colors[name]["hex"])
+    return AF.WrapTextInColorCode(text, AF.GetColorHex(name))
 end
 
 function AF.WrapTextInColorRGB(text, r, g, b)
@@ -483,6 +483,10 @@ function AF.WrapTextInColorRGB(text, r, g, b)
 end
 
 function AF.WrapTextInColorCode(text, colorHexString)
+    colorHexString = colorHexString or "ffffffff"
+    if #colorHexString == 6 then
+        colorHexString = "ff" .. colorHexString
+    end
     return format("|c%s%s|r", colorHexString, text)
 end
 
