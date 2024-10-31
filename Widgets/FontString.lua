@@ -25,6 +25,25 @@ function AF.CreateFontString(parent, text, color, font, layer)
 end
 
 ---------------------------------------------------------------------
+-- GetStringSize
+---------------------------------------------------------------------
+local font_string
+---@param text string
+---@param fontFile string
+---@param fontSize number
+---@param fontFlag string
+---@param fontShadow boolean
+---@return number width, number height
+function AF.GetStringSize(text, fontFile, fontSize, fontFlag, fontShadow)
+    if not font_string then
+        font_string = AF.UIParent:CreateFontString(nil, "OVERLAY")
+    end
+    AF.SetFont(font_string, fontFile, fontSize, fontFlag, fontShadow)
+    font_string:SetText(text)
+    return font_string:GetStringWidth(), font_string:GetStringHeight()
+end
+
+---------------------------------------------------------------------
 -- notification text
 ---------------------------------------------------------------------
 local pool

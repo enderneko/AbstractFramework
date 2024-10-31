@@ -364,8 +364,8 @@ end
 ---------------------------------------------------------------------
 function AF.SetSizeToFitText(frame, fontString, padding)
     padding = padding or 0
-    local width = ceil(fontString:GetWidth() + padding)
-    local height = ceil(fontString:GetHeight() + padding)
+    local width = ceil(fontString:GetStringWidth() + padding)
+    local height = ceil(fontString:GetStringHeight() + padding)
     frame:SetSize(width, height)
 end
 
