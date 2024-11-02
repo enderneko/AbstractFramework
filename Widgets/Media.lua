@@ -53,7 +53,15 @@ function AF.GetSound(sound, addon)
 end
 
 ---------------------------------------------------------------------
--- get font
+-- play sound
+---------------------------------------------------------------------
+---@param channel string Master|Music|SFX|Ambience|Dialog
+function AF.PlaySound(sound, addon, channel)
+    return PlaySoundFile(AF.GetSound(sound, addon), channel)
+end
+
+---------------------------------------------------------------------
+-- get fonts
 ---------------------------------------------------------------------
 function AF.GetFont(font, addon)
     if addon then

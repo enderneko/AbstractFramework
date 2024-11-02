@@ -814,7 +814,7 @@ function AF.ShowDemo()
     })
 
     local function CreateMoverTestFrame(id, group, point)
-        local f = AF.CreateBorderedFrame(AF.UIParent, nil, 170, 120)
+        local f = AF.CreateBorderedFrame(AF.UIParent, nil, 170, 70)
         tinsert(moverTestFrames, f)
         AF.SetPoint(f, point)
         f:SetTitle("Mover Test Frame "..id.."\n"..point, "hotpink", nil, true)
@@ -822,15 +822,15 @@ function AF.ShowDemo()
     end
 
     -- group1
-    CreateMoverTestFrame(1, "group1", "TOPLEFT")
-    CreateMoverTestFrame(2, "group1", "LEFT")
-    CreateMoverTestFrame(3, "group1", "BOTTOMLEFT")
-    CreateMoverTestFrame(4, "group1", "TOP")
-    CreateMoverTestFrame(5, "group1", "CENTER")
+    CreateMoverTestFrame(1, "test1", "TOPLEFT")
+    CreateMoverTestFrame(2, "test1", "LEFT")
+    CreateMoverTestFrame(3, "test1", "BOTTOMLEFT")
+    CreateMoverTestFrame(4, "test1", "TOP")
+    CreateMoverTestFrame(5, "test1", "CENTER")
 
     -- group2
-    CreateMoverTestFrame(6, "group2", "TOPRIGHT")
-    CreateMoverTestFrame(7, "group2", "RIGHT")
-    CreateMoverTestFrame(8, "group2", "BOTTOM")
-    CreateMoverTestFrame(9, "group2", "BOTTOMRIGHT")
+    CreateMoverTestFrame(6, "test2", "TOPRIGHT")
+    CreateMoverTestFrame(7, "test2", "RIGHT")
+    CreateMoverTestFrame(8, "test2", "BOTTOM")
+    CreateMoverTestFrame(9, "test2", "BOTTOMRIGHT")
 end
