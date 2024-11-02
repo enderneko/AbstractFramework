@@ -145,6 +145,7 @@ local function CreateMoverDialog()
         C_Timer.After(0, function()
             AF.SetWidth(moverDialog, AF.Round(max(desc:GetWidth(), tips:GetWidth()) + 40))
         end)
+        AF.ClearPoints(moverDialog)
         AF.SetPoint(moverDialog, "BOTTOM", moverParent, "CENTER", 0, 100)
 
         undo:SetEnabled(false)
