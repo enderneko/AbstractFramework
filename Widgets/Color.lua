@@ -26,16 +26,15 @@ function AF.ConvertRGB256ToHEX(r, g, b, a)
     for key, value in pairs(t) do
         local hex = ""
 
-        while(value > 0)do
+        while (value > 0) do
             local index = math.fmod(value, 16) + 1
             value = math.floor(value / 16)
             hex = string.sub("0123456789abcdef", index, index) .. hex
         end
 
-        if(string.len(hex) == 0)then
+        if (string.len(hex) == 0) then
             hex = "00"
-
-        elseif(string.len(hex) == 1)then
+        elseif (string.len(hex) == 1) then
             hex = "0" .. hex
         end
 
@@ -50,11 +49,11 @@ function AF.ConvertRGBToHEX(r, g, b, a)
 end
 
 function AF.ConvertHEXToRGB256(hex)
-    hex = hex:gsub("#","")
+    hex = hex:gsub("#", "")
     if strlen(hex) == 6 then
-        return tonumber("0x"..hex:sub(1,2)), tonumber("0x"..hex:sub(3,4)), tonumber("0x"..hex:sub(5,6))
+        return tonumber("0x" .. hex:sub(1, 2)), tonumber("0x" .. hex:sub(3, 4)), tonumber("0x" .. hex:sub(5, 6))
     else
-        return tonumber("0x"..hex:sub(3,4)), tonumber("0x"..hex:sub(5,6)), tonumber("0x"..hex:sub(7,8)), tonumber("0x"..hex:sub(1,2))
+        return tonumber("0x" .. hex:sub(3, 4)), tonumber("0x" .. hex:sub(5, 6)), tonumber("0x" .. hex:sub(7, 8)), tonumber("0x" .. hex:sub(1, 2))
     end
 end
 
@@ -63,7 +62,7 @@ function AF.ConvertHEXToRGB(hex)
 end
 
 -- https://warcraft.wiki.gg/wiki/ColorGradient
-function AF.ColorGradient(perc, r1,g1,b1, r2,g2,b2, r3,g3,b3)
+function AF.ColorGradient(perc, r1, g1, b1, r2, g2, b2, r3, g3, b3)
     perc = perc or 1
     if perc >= 1 then
         return r3, g3, b3
@@ -72,7 +71,7 @@ function AF.ColorGradient(perc, r1,g1,b1, r2,g2,b2, r3,g3,b3)
     end
 
     local segment, relperc = math.modf(perc * 2)
-    local rr1, rg1, rb1, rr2, rg2, rb2 = select((segment * 3) + 1, r1,g1,b1, r2,g2,b2, r3,g3,b3)
+    local rr1, rg1, rb1, rr2, rg2, rb2 = select((segment * 3) + 1, r1, g1, b1, r2, g2, b2, r3, g3, b3)
 
     return rr1 + (rr2 - rr1) * relperc, rg1 + (rg2 - rg1) * relperc, rb1 + (rb2 - rb1) * relperc
 end
@@ -87,7 +86,7 @@ end
         H = Hue [0, 360]
         S = Saturation [0, 1]
         B = Brightness [0, 1]
-]]--
+]] --
 function AF.ConvertRGBToHSB(r, g, b)
     local colorMax = max(r, g, b)
     local colorMin = min(r, g, b)
@@ -139,7 +138,7 @@ end
         R = Red [0,1]
         G = Green [0,1]
         B = Blue [0,1]
-]]--
+]] --
 function AF.ConvertHSBToRGB(h, s, b)
     local chroma = b * s
     local prime = (h / 60) % 6
@@ -193,120 +192,121 @@ local UnitReaction = UnitReaction
 
 local colors = {
     -- accent
-    ["accent"] = {["hex"]="ffff6600", ["t"]={1, 0.4, 0, 1}, ["normal"]={1, 0.4, 0, 0.3}, ["hover"]={1, 0.4, 0, 0.6}},
-    ["accent_alt"] = {["hex"]="ffff0066", ["t"]={1, 0, 0.4, 1}, ["normal"]={1, 0, 0.4, 0.3}, ["hover"]={1, 0, 0.4, 0.6}},
+    ["accent"] = {["hex"] = "ffff6600", ["t"] = {1, 0.4, 0, 1}, ["normal"] = {1, 0.4, 0, 0.3}, ["hover"] = {1, 0.4, 0, 0.6}},
+    ["accent_alt"] = {["hex"] = "ffff0066", ["t"] = {1, 0, 0.4, 1}, ["normal"] = {1, 0, 0.4, 0.3}, ["hover"] = {1, 0, 0.4, 0.6}},
 
     -- for regions
-    ["background"] = {["hex"]="e61a1a1a", ["t"]={0.1, 0.1, 0.1, 0.9}},
-    ["border"] = {["hex"]="ff000000", ["t"]={0, 0, 0, 1}},
-    ["header"] = {["hex"]="ff202020", ["t"]={0.127, 0.127, 0.127, 1}}, -- header background
-    ["widget"] = {["hex"]="ff262626", ["t"]={0.15, 0.15, 0.15, 1}}, -- widget background
-    ["disabled"] = {["hex"]="ff666666", ["t"]={0.4, 0.4, 0.4, 1}},
-    ["none"] = {["hex"]="00000000", ["t"]={0, 0, 0, 0}},
-    ["sheet_bg"] = {["t"]={0.15, 0.15, 0.15, 0.9}},
-    ["sheet_cell_highlight"] = {["t"]={1, 1, 1, 0.1}},
-    ["sheet_row_highlight"] = {["t"]={0.7, 0.7, 0.7, 0.1}},
+    ["background"] = {["hex"] = "e61a1a1a", ["t"] = {0.1, 0.1, 0.1, 0.9}},
+    ["border"] = {["hex"] = "ff000000", ["t"] = {0, 0, 0, 1}},
+    ["header"] = {["hex"] = "ff202020", ["t"] = {0.127, 0.127, 0.127, 1}}, -- header background
+    ["widget"] = {["hex"] = "ff262626", ["t"] = {0.15, 0.15, 0.15, 1}}, -- widget background
+    ["disabled"] = {["hex"] = "ff666666", ["t"] = {0.4, 0.4, 0.4, 1}},
+    ["none"] = {["hex"] = "00000000", ["t"] = {0, 0, 0, 0}},
+    ["sheet_bg"] = {["t"] = {0.15, 0.15, 0.15, 0.9}},
+    ["sheet_cell_highlight"] = {["t"] = {1, 1, 1, 0.1}},
+    ["sheet_row_highlight"] = {["t"] = {0.7, 0.7, 0.7, 0.1}},
 
     -- common
-    ["red"] = {["hex"]="ffff0000", ["t"]={1, 0, 0, 1}},
-    ["yellow"] = {["hex"]="ffffff00", ["t"]={1, 1, 0, 1}},
-    ["green"] = {["hex"]="ff00ff00", ["t"]={0, 1, 0, 1}},
-    ["cyan"] = {["hex"]="ff00ffff", ["t"]={0, 1, 1, 1}},
-    ["blue"] = {["hex"]="ff0000ff", ["t"]={0, 0, 1, 1}},
-    ["purple"] = {["hex"]="ffff00ff", ["t"]={1, 0, 1, 1}},
-    ["white"] = {["hex"]="ffffffff", ["t"]={1, 1, 1, 1}},
-    ["black"] = {["hex"]="ff000000", ["t"]={0, 0, 0, 1}},
+    ["red"] = {["hex"] = "ffff0000", ["t"] = {1, 0, 0, 1}},
+    ["yellow"] = {["hex"] = "ffffff00", ["t"] = {1, 1, 0, 1}},
+    ["green"] = {["hex"] = "ff00ff00", ["t"] = {0, 1, 0, 1}},
+    ["cyan"] = {["hex"] = "ff00ffff", ["t"] = {0, 1, 1, 1}},
+    ["blue"] = {["hex"] = "ff0000ff", ["t"] = {0, 0, 1, 1}},
+    ["purple"] = {["hex"] = "ffff00ff", ["t"] = {1, 0, 1, 1}},
+    ["white"] = {["hex"] = "ffffffff", ["t"] = {1, 1, 1, 1}},
+    ["black"] = {["hex"] = "ff000000", ["t"] = {0, 0, 0, 1}},
 
     -- others
-    ["gray"] = {["hex"]="ffb2b2b2", ["t"]={0.7, 0.7, 0.7, 1}},
-    ["sand"] = {["hex"]="ffeccc68", ["t"]={0.93, 0.8, 0.41, 1}},
-    ["gold"] = {["hex"]="ffffd100", ["t"]={1, 0.82, 0, 1}},
-    ["darkred"] = {["hex"]="ff402020", ["t"]={0.17, 0.13, 0.13, 1}},
-    ["orange"] = {["hex"]="ffffa502", ["t"]={1, 0.65, 0.01, 1}},
-    ["orangered"] = {["hex"]="ffff4f00", ["t"]={1, 0.31, 0, 1}},
-    ["firebrick"] = {["hex"]="ffff3030", ["t"]={1, 0.19, 0.19, 1}},
-    ["coral"] = {["hex"]="ffff7f50", ["t"]={1, 0.5, 0.31, 1}},
-    ["tomato"] = {["hex"]="ffff6348", ["t"]={1, 0.39, 0.28, 1}},
-    ["lightred"] = {["hex"]="ffff4757", ["t"]={1, 0.28, 0.34, 1}},
-    ["classicrose"] = {["hex"]="fffbcce7", ["t"]={0.98, 0.8, 0.91, 1}},
-    ["pink"] = {["hex"]="ffff6b81", ["t"]={1, 0.42, 0.51, 1}},
-    ["hotpink"] = {["hex"]="ffff4466", ["t"]={1, 0.27, 0.4, 1}},
-    ["lime"] = {["hex"]="ff7bed9f", ["t"]={0.48, 0.93, 0.62, 1}},
-    ["brightgreen"] = {["hex"]="ff2ed573", ["t"]={0.18, 0.84, 0.45, 1}},
-    ["chartreuse"] = {["hex"]="ff80ff00", ["t"]={0.502, 1, 0, 1}},
-    ["skyblue"] = {["hex"]="ff00ccff", ["t"]={0, 0.8, 1, 1}},
-    ["vividblue"] = {["hex"]="ff1e90ff", ["t"]={0.12, 0.56, 1, 1}},
-    ["softblue"] = {["hex"]="ff5352ed", ["t"]={0.33, 0.32, 0.93, 1}},
-    ["brightblue"] = {["hex"]="ff3742fa", ["t"]={0.22, 0.26, 0.98, 1}},
-    ["guild"] = {["hex"]="ff40ff40", ["t"]={0.251, 1, 0.251, 1}},
+    ["gray"] = {["hex"] = "ffb2b2b2", ["t"] = {0.83, 0.83, 0.83, 1}},
+    ["lightgray"] = {["hex"] = "ffd3d3d3", ["t"] = {0.7, 0.7, 0.7, 1}},
+    ["sand"] = {["hex"] = "ffeccc68", ["t"] = {0.93, 0.8, 0.41, 1}},
+    ["gold"] = {["hex"] = "ffffd100", ["t"] = {1, 0.82, 0, 1}},
+    ["darkred"] = {["hex"] = "ff402020", ["t"] = {0.17, 0.13, 0.13, 1}},
+    ["orange"] = {["hex"] = "ffffa502", ["t"] = {1, 0.65, 0.01, 1}},
+    ["orangered"] = {["hex"] = "ffff4f00", ["t"] = {1, 0.31, 0, 1}},
+    ["firebrick"] = {["hex"] = "ffff3030", ["t"] = {1, 0.19, 0.19, 1}},
+    ["coral"] = {["hex"] = "ffff7f50", ["t"] = {1, 0.5, 0.31, 1}},
+    ["tomato"] = {["hex"] = "ffff6348", ["t"] = {1, 0.39, 0.28, 1}},
+    ["lightred"] = {["hex"] = "ffff4757", ["t"] = {1, 0.28, 0.34, 1}},
+    ["classicrose"] = {["hex"] = "fffbcce7", ["t"] = {0.98, 0.8, 0.91, 1}},
+    ["pink"] = {["hex"] = "ffff6b81", ["t"] = {1, 0.42, 0.51, 1}},
+    ["hotpink"] = {["hex"] = "ffff4466", ["t"] = {1, 0.27, 0.4, 1}},
+    ["lime"] = {["hex"] = "ff7bed9f", ["t"] = {0.48, 0.93, 0.62, 1}},
+    ["brightgreen"] = {["hex"] = "ff2ed573", ["t"] = {0.18, 0.84, 0.45, 1}},
+    ["chartreuse"] = {["hex"] = "ff80ff00", ["t"] = {0.502, 1, 0, 1}},
+    ["skyblue"] = {["hex"] = "ff00ccff", ["t"] = {0, 0.8, 1, 1}},
+    ["vividblue"] = {["hex"] = "ff1e90ff", ["t"] = {0.12, 0.56, 1, 1}},
+    ["softblue"] = {["hex"] = "ff5352ed", ["t"] = {0.33, 0.32, 0.93, 1}},
+    ["brightblue"] = {["hex"] = "ff3742fa", ["t"] = {0.22, 0.26, 0.98, 1}},
+    ["guild"] = {["hex"] = "ff40ff40", ["t"] = {0.251, 1, 0.251, 1}},
 
     -- class (data from RAID_CLASS_COLORS)
-    ["DEATHKNIGHT"] = {["hex"]="ffc41e3a", ["t"]={0.7686275243759155, 0.1176470667123795, 0.2274509966373444}},
-    ["DEMONHUNTER"] = {["hex"]="ffa330c9", ["t"]={0.6392157077789307, 0.1882353127002716, 0.7882353663444519}},
-    ["DRUID"] = {["hex"]="ffff7c0a", ["t"]={1, 0.4862745404243469, 0.03921568766236305}},
-    ["EVOKER"] = {["hex"]="ff33937f", ["t"]={0.2000000178813934, 0.5764706134796143, 0.4980392456054688}},
-    ["HUNTER"] = {["hex"]="ffaad372", ["t"]={0.6666666865348816, 0.8274510502815247, 0.4470588564872742}},
-    ["MAGE"] = {["hex"]="ff3fc7eb", ["t"]={0.2470588386058807, 0.7803922295570374, 0.9215686917304993}},
-    ["MONK"] = {["hex"]="ff00ff98", ["t"]={0, 1, 0.5960784554481506}},
-    ["PALADIN"] = {["hex"]="fff48cba", ["t"]={0.9568628072738647, 0.5490196347236633, 0.729411780834198}},
-    ["PRIEST"] = {["hex"]="ffffffff", ["t"]={1, 1, 1}},
-    ["ROGUE"] = {["hex"]="fffff468", ["t"]={1, 0.9568628072738647, 0.4078431725502014}},
-    ["SHAMAN"] = {["hex"]="ff0070dd", ["t"]={0, 0.4392157196998596, 0.8666667342185974}},
-    ["WARLOCK"] = {["hex"]="ff8788ee", ["t"]={0.529411792755127, 0.5333333611488342, 0.9333333969116211}},
-    ["WARRIOR"] = {["hex"]="ffc69b6d", ["t"]={0.7764706611633301, 0.6078431606292725, 0.4274510145187378}},
-    ["UNKNOWN"] = {["hex"]="ff666666", ["t"]={0.4, 0.4, 0.4}},
+    ["DEATHKNIGHT"] = {["hex"] = "ffc41e3a", ["t"] = {0.7686275243759155, 0.1176470667123795, 0.2274509966373444}},
+    ["DEMONHUNTER"] = {["hex"] = "ffa330c9", ["t"] = {0.6392157077789307, 0.1882353127002716, 0.7882353663444519}},
+    ["DRUID"] = {["hex"] = "ffff7c0a", ["t"] = {1, 0.4862745404243469, 0.03921568766236305}},
+    ["EVOKER"] = {["hex"] = "ff33937f", ["t"] = {0.2000000178813934, 0.5764706134796143, 0.4980392456054688}},
+    ["HUNTER"] = {["hex"] = "ffaad372", ["t"] = {0.6666666865348816, 0.8274510502815247, 0.4470588564872742}},
+    ["MAGE"] = {["hex"] = "ff3fc7eb", ["t"] = {0.2470588386058807, 0.7803922295570374, 0.9215686917304993}},
+    ["MONK"] = {["hex"] = "ff00ff98", ["t"] = {0, 1, 0.5960784554481506}},
+    ["PALADIN"] = {["hex"] = "fff48cba", ["t"] = {0.9568628072738647, 0.5490196347236633, 0.729411780834198}},
+    ["PRIEST"] = {["hex"] = "ffffffff", ["t"] = {1, 1, 1}},
+    ["ROGUE"] = {["hex"] = "fffff468", ["t"] = {1, 0.9568628072738647, 0.4078431725502014}},
+    ["SHAMAN"] = {["hex"] = "ff0070dd", ["t"] = {0, 0.4392157196998596, 0.8666667342185974}},
+    ["WARLOCK"] = {["hex"] = "ff8788ee", ["t"] = {0.529411792755127, 0.5333333611488342, 0.9333333969116211}},
+    ["WARRIOR"] = {["hex"] = "ffc69b6d", ["t"] = {0.7764706611633301, 0.6078431606292725, 0.4274510145187378}},
+    ["UNKNOWN"] = {["hex"] = "ff666666", ["t"] = {0.4, 0.4, 0.4}},
 
     -- faction
-    ["Horde"] = {["hex"]="ffc70000", ["t"]={0.78, 0, 0}},
-    ["Alliance"] = {["hex"]="ff1a80ff", ["t"]={0.1, 0.5, 1}},
+    ["Horde"] = {["hex"] = "ffc70000", ["t"] = {0.78, 0, 0}},
+    ["Alliance"] = {["hex"] = "ff1a80ff", ["t"] = {0.1, 0.5, 1}},
 
     -- role
-    ["TANK"] = {["hex"]="ff627ee2", ["t"]={0.38, 0.49, 0.89}},
-    ["HEALER"] = {["hex"]="ff4baa4e", ["t"]={0.29, 0.67, 0.31}},
-    ["DAMAGER"] = {["hex"]="ffa74c4d", ["t"]={0.65, 0.3, 0.3}},
+    ["TANK"] = {["hex"] = "ff627ee2", ["t"] = {0.38, 0.49, 0.89}},
+    ["HEALER"] = {["hex"] = "ff4baa4e", ["t"] = {0.29, 0.67, 0.31}},
+    ["DAMAGER"] = {["hex"] = "ffa74c4d", ["t"] = {0.65, 0.3, 0.3}},
 
     -- reaction
-    ["FRIENDLY"] = {["hex"]="ff4ab04d", ["t"]={0.29, 0.69, 0.3}},
-    ["NEUTRAL"] = {["hex"]="ffd9c45c", ["t"]={0.85, 0.77, 0.36}},
-    ["HOSTILE"] = {["hex"]="ffc74040", ["t"]={0.78, 0.25, 0.25}},
+    ["FRIENDLY"] = {["hex"] = "ff4ab04d", ["t"] = {0.29, 0.69, 0.3}},
+    ["NEUTRAL"] = {["hex"] = "ffd9c45c", ["t"] = {0.85, 0.77, 0.36}},
+    ["HOSTILE"] = {["hex"] = "ffc74040", ["t"] = {0.78, 0.25, 0.25}},
 
     -- power color (color from PowerBarColor & ElvUI)
-    ["MANA"] = {["hex"]="ff007fff", ["t"]={0, 0.5, 1}}, -- 0, 0, 1
-    ["RAGE"] = {["hex"]="ffff0000", ["t"]={1, 0, 0}},
-    ["FOCUS"] = {["hex"]="ffff7f3f", ["t"]={1, 0.50, 0.25}},
-    ["ENERGY"] = {["hex"]="ffffff00", ["t"]={1, 1, 0}},
-    ["COMBO_POINTS"] = {["hex"]="fffff468", ["t"]={1, 0.96, 0.41}},
-    ["RUNES"] = {["hex"]="ff7f7f7f", ["t"]={0.50, 0.50, 0.50}},
-    ["RUNIC_POWER"] = {["hex"]="ff00d1ff", ["t"]={0, 0.82, 1}},
-    ["SOUL_SHARDS"] = {["hex"]="ff9482c9", ["t"]={0.58, 0.51, 0.79}}, --{["hex"]="ff7f518c", ["t"]={0.50, 0.32, 0.55}}
-    ["LUNAR_POWER"] = {["hex"]="ff4c84e5", ["t"]={0.30, 0.52, 0.90}},
-    ["HOLY_POWER"] = {["hex"]="fff2e54d", ["t"]={0.95, 0.9, 0.3}}, -- {["hex"]="fff2e599", ["t"]={0.95, 0.90, 0.60}},
-    ["MAELSTROM"] = {["hex"]="ff007fff", ["t"]={0, 0.5, 1}},
-    ["INSANITY"] = {["hex"]="ff9933ff", ["t"]={0.6, 0.2, 1}}, -- 0.40, 0, 0.80
-    ["CHI"] = {["hex"]="ffb5ffea", ["t"]={0.71, 1, 0.92}},
-    ["ESSENCE"] = {["hex"]="FF76DFD1", ["t"]={0.46, 0.87, 0.82}},
-    ["ARCANE_CHARGES"] = {["hex"]="ff009eff", ["t"]={0, 0.62, 1}}, -- {["hex"]="ff1919f9", ["t"]={0.10, 0.10, 0.98}}
-    ["FURY"] = {["hex"]="ffc842fc", ["t"]={0.788, 0.259, 0.992}},
-    ["PAIN"] = {["hex"]="ffff9c00", ["t"]={1, 0.612, 0}},
+    ["MANA"] = {["hex"] = "ff007fff", ["t"] = {0, 0.5, 1}}, -- 0, 0, 1
+    ["RAGE"] = {["hex"] = "ffff0000", ["t"] = {1, 0, 0}},
+    ["FOCUS"] = {["hex"] = "ffff7f3f", ["t"] = {1, 0.50, 0.25}},
+    ["ENERGY"] = {["hex"] = "ffffff00", ["t"] = {1, 1, 0}},
+    ["COMBO_POINTS"] = {["hex"] = "fffff468", ["t"] = {1, 0.96, 0.41}},
+    ["RUNES"] = {["hex"] = "ff7f7f7f", ["t"] = {0.50, 0.50, 0.50}},
+    ["RUNIC_POWER"] = {["hex"] = "ff00d1ff", ["t"] = {0, 0.82, 1}},
+    ["SOUL_SHARDS"] = {["hex"] = "ff9482c9", ["t"] = {0.58, 0.51, 0.79}}, --{["hex"]="ff7f518c", ["t"]={0.50, 0.32, 0.55}}
+    ["LUNAR_POWER"] = {["hex"] = "ff4c84e5", ["t"] = {0.30, 0.52, 0.90}},
+    ["HOLY_POWER"] = {["hex"] = "fff2e54d", ["t"] = {0.95, 0.9, 0.3}}, -- {["hex"]="fff2e599", ["t"]={0.95, 0.90, 0.60}},
+    ["MAELSTROM"] = {["hex"] = "ff007fff", ["t"] = {0, 0.5, 1}},
+    ["INSANITY"] = {["hex"] = "ff9933ff", ["t"] = {0.6, 0.2, 1}}, -- 0.40, 0, 0.80
+    ["CHI"] = {["hex"] = "ffb5ffea", ["t"] = {0.71, 1, 0.92}},
+    ["ESSENCE"] = {["hex"] = "FF76DFD1", ["t"] = {0.46, 0.87, 0.82}, ["start"] = {0.71, 0.82, 1}, ["end"] = {1, 0.75, 0.75}},
+    ["ARCANE_CHARGES"] = {["hex"] = "ff009eff", ["t"] = {0, 0.62, 1}}, -- {["hex"]="ff1919f9", ["t"]={0.10, 0.10, 0.98}}
+    ["FURY"] = {["hex"] = "ffc842fc", ["t"] = {0.788, 0.259, 0.992}},
+    ["PAIN"] = {["hex"] = "ffff9c00", ["t"] = {1, 0.612, 0}},
     -- vehicle colors
-    ["AMMOSLOT"] = {["hex"]="ffcc9900", ["t"]={0.80, 0.60, 0}},
-    ["FUEL"] = {["hex"]="ff008c7f", ["t"]={0.0, 0.55, 0.5}},
+    ["AMMOSLOT"] = {["hex"] = "ffcc9900", ["t"] = {0.80, 0.60, 0}},
+    ["FUEL"] = {["hex"] = "ff008c7f", ["t"] = {0.0, 0.55, 0.5}},
     -- alternate power bar colors
-    ["EBON_MIGHT"] = {["hex"]="ffe58c4c", ["t"]={0.9, 0.55, 0.3}},
-    ["STAGGER_GREEN"] = {["hex"]="ff84ff84", ["t"]={0.52, 1, 0.52,}},
-    ["STAGGER_YELLOW"] = {["hex"]="fffff9b7", ["t"]={1, 0.98, 0.72}},
-    ["STAGGER_RED"] = {["hex"]="ffff6b6b", ["t"]={1, 0.42, 0.42}},
+    ["EBON_MIGHT"] = {["hex"] = "ffe58c4c", ["t"] = {0.9, 0.55, 0.3}},
+    ["STAGGER_GREEN"] = {["hex"] = "ff84ff84", ["t"] = {0.52, 1, 0.52,}},
+    ["STAGGER_YELLOW"] = {["hex"] = "fffff9b7", ["t"] = {1, 0.98, 0.72}},
+    ["STAGGER_RED"] = {["hex"] = "ffff6b6b", ["t"] = {1, 0.42, 0.42}},
 
     -- quality https://warcraft.wiki.gg/wiki/Quality
-    ["Poor"] = {["hex"]="ff9d9d9d", ["t"]={0.62, 0.62, 0.62, 1}}, -- ITEM_QUALITY0_DESC
-    ["Common"] = {["hex"]="ffffffff", ["t"]={1, 1, 1, 1}}, -- ITEM_QUALITY1_DESC
-    ["Uncommon"] = {["hex"]="ff1eff00", ["t"]={0.12, 1, 0, 1}}, -- ITEM_QUALITY2_DESC
-    ["Rare"] = {["hex"]="ff0070dd", ["t"]={0, 0.44, 0.87, 1}}, -- ITEM_QUALITY3_DESC
-    ["Epic"] = {["hex"]="ffa335ee", ["t"]={0.64, 0.21, 0.93, 1}}, -- ITEM_QUALITY4_DESC
-    ["Legendary"] = {["hex"]="ffff8000", ["t"]={1, 0.5, 0, 1}}, -- ITEM_QUALITY5_DESC
-    ["Artifact"] = {["hex"]="ffe6cc80", ["t"]={0.9, 0.8, 0.5, 1}}, -- ITEM_QUALITY6_DESC
-    ["Heirloom"] = {["hex"]="ff00ccff", ["t"]={0, 0.8, 1, 1}}, -- ITEM_QUALITY7_DESC
-    ["WoWToken"] = {["hex"]="ff00ccff", ["t"]={0, 0.8, 1, 1}}, -- ITEM_QUALITY8_DESC
+    ["Poor"] = {["hex"] = "ff9d9d9d", ["t"] = {0.62, 0.62, 0.62, 1}}, -- ITEM_QUALITY0_DESC
+    ["Common"] = {["hex"] = "ffffffff", ["t"] = {1, 1, 1, 1}}, -- ITEM_QUALITY1_DESC
+    ["Uncommon"] = {["hex"] = "ff1eff00", ["t"] = {0.12, 1, 0, 1}}, -- ITEM_QUALITY2_DESC
+    ["Rare"] = {["hex"] = "ff0070dd", ["t"] = {0, 0.44, 0.87, 1}}, -- ITEM_QUALITY3_DESC
+    ["Epic"] = {["hex"] = "ffa335ee", ["t"] = {0.64, 0.21, 0.93, 1}}, -- ITEM_QUALITY4_DESC
+    ["Legendary"] = {["hex"] = "ffff8000", ["t"] = {1, 0.5, 0, 1}}, -- ITEM_QUALITY5_DESC
+    ["Artifact"] = {["hex"] = "ffe6cc80", ["t"] = {0.9, 0.8, 0.5, 1}}, -- ITEM_QUALITY6_DESC
+    ["Heirloom"] = {["hex"] = "ff00ccff", ["t"] = {0, 0.8, 1, 1}}, -- ITEM_QUALITY7_DESC
+    ["WoWToken"] = {["hex"] = "ff00ccff", ["t"] = {0, 0.8, 1, 1}}, -- ITEM_QUALITY8_DESC
 }
 
 function AF.HasColor(name)
@@ -321,7 +321,7 @@ function AF.GetColorRGB(name, alpha, saturation)
 
     saturation = saturation or 1
     alpha = alpha or colors[name]["t"][4]
-    return colors[name]["t"][1]*saturation, colors[name]["t"][2]*saturation, colors[name]["t"][3]*saturation, alpha
+    return colors[name]["t"][1] * saturation, colors[name]["t"][2] * saturation, colors[name]["t"][3] * saturation, alpha
 end
 
 function AF.GetColorTable(name, alpha, saturation)
@@ -333,7 +333,7 @@ function AF.GetColorTable(name, alpha, saturation)
     saturation = saturation or 1
     alpha = alpha or colors[name]["t"][4]
 
-    return {colors[name]["t"][1]*saturation, colors[name]["t"][2]*saturation, colors[name]["t"][3]*saturation, alpha}
+    return {colors[name]["t"][1] * saturation, colors[name]["t"][2] * saturation, colors[name]["t"][3] * saturation, alpha}
 end
 
 function AF.GetColorHex(name)
@@ -408,7 +408,7 @@ function AF.GetClassColor(class, alpha, saturation)
 
     if RAID_CLASS_COLORS[class] then
         local r, g, b = RAID_CLASS_COLORS[class]:GetRGB()
-        return r*saturation, g*saturation, b*saturation, alpha
+        return r * saturation, g * saturation, b * saturation, alpha
     end
 
     return AF.GetColorRGB("UNKNOWN")
@@ -431,13 +431,18 @@ function AF.GetPowerColor(power, unit, alpha, saturation)
     saturation = saturation or 1
 
     if colors[power] then
-        return AF.GetColorRGB(power, alpha, saturation)
+        if colors[power]["start"] then -- gradient
+            return colors[power]["start"][1] * saturation, colors[power]["start"][2] * saturation, colors[power]["start"][3] * saturation, alpha,
+                colors[power]["end"][1] * saturation, colors[power]["end"][2] * saturation, colors[power]["end"][3] * saturation, alpha
+        else
+            return AF.GetColorRGB(power, alpha, saturation)
+        end
     end
 
     if unit then
         local r, g, b = select(3, UnitPowerType(unit))
         if r then
-            return r, g, b
+            return r, g, b, alpha
         end
     end
 
@@ -494,7 +499,6 @@ function AF.Interpolate(start, stop, step, maxSteps)
     return start + (stop - start) * step / maxSteps
 end
 
-
 ---@param text string
 ---@param startColor string colorName or hexColor
 ---@param endColor string colorName or hexColor
@@ -533,22 +537,22 @@ end
 ---------------------------------------------------------------------
 local button_color_normal = {0.127, 0.127, 0.127, 1}
 local buttonColors = {
-    ["accent"] = {["normal"]=colors["accent"]["normal"], ["hover"]=colors["accent"]["hover"]},
-    ["accent_hover"] = {["normal"]=button_color_normal, ["hover"]=colors["accent"]["hover"]},
-    ["accent_transparent"] = {["normal"]={0, 0, 0, 0}, ["hover"]=colors["accent"]["hover"]},
-    ["border_only"] = {["normal"]={0, 0, 0, 0}, ["hover"]={0, 0, 0, 0}},
-    ["none"] = {["normal"]={0, 0, 0, 0}, ["hover"]={0, 0, 0, 0}},
-    ["red"] = {["normal"]={0.6, 0.1, 0.1, 0.6}, ["hover"]={0.6, 0.1, 0.1, 1}},
-    ["red_hover"] = {["normal"]=button_color_normal, ["hover"]={0.6, 0.1, 0.1, 1}},
-    ["green"] = {["normal"]={0.1, 0.6, 0.1, 0.6}, ["hover"]={0.1, 0.6, 0.1, 1}},
-    ["green_hover"] = {["normal"]=button_color_normal, ["hover"]={0.1, 0.6, 0.1, 1}},
-    ["blue"] = {["normal"]={0, 0.5, 0.8, 0.6}, ["hover"]={0, 0.5, 0.8, 1}},
-    ["blue_hover"] = {["normal"]=button_color_normal, ["hover"]={0, 0.5, 0.8, 1}},
-    ["yellow"] = {["normal"]={0.7, 0.7, 0, 0.6}, ["hover"]={0.7, 0.7, 0, 1}},
-    ["yellow_hover"] = {["normal"]=button_color_normal, ["hover"]={0.7, 0.7, 0, 1}},
-    ["hotpink"] = {["normal"]={1, 0.27, 0.4, 0.6}, ["hover"]={1, 0.27, 0.4, 1}},
-    ["lime"] = {["normal"]={0.8, 1, 0, 0.35}, ["hover"]={0.8, 1, 0, 0.65}},
-    ["lavender"] = {["normal"]={0.96, 0.73, 1, 0.35}, ["hover"]={0.96, 0.73, 1, 0.65}},
+    ["accent"] = {["normal"] = colors["accent"]["normal"], ["hover"] = colors["accent"]["hover"]},
+    ["accent_hover"] = {["normal"] = button_color_normal, ["hover"] = colors["accent"]["hover"]},
+    ["accent_transparent"] = {["normal"] = {0, 0, 0, 0}, ["hover"] = colors["accent"]["hover"]},
+    ["border_only"] = {["normal"] = {0, 0, 0, 0}, ["hover"] = {0, 0, 0, 0}},
+    ["none"] = {["normal"] = {0, 0, 0, 0}, ["hover"] = {0, 0, 0, 0}},
+    ["red"] = {["normal"] = {0.6, 0.1, 0.1, 0.6}, ["hover"] = {0.6, 0.1, 0.1, 1}},
+    ["red_hover"] = {["normal"] = button_color_normal, ["hover"] = {0.6, 0.1, 0.1, 1}},
+    ["green"] = {["normal"] = {0.1, 0.6, 0.1, 0.6}, ["hover"] = {0.1, 0.6, 0.1, 1}},
+    ["green_hover"] = {["normal"] = button_color_normal, ["hover"] = {0.1, 0.6, 0.1, 1}},
+    ["blue"] = {["normal"] = {0, 0.5, 0.8, 0.6}, ["hover"] = {0, 0.5, 0.8, 1}},
+    ["blue_hover"] = {["normal"] = button_color_normal, ["hover"] = {0, 0.5, 0.8, 1}},
+    ["yellow"] = {["normal"] = {0.7, 0.7, 0, 0.6}, ["hover"] = {0.7, 0.7, 0, 1}},
+    ["yellow_hover"] = {["normal"] = button_color_normal, ["hover"] = {0.7, 0.7, 0, 1}},
+    ["hotpink"] = {["normal"] = {1, 0.27, 0.4, 0.6}, ["hover"] = {1, 0.27, 0.4, 1}},
+    ["lime"] = {["normal"] = {0.8, 1, 0, 0.35}, ["hover"] = {0.8, 1, 0, 0.65}},
+    ["lavender"] = {["normal"] = {0.96, 0.73, 1, 0.35}, ["hover"] = {0.96, 0.73, 1, 0.65}},
 }
 
 function AF.GetButtonNormalColor(name)
