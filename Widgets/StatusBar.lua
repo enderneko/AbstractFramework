@@ -78,7 +78,7 @@ local Clamp = Clamp
 
 local function UpdateValue(self)
     if self.value == self.min then
-        self.fg.mask:SetWidth(0.001)
+        self.fg.mask:SetWidth(0.00000001)
     elseif self.max == self.min then
         self.fg.mask:SetWidth(self:GetBarWidth())
     else
