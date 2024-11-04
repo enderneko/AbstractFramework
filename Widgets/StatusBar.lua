@@ -78,18 +78,18 @@ local Clamp = Clamp
 
 local function UpdateValue(self)
     if self.value == self.min then
-        self.fg:SetWidth(0.001)
+        self.fg.mask:SetWidth(0.001)
     elseif self.max == self.min then
-        self.fg:SetWidth(self:GetBarWidth())
+        self.fg.mask:SetWidth(self:GetBarWidth())
     else
         self.value = Clamp(self.value, self.min, self.max)
         local p = (self.value - self.min) / (self.max - self.min)
         if self:GetBarWidth() == 0 then
             C_Timer.After(0, function()
-                self.fg:SetWidth(p * self:GetBarWidth())
+                self.fg.mask:SetWidth(p * self:GetBarWidth())
             end)
         else
-            self.fg:SetWidth(p * self:GetBarWidth())
+            self.fg.mask:SetWidth(p * self:GetBarWidth())
         end
     end
 end
@@ -101,13 +101,32 @@ local prototype = {
         self.loss:SetTexture(lossTexture or texture)
     end,
     SetColor = function(self, r, g, b, a)
+        self.fg.isGradient = false
         self.fg:SetVertexColor(r, g, b, a)
     end,
-    SetGradientColor = function(self, startColor, endColor)
-        self.fg:SetGradient("HORIZONTAL", CreateColor(AF.UnpackColor(startColor)), CreateColor(AF.UnpackColor(endColor)))
+    SetGradientColor = function(self, ...)
+        self.fg.isGradient = true
+        if select("#", ...) == 2 then
+            local startColor, endColor = ...
+            self.fg:SetGradient("HORIZONTAL", CreateColor(AF.UnpackColor(startColor)), CreateColor(AF.UnpackColor(endColor)))
+        else
+            local r1, g1, b1, a1, r2, g2, b2, a2 = ...
+            self.fg:SetGradient("HORIZONTAL", CreateColor(r1, g1, b1, a1), CreateColor(r2, g2, b2, a2))
+        end
     end,
     SetLossColor = function(self, r, g, b, a)
+        self.loss.isGradient = false
         self.loss:SetVertexColor(r, g, b, a)
+    end,
+    SetGradientLossColor = function(self, ...)
+        self.loss.isGradient = true
+        if select("#", ...) == 2 then
+            local startColor, endColor = ...
+            self.loss:SetGradient("HORIZONTAL", CreateColor(AF.UnpackColor(startColor)), CreateColor(AF.UnpackColor(endColor)))
+        else
+            local r1, g1, b1, a1, r2, g2, b2, a2 = ...
+            self.loss:SetGradient("HORIZONTAL", CreateColor(r1, g1, b1, a1), CreateColor(r2, g2, b2, a2))
+        end
     end,
     SetBackgroundColor = function(self, r, g, b, a)
         self:SetBackdropColor(r, g, b, a)
@@ -123,20 +142,28 @@ local prototype = {
             AF.SetPoint(self.bg, "TOPLEFT")
             AF.SetPoint(self.bg, "BOTTOMRIGHT")
             AF.SetPoint(self.fg, "TOPLEFT")
-            AF.SetPoint(self.fg, "BOTTOMLEFT")
-            AF.SetPoint(self.loss, "TOPLEFT", self.fg, "TOPRIGHT")
-            AF.SetPoint(self.loss, "BOTTOMLEFT", self.fg, "BOTTOMRIGHT")
-            AF.SetPoint(self.loss, "TOPRIGHT")
+            AF.SetPoint(self.fg, "BOTTOMRIGHT")
+            AF.SetPoint(self.fg.mask, "TOPLEFT")
+            AF.SetPoint(self.fg.mask, "BOTTOMLEFT")
+            AF.SetPoint(self.loss, "TOPLEFT")
             AF.SetPoint(self.loss, "BOTTOMRIGHT")
+            AF.SetPoint(self.loss.mask, "TOPLEFT", self.fg.mask, "TOPRIGHT")
+            AF.SetPoint(self.loss.mask, "BOTTOMLEFT", self.fg.mask, "BOTTOMRIGHT")
+            AF.SetPoint(self.loss.mask, "TOPRIGHT")
+            AF.SetPoint(self.loss.mask, "BOTTOMRIGHT")
         else
             AF.SetPoint(self.bg, "TOPLEFT", 1, -1)
             AF.SetPoint(self.bg, "BOTTOMRIGHT", -1, 1)
             AF.SetPoint(self.fg, "TOPLEFT", 1, -1)
-            AF.SetPoint(self.fg, "BOTTOMLEFT", 1, 1)
-            AF.SetPoint(self.loss, "TOPLEFT", self.fg, "TOPRIGHT")
-            AF.SetPoint(self.loss, "BOTTOMLEFT", self.fg, "BOTTOMRIGHT")
-            AF.SetPoint(self.loss, "TOPRIGHT", -1, -1)
+            AF.SetPoint(self.fg, "BOTTOMRIGHT", -1, 1)
+            AF.SetPoint(self.fg.mask, "TOPLEFT", 1, -1)
+            AF.SetPoint(self.fg.mask, "BOTTOMLEFT", 1, 1)
+            AF.SetPoint(self.loss, "TOPLEFT", 1, -1)
             AF.SetPoint(self.loss, "BOTTOMRIGHT", -1, 1)
+            AF.SetPoint(self.loss.mask, "TOPLEFT", self.fg.mask, "TOPRIGHT")
+            AF.SetPoint(self.loss.mask, "BOTTOMLEFT", self.fg.mask, "BOTTOMRIGHT")
+            AF.SetPoint(self.loss.mask, "TOPRIGHT", -1, -1)
+            AF.SetPoint(self.loss.mask, "BOTTOMRIGHT", -1, 1)
         end
     end,
 
@@ -181,13 +208,15 @@ local prototype = {
     end,
 
     -- pixel perfect
-    UpdatePixels = function(self)
+    DefaultUpdatePixels = function(self)
         AF.ReSize(self)
         AF.RePoint(self)
         AF.ReBorder(self)
-        AF.ReSize(self.fg)
+        -- AF.ReSize(self.fg.mask)
         AF.RePoint(self.fg)
+        AF.RePoint(self.fg.mask)
         AF.RePoint(self.loss)
+        AF.RePoint(self.loss.mask)
     end,
 }
 
@@ -221,6 +250,10 @@ function AF.CreateSimpleBar(parent, name, noBackdrop)
     -- foreground texture
     local fg = bar:CreateTexture(nil, "BORDER", nil, -1)
     bar.fg = fg
+    fg.mask = bar:CreateMaskTexture()
+    fg.mask:SetTexture(AF.GetPlainTexture(), "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE", "NEAREST")
+    fg:AddMaskTexture(fg.mask)
+
     -- already done in PixelUtil
     -- fg:SetTexelSnappingBias(0)
     -- fg:SetSnapToPixelGrid(false)
@@ -228,6 +261,9 @@ function AF.CreateSimpleBar(parent, name, noBackdrop)
     -- loss texture
     local loss = bar:CreateTexture(nil, "BORDER", nil, -1)
     bar.loss = loss
+    loss.mask = bar:CreateMaskTexture()
+    loss.mask:SetTexture(AF.GetPlainTexture(), "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE", "NEAREST")
+    loss:AddMaskTexture(loss.mask)
 
     -- bg texture NOTE: currently only for GetBarSize/Width/Height
     local bg = bar:CreateTexture(nil, "BORDER", nil, -2)
@@ -237,8 +273,7 @@ function AF.CreateSimpleBar(parent, name, noBackdrop)
     bar:SnapTextureToEdge(noBackdrop)
 
     -- pixel perfect
-    -- NOTE: UpdatePixels() added in prototype, remember to use it
-    -- AF.AddToPixelUpdater(bar)
+    AF.AddToPixelUpdater(bar, bar.DefaultUpdatePixels)
 
     return bar
 end
