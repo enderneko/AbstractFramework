@@ -186,6 +186,9 @@ local prototype = {
     GetValue = function(self)
         return self.value
     end,
+    GetRemainingValue = function(self)
+        return self.max - self.value
+    end,
     GetBarSize = function(self)
         return self.bg:GetSize()
     end,
@@ -205,6 +208,11 @@ local prototype = {
     SetValue = function(self, value)
         self.value = value
         UpdateValue(self)
+    end,
+
+    -- desaturate
+    Desaturate = function(self, enabled)
+        self.mod:SetShown(enabled)
     end,
 
     -- pixel perfect
@@ -268,6 +276,14 @@ function AF.CreateSimpleBar(parent, name, noBackdrop)
     -- bg texture NOTE: currently only for GetBarSize/Width/Height
     local bg = bar:CreateTexture(nil, "BORDER", nil, -2)
     bar.bg = bg
+
+    -- desaturate
+    local mod = bar:CreateTexture(nil, "ARTWORK", nil, 1)
+    bar.mod = mod
+    mod:SetAllPoints(fg.mask)
+    mod:SetColorTexture(0.7, 0.7, 0.7)
+    mod:SetBlendMode("MOD")
+    mod:Hide()
 
     -- setup default texture points
     bar:SnapTextureToEdge(noBackdrop)
