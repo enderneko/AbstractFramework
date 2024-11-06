@@ -37,6 +37,7 @@
     <Script file="Widgets\Misc.lua"/>
 
     <!-- utils -->
+    <Script file="Utils\Common.lua"/>
     <Script file="Utils\SharedMedia.lua"/>
 
     <!-- demo -->
