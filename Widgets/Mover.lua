@@ -735,6 +735,7 @@ end
 -- toggle movers
 ---------------------------------------------------------------------
 function AF.ShowMovers(group)
+    if InCombatLockdown() then return end
     if not moverParent then CreateMoverParent() end
 
     for g, gt in pairs(movers) do
@@ -758,7 +759,7 @@ function AF.ShowMovers(group)
 end
 
 function AF.HideMovers()
-    if not moverParent then return end
+    if InCombatLockdown() or not moverParent then return end
 
     for _, g in pairs(movers) do
         for _, m in pairs(g) do
@@ -771,6 +772,7 @@ function AF.HideMovers()
 end
 
 function AF.ToggleMovers()
+    if InCombatLockdown() then return end
     if not (moverParent and moverParent:IsShown()) then
         AF.ShowMovers()
     else
@@ -779,6 +781,7 @@ function AF.ToggleMovers()
 end
 
 function AF.UndoMovers()
+    if InCombatLockdown() then return end
     if not moverParent:IsShown() then return end
 
     for _, g in pairs(movers) do
