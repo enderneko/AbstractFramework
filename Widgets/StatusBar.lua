@@ -281,7 +281,7 @@ function AF.CreateSimpleBar(parent, name, noBackdrop)
     local mod = bar:CreateTexture(nil, "ARTWORK", nil, 1)
     bar.mod = mod
     mod:SetAllPoints(fg.mask)
-    mod:SetColorTexture(0.7, 0.7, 0.7)
+    mod:SetColorTexture(0.6, 0.6, 0.6)
     mod:SetBlendMode("MOD")
     mod:Hide()
 

@@ -276,7 +276,7 @@ local colors = {
     ["FOCUS"] = {["hex"] = "ffff7f3f", ["t"] = {1, 0.50, 0.25}},
     ["ENERGY"] = {["hex"] = "ffffff00", ["t"] = {1, 1, 0}},
     ["COMBO_POINTS"] = {["hex"] = "fffff468", ["t"] = {1, 0.96, 0.41}},
-    ["RUNE_BLOOD"] = {["hex"] = "ffd12121", ["t"] = {0.82, 0.13, 0.13}},
+    ["RUNE_BLOOD"] = {["hex"] = "ffff4040", ["t"] = {1, 0.25, 0.25}},
     ["RUNE_FROST"] = {["hex"] = "ff5798db", ["t"] = {0.34, 0.6, 0.86}},
     ["RUNE_UNHOLY"] = {["hex"] = "ff99d144", ["t"] = {0.6, 0.82, 0.27}},
     ["RUNIC_POWER"] = {["hex"] = "ff00d1ff", ["t"] = {0, 0.82, 1}},
