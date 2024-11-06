@@ -77,6 +77,11 @@ function AF.SetDefaultBackdrop_NoBorder(frame)
     frame:SetBackdrop({bgFile=AF.GetPlainTexture()})
 end
 
+function AF.ApplyDefaultBackdropColors(frame)
+    frame:SetBackdropColor(AF.GetColorRGB("background"))
+    frame:SetBackdropBorderColor(AF.GetColorRGB("border"))
+end
+
 ---------------------------------------------------------------------
 -- drag
 ---------------------------------------------------------------------
