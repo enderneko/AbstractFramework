@@ -78,19 +78,23 @@ local Clamp = Clamp
 
 local function UpdateValue(self)
     if self.value == self.min then
-        self.fg.mask:SetWidth(0.00000001)
+        self.fg.mask:SetWidth(0.0001)
+        self.fg:Hide()
     elseif self.max == self.min then
         self.fg.mask:SetWidth(self:GetBarWidth())
+        self.fg:Show()
     else
         self.value = Clamp(self.value, self.min, self.max)
-        local p = (self.value - self.min) / (self.max - self.min)
-        if self:GetBarWidth() == 0 then
-            C_Timer.After(0, function()
-                self.fg.mask:SetWidth(p * self:GetBarWidth())
-            end)
-        else
-            self.fg.mask:SetWidth(p * self:GetBarWidth())
-        end
+        self.progress = (self.value - self.min) / (self.max - self.min)
+        self.progress = self.progress > 0.0001 and self.progress or 0.0001
+        -- if self:GetBarWidth() == 0 then
+        --     C_Timer.After(0, function()
+        --         self.fg.mask:SetWidth(self.progress * self:GetBarWidth())
+        --     end)
+        -- else
+        -- end
+        self.fg.mask:SetWidth(self.progress * self:GetBarWidth())
+        self.fg:SetShown(self.progress > 0.0001)
     end
 end
 
@@ -234,7 +238,7 @@ function AF.CreateSimpleBar(parent, name, noBackdrop)
     if noBackdrop then
         bar = CreateFrame("Frame", name, parent)
         for k, v in pairs(prototype) do
-            if k ~= "SetBackgroundColor" and k ~= "SetBorderColor" or k ~= "SnapTextureToEdge" then
+            if k ~= "SetBackgroundColor" and k ~= "SetBorderColor" then
                 bar[k] = v
             end
         end
