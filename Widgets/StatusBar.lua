@@ -6,7 +6,7 @@ local AF = _G.AbstractFramework
 ---------------------------------------------------------------------
 --- @param color string color name defined in Color.lua
 --- @param borderColor string color name defined in Color.lua
-function AF.CreateStatusBar(parent, minValue, maxValue, width, height, color, borderColor, progressTextType)
+function AF.CreateBlizzardStatusBar(parent, minValue, maxValue, width, height, color, borderColor, progressTextType)
     local bar = CreateFrame("StatusBar", nil, parent, "BackdropTemplate")
     AF.StylizeFrame(bar, AF.GetColorTable(color, 0.9, 0.1), borderColor)
     AF.SetSize(bar, width, height)
@@ -72,7 +72,7 @@ function AF.CreateStatusBar(parent, minValue, maxValue, width, height, color, bo
 end
 
 ---------------------------------------------------------------------
--- custom
+-- simple
 ---------------------------------------------------------------------
 local Clamp = Clamp
 
@@ -232,7 +232,7 @@ local prototype = {
     end,
 }
 
-function AF.CreateSimpleBar(parent, name, noBackdrop)
+function AF.CreateSimpleStatusBar(parent, name, noBackdrop)
     local bar
 
     if noBackdrop then

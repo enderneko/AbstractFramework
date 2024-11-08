@@ -668,18 +668,18 @@ function AF.ShowDemo()
         end
     end
 
-    local bar1 = AF.CreateStatusBar(demo, 0, 100, 100, 20, "skyblue", nil, "percentage")
+    local bar1 = AF.CreateBlizzardStatusBar(demo, 0, 100, 100, 20, "skyblue", nil, "percentage")
     AF.SetPoint(bar1, "TOPLEFT", b10, "BOTTOMLEFT", 0, -10)
 
-    local bar2 = AF.CreateStatusBar(demo, 0, 100, 100, 20, "hotpink", nil, "value")
+    local bar2 = AF.CreateBlizzardStatusBar(demo, 0, 100, 100, 20, "hotpink", nil, "value")
     AF.SetPoint(bar2, "TOPLEFT", bar1, "TOPRIGHT", 10, 0)
     bar2:SetScript("OnUpdate", OnUpdate)
 
-    local bar3 = AF.CreateStatusBar(demo, 0, 100, 100, 20, "lime", nil, "value-max")
+    local bar3 = AF.CreateBlizzardStatusBar(demo, 0, 100, 100, 20, "lime", nil, "value-max")
     AF.SetPoint(bar3, "TOPLEFT", bar2, "TOPRIGHT", 10, 0)
     bar3:SetScript("OnUpdate", OnUpdate)
 
-    local bar4 = AF.CreateStatusBar(demo, 0, 100, 320, 7, "accent")
+    local bar4 = AF.CreateBlizzardStatusBar(demo, 0, 100, 320, 7, "accent")
     AF.SetPoint(bar4, "TOPLEFT", bar1, "BOTTOMLEFT", 0, -5)
 
     bar1:SetScript("OnUpdate", function(self, elapsed)
