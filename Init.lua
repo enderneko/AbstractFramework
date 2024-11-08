@@ -7,6 +7,7 @@ local AF = _G.AbstractFramework
 -- libs
 ---------------------------------------------------------------------
 AF.LSM = LibStub("LibSharedMedia-3.0")
+AF.LCG = LibStub("LibCustomGlow-1.0")
 
 ---------------------------------------------------------------------
 -- vars

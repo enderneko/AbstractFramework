@@ -270,6 +270,16 @@ local colors = {
     ["NEUTRAL"] = {["hex"] = "ffd9c45c", ["t"] = {0.85, 0.77, 0.36}},
     ["HOSTILE"] = {["hex"] = "ffc74040", ["t"] = {0.78, 0.25, 0.25}},
 
+    -- aura
+    ["aura_curse"] = {["hex"] = "ff9900ff", ["t"] = {0.6, 0, 1}},
+    ["aura_disease"] = {["hex"] = "ff996600", ["t"] = {0.6, 0.4, 0}},
+    ["aura_magic"] = {["hex"] = "ff3399ff", ["t"] = {0.2, 0.6, 1}},
+    ["aura_poison"] = {["hex"] = "ff009900", ["t"] = {0, 0.6, 0}},
+    ["aura_bleed"] = {["hex"] = "ffff3399", ["t"] = {1, 0.2, 0.6}},
+    ["aura_none"] = {["hex"] = "ffcc0000", ["t"] = {0.8, 0, 0}},
+    ["aura_castbyme"] = {["hex"] = "ff00cc00", ["t"] = {0, 0.8, 0}},
+    ["aura_dispellable"] = {["hex"] = "ffffff00", ["t"] = {1, 1, 0}},
+
     -- power color (color from PowerBarColor & ElvUI)
     ["MANA"] = {["hex"] = "ff007fff", ["t"] = {0, 0.5, 1}}, -- 0, 0, 1
     ["RAGE"] = {["hex"] = "ffff0000", ["t"] = {1, 0, 0}},
@@ -344,6 +354,15 @@ function AF.GetColorHex(name)
         colors[name]["hex"] = AF.ConvertRGB256ToHEX(AF.ConvertToRGB256(unpack(colors[name]["t"])))
     end
     return colors[name]["hex"]
+end
+
+function AF.GetAuraTypeColor(auraType)
+    auraType = auraType and "aura_" .. strlower(auraType)
+    if colors[auraType] then
+        return AF.GetColorRGB(auraType)
+    else
+        return AF.GetColorRGB("black")
+    end
 end
 
 local ADDONS = {}
