@@ -39,6 +39,7 @@
     <!-- utils -->
     <Script file="Utils\Common.lua"/>
     <Script file="Utils\SharedMedia.lua"/>
+    <Script file="Utils\CallbackHandler.lua"/>
     <Script file="Utils\EventHandler.lua"/>
 
     <!-- demo -->
