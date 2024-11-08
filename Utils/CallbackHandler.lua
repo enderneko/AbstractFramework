@@ -1,42 +1,43 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 
-local callbacks = {
-    -- invoke priority
-    {}, -- 1
-    {}, -- 2
-    {}, -- 3
-}
+-- NOTE: use addon built-in CallbackHandler
+-- local callbacks = {
+--     -- invoke priority
+--     {}, -- 1
+--     {}, -- 2
+--     {}, -- 3
+-- }
 
-function AF.RegisterCallback(eventName, onEventFuncName, onEventFunc, priority)
-    local t = priority and callbacks[priority] or callbacks[2]
-    if not t[eventName] then t[eventName] = {} end
-    t[eventName][onEventFuncName] = onEventFunc
-end
+-- function AF.RegisterCallback(eventName, onEventFuncName, onEventFunc, priority)
+--     local t = priority and callbacks[priority] or callbacks[2]
+--     if not t[eventName] then t[eventName] = {} end
+--     t[eventName][onEventFuncName] = onEventFunc
+-- end
 
-function AF.UnregisterCallback(eventName, onEventFuncName)
-    for _, t in pairs(callbacks) do
-        if t[eventName] then
-            t[eventName][onEventFuncName] = nil
-        end
-    end
-end
+-- function AF.UnregisterCallback(eventName, onEventFuncName)
+--     for _, t in pairs(callbacks) do
+--         if t[eventName] then
+--             t[eventName][onEventFuncName] = nil
+--         end
+--     end
+-- end
 
-function AF.UnregisterAllCallbacks(eventName)
-    for _, t in pairs(callbacks) do
-        t[eventName] = nil
-    end
-end
+-- function AF.UnregisterAllCallbacks(eventName)
+--     for _, t in pairs(callbacks) do
+--         t[eventName] = nil
+--     end
+-- end
 
-function AF.Fire(eventName, ...)
-    for _, t in pairs(callbacks) do
-        if t[eventName] then
-            for _, fn in pairs(t[eventName]) do
-                fn(...)
-            end
-        end
-    end
-end
+-- function AF.Fire(eventName, ...)
+--     for _, t in pairs(callbacks) do
+--         if t[eventName] then
+--             for _, fn in pairs(t[eventName]) do
+--                 fn(...)
+--             end
+--         end
+--     end
+-- end
 
 ---------------------------------------------------------------------
 -- addon loaded
