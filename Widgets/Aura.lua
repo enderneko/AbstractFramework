@@ -5,18 +5,18 @@ local LCG = AF.LCG
 ---------------------------------------------------------------------
 -- recalc texcoords
 ---------------------------------------------------------------------
-local function ReCalcTexCoord(self, width, height)
-    self.icon:SetTexCoord(unpack(AF.CalcTexCoordPreCrop(width, height, 1, 0.12)))
+function AF.ReCalcTexCoordForAura(aura, width, height)
+    aura.icon:SetTexCoord(unpack(AF.CalcTexCoordPreCrop(width, height, 1, 0.12)))
 end
 
 ---------------------------------------------------------------------
 -- cooldown style: vertical progress
 ---------------------------------------------------------------------
-local function VerticalCooldown_OnUpdate(self, elapsed)
-    self.elapsed = self.elapsed + elapsed
-    if self.elapsed >= 0.1 then
-        self:SetValue(self:GetValue() + self.elapsed)
-        self.elapsed = 0
+local function VerticalCooldown_OnUpdate(aura, elapsed)
+    aura.elapsed = aura.elapsed + elapsed
+    if aura.elapsed >= 0.1 then
+        aura:SetValue(aura:GetValue() + aura.elapsed)
+        aura.elapsed = 0
     end
 end
 
@@ -25,33 +25,33 @@ local function VerticalCooldown_GetCooldownDuration()
     return 0
 end
 
-local function VerticalCooldown_ShowCooldown(self, start, duration, _, icon, auraType)
+local function VerticalCooldown_ShowCooldown(aura, start, duration, _, icon, auraType)
     if auraType then
-        self.spark:SetColorTexture(AF.GetAuraTypeColor(auraType))
+        aura.spark:SetColorTexture(AF.GetAuraTypeColor(auraType))
     else
-        self.spark:SetColorTexture(0.5, 0.5, 0.5, 1)
+        aura.spark:SetColorTexture(0.5, 0.5, 0.5, 1)
     end
-    if self.icon then
-    self.icon:SetTexture(icon)
+    if aura.icon then
+    aura.icon:SetTexture(icon)
     end
 
-    self.elapsed = 0.1 -- update immediately
-    self:SetMinMaxValues(0, duration)
-    self:SetValue(GetTime() - start)
-    self:Show()
+    aura.elapsed = 0.1 -- update immediately
+    aura:SetMinMaxValues(0, duration)
+    aura:SetValue(GetTime() - start)
+    aura:Show()
 end
 
-local function CreateCooldown_Vertical(self, hasIcon)
-    local cooldown = CreateFrame("StatusBar", nil, self)
-    self.cooldown = cooldown
+local function CreateCooldown_Vertical(aura, hasIcon)
+    local cooldown = CreateFrame("StatusBar", nil, aura)
+    aura.cooldown = cooldown
     cooldown:Hide()
 
     cooldown.GetCooldownDuration = VerticalCooldown_GetCooldownDuration
     cooldown.ShowCooldown = VerticalCooldown_ShowCooldown
     cooldown:SetScript("OnUpdate", VerticalCooldown_OnUpdate)
 
-    AF.SetPoint(cooldown, "TOPLEFT", self.icon)
-    AF.SetPoint(cooldown, "BOTTOMRIGHT", self.icon, "BOTTOMRIGHT", 0, 1)
+    AF.SetPoint(cooldown, "TOPLEFT", aura.icon)
+    AF.SetPoint(cooldown, "BOTTOMRIGHT", aura.icon, "BOTTOMRIGHT", 0, 1)
     cooldown:SetOrientation("VERTICAL")
     cooldown:SetReverseFill(true)
     cooldown:SetStatusBarTexture(AF.GetPlainTexture())
@@ -77,10 +77,10 @@ local function CreateCooldown_Vertical(self, hasIcon)
     cooldown.icon = icon
     icon:SetTexCoord(0.12, 0.88, 0.12, 0.88)
     icon:SetDesaturated(true)
-    icon:SetAllPoints(self.icon)
+    icon:SetAllPoints(aura.icon)
     icon:SetVertexColor(0.5, 0.5, 0.5, 1)
     icon:AddMaskTexture(mask)
-    cooldown:SetScript("OnSizeChanged", ReCalcTexCoord)
+    cooldown:SetScript("OnSizeChanged", AF.ReCalcTexCoordForAura)
     else
         texture:SetVertexColor(0, 0, 0, 0.8)
     end
@@ -89,12 +89,12 @@ end
 ---------------------------------------------------------------------
 -- cooldown style: clock (w/ or w/o leading edge)
 ---------------------------------------------------------------------
-local function CreateCooldown_Clock(self, drawEdge)
-    local cooldown = CreateFrame("Cooldown", nil, self, "AFCooldownFrameTemplate")
-    self.cooldown = cooldown
+local function CreateCooldown_Clock(aura, drawEdge)
+    local cooldown = CreateFrame("Cooldown", nil, aura, "AFCooldownFrameTemplate")
+    aura.cooldown = cooldown
     cooldown:Hide()
 
-    cooldown:SetAllPoints(self.icon)
+    cooldown:SetAllPoints(aura.icon)
     cooldown:SetReverse(true)
     cooldown:SetDrawEdge(drawEdge)
 
@@ -115,239 +115,305 @@ end
 ---------------------------------------------------------------------
 -- set cooldown style
 ---------------------------------------------------------------------
-local function Aura_SetCooldownStyle(self, style)
-    if self.style == style then return end
+local function Aura_SetCooldownStyle(aura, style)
+    if aura.style == style then return end
 
-    if self.cooldown then
-        self.cooldown:SetParent(nil)
-        self.cooldown:Hide()
+    if aura.cooldown then
+        aura.cooldown:SetParent(nil)
+        aura.cooldown:Hide()
     end
 
-    self.style = style
+    aura.style = style
     if style == "vertical" then
-        CreateCooldown_Vertical(self, true)
+        CreateCooldown_Vertical(aura, true)
     elseif style == "block_vertical" then
-        CreateCooldown_Vertical(self, false)
+        CreateCooldown_Vertical(aura, false)
     elseif strfind(style, "^clock") or strfind(style, "^block_clock") then
         -- clock, clock_with_leading_edge
         -- block_clock, block_clock_with_leading_edge
-        CreateCooldown_Clock(self, strfind(style, "edge$") and true or false)
+        CreateCooldown_Clock(aura, strfind(style, "edge$") and true or false)
     end
 
     if strfind(style, "^block") then
-        self.icon:Hide()
+        aura.icon:Hide()
     else
-        self.icon:Show()
+        aura.icon:Show()
     end
 end
 
 ---------------------------------------------------------------------
 -- glow
 ---------------------------------------------------------------------
-local function Aura_CreateGlow(self)
-    self.glow = CreateFrame("Frame", nil, self, "BackdropTemplate")
-    self.glow:SetAllPoints()
-    self.glow:SetBackdrop({edgeFile = AF.GetTexture("CalloutGlow"), edgeSize = 7})
-    self.glow:SetBorderBlendMode("ADD")
-    self.glow:SetFrameLevel(self:GetFrameLevel())
-    AF.SetOutside(self.glow, self, 4)
-    AF.CreateBlinkAnimation(self.glow, 0.5)
+local function Aura_CreateGlow(aura)
+    aura.glow = CreateFrame("Frame", nil, aura, "BackdropTemplate")
+    aura.glow:SetAllPoints()
+    aura.glow:SetBackdrop({edgeFile = AF.GetTexture("CalloutGlow"), edgeSize = 7})
+    aura.glow:SetBorderBlendMode("ADD")
+    aura.glow:SetFrameLevel(aura:GetFrameLevel())
+    AF.SetOutside(aura.glow, aura, 4)
+    AF.CreateBlinkAnimation(aura.glow, 0.5)
 end
 
 ---------------------------------------------------------------------
 -- SetCooldown
 ---------------------------------------------------------------------
 local GetTime = GetTime
-local function UpdateDuration(self, elapsed)
-    if self._elapsed >= 0.1 then
-        self._remain = self._duration - (GetTime() - self._start)
-        if self._remain < 0 then self._remain = 0 end
 
-        if self.durationColor then
-            -- color
-            if self.durationColor[3][1] and self._remain < self.durationColor[3][2] then
-                self.duration:SetTextColor(AF.UnpackColor(self.durationColor[3][3]))
-            elseif self.durationColor[2][1] and self._remain < (self.durationColor[2][2] * self._duration) then
-                self.duration:SetTextColor(AF.UnpackColor(self.durationColor[2][3]))
-            else
-                self.duration:SetTextColor(AF.UnpackColor(self.durationColor[1]))
-            end
-        end
-
-        -- duration text
-        if self._remain > 86400 then
-            self.duration:SetFormattedText("%dd", self._remain / 86400)
-        elseif self._remain > 3600 then
-            self.duration:SetFormattedText("%dh", self._remain / 3600)
-        elseif self._remain > 60 then
-            self.duration:SetFormattedText("%dm", self._remain / 60)
-        elseif self._remain < 5 then
-            self.duration:SetFormattedText("%.1f", self._remain)
-        else
-            self.duration:SetFormattedText("%d", self._remain)
-        end
-
-        self._elapsed = 0
+local function UpdateDurationText(aura)
+    if aura._remain > 86400 then
+        aura.duration:SetFormattedText("%dd", aura._remain / 86400)
+    elseif aura._remain > 3600 then
+        aura.duration:SetFormattedText("%dh", aura._remain / 3600)
+    elseif aura._remain > 60 then
+        aura.duration:SetFormattedText("%dm", aura._remain / 60)
+    elseif aura._remain < 5 then
+        aura.duration:SetFormattedText("%.1f%s", aura._remain, aura.showSecondsUnit and "s" or "")
     else
-        self._elapsed = self._elapsed + elapsed
+        aura.duration:SetFormattedText("%d%s", aura._remain, aura.showSecondsUnit and "s" or "")
     end
 end
 
-local function UpdateDuration_NoColor(self, elapsed)
-    if self._elapsed >= 0.1 then
-        self._remain = self._duration - (GetTime() - self._start)
-        if self._remain < 0 then self._remain = 0 end
+local function UpdateDuration_ColorByPercentSeconds(aura, elapsed)
+    if aura._elapsed >= 0.1 then
+        aura._remain = aura._duration - (GetTime() - aura._start)
+        if aura._remain < 0 then aura._remain = 0 end
 
-        -- duration text
-        if self._remain > 86400 then
-            self.duration:SetFormattedText("%dd", self._remain / 86400)
-        elseif self._remain > 3600 then
-            self.duration:SetFormattedText("%dh", self._remain / 3600)
-        elseif self._remain > 60 then
-            self.duration:SetFormattedText("%dm", self._remain / 60)
-        elseif self._remain < 5 then
-            self.duration:SetFormattedText("%.1f", self._remain)
+        -- color = {
+        --     AF.GetColorTable("white"), -- normal
+        --     {false, 0.5, AF.GetColorTable("aura_percent")}, -- less than 50%
+        --     {true,  5,   AF.GetColorTable("aura_seconds")}, -- less than 5sec
+        -- }
+        if aura.durationColor[3][1] and aura._remain < aura.durationColor[3][2] then
+            aura.duration:SetTextColor(AF.UnpackColor(aura.durationColor[3][3]))
+        elseif aura.durationColor[2][1] and aura._remain < (aura.durationColor[2][2] * aura._duration) then
+            aura.duration:SetTextColor(AF.UnpackColor(aura.durationColor[2][3]))
         else
-            self.duration:SetFormattedText("%d", self._remain)
+            aura.duration:SetTextColor(AF.UnpackColor(aura.durationColor[1]))
         end
 
-        self._elapsed = 0
+        UpdateDurationText(aura)
+        aura._elapsed = 0
     else
-        self._elapsed = self._elapsed + elapsed
+        aura._elapsed = aura._elapsed + elapsed
     end
 end
 
-local function Aura_SetCooldown(self, start, duration, count, icon, auraType, desaturated, glow, r, g, b, a)
+local function UpdateDuration_ColorByExpiring(aura, elapsed)
+    if aura._elapsed >= 0.1 then
+        aura._remain = aura._duration - (GetTime() - aura._start)
+        if aura._remain < 0 then aura._remain = 0 end
+
+        -- color = {
+        --     AF.GetColorTable("white"), -- normal
+        --     AF.GetColorTable("aura_seconds"), -- expiring
+        -- },
+        if aura._remain < 5 then
+            aura.duration:SetTextColor(AF.UnpackColor(aura.durationColor[2]))
+        else
+            aura.duration:SetTextColor(AF.UnpackColor(aura.durationColor[1]))
+        end
+
+        UpdateDurationText(aura)
+        aura._elapsed = 0
+    else
+        aura._elapsed = aura._elapsed + elapsed
+    end
+end
+
+-- local function UpdateDuration_ColorByUnit(aura, elapsed)
+--     if aura._elapsed >= 0.1 then
+--         aura._remain = aura._duration - (GetTime() - aura._start)
+--         if aura._remain < 0 then aura._remain = 0 end
+
+--         -- color
+--         if aura.durationColor[6][1] and aura._remain < 5 then
+--             aura.duration:SetTextColor(AF.UnpackColor(aura.durationColor[6][2]))
+--         elseif aura.durationColor[5][1] and aura._remain < 60 then -- second
+--             aura.duration:SetTextColor(AF.UnpackColor(aura.durationColor[5][2]))
+--         elseif aura.durationColor[4][1] and aura._remain < 3600 then -- minute
+--             aura.duration:SetTextColor(AF.UnpackColor(aura.durationColor[4][2]))
+--         elseif aura.durationColor[3][1] and aura._remain < 86400 then -- hour
+--             aura.duration:SetTextColor(AF.UnpackColor(aura.durationColor[3][2]))
+--         elseif aura.durationColor[2][1] and aura._remain < 86400 then -- hour
+--             aura.duration:SetTextColor(AF.UnpackColor(aura.durationColor[2][2]))
+--         else -- day
+--             aura.duration:SetTextColor(AF.UnpackColor(aura.durationColor[1]))
+--         end
+
+--         UpdateDurationText(aura)
+--         aura._elapsed = 0
+--     else
+--         aura._elapsed = aura._elapsed + elapsed
+--     end
+-- end
+
+local function UpdateDuration_NoColor(aura, elapsed)
+    if aura._elapsed >= 0.1 then
+        aura._remain = aura._duration - (GetTime() - aura._start)
+        if aura._remain < 0 then aura._remain = 0 end
+
+        UpdateDurationText(aura)
+        aura._elapsed = 0
+    else
+        aura._elapsed = aura._elapsed + elapsed
+    end
+end
+
+function AF.SetAuraCooldown(aura, start, duration, count, icon, auraType, desaturated, glow, r, g, b, a)
     if duration == 0 then
-        if self.cooldown then self.cooldown:Hide() end
-        self.duration:SetText("")
-        self.stack:SetParent(self)
-        self:SetScript("OnUpdate", nil)
-        self._start = nil
-        self._duration = nil
-        self._remain = nil
-        self._elapsed = nil
+        if aura.cooldown then aura.cooldown:Hide() end
+        aura.duration:SetText("")
+        aura.stack:SetParent(aura)
+        aura:SetScript("OnUpdate", nil)
+        aura._start = nil
+        aura._duration = nil
+        aura._remain = nil
+        aura._elapsed = nil
     else
-        if self.cooldown then
+        if aura.cooldown then
             -- NOTE: the "nil" is to make it compatible with Cooldown:SetCooldown(start, duration [, modRate])
-            self.cooldown:ShowCooldown(start, duration, nil, icon, auraType)
-            self.duration:SetParent(self.cooldown)
-            self.stack:SetParent(self.cooldown)
+            aura.cooldown:ShowCooldown(start, duration, nil, icon, auraType)
+            aura.duration:SetParent(aura.cooldown)
+            aura.stack:SetParent(aura.cooldown)
         else
-            self.duration:SetParent(self)
-            self.stack:SetParent(self)
+            aura.duration:SetParent(aura)
+            aura.stack:SetParent(aura)
         end
-        self._start = start
-        self._duration = duration
-        self._elapsed = 0.1
-        self:SetScript("OnUpdate", self.UpdateDuration)
+        aura._start = start
+        aura._duration = duration
+        aura._elapsed = 0.1
+        aura:SetScript("OnUpdate", aura.UpdateDuration)
     end
 
     if glow then
-        LCG.ButtonGlow_Start(self, nil, nil, 0)
-        if not self.glow then
-            Aura_CreateGlow(self)
+        LCG.ButtonGlow_Start(aura, nil, nil, 0)
+        if not aura.glow then
+            Aura_CreateGlow(aura)
         end
-        self.glow:Show()
+        aura.glow:Show()
     else
-        if self.glow then self.glow:Hide() end
-        LCG.ButtonGlow_Stop(self)
+        if aura.glow then aura.glow:Hide() end
+        LCG.ButtonGlow_Stop(aura)
     end
 
     if r then
-        self:SetBackdropColor(r, g, b, a)
+        aura:SetBackdropColor(r, g, b, a)
     end
 
-    self:SetDesaturated(desaturated)
-    self:SetBackdropBorderColor(AF.GetAuraTypeColor(auraType))
-    self.stack:SetText((count == 0 or count == 1) and "" or count)
-    self.icon:SetTexture(icon)
-    self:Show()
+    aura:SetDesaturated(desaturated)
+    aura:SetBackdropBorderColor(AF.GetAuraTypeColor(auraType))
+    aura.stack:SetText((count == 0 or count == 1) and "" or count)
+    aura.icon:SetTexture(icon)
+
+    if not aura:IsProtected() then
+        aura:Show()
+    end
 end
 
 ---------------------------------------------------------------------
--- ShowTooltips
+-- tooltip
 ---------------------------------------------------------------------
-local function Aura_SetTooltipPosition(self)
-    if self.tooltipAnchorTo == "self" then
-        GameTooltip:SetOwner(self, "ANCHOR_NONE")
-        GameTooltip:SetPoint(self.tooltipPosition[1], self, self.tooltipPosition[2], self.tooltipPosition[3], self.tooltipPosition[4])
+local function Aura_SetTooltipPosition(aura)
+    if aura.tooltipAnchorTo == "aura" then
+        GameTooltip:SetOwner(aura, "ANCHOR_NONE")
+        GameTooltip:SetPoint(aura.tooltipPosition[1], aura, aura.tooltipPosition[2], aura.tooltipPosition[3], aura.tooltipPosition[4])
     else -- default
-        GameTooltip_SetDefaultAnchor(GameTooltip, self)
+        GameTooltip_SetDefaultAnchor(GameTooltip, aura)
     end
 end
 
-local function Aura_ShowBuffTooltip(self)
-    Aura_SetTooltipPosition(self)
-    GameTooltip:SetUnitBuffByAuraInstanceID(self.root.unit, self.auraInstanceID)
+local function Aura_ShowBuffTooltip(aura)
+    Aura_SetTooltipPosition(aura)
+    GameTooltip:SetUnitBuffByAuraInstanceID(aura.root.unit, aura.auraInstanceID)
     end
 
-local function Aura_ShowDebuffTooltip(self)
-    Aura_SetTooltipPosition(self)
-    GameTooltip:SetUnitDebuffByAuraInstanceID(self.root.unit, self.auraInstanceID)
+local function Aura_ShowDebuffTooltip(aura)
+    Aura_SetTooltipPosition(aura)
+    GameTooltip:SetUnitDebuffByAuraInstanceID(aura.root.unit, aura.auraInstanceID)
 end
 
 local function Aura_HideTooltips()
     GameTooltip:Hide()
 end
 
-local function Aura_EnableTooltip(self, config, helpful)
+local function Aura_EnableTooltip(aura, config, helpful)
     if config.enabled then
-        self.tooltipAnchorTo = config.anchorTo
-        self.tooltipPosition = config.position
-        self:SetScript("OnEnter", helpful and Aura_ShowBuffTooltip or Aura_ShowDebuffTooltip)
-        self:SetScript("OnLeave", Aura_HideTooltips)
+        aura.tooltipAnchorTo = config.anchorTo
+        aura.tooltipPosition = config.position
+        aura:SetScript("OnEnter", helpful and Aura_ShowBuffTooltip or Aura_ShowDebuffTooltip)
+        aura:SetScript("OnLeave", Aura_HideTooltips)
     else
-        self.tooltipAnchorTo = nil
-        self.tooltipPosition = nil
-        self:SetScript("OnEnter", nil)
-        self:SetScript("OnLeave", nil)
-        self:EnableMouse(false)
+        aura.tooltipAnchorTo = nil
+        aura.tooltipPosition = nil
+        aura:SetScript("OnEnter", nil)
+        aura:SetScript("OnLeave", nil)
+        aura:EnableMouse(false)
     end
 end
 
 ---------------------------------------------------------------------
 -- desaturated
 ---------------------------------------------------------------------
-local function Aura_SetDesaturated(self, desaturated)
-    self.icon:SetDesaturated(desaturated)
+function AF.SetAuraDesaturated(aura, desaturated)
+    aura.icon:SetDesaturated(desaturated)
 end
 
 ---------------------------------------------------------------------
--- base
+-- stack
 ---------------------------------------------------------------------
-local function Aura_SetupStackText(self, config)
-    self.stack:SetShown(config.enabled)
-    AF.LoadWidgetPosition(self.stack, config.position, self)
-    AF.SetFont(self.stack, unpack(config.font))
-    self.stack:SetTextColor(unpack(config.color))
+function AF.SetupAuraStackText(aura, config)
+    aura.stack:SetShown(config.enabled)
+    AF.LoadWidgetPosition(aura.stack, config.position, aura)
+    AF.SetFont(aura.stack, unpack(config.font))
+    aura.stack:SetTextColor(unpack(config.color))
 end
 
-local function Aura_SetupDurationText(self, config)
-    self.duration:SetShown(config.enabled)
-    AF.LoadWidgetPosition(self.duration, config.position, self)
-    AF.SetFont(self.duration, unpack(config.font))
+---------------------------------------------------------------------
+-- duration
+---------------------------------------------------------------------
+function AF.SetupAuraDurationText(aura, config)
+    aura.duration:SetShown(config.enabled)
+    AF.LoadWidgetPosition(aura.duration, config.position, aura)
+    AF.SetFont(aura.duration, unpack(config.font))
 
-    if type(config.color[1]) == "table" then
-        -- [1]normal, [2]percent, [3]second
-        self.durationColor = config.color
-        self.UpdateDuration = UpdateDuration
-    else
-        self.UpdateDuration = UpdateDuration_NoColor
+    if not config.enabled then
+        aura.UpdateDuration = AF.noop
+        return
+    end
+
+    aura.showSecondsUnit = config.showSecondsUnit
+
+    if config.colorBy == "percent_seconds" then
+        -- [1]normal, [2]percent, [3]seconds
+        aura.durationColor = config.color
+        aura.UpdateDuration = UpdateDuration_ColorByPercentSeconds
+    elseif config.colorBy == "expiring" then
+        -- [1]normal, [2]expiring
+        aura.durationColor = config.color
+        aura.UpdateDuration = UpdateDuration_ColorByExpiring
+    elseif config.colorBy == "none" or not config.colorBy then
+        aura.duration:SetTextColor(unpack(config.color))
+        aura.UpdateDuration = UpdateDuration_NoColor
     end
 end
 
-local function Aura_OnHide(self)
-    LCG.ButtonGlow_Stop(self)
+---------------------------------------------------------------------
+-- OnHide
+---------------------------------------------------------------------
+local function Aura_OnHide(aura)
+    LCG.ButtonGlow_Stop(aura)
 end
 
-local function Aura_UpdatePixels(self)
-    AF.ReSize(self)
-    AF.RePoint(self)
-    AF.ReBorder(self)
-    AF.RePoint(self.icon)
-    if self.cooldown then
-        AF.RePoint(self.cooldown)
+---------------------------------------------------------------------
+-- pixels
+---------------------------------------------------------------------
+local function Aura_UpdatePixels(aura)
+    AF.ReSize(aura)
+    AF.RePoint(aura)
+    AF.ReBorder(aura)
+    AF.RePoint(aura.icon)
+    if aura.cooldown then
+        AF.RePoint(aura.cooldown)
     end
 end
 
@@ -368,7 +434,7 @@ function AF.CreateAura(parent)
     frame.icon = icon
     AF.SetOnePixelInside(icon, frame)
     icon:SetTexCoord(0.12, 0.88, 0.12, 0.88)
-    frame:SetScript("OnSizeChanged", ReCalcTexCoord)
+    frame:SetScript("OnSizeChanged", AF.ReCalcTexCoordForAura)
 
     -- stack text
     local stack = frame:CreateFontString(nil, "OVERLAY")
@@ -379,11 +445,11 @@ function AF.CreateAura(parent)
     frame.duration = duration
 
     -- functions
-    frame.SetCooldown = Aura_SetCooldown
+    frame.SetCooldown = AF.SetAuraCooldown
     frame.SetCooldownStyle = Aura_SetCooldownStyle
-    frame.SetupStackText = Aura_SetupStackText
-    frame.SetupDurationText = Aura_SetupDurationText
-    frame.SetDesaturated = Aura_SetDesaturated
+    frame.SetupStackText = AF.SetupAuraStackText
+    frame.SetupDurationText = AF.SetupAuraDurationText
+    frame.SetDesaturated = AF.SetAuraDesaturated
     frame.EnableTooltip = Aura_EnableTooltip
 
     -- pixels
