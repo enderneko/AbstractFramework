@@ -3,6 +3,9 @@ _G.AbstractFramework = {}
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 
+-- no operation
+AF.noop = function() end
+
 ---------------------------------------------------------------------
 -- libs
 ---------------------------------------------------------------------
