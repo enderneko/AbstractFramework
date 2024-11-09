@@ -161,7 +161,9 @@ local function ResumeCoroutine()
     end
 
     if eventQueueLength > 0 then
+        -- TODO: remove
         print("ResumeCoroutine (next frame): ", eventQueueLength)
+        C_VoiceChat.SpeakText(0, "ResumeCoroutine (next frame) " .. eventQueueLength, Enum.VoiceTtsDestination.LocalPlayback, 0, 100)
         C_Timer.After(0, ResumeCoroutine)
     else
         eventInProgress = false
