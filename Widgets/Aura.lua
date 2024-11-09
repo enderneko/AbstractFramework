@@ -314,6 +314,7 @@ end
 -- tooltip
 ---------------------------------------------------------------------
 local function Aura_SetTooltipPosition(aura)
+    -- TODO: more anchorTo
     if aura.tooltipAnchorTo == "aura" then
         GameTooltip:SetOwner(aura, "ANCHOR_NONE")
         GameTooltip:SetPoint(aura.tooltipPosition[1], aura, aura.tooltipPosition[2], aura.tooltipPosition[3], aura.tooltipPosition[4])
@@ -325,7 +326,7 @@ end
 local function Aura_ShowBuffTooltip(aura)
     Aura_SetTooltipPosition(aura)
     GameTooltip:SetUnitBuffByAuraInstanceID(aura.root.unit, aura.auraInstanceID)
-    end
+end
 
 local function Aura_ShowDebuffTooltip(aura)
     Aura_SetTooltipPosition(aura)
@@ -336,11 +337,11 @@ local function Aura_HideTooltips()
     GameTooltip:Hide()
 end
 
-local function Aura_EnableTooltip(aura, config, helpful)
+local function Aura_EnableTooltip(aura, config, isHelpful)
     if config.enabled then
         aura.tooltipAnchorTo = config.anchorTo
         aura.tooltipPosition = config.position
-        aura:SetScript("OnEnter", helpful and Aura_ShowBuffTooltip or Aura_ShowDebuffTooltip)
+        aura:SetScript("OnEnter", isHelpful and Aura_ShowBuffTooltip or Aura_ShowDebuffTooltip)
         aura:SetScript("OnLeave", Aura_HideTooltips)
     else
         aura.tooltipAnchorTo = nil
