@@ -44,6 +44,28 @@ function AF.GetStringSize(text, fontFile, fontSize, fontFlag, fontShadow)
 end
 
 ---------------------------------------------------------------------
+-- FitStringWidth
+---------------------------------------------------------------------
+function AF.TruncateString(fs, text, alignment)
+    fs:SetText(text)
+    fs:SetWordWrap(false)
+
+    if fs:IsTruncated() then
+        for i = 1, string.utf8len(text) do
+            if strlower(alignment) == "right" then
+                fs:SetText("..."..string.utf8sub(text, i))
+            else
+                fs:SetText(string.utf8sub(text, i).."...")
+            end
+
+            if not fs:IsTruncated() then
+                break
+            end
+        end
+    end
+end
+
+---------------------------------------------------------------------
 -- notification text
 ---------------------------------------------------------------------
 local pool

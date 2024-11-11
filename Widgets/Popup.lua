@@ -370,7 +370,7 @@ local ppCreationFn = function()
     AF.SetPoint(p.text, "RIGHT", -7, 0)
 
     -- progressBar ----------------------------------------------------------- --
-    local bar = AF.CreateStatusBar(p, nil, nil, 5, 5, "accent", nil, "percentage")
+    local bar = AF.CreateBlizzardStatusBar(p, nil, nil, 5, 5, "accent", nil, "percentage")
     p.bar = bar
     AF.SetPoint(bar, "BOTTOMLEFT")
     AF.SetPoint(bar, "BOTTOMRIGHT")
