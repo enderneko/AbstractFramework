@@ -136,55 +136,79 @@ local function CoroutineEventHandler(obj, event, ...)
     end
 end
 
-local function CoroutineProcessEvents()
-    while true do
-        -- print("CoroutineProcessEvents", coroutine.running())
-        CoroutineEventHandler(coroutine.yield())
-    end
-end
-
-local sharedCoroutine = coroutine.wrap(CoroutineProcessEvents)
-local eventQueue = {}
-local eventQueueLength = 0
-local maxEventsPerTick = 5
-local eventInProgress = false
-
-local function ResumeCoroutine()
-    eventInProgress = true
-    local eventsProcessed = 0
-
-    while eventQueueLength > 0 and eventsProcessed < maxEventsPerTick do
-        local eventData = tremove(eventQueue, 1)
-        eventQueueLength = eventQueueLength - 1
-        eventsProcessed = eventsProcessed + 1
-        sharedCoroutine(unpack(eventData))
-    end
-
-    if eventQueueLength > 0 then
-        -- TODO: remove
-        print("ResumeCoroutine (next frame): ", eventQueueLength)
-        C_VoiceChat.SpeakText(0, "ResumeCoroutine (next frame) " .. eventQueueLength, Enum.VoiceTtsDestination.LocalPlayback, 0, 100)
-        C_Timer.After(0, ResumeCoroutine)
-    else
-        eventInProgress = false
-    end
-end
-
--- local function ResumeCoroutine()
---     while #eventQueue > 0 do
---         local eventData = tremove(eventQueue, 1)
---         sharedCoroutine(unpack(eventData))
+-- local function CoroutineProcessEvents()
+--     while true do
+--         -- print("CoroutineProcessEvents", coroutine.running())
+--         CoroutineEventHandler(coroutine.yield())
 --     end
 -- end
 
-local function CoroutineOnEvent(obj, event, ...)
+-- local sharedCoroutine = coroutine.wrap(CoroutineProcessEvents)
+-- local eventQueue = {}
+-- local eventQueueLength = 0
+-- local maxEventsPerTick = 5
+-- local eventInProgress = false
+
+-- local function ResumeCoroutine()
+--     eventInProgress = true
+--     local eventsProcessed = 0
+
+--     while eventQueueLength > 0 and eventsProcessed < maxEventsPerTick do
+--         eventQueueLength = eventQueueLength - 1
+--         eventsProcessed = eventsProcessed + 1
+--         local eventData = tremove(eventQueue, 1)
+--         sharedCoroutine(unpack(eventData))
+--     end
+
+--     if eventQueueLength > 0 then
+--         -- TODO: remove
+--         print("ResumeCoroutine (next frame): ", eventQueueLength)
+--         -- C_VoiceChat.SpeakText(0, "ResumeCoroutine (next frame) " .. eventQueueLength, Enum.VoiceTtsDestination.LocalPlayback, 0, 100)
+--         C_Timer.After(0, ResumeCoroutine)
+--     else
+--         eventInProgress = false
+--     end
+-- end
+
+-- local function CoroutineOnEvent(obj, event, ...)
+--     obj = obj.owner and obj.owner or obj
+--     tinsert(eventQueue, {obj, event, ...})
+--     eventQueueLength = eventQueueLength + 1
+--     if not eventInProgress then
+--         ResumeCoroutine()
+--     end
+-- end
+
+local eventQueue = {}
+local maxEventsPerFrame = 20
+local eventQueueLength = 0
+
+local function EventHandler(obj, event, ...)
+    if obj.events[event] then
+        for fn in pairs(obj.events[event]) do
+            fn(obj, event, ...)
+        end
+    end
+end
+
+local function QueueOnEvent(obj, event, ...)
     obj = obj.owner and obj.owner or obj
     tinsert(eventQueue, {obj, event, ...})
     eventQueueLength = eventQueueLength + 1
-    if not eventInProgress then
-        ResumeCoroutine()
-    end
 end
+
+local function ProcessEvents()
+    local processedCount = 0
+    while processedCount < maxEventsPerFrame and eventQueueLength > 0 do
+        eventQueueLength = eventQueueLength - 1
+        processedCount = processedCount + 1
+        local eventData = table.remove(eventQueue, 1)
+        EventHandler(unpack(eventData))
+    end
+    -- print("#queue", eventQueueLength)
+end
+sharedEventHandler:SetScript("OnUpdate", ProcessEvents)
+
 
 ---------------------------------------------------------------------
 -- embeded
@@ -244,7 +268,8 @@ end
 ---------------------------------------------------------------------
 -- add event handler
 ---------------------------------------------------------------------
-function AF.AddEventHandler(obj)
+---@param instantProcess boolean
+function AF.AddEventHandler(obj, instantProcess)
     obj.RegisterCLEU = RegisterCLEU
     obj.UnregisterCLEU = UnregisterCLEU
 
@@ -269,23 +294,29 @@ function AF.AddEventHandler(obj)
         if not obj.RegisterEvent then
             -- text, texture ...
             obj.eventHandler = CreateFrame("Frame")
-            obj.eventHandler:SetScript("OnEvent", CoroutineOnEvent)
             obj.eventHandler.owner = obj
+            if instantProcess then
+                obj.eventHandler:SetScript("OnEvent", function(_, event, ...)
+                    EventHandler(obj, event, ...)
+                end)
+            else
+                obj.eventHandler:SetScript("OnEvent", QueueOnEvent)
+            end
         else
             -- script region
-            obj:SetScript("OnEvent", CoroutineOnEvent)
+            if instantProcess then
+                obj:SetScript("OnEvent", function(_, event, ...)
+                    EventHandler(obj, event, ...)
+                end)
+            else
+                obj:SetScript("OnEvent", QueueOnEvent)
+            end
         end
 
         obj.RegisterEvent = RegisterEvent
         obj.RegisterUnitEvent = RegisterUnitEvent
         obj.UnregisterEvent = UnregisterEvent
         obj.UnregisterAllEvents = UnregisterAllEvents
-
-        -- obj:SetScript("OnEvent", function(self, event, ...)
-        --     for fn in pairs(self.events[event]) do
-        --         fn(self, event, ...)
-        --     end
-        -- end)
     end
 end
 
