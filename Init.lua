@@ -42,9 +42,12 @@ local function DelayedUpdatePixels()
 end
 
 -- hooksecurefunc(UIParent, "SetScale", UpdatePixels)
--- AF.UIParent:RegisterEvent("DISPLAY_SIZE_CHANGED")
-AF.UIParent:RegisterEvent("UI_SCALE_CHANGED")
-AF.UIParent:SetScript("OnEvent", DelayedUpdatePixels)
+AF.UIParent:RegisterEvent("FIRST_FRAME_RENDERED")
+AF.UIParent:SetScript("OnEvent", function(self, event)
+    AF.UIParent:UnregisterEvent("FIRST_FRAME_RENDERED")
+    AF.UIParent:RegisterEvent("UI_SCALE_CHANGED")
+    AF.UIParent:SetScript("OnEvent", DelayedUpdatePixels)
+end)
 
 -- function AF.SetIgnoreParentScale(ignore)
 --     AF.UIParent:SetIgnoreParentScale(ignore)
