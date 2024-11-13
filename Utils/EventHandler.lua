@@ -126,90 +126,6 @@ local function UnregisterAllEvents(self)
     _UnregisterAllEvents(self.eventHandler or self)
 end
 
-local tremove = tremove
-local tinsert = tinsert
-local unpack = unpack
-
-local function CoroutineEventHandler(obj, event, ...)
-    for fn in pairs(obj.events[event]) do
-        fn(obj, event, ...)
-    end
-end
-
--- local function CoroutineProcessEvents()
---     while true do
---         -- print("CoroutineProcessEvents", coroutine.running())
---         CoroutineEventHandler(coroutine.yield())
---     end
--- end
-
--- local sharedCoroutine = coroutine.wrap(CoroutineProcessEvents)
--- local eventQueue = {}
--- local eventQueueLength = 0
--- local maxEventsPerTick = 5
--- local eventInProgress = false
-
--- local function ResumeCoroutine()
---     eventInProgress = true
---     local eventsProcessed = 0
-
---     while eventQueueLength > 0 and eventsProcessed < maxEventsPerTick do
---         eventQueueLength = eventQueueLength - 1
---         eventsProcessed = eventsProcessed + 1
---         local eventData = tremove(eventQueue, 1)
---         sharedCoroutine(unpack(eventData))
---     end
-
---     if eventQueueLength > 0 then
---         -- TODO: remove
---         print("ResumeCoroutine (next frame): ", eventQueueLength)
---         -- C_VoiceChat.SpeakText(0, "ResumeCoroutine (next frame) " .. eventQueueLength, Enum.VoiceTtsDestination.LocalPlayback, 0, 100)
---         C_Timer.After(0, ResumeCoroutine)
---     else
---         eventInProgress = false
---     end
--- end
-
--- local function CoroutineOnEvent(obj, event, ...)
---     obj = obj.owner and obj.owner or obj
---     tinsert(eventQueue, {obj, event, ...})
---     eventQueueLength = eventQueueLength + 1
---     if not eventInProgress then
---         ResumeCoroutine()
---     end
--- end
-
-local eventQueue = {}
-local maxEventsPerFrame = 20
-local eventQueueLength = 0
-
-local function EventHandler(obj, event, ...)
-    if obj.events[event] then
-        for fn in pairs(obj.events[event]) do
-            fn(obj, event, ...)
-        end
-    end
-end
-
-local function QueueOnEvent(obj, event, ...)
-    obj = obj.owner and obj.owner or obj
-    tinsert(eventQueue, {obj, event, ...})
-    eventQueueLength = eventQueueLength + 1
-end
-
-local function ProcessEvents()
-    local processedCount = 0
-    while processedCount < maxEventsPerFrame and eventQueueLength > 0 do
-        eventQueueLength = eventQueueLength - 1
-        processedCount = processedCount + 1
-        local eventData = table.remove(eventQueue, 1)
-        EventHandler(unpack(eventData))
-    end
-    -- print("#queue", eventQueueLength)
-end
-sharedEventHandler:SetScript("OnUpdate", ProcessEvents)
-
-
 ---------------------------------------------------------------------
 -- embeded
 ---------------------------------------------------------------------
@@ -266,6 +182,124 @@ local function UnregisterAllEvents_Embeded(self)
 end
 
 ---------------------------------------------------------------------
+-- handle events
+---------------------------------------------------------------------
+local QUEUE_THRESHOLD = 1000000
+local MAX_EVENTS_PER_TICK = 2000
+
+local FIFOQueue = {}
+FIFOQueue.__index = FIFOQueue
+
+function FIFOQueue:new()
+    local instance = {
+        first = 1,
+        last = 0,
+        length = 0,
+        threshold = QUEUE_THRESHOLD,
+        queue = {},
+    }
+    setmetatable(instance, FIFOQueue)
+    return instance
+end
+
+function FIFOQueue:push(value)
+    self.length = self.length + 1
+    self.last = self.last + 1
+    self.queue[self.last] = value
+end
+
+function FIFOQueue:pop()
+    if self.first > self.last then return end
+    local value = self.queue[self.first]
+    self.queue[self.first] = nil
+    self.first = self.first + 1
+    self.length = self.length - 1
+    return value
+end
+
+function FIFOQueue:isEmpty()
+    return self.first > self.last
+end
+
+function FIFOQueue:shrink()
+    local newQueue = {}
+    local newFirst = 1
+    for i = self.first, self.last do
+        newQueue[newFirst] = self.queue[i]
+        newFirst = newFirst + 1
+    end
+    self.queue = newQueue
+    self.first = 1
+    self.last = newFirst - 1
+end
+
+function FIFOQueue:checkShrink()
+    if self.first > self.threshold then
+        FIFOQueue:shrink()
+    end
+end
+
+---------------------------------------------------------------------
+-- process events
+---------------------------------------------------------------------
+local function HandleEvent(obj, event, ...)
+    if obj.events[event] then
+        for fn in pairs(obj.events[event]) do
+            fn(obj, event, ...)
+        end
+    end
+end
+
+-- local function CoroutineProcessEvents()
+--     while true do
+--         -- print("CoroutineProcessEvents", coroutine.running())
+--         HandleEvent(coroutine.yield())
+--     end
+-- end
+-- NOTE: poor performance
+-- local sharedCoroutine = coroutine.wrap(CoroutineProcessEvents)
+
+local eventQueue = FIFOQueue:new()
+local eventsProcessed = 0
+local before
+
+local function ProcessEvents()
+    before = eventQueue.length
+
+    while eventQueue.length > 0 and eventsProcessed < MAX_EVENTS_PER_TICK do
+        eventsProcessed = eventsProcessed + 1
+        -- sharedCoroutine(AF.Unpack7(eventQueue:pop()))
+        HandleEvent(AF.Unpack7(eventQueue:pop()))
+    end
+
+    if eventQueue.length > 0 then
+        print(format("------------- START %s", GetTime()))
+        print("Before:", before)
+        print("Remains:", eventQueue.length)
+        print(" ")
+    end
+end
+
+local function PushEvent(obj, event, arg1, arg2, arg3, arg4, arg5)
+    obj = obj.owner and obj.owner or obj
+    eventQueue:push({obj, event, arg1, arg2, arg3, arg4, arg5})
+end
+
+local ticker, OnTick
+OnTick = function()
+    if eventQueue.first > eventQueue.threshold then
+        ticker:Cancel()
+        eventQueue:shrink()
+        C_VoiceChat.SpeakText(0, "queue shrinked", Enum.VoiceTtsDestination.LocalPlayback, 0, 100)
+        ticker = C_Timer.NewTicker(0, OnTick)
+    else
+        eventsProcessed = 0
+        ProcessEvents()
+    end
+end
+ticker = C_Timer.NewTicker(0, OnTick)
+
+---------------------------------------------------------------------
 -- add event handler
 ---------------------------------------------------------------------
 ---@param instantProcess boolean
@@ -297,19 +331,19 @@ function AF.AddEventHandler(obj, instantProcess)
             obj.eventHandler.owner = obj
             if instantProcess then
                 obj.eventHandler:SetScript("OnEvent", function(_, event, ...)
-                    EventHandler(obj, event, ...)
+                    HandleEvent(obj, event, ...)
                 end)
             else
-                obj.eventHandler:SetScript("OnEvent", QueueOnEvent)
+                obj.eventHandler:SetScript("OnEvent", PushEvent)
             end
         else
             -- script region
             if instantProcess then
                 obj:SetScript("OnEvent", function(_, event, ...)
-                    EventHandler(obj, event, ...)
+                    HandleEvent(obj, event, ...)
                 end)
             else
-                obj:SetScript("OnEvent", QueueOnEvent)
+                obj:SetScript("OnEvent", PushEvent)
             end
         end
 

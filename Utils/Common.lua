@@ -16,6 +16,18 @@ function AF.Unpack4(t)
     return t[1], t[2], t[3], t[4]
 end
 
+function AF.Unpack5(t)
+    return t[1], t[2], t[3], t[4], t[5]
+end
+
+function AF.Unpack6(t)
+    return t[1], t[2], t[3], t[4], t[5], t[6]
+end
+
+function AF.Unpack7(t)
+    return t[1], t[2], t[3], t[4], t[5], t[6], t[7]
+end
+
 function AF.Round(num, numDecimalPlaces)
     if numDecimalPlaces and numDecimalPlaces >= 0 then
         local mult = 10 ^ numDecimalPlaces
