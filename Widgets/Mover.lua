@@ -205,7 +205,7 @@ end
 ---------------------------------------------------------------------
 -- calc new point
 ---------------------------------------------------------------------
-local function CalcPoint(owner)
+function AF.CalcPoint(owner)
     local point, x, y
 
     if isAnchorLocked then
@@ -363,7 +363,7 @@ local function CreatePositionAdjustmentFrame()
             owner:ClearAllPoints()
             owner:SetPoint(_p, v, _y)
 
-            UpdateAndSave(owner, CalcPoint(owner))
+            UpdateAndSave(owner, AF.CalcPoint(owner))
             AnchorPositionAdjustmentFrame(owner)
         end
     end)
@@ -399,7 +399,7 @@ local function CreatePositionAdjustmentFrame()
             owner:ClearAllPoints()
             owner:SetPoint(_p, _x, v)
 
-            UpdateAndSave(owner, CalcPoint(owner))
+            UpdateAndSave(owner, AF.CalcPoint(owner))
             AnchorPositionAdjustmentFrame(owner)
         end
     end)
@@ -534,7 +534,7 @@ local function StopMoving(owner)
         owner.mover.moved = nil
 
         -- calc new point
-        local p, x, y = CalcPoint(owner)
+        local p, x, y = AF.CalcPoint(owner)
         UpdateAndSave(owner, p, x, y)
     end
 end

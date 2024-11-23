@@ -206,18 +206,18 @@ function AF.SetOnePixelOutside(region, relativeTo)
     AF.SetPoint(region, "BOTTOMRIGHT", relativeTo, "BOTTOMRIGHT", 1, -1)
 end
 
-function AF.SetInside(region, relativeTo, size)
+function AF.SetInside(region, relativeTo, offset)
     relativeTo = relativeTo or region:GetParent()
     AF.ClearPoints(region)
-    AF.SetPoint(region, "TOPLEFT", relativeTo, "TOPLEFT", size, -size)
-    AF.SetPoint(region, "BOTTOMRIGHT", relativeTo, "BOTTOMRIGHT", -size, size)
+    AF.SetPoint(region, "TOPLEFT", relativeTo, "TOPLEFT", offset, -offset)
+    AF.SetPoint(region, "BOTTOMRIGHT", relativeTo, "BOTTOMRIGHT", -offset, offset)
 end
 
-function AF.SetOutside(region, relativeTo, size)
+function AF.SetOutside(region, relativeTo, offset)
     relativeTo = relativeTo or region:GetParent()
     AF.ClearPoints(region)
-    AF.SetPoint(region, "TOPLEFT", relativeTo, "TOPLEFT", -size, size)
-    AF.SetPoint(region, "BOTTOMRIGHT", relativeTo, "BOTTOMRIGHT", size, -size)
+    AF.SetPoint(region, "TOPLEFT", relativeTo, "TOPLEFT", -offset, offset)
+    AF.SetPoint(region, "BOTTOMRIGHT", relativeTo, "BOTTOMRIGHT", offset, -offset)
 end
 
 function AF.ClearPoints(region)

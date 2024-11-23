@@ -16,6 +16,10 @@ function AF.GetIconString(icon, addon)
     return "|T" .. AF.GetIcon(icon, addon) .. ":0|t"
 end
 
+function AF.EscapeIcon(icon, size)
+    return format("|T%s:%d|t", icon, size or 0)
+end
+
 ---------------------------------------------------------------------
 -- get texture
 ---------------------------------------------------------------------

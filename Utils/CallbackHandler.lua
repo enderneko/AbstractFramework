@@ -46,15 +46,15 @@ local addonCallbacks = {}
 
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("ADDON_LOADED")
-frame:SetScript("OnEvent", function(self, event, addon)
+frame:SetScript("OnEvent", function(self, event, addon, containsBindings)
     if addonCallbacks[addon] then
         for _, fn in pairs(addonCallbacks[addon]) do
-            fn(addon)
+            fn(addon, containsBindings)
         end
     end
 end)
 
-function AF.RegisterCallbackForAddon(addon, func)
+function AF.RegisterAddonLoaded(addon, func)
     if not addonCallbacks[addon] then addonCallbacks[addon] = {} end
     tinsert(addonCallbacks[addon], func)
 end

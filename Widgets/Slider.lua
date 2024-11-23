@@ -6,7 +6,9 @@ local AF = _G.AbstractFramework
 ---------------------------------------------------------------------
 -- slider
 ---------------------------------------------------------------------
+---@return slider
 function AF.CreateSlider(parent, text, width, low, high, step, showPercentSign, hideLowHighText)
+    ---@class slider
     local slider = CreateFrame("Slider", nil, parent, "BackdropTemplate")
     AF.StylizeFrame(slider, "widget")
 

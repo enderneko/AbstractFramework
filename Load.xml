@@ -44,6 +44,7 @@
     <Script file="Utils\SharedMedia.lua"/>
     <Script file="Utils\CallbackHandler.lua"/>
     <Script file="Utils\EventHandler.lua"/>
+    <Script file="Utils\Spell.lua"/>
     <Script file="Utils\Bleeds.lua"/>
 
     <!-- demo -->

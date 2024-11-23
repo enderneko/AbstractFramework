@@ -602,3 +602,33 @@ function AF.CreateSwitch(parent, width, height, labels)
 
     return switch
 end
+
+---------------------------------------------------------------------
+-- resize button
+---------------------------------------------------------------------
+local function ResizeButton_OnEnter(self)
+    SetCursor("UI_RESIZE_CURSOR")
+end
+
+local function ResizeButton_OnLeave(self)
+    SetCursor(nil)
+end
+
+function AF.CreateResizeButton(owner, minWidth, minHeight, maxWidth, maxHeight)
+    local b = CreateFrame("Button", nil, owner)
+    owner.resizeButton = b
+    b.owner = owner
+
+    AF.SetSize(b, 16, 16)
+    AF.SetPoint(b, "BOTTOMRIGHT", -1, 1)
+
+    b:SetScript("OnEnter", ResizeButton_OnEnter)
+    b:SetScript("OnLeave", ResizeButton_OnLeave)
+
+    local tex = b:CreateTexture(nil, "ARTWORK")
+    b.tex = tex
+    tex:SetAllPoints()
+    tex:SetTexture(AF.GetIcon("ResizeButton"))
+
+    return b
+end
