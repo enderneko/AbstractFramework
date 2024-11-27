@@ -182,64 +182,6 @@ local function UnregisterAllEvents_Embeded(self)
 end
 
 ---------------------------------------------------------------------
--- handle events
----------------------------------------------------------------------
-local QUEUE_THRESHOLD = 1000000
-local MAX_EVENTS_PER_TICK = 2000
-
-local FIFOQueue = {}
-FIFOQueue.__index = FIFOQueue
-
-function FIFOQueue:new()
-    local instance = {
-        first = 1,
-        last = 0,
-        length = 0,
-        threshold = QUEUE_THRESHOLD,
-        queue = {},
-    }
-    setmetatable(instance, FIFOQueue)
-    return instance
-end
-
-function FIFOQueue:push(value)
-    self.length = self.length + 1
-    self.last = self.last + 1
-    self.queue[self.last] = value
-end
-
-function FIFOQueue:pop()
-    if self.first > self.last then return end
-    local value = self.queue[self.first]
-    self.queue[self.first] = nil
-    self.first = self.first + 1
-    self.length = self.length - 1
-    return value
-end
-
-function FIFOQueue:isEmpty()
-    return self.first > self.last
-end
-
-function FIFOQueue:shrink()
-    local newQueue = {}
-    local newFirst = 1
-    for i = self.first, self.last do
-        newQueue[newFirst] = self.queue[i]
-        newFirst = newFirst + 1
-    end
-    self.queue = newQueue
-    self.first = 1
-    self.last = newFirst - 1
-end
-
-function FIFOQueue:checkShrink()
-    if self.first > self.threshold then
-        FIFOQueue:shrink()
-    end
-end
-
----------------------------------------------------------------------
 -- process events
 ---------------------------------------------------------------------
 local function HandleEvent(obj, event, ...)
@@ -259,12 +201,14 @@ end
 -- NOTE: poor performance
 -- local sharedCoroutine = coroutine.wrap(CoroutineProcessEvents)
 
-local eventQueue = FIFOQueue:new()
+local eventQueue = AF.NewQueue()
 local eventsProcessed = 0
-local before
+local tickEventsNum = 0
+local MAX_EVENTS_PER_TICK = 1000
+-- local before
 
 local function ProcessEvents()
-    before = eventQueue.length
+    -- before = eventQueue.length
 
     while eventQueue.length > 0 and eventsProcessed < MAX_EVENTS_PER_TICK do
         eventsProcessed = eventsProcessed + 1
@@ -272,27 +216,36 @@ local function ProcessEvents()
         HandleEvent(AF.Unpack7(eventQueue:pop()))
     end
 
-    if eventQueue.length > 0 then
-        print(format("------------- START %s", GetTime()))
-        print("Before:", before)
-        print("Remains:", eventQueue.length)
-        print(" ")
-    end
+    -- if eventQueue.length > 0 then
+    --     print(format("------------- START %s", GetTime()))
+    --     print("Before:", before)
+    --     print("Remains:", eventQueue.length)
+    --     print(" ")
+    -- end
 end
 
 local function PushEvent(obj, event, arg1, arg2, arg3, arg4, arg5)
-    obj = obj.owner and obj.owner or obj
-    eventQueue:push({obj, event, arg1, arg2, arg3, arg4, arg5})
+    if tickEventsNum <= MAX_EVENTS_PER_TICK then
+        tickEventsNum = tickEventsNum + 1
+        HandleEvent(obj.owner or obj, event, arg1, arg2, arg3, arg4, arg5)
+    else
+        print("PUSHED:", GetTime(), event)
+        eventQueue:push({obj.owner or obj, event, arg1, arg2, arg3, arg4, arg5})
+    end
 end
 
 local ticker, OnTick
 OnTick = function()
+    tickEventsNum = 0
+
     if eventQueue.first > eventQueue.threshold then
         ticker:Cancel()
         eventQueue:shrink()
         C_VoiceChat.SpeakText(0, "queue shrinked", Enum.VoiceTtsDestination.LocalPlayback, 0, 100)
         ticker = C_Timer.NewTicker(0, OnTick)
-    else
+    end
+
+    if eventQueue.length > 0 then
         eventsProcessed = 0
         ProcessEvents()
     end
@@ -328,12 +281,12 @@ function AF.AddEventHandler(obj, instantProcess)
         if not obj.RegisterEvent then
             -- text, texture ...
             obj.eventHandler = CreateFrame("Frame")
-            obj.eventHandler.owner = obj
             if instantProcess then
                 obj.eventHandler:SetScript("OnEvent", function(_, event, ...)
                     HandleEvent(obj, event, ...)
                 end)
             else
+                obj.eventHandler.owner = obj
                 obj.eventHandler:SetScript("OnEvent", PushEvent)
             end
         else
