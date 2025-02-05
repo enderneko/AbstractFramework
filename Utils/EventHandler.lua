@@ -125,11 +125,31 @@ end
 -- process events
 ---------------------------------------------------------------------
 local function HandleEvent(eventHandler, event, ...)
-    -- if eventHandler.eventFuncs[event] then
+    if eventHandler.eventFuncs[event] then -- wipe on hide
         for fn in pairs(eventHandler.eventFuncs[event]) do
             fn(eventHandler.owner, event, ...)
         end
-    -- end
+    end
+end
+
+local UNIT_EVENT_PATTERN = "^UNIT_"
+local function MergeAndHandleEvent(eventHandler, event, ...)
+    if event:match(UNIT_EVENT_PATTERN) then
+        local unit = ...
+        if not eventHandler.mergedUnitEvents[event] then
+            eventHandler.mergedUnitEvents[event] = {}
+            eventGH
+        end
+        eventHandler.mergedUnitEvents[event][unit] = {select(2, ...)}
+    else
+        print("MERGE", event, ...)
+        eventHandler.mergedEvents[event] = {...}
+    end
+
+    if not eventHandler.nextTickScheduled then
+        eventHandler.nextTickScheduled = true
+        C_Timer.After(0, eventHandler.nextTickHandler)
+    end
 end
 
 -- local function CoroutineProcessEvents()
@@ -195,14 +215,38 @@ end
 ---------------------------------------------------------------------
 -- add event handler
 ---------------------------------------------------------------------
-function AF.AddEventHandler(obj)
+---@param obj table
+---@param mergeEvents boolean
+function AF.AddEventHandler(obj, mergeEvents)
     obj.RegisterCLEU = RegisterCLEU
     obj.UnregisterCLEU = UnregisterCLEU
 
     obj._eventHandler = CreateFrame("Frame")
     obj._eventHandler.owner = obj
     obj._eventHandler.eventFuncs = {}
-    obj._eventHandler:SetScript("OnEvent", HandleEvent)
+
+    if mergeEvents then
+        obj._eventHandler.mergedEvents = {}
+        obj._eventHandler.mergedUnitEvents = {}
+        obj._eventHandler.nextTickHandler = function()
+            obj._eventHandler.nextTickScheduled = false
+            for e, params in pairs(obj._eventHandler.mergedEvents) do
+                print("mergedEvents: ", obj.GetName and obj:GetName() or "", e)
+                HandleEvent(obj._eventHandler, e, AF.Unpack5(params))
+            end
+            wipe(obj._eventHandler.mergedEvents)
+            for e, paramsTable in pairs(obj._eventHandler.mergedUnitEvents) do
+                print("mergedUnitEvents: ", obj.GetName and obj:GetName() or "", e)
+                for unit, params in pairs(paramsTable) do
+                    HandleEvent(obj._eventHandler, e, unit, AF.Unpack4(params))
+                end
+            end
+            wipe(obj._eventHandler.mergedUnitEvents)
+        end
+        obj._eventHandler:SetScript("OnEvent", MergeAndHandleEvent)
+    else
+        obj._eventHandler:SetScript("OnEvent", HandleEvent)
+    end
 
     obj.RegisterEvent = RegisterEvent
     obj.RegisterUnitEvent = RegisterUnitEvent
