@@ -264,16 +264,8 @@ function AF.ReSize(region)
     end
 end
 
-local function IsEmpty(t)
-    if not t then return true end
-    for _ in pairs(t) do
-        return false
-    end
-    return true
-end
-
 function AF.RePoint(region)
-    if IsEmpty(region._points) then return end
+    if AF.IsEmpty(region._points) then return end
     region:ClearAllPoints()
     for _, t in pairs(region._points) do
         local x, y

@@ -19,16 +19,16 @@ function AF.ShowDemo()
 
     -- background
     demo:SetScript("OnShow", function()
-        if not THE_BACKGROUND then
-            THE_BACKGROUND = CreateFrame("Frame", "THE_BACKGROUND", nil, "BackdropTemplate")
-            AF.SetDefaultBackdrop_NoBorder(THE_BACKGROUND)
-            THE_BACKGROUND:SetBackdropColor(0.3, 0.3, 0.3, 1)
-            THE_BACKGROUND:SetAllPoints(UIParent)
-            THE_BACKGROUND:SetFrameStrata("BACKGROUND")
-            THE_BACKGROUND:SetFrameLevel(0)
-            THE_BACKGROUND:Hide()
+        if not DEV_BACKGROUND then
+            DEV_BACKGROUND = CreateFrame("Frame", "DEV_BACKGROUND", nil, "BackdropTemplate")
+            AF.SetDefaultBackdrop_NoBorder(DEV_BACKGROUND)
+            DEV_BACKGROUND:SetBackdropColor(0.3, 0.3, 0.3, 1)
+            DEV_BACKGROUND:SetAllPoints(UIParent)
+            DEV_BACKGROUND:SetFrameStrata("BACKGROUND")
+            DEV_BACKGROUND:SetFrameLevel(0)
+            DEV_BACKGROUND:Hide()
         end
-        THE_BACKGROUND:Show()
+        DEV_BACKGROUND:Show()
 
         for _, f in pairs(moverTestFrames) do
             f:Show()
@@ -36,7 +36,7 @@ function AF.ShowDemo()
     end)
 
     demo:SetScript("OnHide", function()
-        THE_BACKGROUND:Hide()
+        DEV_BACKGROUND:Hide()
         for _, f in pairs(moverTestFrames) do
             f:Hide()
         end

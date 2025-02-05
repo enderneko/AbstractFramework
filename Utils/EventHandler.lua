@@ -1,13 +1,6 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 
-local function IsEmpty(t)
-    for _ in pairs(t) do
-        return false
-    end
-    return true
-end
-
 ---------------------------------------------------------------------
 -- base
 ---------------------------------------------------------------------
@@ -23,12 +16,12 @@ local _UnregisterAllEvents = sharedEventHandler.UnregisterAllEvents
 ---------------------------------------------------------------------
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local cleuDispatcher = CreateFrame("Frame", "BFI_CLEU_HANDLER")
-cleuDispatcher.events = {}
+cleuDispatcher.eventFuncs = {}
 cleuDispatcher:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 
 local function DispatchCLEU(_, subevent, ...)
-    if cleuDispatcher.events[subevent] then
-        for fn, obj in pairs(cleuDispatcher.events[subevent]) do
+    if cleuDispatcher.eventFuncs[subevent] then
+        for fn, obj in pairs(cleuDispatcher.eventFuncs[subevent]) do
             fn(obj, subevent, ...)
         end
     end
@@ -39,28 +32,28 @@ cleuDispatcher:SetScript("OnEvent", function()
 end)
 
 local function RegisterCLEU(obj, subevent, ...)
-    if not cleuDispatcher.events[subevent] then
-        cleuDispatcher.events[subevent] = {}
+    if not cleuDispatcher.eventFuncs[subevent] then
+        cleuDispatcher.eventFuncs[subevent] = {}
     end
 
     for i = 1, select("#", ...) do
         local fn = select(i, ...)
-        cleuDispatcher.events[subevent][fn] = obj
+        cleuDispatcher.eventFuncs[subevent][fn] = obj
     end
 end
 
 local function UnregisterCLEU(obj, subevent)
-    if not cleuDispatcher.events[subevent] then return end
+    if not cleuDispatcher.eventFuncs[subevent] then return end
 
     if subevent then
-        for f, o in pairs(cleuDispatcher.events[subevent]) do
+        for f, o in pairs(cleuDispatcher.eventFuncs[subevent]) do
             if obj == o then
-                cleuDispatcher.events[subevent][f] = nil
+                cleuDispatcher.eventFuncs[subevent][f] = nil
             end
         end
     else
         --! NOT IDEAL
-        for _, sub in pairs(cleuDispatcher.events) do
+        for _, sub in pairs(cleuDispatcher.eventFuncs) do
             for f, o in pairs(sub) do
                 if obj == o then
                     sub[f] = nil
@@ -71,125 +64,72 @@ local function UnregisterCLEU(obj, subevent)
     end
 end
 
+
 ---------------------------------------------------------------------
--- self
+-- register / unregister events
 ---------------------------------------------------------------------
 local function RegisterEvent(self, event, ...)
-    if not self.events[event] then self.events[event] = {} end
+    if not self._eventHandler.eventFuncs[event] then self._eventHandler.eventFuncs[event] = {} end
 
     for i = 1, select("#", ...) do
         local fn = select(i, ...)
-        self.events[event][fn] = true
+        self._eventHandler.eventFuncs[event][fn] = true
     end
 
-    _RegisterEvent(self.eventHandler or self, event)
+    _RegisterEvent(self._eventHandler, event)
 end
 
 local function RegisterUnitEvent(self, event, unit, ...)
-    if not self.events[event] then self.events[event] = {} end
+    if not self._eventHandler.eventFuncs[event] then self._eventHandler.eventFuncs[event] = {} end
 
     for i = 1, select("#", ...) do
         local fn = select(i, ...)
-        self.events[event][fn] = true
+        self._eventHandler.eventFuncs[event][fn] = true
     end
 
     if type(unit) == "table" then
-        _RegisterUnitEvent(self.eventHandler or self, event, unpack(unit))
+        _RegisterUnitEvent(self._eventHandler, event, unpack(unit))
     else
-        _RegisterUnitEvent(self.eventHandler or self, event, unit)
+        _RegisterUnitEvent(self._eventHandler, event, unit)
     end
 end
 
 local function UnregisterEvent(self, event, ...)
-    if not self.events[event] then return end
+    if not self._eventHandler.eventFuncs[event] then return end
 
     if select("#", ...) == 0 then
-        self.events[event] = nil
-        _UnregisterEvent(self.eventHandler or self, event)
+        self._eventHandler.eventFuncs[event] = nil
+        _UnregisterEvent(self._eventHandler, event)
         return
     end
 
     for i = 1, select("#", ...) do
         local fn = select(i, ...)
-        self.events[event][fn] = nil
+        self._eventHandler.eventFuncs[event][fn] = nil
     end
 
     -- check if isEmpty
-    if IsEmpty(self.events[event]) then
-        self.events[event] = nil
-        _UnregisterEvent(self.eventHandler or self, event)
+    if AF.IsEmpty(self._eventHandler.eventFuncs[event]) then
+        self._eventHandler.eventFuncs[event] = nil
+        _UnregisterEvent(self._eventHandler, event)
     end
 end
 
 local function UnregisterAllEvents(self)
-    wipe(self.events)
-    _UnregisterAllEvents(self.eventHandler or self)
+    wipe(self._eventHandler.eventFuncs)
+    _UnregisterAllEvents(self._eventHandler)
 end
 
----------------------------------------------------------------------
--- embeded
----------------------------------------------------------------------
-local function RegisterEvent_Embeded(self, event, ...)
-    if not self.eventHandler.events[event] then self.eventHandler.events[event] = {} end
-
-    for i = 1, select("#", ...) do
-        local fn = select(i, ...)
-        self.eventHandler.events[event][fn] = true
-    end
-
-    _RegisterEvent(self.eventHandler, event)
-end
-
-local function RegisterUnitEvent_Embeded(self, event, unit, ...)
-    if not self.eventHandler.events[event] then self.eventHandler.events[event] = {} end
-
-    for i = 1, select("#", ...) do
-        local fn = select(i, ...)
-        self.eventHandler.events[event][fn] = true
-    end
-
-    if type(unit) == "table" then
-        _RegisterUnitEvent(self.eventHandler, event, unpack(unit))
-    else
-        _RegisterUnitEvent(self.eventHandler, event, unit)
-    end
-end
-
-local function UnregisterEvent_Embeded(self, event, ...)
-    if not self.eventHandler.events[event] then return end
-
-    if select("#", ...) == 0 then
-        self.eventHandler.events[event] = nil
-        _UnregisterEvent(self.eventHandler, event)
-        return
-    end
-
-    for i = 1, select("#", ...) do
-        local fn = select(i, ...)
-        self.eventHandler.events[event][fn] = nil
-    end
-
-    -- check if isEmpty
-    if IsEmpty(self.eventHandler.events[event]) then
-        self.eventHandler.events[event] = nil
-        _UnregisterEvent(self.eventHandler, event)
-    end
-end
-
-local function UnregisterAllEvents_Embeded(self)
-    wipe(self.eventHandler.events)
-    _UnregisterAllEvents(self.eventHandler)
-end
 
 ---------------------------------------------------------------------
 -- process events
 ---------------------------------------------------------------------
-local function HandleEvent(obj, event, ...)
-    if obj.events[event] then
-        for fn in pairs(obj.events[event]) do
-            fn(obj, event, ...)
+local function HandleEvent(eventHandler, event, ...)
+    -- if eventHandler.eventFuncs[event] then
+        for fn in pairs(eventHandler.eventFuncs[event]) do
+            fn(eventHandler.owner, event, ...)
         end
-    end
+    -- end
 end
 
 -- local function CoroutineProcessEvents()
@@ -201,111 +141,75 @@ end
 -- NOTE: poor performance
 -- local sharedCoroutine = coroutine.wrap(CoroutineProcessEvents)
 
-local eventQueue = AF.NewQueue()
-local eventsProcessed = 0
-local tickEventsNum = 0
-local MAX_EVENTS_PER_TICK = 1000
+-- local eventQueue = AF.NewQueue()
+-- local eventsProcessed = 0
+-- local tickEventsNum = 0
+-- local MAX_EVENTS_PER_TICK = 1000
 -- local before
 
-local function ProcessEvents()
-    -- before = eventQueue.length
+-- local function ProcessEvents()
+--     -- before = eventQueue.length
 
-    while eventQueue.length > 0 and eventsProcessed < MAX_EVENTS_PER_TICK do
-        eventsProcessed = eventsProcessed + 1
-        -- sharedCoroutine(AF.Unpack7(eventQueue:pop()))
-        HandleEvent(AF.Unpack7(eventQueue:pop()))
-    end
+--     while eventQueue.length > 0 and eventsProcessed < MAX_EVENTS_PER_TICK do
+--         eventsProcessed = eventsProcessed + 1
+--         -- sharedCoroutine(AF.Unpack7(eventQueue:pop()))
+--         HandleEvent(AF.Unpack7(eventQueue:pop()))
+--     end
 
-    -- if eventQueue.length > 0 then
-    --     print(format("------------- START %s", GetTime()))
-    --     print("Before:", before)
-    --     print("Remains:", eventQueue.length)
-    --     print(" ")
-    -- end
-end
+--     -- if eventQueue.length > 0 then
+--     --     print(format("------------- START %s", GetTime()))
+--     --     print("Before:", before)
+--     --     print("Remains:", eventQueue.length)
+--     --     print(" ")
+--     -- end
+-- end
 
-local function PushEvent(obj, event, arg1, arg2, arg3, arg4, arg5)
-    if tickEventsNum <= MAX_EVENTS_PER_TICK then
-        tickEventsNum = tickEventsNum + 1
-        HandleEvent(obj.owner or obj, event, arg1, arg2, arg3, arg4, arg5)
-    else
-        print("PUSHED:", GetTime(), event)
-        eventQueue:push({obj.owner or obj, event, arg1, arg2, arg3, arg4, arg5})
-    end
-end
+-- local function MergeEvent(obj, event, arg1, arg2, arg3, arg4, arg5)
+--     if tickEventsNum <= MAX_EVENTS_PER_TICK then
+--         tickEventsNum = tickEventsNum + 1
+--         HandleEvent(obj.owner or obj, event, arg1, arg2, arg3, arg4, arg5)
+--     else
+--         eventQueue:push({obj.owner or obj, event, arg1, arg2, arg3, arg4, arg5})
+--     end
+-- end
 
-local ticker, OnTick
-OnTick = function()
-    tickEventsNum = 0
+-- local ticker, OnTick
+-- OnTick = function()
+--     tickEventsNum = 0
 
-    if eventQueue.first > eventQueue.threshold then
-        ticker:Cancel()
-        eventQueue:shrink()
-        C_VoiceChat.SpeakText(0, "queue shrinked", Enum.VoiceTtsDestination.LocalPlayback, 0, 100)
-        ticker = C_Timer.NewTicker(0, OnTick)
-    end
+--     if eventQueue.first > eventQueue.threshold then
+--         ticker:Cancel()
+--         eventQueue:shrink()
+--         C_VoiceChat.SpeakText(0, "queue shrinked", Enum.VoiceTtsDestination.LocalPlayback, 0, 100)
+--         ticker = C_Timer.NewTicker(0, OnTick)
+--     end
 
-    if eventQueue.length > 0 then
-        eventsProcessed = 0
-        ProcessEvents()
-    end
-end
-ticker = C_Timer.NewTicker(0, OnTick)
+--     if eventQueue.length > 0 then
+--         eventsProcessed = 0
+--         ProcessEvents()
+--     end
+-- end
+-- ticker = C_Timer.NewTicker(0, OnTick)
+
 
 ---------------------------------------------------------------------
 -- add event handler
 ---------------------------------------------------------------------
----@param instantProcess boolean
-function AF.AddEventHandler(obj, instantProcess)
+function AF.AddEventHandler(obj)
     obj.RegisterCLEU = RegisterCLEU
     obj.UnregisterCLEU = UnregisterCLEU
 
-    if not obj.GetObjectType then
-        -- use embeded
-        obj.RegisterEvent = RegisterEvent_Embeded
-        obj.RegisterUnitEvent = RegisterUnitEvent_Embeded
-        obj.UnregisterEvent = UnregisterEvent_Embeded
-        obj.UnregisterAllEvents = UnregisterAllEvents_Embeded
+    obj._eventHandler = CreateFrame("Frame")
+    obj._eventHandler.owner = obj
+    obj._eventHandler.eventFuncs = {}
+    obj._eventHandler:SetScript("OnEvent", HandleEvent)
 
-        obj.eventHandler = CreateFrame("Frame")
-        obj.eventHandler.events = {}
-
-        obj.eventHandler:SetScript("OnEvent", function(self, event, ...)
-            for fn in pairs(self.events[event]) do
-                fn(obj, event, ...)
-            end
-        end)
-    else
-        obj.events = {}
-
-        if not obj.RegisterEvent then
-            -- text, texture ...
-            obj.eventHandler = CreateFrame("Frame")
-            if instantProcess then
-                obj.eventHandler:SetScript("OnEvent", function(_, event, ...)
-                    HandleEvent(obj, event, ...)
-                end)
-            else
-                obj.eventHandler.owner = obj
-                obj.eventHandler:SetScript("OnEvent", PushEvent)
-            end
-        else
-            -- script region
-            if instantProcess then
-                obj:SetScript("OnEvent", function(_, event, ...)
-                    HandleEvent(obj, event, ...)
-                end)
-            else
-                obj:SetScript("OnEvent", PushEvent)
-            end
-        end
-
-        obj.RegisterEvent = RegisterEvent
-        obj.RegisterUnitEvent = RegisterUnitEvent
-        obj.UnregisterEvent = UnregisterEvent
-        obj.UnregisterAllEvents = UnregisterAllEvents
-    end
+    obj.RegisterEvent = RegisterEvent
+    obj.RegisterUnitEvent = RegisterUnitEvent
+    obj.UnregisterEvent = UnregisterEvent
+    obj.UnregisterAllEvents = UnregisterAllEvents
 end
+
 
 ---------------------------------------------------------------------
 -- add simple event handler for frame
