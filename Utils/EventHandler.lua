@@ -132,26 +132,27 @@ local function HandleEvent(eventHandler, event, ...)
     end
 end
 
-local UNIT_EVENT_PATTERN = "^UNIT_"
-local function MergeAndHandleEvent(eventHandler, event, ...)
-    if event:match(UNIT_EVENT_PATTERN) then
-        local unit = ...
-        if not eventHandler.mergedUnitEvents[event] then
-            eventHandler.mergedUnitEvents[event] = {}
-            eventGH
-        end
-        eventHandler.mergedUnitEvents[event][unit] = {select(2, ...)}
-    else
-        print("MERGE", event, ...)
-        eventHandler.mergedEvents[event] = {...}
-    end
+---------------------------------------------------------------------
+-- local UNIT_EVENT_PATTERN = "^UNIT_"
+-- local function SquashAndHandleEvent(eventHandler, event, ...)
+--     if event:match(UNIT_EVENT_PATTERN) then
+--         local unit = ...
+--         if not eventHandler.squashedUnitEvents[event] then
+--             eventHandler.squashedUnitEvents[event] = {}
+--         end
+--         eventHandler.squashedUnitEvents[event][unit] = {select(2, ...)}
+--     else
+--         eventHandler.squashedEvents[event] = {...}
+--     end
 
-    if not eventHandler.nextTickScheduled then
-        eventHandler.nextTickScheduled = true
-        C_Timer.After(0, eventHandler.nextTickHandler)
-    end
-end
+--     if not eventHandler.nextTickScheduled then
+--         eventHandler.nextTickScheduled = true
+--         C_Timer.After(0, eventHandler.nextTickHandler)
+--     end
+-- end
+---------------------------------------------------------------------
 
+---------------------------------------------------------------------
 -- local function CoroutineProcessEvents()
 --     while true do
 --         -- print("CoroutineProcessEvents", coroutine.running())
@@ -210,14 +211,15 @@ end
 --     end
 -- end
 -- ticker = C_Timer.NewTicker(0, OnTick)
+---------------------------------------------------------------------
 
 
 ---------------------------------------------------------------------
 -- add event handler
 ---------------------------------------------------------------------
 ---@param obj table
----@param mergeEvents boolean
-function AF.AddEventHandler(obj, mergeEvents)
+--@param squashEvents boolean
+function AF.AddEventHandler(obj)
     obj.RegisterCLEU = RegisterCLEU
     obj.UnregisterCLEU = UnregisterCLEU
 
@@ -225,28 +227,27 @@ function AF.AddEventHandler(obj, mergeEvents)
     obj._eventHandler.owner = obj
     obj._eventHandler.eventFuncs = {}
 
-    if mergeEvents then
-        obj._eventHandler.mergedEvents = {}
-        obj._eventHandler.mergedUnitEvents = {}
-        obj._eventHandler.nextTickHandler = function()
-            obj._eventHandler.nextTickScheduled = false
-            for e, params in pairs(obj._eventHandler.mergedEvents) do
-                print("mergedEvents: ", obj.GetName and obj:GetName() or "", e)
-                HandleEvent(obj._eventHandler, e, AF.Unpack5(params))
-            end
-            wipe(obj._eventHandler.mergedEvents)
-            for e, paramsTable in pairs(obj._eventHandler.mergedUnitEvents) do
-                print("mergedUnitEvents: ", obj.GetName and obj:GetName() or "", e)
-                for unit, params in pairs(paramsTable) do
-                    HandleEvent(obj._eventHandler, e, unit, AF.Unpack4(params))
-                end
-            end
-            wipe(obj._eventHandler.mergedUnitEvents)
-        end
-        obj._eventHandler:SetScript("OnEvent", MergeAndHandleEvent)
-    else
+    -- if squashEvents then
+    --     obj._eventHandler.squashedEvents = {}
+    --     obj._eventHandler.squashedUnitEvents = {}
+    --     obj._eventHandler.nextTickHandler = function()
+    --         obj._eventHandler.nextTickScheduled = false
+    --         for e, params in pairs(obj._eventHandler.squashedEvents) do
+    --             HandleEvent(obj._eventHandler, e, AF.Unpack5(params))
+    --         end
+    --         wipe(obj._eventHandler.squashedEvents)
+    --         for e, paramsTable in pairs(obj._eventHandler.squashedUnitEvents) do
+    --             local name = obj.GetName and obj:GetName() or ""
+    --             for unit, params in pairs(paramsTable) do
+    --                 HandleEvent(obj._eventHandler, e, unit, AF.Unpack4(params))
+    --             end
+    --         end
+    --         wipe(obj._eventHandler.squashedUnitEvents)
+    --     end
+    --     obj._eventHandler:SetScript("OnEvent", SquashAndHandleEvent)
+    -- else
         obj._eventHandler:SetScript("OnEvent", HandleEvent)
-    end
+    -- end
 
     obj.RegisterEvent = RegisterEvent
     obj.RegisterUnitEvent = RegisterUnitEvent
