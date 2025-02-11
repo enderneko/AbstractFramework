@@ -16,8 +16,17 @@
     <Script file="Utils\EventHandler.lua"/>
     <Script file="Utils\Common.lua"/>
     <Script file="Utils\CallbackHandler.lua"/>
-    <Script file="Utils\Spell.lua"/>
-    <Script file="Utils\Bleeds.lua"/>
+
+    <!-- media -->
+    <Script file="Media\Media.lua"/>
+    <Script file="Media\SharedMedia.lua"/>
+
+    <!-- spells -->
+    <Script file="Spells\Common.lua"/>
+    <Script file="Spells\Bleeds.lua"/>
+    <Script file="Spells\CrowdControls.lua"/>
+    <Script file="Spells\Dispellables_Retail.lua"/>
+    <Script file="Spells\Interrupts.lua"/>
 
     <!-- widgets -->
     <Script file="Widgets\PixelUtil.lua"/>
@@ -25,7 +34,6 @@
     <Script file="Widgets\Texture.lua"/>
     <Script file="Widgets\Font.lua"/>
     <Script file="Widgets\Animation.lua"/>
-    <Script file="Widgets\Media.lua"/>
     <Script file="Widgets\Frame.lua"/>
     <Script file="Widgets\Glow.lua"/>
     <Include file="Widgets\TooltipTemplate.xml"/>
@@ -46,9 +54,6 @@
     <Include file="Widgets\AuraCooldown.xml"/>
     <Script file="Widgets\Aura.lua"/>
     <Script file="Widgets\Misc.lua"/>
-
-    <!-- LibSharedMedia -->
-    <Script file="Utils\SharedMedia.lua"/>
 
     <!-- demo -->
     <Script file="Demo.lua"/>
