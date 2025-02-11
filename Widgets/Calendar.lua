@@ -259,6 +259,7 @@ local function CreateCalendar()
         local width3 = AF.ConvertPixelsForRegion(1, calendar) * 6
         calendar:SetWidth(width1 + width2 - width3)
     end
+    calendar:UpdatePixels()
 
     -- set date
     calendar.date = {}

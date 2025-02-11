@@ -323,7 +323,7 @@ end
 AF.DefaultUpdatePixels = DefaultUpdatePixels
 
 local regions = {}
-AF.regions = regions
+AF.pixelPerfectRegions = regions
 
 ---@param fn function
 function AF.AddToPixelUpdater(r, fn)
