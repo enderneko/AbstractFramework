@@ -253,8 +253,8 @@ end
 ---------------------------------------------------------------------
 -- resize with animation
 ---------------------------------------------------------------------
---- @param steps number total steps to final size
---- @param anchorPoint string TOPLEFT|TOPRIGHT|BOTTOMLEFT|BOTTOMRIGHT
+---@param steps number total steps to final size
+---@param anchorPoint string TOPLEFT|TOPRIGHT|BOTTOMLEFT|BOTTOMRIGHT
 function AF.AnimatedResize(frame, targetWidth, targetHeight, frequency, steps, onStart, onFinish, onChange, anchorPoint)
     frequency = frequency or 0.015
     steps = steps or 7

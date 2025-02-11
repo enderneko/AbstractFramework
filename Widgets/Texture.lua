@@ -4,27 +4,31 @@ local AF = _G.AbstractFramework
 ---------------------------------------------------------------------
 -- texture
 ---------------------------------------------------------------------
---- @param color table|string
+---@class AF_Texture
+local AF_TextureMixin = {}
+
+function AF_TextureMixin:SetColor(color)
+    if type(color) == "string" then color = AF.GetColorTable(color) end
+    color = color or {1, 1, 1, 1}
+    if self._hasTexture then
+        self:SetVertexColor(unpack(color))
+    else
+        self:SetColorTexture(unpack(color))
+    end
+end
+
+---@param color table|string
+---@return AF_TextureMixin|Texture tex
 function AF.CreateTexture(parent, texture, color, drawLayer, subLevel, wrapModeHorizontal, wrapModeVertical, filterMode)
     local tex = parent:CreateTexture(nil, drawLayer or "ARTWORK", nil, subLevel)
+    Mixin(tex, AF_TextureMixin)
 
-    function tex:SetColor(c)
-        if type(c) == "string" then c = AF.GetColorTable(c) end
-        c = c or {1, 1, 1, 1}
-        if texture then
-            tex:SetTexture(texture, wrapModeHorizontal, wrapModeVertical, filterMode)
-            tex:SetVertexColor(unpack(c))
-        else
-            tex:SetColorTexture(unpack(c))
-        end
+    if texture then
+        tex._hasTexture = true
+        tex:SetTexture(texture, wrapModeHorizontal, wrapModeVertical, filterMode)
     end
 
     tex:SetColor(color)
-
-    -- function tex:UpdatePixels()
-    --     AF.ReSize(tex)
-    --     AF.RePoint(tex)
-    -- end
 
     AF.AddToPixelUpdater(tex)
 
@@ -70,8 +74,9 @@ end
 ---------------------------------------------------------------------
 -- gradient texture
 ---------------------------------------------------------------------
---- @param color1 table|string
---- @param color2 table|string
+---@param color1 table|string
+---@param color2 table|string
+---@return Texture tex
 function AF.CreateGradientTexture(parent, orientation, color1, color2, texture, drawLayer, subLevel)
     texture = texture or AF.GetPlainTexture()
     if type(color1) == "string" then color1 = AF.GetColorTable(color1) end
@@ -83,11 +88,6 @@ function AF.CreateGradientTexture(parent, orientation, color1, color2, texture, 
     tex:SetTexture(texture)
     tex:SetGradient(orientation, CreateColor(unpack(color1)), CreateColor(unpack(color2)))
 
-    function tex:UpdatePixels()
-        AF.ReSize(tex)
-        AF.RePoint(tex)
-    end
-
     AF.AddToPixelUpdater(tex)
 
     return tex
@@ -96,35 +96,37 @@ end
 ---------------------------------------------------------------------
 -- line
 ---------------------------------------------------------------------
+local function Separator_UpdatePixels(self)
+    AF.ReSize(self)
+    AF.RePoint(self)
+    AF.ReSize(self.shadow)
+    AF.RePoint(self.shadow)
+end
+
+---@return Texture separator
 function AF.CreateSeparator(parent, width, height, color)
     if type(color) == "string" then color = AF.GetColorTable(color) end
     color = color or AF.GetColorTable("accent")
 
-    local line = parent:CreateTexture(nil, "ARTWORK", nil, 0)
-    AF.SetSize(line, width, height)
-    line:SetColorTexture(unpack(color))
+    local separator = parent:CreateTexture(nil, "ARTWORK", nil, 0)
+    AF.SetSize(separator, width, height)
+    separator:SetColorTexture(unpack(color))
 
     local shadow = parent:CreateTexture(nil, "ARTWORK", nil, -1)
+    separator.shadow = shadow
     AF.SetSize(shadow, height)
-    AF.SetPoint(shadow, "TOPLEFT", line, 1, -1)
-    AF.SetPoint(shadow, "TOPRIGHT", line, 1, -1)
+    AF.SetPoint(shadow, "TOPLEFT", separator, 1, -1)
+    AF.SetPoint(shadow, "TOPRIGHT", separator, 1, -1)
     shadow:SetColorTexture(AF.GetColorRGB("black", color[4])) -- use line alpha
 
-    hooksecurefunc(line, "Show", function()
+    hooksecurefunc(separator, "Show", function()
         shadow:Show()
     end)
-    hooksecurefunc(line, "Hide", function()
+    hooksecurefunc(separator, "Hide", function()
         shadow:Hide()
     end)
 
-    function line:UpdatePixels()
-        AF.ReSize(line)
-        AF.RePoint(line)
-        AF.ReSize(shadow)
-        AF.RePoint(shadow)
-    end
+    AF.AddToPixelUpdater(separator, Separator_UpdatePixels)
 
-    AF.AddToPixelUpdater(line)
-
-    return line
+    return separator
 end

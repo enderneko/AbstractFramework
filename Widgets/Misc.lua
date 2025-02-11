@@ -6,7 +6,7 @@ local AF = _G.AbstractFramework
 ---------------------------------------------------------------------
 -- net stats
 ---------------------------------------------------------------------
---- @param layout string "horizontal|vertical"
+---@param layout string "horizontal|vertical"
 function AF.CreateNetStatsPane(parent, anchorPoint, showBandwidth, showLatency, layout)
     anchorPoint = anchorPoint or "LEFT"
     anchorPoint = strupper(anchorPoint)

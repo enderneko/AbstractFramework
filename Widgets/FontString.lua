@@ -4,20 +4,23 @@ local AF = _G.AbstractFramework
 ---------------------------------------------------------------------
 -- font string
 ---------------------------------------------------------------------
---- @param color string color name defined in Color.lua
---- @param font string color name defined in Font.lua
+---@class AF_FontString
+local AF_FontStringMixin = {}
+
+---@param color string
+function AF_FontStringMixin:SetColor(color)
+    AF.ColorFontString(self, color)
+end
+
+---@param color string color name defined in Color.lua
+---@param font string color name defined in Font.lua
+---@return AF_FontString|FontString fs
 function AF.CreateFontString(parent, text, color, font, layer)
     local fs = parent:CreateFontString(nil, layer or "OVERLAY", font or "AF_FONT_NORMAL")
+    Mixin(fs, AF_FontStringMixin)
+
     if color then AF.ColorFontString(fs, color) end
     fs:SetText(text)
-
-    function fs:SetColor(color)
-        AF.ColorFontString(fs, color)
-    end
-
-    -- function fs:UpdatePixels()
-    --     AF.RePoint(fs)
-    -- end
 
     AF.AddToPixelUpdater(fs)
 
@@ -70,6 +73,23 @@ end
 ---------------------------------------------------------------------
 local pool
 
+local function ShowUp(fs, parent, hideDelay)
+    parent._notificationString = fs
+    fs.ag.out_a:SetStartDelay(hideDelay or 2)
+    fs:Show()
+    fs.ag:Play()
+    fs.ag:SetScript("OnFinished", function()
+        parent._notificationString = nil
+        pool:Release(fs)
+    end)
+end
+
+local function HideOut(fs, parent)
+    parent._notificationString = nil
+    pool:Release(fs)
+    fs.ag:Stop()
+end
+
 local function creationFunc()
     -- NOTE: do not use AF.CreateFontString, since we don't need UpdatePixels() for it
     local fs = UIParent:CreateFontString(nil, "OVERLAY", "AF_FONT_NORMAL")
@@ -78,9 +98,11 @@ local function creationFunc()
     fs:SetWordWrap(true) -- multiline allowed
 
     local ag = fs:CreateAnimationGroup()
+    fs.ag = ag
 
     -- in ---------------------------------------
     local in_a = ag:CreateAnimation("Alpha")
+    ag.in_a = in_a
     in_a:SetOrder(1)
     in_a:SetFromAlpha(0)
     in_a:SetToAlpha(1)
@@ -88,28 +110,15 @@ local function creationFunc()
 
     -- out -------------------------------------
     local out_a = ag:CreateAnimation("Alpha")
+    ag.out_a = out_a
     out_a:SetOrder(2)
     out_a:SetFromAlpha(1)
     out_a:SetToAlpha(0)
     out_a:SetStartDelay(2)
     out_a:SetDuration(0.25)
 
-    function fs:ShowUp(parent, hideDelay)
-        parent._notificationString = fs
-        out_a:SetStartDelay(hideDelay or 2)
-        fs:Show()
-        ag:Play()
-        ag:SetScript("OnFinished", function()
-            parent._notificationString = nil
-            pool:Release(fs)
-        end)
-    end
-
-    function fs:HideOut(parent)
-        parent._notificationString = nil
-        pool:Release(fs)
-        ag:Stop()
-    end
+    fs.ShowUp = ShowUp
+    fs.HideOut = HideOut
 
     return fs
 end
@@ -146,9 +155,33 @@ function AF.ShowNotificationText(text, color, width, hideDelay, point, relativeT
 end
 
 ---------------------------------------------------------------------
--- scroll text
+-- scrolling text
 ---------------------------------------------------------------------
-function AF.CreateScrollText(parent, frequency, step, startDelay, endDelay)
+---@class AF_ScrollingText
+local AF_ScrollingTextMixin = {}
+
+function AF_ScrollingTextMixin:SetText(str, color)
+    self.text:SetText(color and AF.WrapTextInColor(str, color) or str)
+    if self:IsVisible() then
+        self:GetScript("OnShow")()
+    end
+end
+
+function AF_ScrollingTextMixin:UpdatePixels()
+    AF.ReSize(self)
+    AF.RePoint(self)
+    if self:IsVisible() then
+        self:GetScript("OnShow")()
+    end
+end
+
+---@param parent Frame
+---@param frequency number
+---@param step number
+---@param startDelay number
+---@param endDelay number
+---@return AF_ScrollingText|ScrollFrame scroller
+function AF.CreateScrollingText(parent, frequency, step, startDelay, endDelay)
     -- vars -------------------------------------
     frequency = frequency or 0.02
     step = step or 1
@@ -166,6 +199,7 @@ function AF.CreateScrollText(parent, frequency, step, startDelay, endDelay)
     holder:SetScrollChild(content)
 
     local text = AF.CreateFontString(content)
+    holder.text = text
     text:SetWordWrap(false)
     text:SetPoint("LEFT")
 
@@ -245,20 +279,7 @@ function AF.CreateScrollText(parent, frequency, step, startDelay, endDelay)
         end)
     end)
 
-    function holder:SetText(str, color)
-        text:SetText(color and AF.WrapTextInColor(str, color) or str)
-        if holder:IsVisible() then
-            holder:GetScript("OnShow")()
-        end
-    end
-
-    function holder:UpdatePixels()
-        AF.ReSize(holder)
-        AF.RePoint(holder)
-        if holder:IsVisible() then
-            holder:GetScript("OnShow")()
-        end
-    end
+    Mixin(holder, AF_ScrollingTextMixin)
 
     AF.AddToPixelUpdater(holder)
 
@@ -268,9 +289,12 @@ end
 ---------------------------------------------------------------------
 -- SetText with length
 ---------------------------------------------------------------------
---- @param fs FontString
+---@param fs FontString
+---@param text string
+---@param length? number
+---@param suffix? string|number
 function AF.SetText(fs, text, length, suffix)
-    if length > 0 then
+    if length and length > 0 then
         if length <= 1 then
             local width = fs:GetParent():GetWidth() - 2
             for i = string.utf8len(text), 0, -1 do

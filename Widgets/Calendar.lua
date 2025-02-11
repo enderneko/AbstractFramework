@@ -323,7 +323,7 @@ end
 -- %Y  full year (1998)
 -- %y  two-digit year (98) [00-99]
 
---- @param date string|number|table "YYYYMMDD", a epoch unix timestamp in seconds, or a "*t" table
+---@param date string|number|table "YYYYMMDD", a epoch unix timestamp in seconds, or a "*t" table
 function AF.CreateDateWidget(parent, date, width, calendarPosition)
     local w = AF.CreateButton(parent, "", "accent", width or 110, 20)
     w:SetTexture(AF.GetIcon("Calendar"), {16, 16},  {"LEFT", 2, 0})

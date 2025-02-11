@@ -4,20 +4,51 @@ local AF = _G.AbstractFramework
 ---------------------------------------------------------------------
 -- color utils
 ---------------------------------------------------------------------
+
+-- convert rgba 0-255 to 0-1
+---@param r number
+---@param g number
+---@param b number
+---@param a? number
+---@param saturation? number
+---@return number r
+---@return number g
+---@return number b
+---@return number a
 function AF.ConvertToRGB(r, g, b, a, saturation)
-    a = a or 255
     saturation = saturation or 1
     r = AF.Round(r / 255 * saturation, 5)
     g = AF.Round(g / 255 * saturation, 5)
     b = AF.Round(b / 255 * saturation, 5)
-    a = AF.Round(a / 255, 5)
+    a = a and AF.Round(a / 255, 5)
     return r, g, b, a
 end
 
-function AF.ConvertToRGB256(r, g, b, a)
-    return floor(r * 255), floor(g * 255), floor(b * 255), a and floor(a * 255)
+-- convert rgba 0-1 to 0-255
+---@param r number
+---@param g number
+---@param b number
+---@param a? number
+---@param saturation? number
+---@return number r
+---@return number g
+---@return number b
+---@return number a
+function AF.ConvertToRGB256(r, g, b, a, saturation)
+    saturation = saturation or 1
+    r = floor(r * 255 * saturation)
+    g = floor(g * 255 * saturation)
+    b = floor(b * 255 * saturation)
+    a = a and floor(a * 255 * saturation)
+    return r, g, b, a
 end
 
+--  convert rgb 0-255 to hex
+---@param r number
+---@param g number
+---@param b number
+---@param a? number
+---@return string hex
 function AF.ConvertRGB256ToHEX(r, g, b, a)
     local result = ""
 
@@ -44,10 +75,22 @@ function AF.ConvertRGB256ToHEX(r, g, b, a)
     return result
 end
 
+-- convert rgb 0-1 to hex
+---@param r number
+---@param g number
+---@param b number
+---@param a? number
+---@return string hex
 function AF.ConvertRGBToHEX(r, g, b, a)
     return AF.ConvertRGB256ToHEX(AF.ConvertToRGB256(r, g, b, a))
 end
 
+-- convert hex to rgb 0-255
+---@param hex string
+---@return number r
+---@return number g
+---@return number b
+---@return number? a
 function AF.ConvertHEXToRGB256(hex)
     hex = hex:gsub("#", "")
     if strlen(hex) == 6 then
@@ -57,11 +100,30 @@ function AF.ConvertHEXToRGB256(hex)
     end
 end
 
+-- convert hex to rgb 0-1
+---@param hex string
+---@return number r
+---@return number g
+---@return number b
+---@return number? a
 function AF.ConvertHEXToRGB(hex)
     return AF.ConvertToRGB(AF.ConvertHEXToRGB256(hex))
 end
 
 -- https://warcraft.wiki.gg/wiki/ColorGradient
+---@param perc number current percentage
+---@param r1 number start r
+---@param g1 number start g
+---@param b1 number start b
+---@param r2 number middle r
+---@param g2 number middle g
+---@param b2 number middle b
+---@param r3 number end r
+---@param g3 number end g
+---@param b3 number end b
+---@return number r
+---@return number g
+---@return number b
 function AF.ColorGradient(perc, r1, g1, b1, r2, g2, b2, r3, g3, b3)
     perc = perc or 1
     if perc >= 1 then
@@ -71,22 +133,21 @@ function AF.ColorGradient(perc, r1, g1, b1, r2, g2, b2, r3, g3, b3)
     end
 
     local segment, relperc = math.modf(perc * 2)
-    local rr1, rg1, rb1, rr2, rg2, rb2 = select((segment * 3) + 1, r1, g1, b1, r2, g2, b2, r3, g3, b3)
-
-    return rr1 + (rr2 - rr1) * relperc, rg1 + (rg2 - rg1) * relperc, rb1 + (rb2 - rb1) * relperc
+    -- local rr1, rg1, rb1, rr2, rg2, rb2 = select((segment * 3) + 1, r1, g1, b1, r2, g2, b2, r3, g3, b3)
+    if segment == 0 then
+        return r1 + (r2 - r1) * relperc, g1 + (g2 - g1) * relperc, b1 + (b2 - b1) * relperc
+    else
+        return r2 + (r3 - r2) * relperc, g2 + (g3 - g2) * relperc, b2 + (b3 - b2) * relperc
+    end
 end
 
 -- From ColorPickerAdvanced by Feyawen-Llane
---[[ Convert RGB to HSV ---------------------------------------------------
-    Inputs:
-        r = Red [0, 1]
-        g = Green [0, 1]
-        b = Blue [0, 1]
-    Outputs:
-        H = Hue [0, 360]
-        S = Saturation [0, 1]
-        B = Brightness [0, 1]
-]] --
+---@param r number [0, 1]
+---@param g number [0, 1]
+---@param b number [0, 1]
+---@return number h [0, 360]
+---@return number s [0, 1]
+---@return number b [0, 1]
 function AF.ConvertRGBToHSB(r, g, b)
     local colorMax = max(r, g, b)
     local colorMin = min(r, g, b)
@@ -100,7 +161,7 @@ function AF.ConvertRGBToHSB(r, g, b)
     g = tonumber(format("%f", g))
     b = tonumber(format("%f", b))
 
-    if (delta > 0) then
+    if delta > 0 then
         if (colorMax == r) then
             H = 60 * (((g - b) / delta) % 6)
         elseif (colorMax == g) then
@@ -109,7 +170,7 @@ function AF.ConvertRGBToHSB(r, g, b)
             H = 60 * (((r - g) / delta) + 4)
         end
 
-        if (colorMax > 0) then
+        if colorMax > 0 then
             S = delta / colorMax
         else
             S = 0
@@ -122,23 +183,20 @@ function AF.ConvertRGBToHSB(r, g, b)
         B = colorMax
     end
 
-    if (H < 0) then
+    if H < 0 then
         H = H + 360
     end
 
     return H, S, B
 end
 
---[[ Convert HSB to RGB ---------------------------------------------------
-    Inputs:
-        h = Hue [0, 360]
-        s = Saturation [0, 1]
-        b = Brightness [0, 1]
-    Outputs:
-        R = Red [0,1]
-        G = Green [0,1]
-        B = Blue [0,1]
-]] --
+-- From ColorPickerAdvanced by Feyawen-Llane
+---@param h number [0, 360]
+---@param s number [0, 1]
+---@param b number [0, 1]
+---@return number r [0, 1]
+---@return number g [0, 1]
+---@return number b [0, 1]
 function AF.ConvertHSBToRGB(h, s, b)
     local chroma = b * s
     local prime = (h / 60) % 6
@@ -146,34 +204,20 @@ function AF.ConvertHSBToRGB(h, s, b)
     local M = b - chroma
     local R, G, B
 
-    if (0 <= prime) and (prime < 1) then
-        R = chroma
-        G = X
-        B = 0
-    elseif (1 <= prime) and (prime < 2) then
-        R = X
-        G = chroma
-        B = 0
-    elseif (2 <= prime) and (prime < 3) then
-        R = 0
-        G = chroma
-        B = X
-    elseif (3 <= prime) and (prime < 4) then
-        R = 0
-        G = X
-        B = chroma
-    elseif (4 <= prime) and (prime < 5) then
-        R = X
-        G = 0
-        B = chroma
-    elseif (5 <= prime) and (prime < 6) then
-        R = chroma
-        G = 0
-        B = X
+    if prime < 1 then
+        R, G, B = chroma, X, 0
+    elseif prime < 2 then
+        R, G, B = X, chroma, 0
+    elseif prime < 3 then
+        R, G, B = 0, chroma, X
+    elseif prime < 4 then
+        R, G, B = 0, X, chroma
+    elseif prime < 5 then
+        R, G, B = X, 0, chroma
+    elseif prime < 6 then
+        R, G, B = chroma, 0, X
     else
-        R = 0
-        G = 0
-        B = 0
+        R, G, B = 0, 0, 0
     end
 
     R = tonumber(format("%.3f", R + M))
@@ -190,7 +234,7 @@ local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 local UnitPowerType = UnitPowerType
 local UnitReaction = UnitReaction
 
-local colors = {
+local COLORS = {
     -- accent
     ["accent"] = {["hex"] = "ffff6600", ["t"] = {1, 0.4, 0, 1}, ["normal"] = {1, 0.4, 0, 0.3}, ["hover"] = {1, 0.4, 0, 0.6}},
     ["accent_alt"] = {["hex"] = "ffff0066", ["t"] = {1, 0, 0.4, 1}, ["normal"] = {1, 0, 0.4, 0.3}, ["hover"] = {1, 0, 0.4, 0.6}},
@@ -321,44 +365,70 @@ local colors = {
     ["WoWToken"] = {["hex"] = "ff00ccff", ["t"] = {0, 0.8, 1, 1}}, -- ITEM_QUALITY8_DESC
 }
 
-function AF.HasColor(name)
-    return colors[name] and true or false
+---@param color string
+---@return boolean
+function AF.HasColor(color)
+    return COLORS[color] and true or false
 end
 
-function AF.GetColorRGB(name, alpha, saturation)
-    assert(colors[name], "no such color:", name)
-    -- if not colors[name] then
-    --     return 1, 1, 1, 1
-    -- end
-
-    saturation = saturation or 1
-    alpha = alpha or colors[name]["t"][4]
-    return colors[name]["t"][1] * saturation, colors[name]["t"][2] * saturation, colors[name]["t"][3] * saturation, alpha
-end
-
-function AF.GetColorTable(name, alpha, saturation)
-    assert(colors[name], "no such color:", name)
-    -- if not colors[name] then
-    --     return AF.GetColorTable("white", alpha, saturation)
-    -- end
-
-    saturation = saturation or 1
-    alpha = alpha or colors[name]["t"][4]
-
-    return {colors[name]["t"][1] * saturation, colors[name]["t"][2] * saturation, colors[name]["t"][3] * saturation, alpha}
-end
-
-function AF.GetColorHex(name)
-    assert(colors[name], "no such color:", name)
-    if not colors[name]["hex"] then
-        colors[name]["hex"] = AF.ConvertRGB256ToHEX(AF.ConvertToRGB256(unpack(colors[name]["t"])))
+---@param color string
+---@param alpha? number
+---@param saturation? number
+---@return number r
+---@return number g
+---@return number b
+---@return number a
+function AF.GetColorRGB(color, alpha, saturation)
+    if color:find("^#") then
+        return AF.ConvertHEXToRGB(color)
     end
-    return colors[name]["hex"]
+
+    assert(COLORS[color], "no such color:", color)
+
+    saturation = saturation or 1
+    alpha = alpha or COLORS[color]["t"][4] or 1
+    return COLORS[color]["t"][1] * saturation, COLORS[color]["t"][2] * saturation, COLORS[color]["t"][3] * saturation, alpha
 end
 
+---@param color string
+---@param alpha? number
+---@param saturation? number
+---@return table
+function AF.GetColorTable(color, alpha, saturation)
+    if color:find("^#") then
+        return {AF.ConvertHEXToRGB(color)}
+    end
+
+    assert(COLORS[color], "no such color:", color)
+
+    saturation = saturation or 1
+    alpha = alpha or COLORS[color]["t"][4]
+
+    return {COLORS[color]["t"][1] * saturation, COLORS[color]["t"][2] * saturation, COLORS[color]["t"][3] * saturation, alpha}
+end
+
+---@param color string
+---@return string hexColor \"rrggbb\" or \"aarrggbb\"
+function AF.GetColorHex(color)
+    if color:find("^#") then
+        return color:gsub("#", "")
+    end
+
+    assert(COLORS[color], "no such color:", color)
+
+    if not COLORS[color]["hex"] then
+        COLORS[color]["hex"] = AF.ConvertRGB256ToHEX(AF.ConvertToRGB256(unpack(COLORS[color]["t"])))
+    end
+    return COLORS[color]["hex"]
+end
+
+---@param auraType string
+---@return number r
+---@return number g
+---@return number b
 function AF.GetAuraTypeColor(auraType)
     auraType = auraType and "aura_" .. strlower(auraType)
-    if colors[auraType] then
+    if COLORS[auraType] then
         return AF.GetColorRGB(auraType)
     else
         return AF.GetColorRGB("black")
@@ -366,64 +436,88 @@ function AF.GetAuraTypeColor(auraType)
 end
 
 local ADDONS = {}
+---@param addon string addonFolderName
 function AF.RegisterAddonForAccentColor(addon)
     ADDONS[addon] = true
 end
 
+local PATTERN = AF.isRetail and "\n%[Interface/AddOns/([^/]+)/" or "@Interface/AddOns/([^/]+)/"
+
 local function GetAddon()
-    for addon in string.gmatch(debugstack(2), "@Interface/AddOns/([^/]+)/") do
+    for addon in string.gmatch(debugstack(2), PATTERN) do
         if ADDONS[addon] then
             return addon
         end
     end
 end
 
----@param color string|table
+---@param color string|table colorName|colorHex|colorTable
 ---@param alias string?
 function AF.SetAccentColor(color, alias)
     local addon = GetAddon()
     assert(addon, "no registered addon found")
 
     if type(color) == "string" then
-        if colors[color] then
-            colors[addon] = colors[color]
+        if COLORS[color] then
+            COLORS[addon] = COLORS[color]
         else
+            color = color:gsub("#", "")
             color = strlower(color)
             local hex = strlen(color) == 6 and "ff" .. color or color
-            colors[addon] = {["hex"] = hex, ["t"] = {AF.ConvertHEXToRGB(hex)}}
+            COLORS[addon] = {["hex"] = hex, ["t"] = {AF.ConvertHEXToRGB(hex)}}
         end
     elseif type(color) == "table" then
         if #color == 3 then
             color[4] = 1
         end
-        colors[addon] = {["hex"] = AF.ConvertRGBToHEX(AF.UnpackColor(color)), ["t"] = color}
+        COLORS[addon] = {["hex"] = AF.ConvertRGBToHEX(AF.UnpackColor(color)), ["t"] = color}
     end
 
     if alias then
-        colors[alias] = colors[addon]
+        COLORS[alias] = COLORS[addon]
     end
 end
 
+---@return string accentColorName registered addon folder name or "accent"
 function AF.GetAccentColorName()
     return GetAddon() or "accent"
 end
 
-function AF.GetAccentColorTable(alpha)
-    return AF.GetColorTable(AF.GetAccentColorName(), alpha)
+---@param alpha? number
+---@param saturation? number
+---@return table
+function AF.GetAccentColorTable(alpha, saturation)
+    return AF.GetColorTable(AF.GetAccentColorName(), alpha, saturation)
 end
 
-function AF.GetAccentColorRGB(alpha)
-    return AF.GetColorRGB(AF.GetAccentColorName(), alpha)
+---@param alpha? number
+---@param saturation? number
+---@return number r
+---@return number g
+---@return number b
+---@return number a
+function AF.GetAccentColorRGB(alpha, saturation)
+    return AF.GetColorRGB(AF.GetAccentColorName(), alpha, saturation)
 end
 
-function AF.GetAccentColorHex(alpha)
-    return AF.GetColorHex(AF.GetAccentColorName(), alpha)
+---@param alpha? number
+---@param saturation? number
+---@return string
+function AF.GetAccentColorHex(alpha, saturation)
+    return AF.GetColorHex(AF.GetAccentColorName(), alpha, saturation)
 end
 
+---@param class string capitalized class name
+---@param alpha? number
+---@param saturation? number
+---@return number r
+---@return number g
+---@return number b
+---@return number a
 function AF.GetClassColor(class, alpha, saturation)
     saturation = saturation or 1
 
-    if colors[class] then
+    if COLORS[class] then
         return AF.GetColorRGB(class, alpha, saturation)
     end
 
@@ -435,6 +529,13 @@ function AF.GetClassColor(class, alpha, saturation)
     return AF.GetColorRGB("UNKNOWN")
 end
 
+---@param unit string unitId
+---@param alpha? number
+---@param saturation? number
+---@return number r
+---@return number g
+---@return number b
+---@return number a
 function AF.GetReactionColor(unit, alpha, saturation)
     --! reaction to player, MUST use UnitReaction(unit, "player")
     --! NOT UnitReaction("player", unit)
@@ -448,13 +549,21 @@ function AF.GetReactionColor(unit, alpha, saturation)
     end
 end
 
+---@param power string capitalized power token
+---@param unit string unitId
+---@param alpha? number
+---@param saturation? number
+---@return number r
+---@return number g
+---@return number b
+---@return number a
 function AF.GetPowerColor(power, unit, alpha, saturation)
     saturation = saturation or 1
 
-    if colors[power] then
-        if colors[power]["start"] then -- gradient
-            return colors[power]["start"][1] * saturation, colors[power]["start"][2] * saturation, colors[power]["start"][3] * saturation, alpha,
-                colors[power]["end"][1] * saturation, colors[power]["end"][2] * saturation, colors[power]["end"][3] * saturation, alpha
+    if COLORS[power] then
+        if COLORS[power]["start"] then -- gradient
+            return COLORS[power]["start"][1] * saturation, COLORS[power]["start"][2] * saturation, COLORS[power]["start"][3] * saturation, alpha,
+                COLORS[power]["end"][1] * saturation, COLORS[power]["end"][2] * saturation, COLORS[power]["end"][3] * saturation, alpha
         else
             return AF.GetColorRGB(power, alpha, saturation)
         end
@@ -470,45 +579,85 @@ function AF.GetPowerColor(power, unit, alpha, saturation)
     return AF.GetColorRGB("MANA", alpha, saturation)
 end
 
+---add new COLORS to the color table with specific name
+---@param name any
+---@param color table|string \"{r, g, b, a}\" or \"rrggbb\" or \"aarrggbb\"
 function AF.AddColor(name, color)
-    colors[name] = {["t"] = color, ["hex"] = AF.ConvertRGBToHEX(AF.UnpackColor(color))}
+    if type(color) == "string" then
+        color = color:gsub("#", "")
+        color = strlower(color)
+        local hex = strlen(color) == 6 and "ff" .. color or color
+        COLORS[name] = {["hex"] = hex, ["t"] = {AF.ConvertHEXToRGB(hex)}}
+    elseif type(color) == "table" then
+        if #color == 3 then
+            color[4] = 1
+        end
+        COLORS[name] = {["t"] = color, ["hex"] = AF.ConvertRGBToHEX(AF.UnpackColor(color))}
+    end
 end
 
+---add new COLORS to the color table
+---@param t table {["name"] = {r, g, b, a}|"rrggbb"|"aarrggbb", ...}
 function AF.AddColors(t)
     for k, v in pairs(t) do
         AF.AddColor(k, v)
     end
 end
 
+---@param t table
+---@param alpha? number
+---@return number r
+---@return number g
+---@return number b
+---@return number a
 function AF.UnpackColor(t, alpha)
-    return t[1], t[2], t[3], alpha or t[4]
+    return t[1], t[2], t[3], alpha or t[4] or 1
 end
 
+---@param t table {r = number, g = number, b = number, a = number}
+---@return number r
+---@return number g
+---@return number b
+---@return number a
 function AF.ExtractColor(t, alpha)
-    return t.r, t.g, t.b, alpha or t.a
+    return t.r, t.g, t.b, alpha or t.a or 1
 end
 
 ---------------------------------------------------------------------
 -- coloring
 ---------------------------------------------------------------------
-function AF.ColorFontString(fs, name)
-    assert(colors[name], "no such color:", name)
-    fs:SetTextColor(colors[name]["t"][1], colors[name]["t"][2], colors[name]["t"][3])
+---@param fs FontString
+---@param color
+function AF.ColorFontString(fs, color)
+    local r, g, b, a = AF.GetColorRGB(color)
+    fs:SetTextColor(r, g, b, a)
 end
 
+---@param text string
+---@param name string colorName in COLORS
+---@return string coloredText \"|caarrggbbtext|r\"
 function AF.WrapTextInColor(text, name)
-    -- assert(colors[name], "no such color:", name)
-    if not colors[name] then
+    if not COLORS[name] then
         return text
     end
     return AF.WrapTextInColorCode(text, AF.GetColorHex(name))
 end
 
+---@param text string
+---@param r number
+---@param g number
+---@param b number
+---@return string coloredText \"|caarrggbbtext|r\"
 function AF.WrapTextInColorRGB(text, r, g, b)
     return AF.WrapTextInColorCode(text, AF.ConvertRGBToHEX(r, g, b, 1))
 end
 
+---comment
+---@param text string
+---@param colorHexString string \"rrggbb\" or \"aarrggbb\"
+---@return string coloredText \"|caarrggbbtext|r\"
 function AF.WrapTextInColorCode(text, colorHexString)
+    colorHexString = colorHexString:gsub("#", "")
     colorHexString = colorHexString or "ffffffff"
     if #colorHexString == 6 then
         colorHexString = "ff" .. colorHexString
@@ -516,26 +665,22 @@ function AF.WrapTextInColorCode(text, colorHexString)
     return format("|c%s%s|r", colorHexString, text)
 end
 
-function AF.Interpolate(start, stop, step, maxSteps)
-    return start + (stop - start) * step / maxSteps
-end
-
 ---@param text string
 ---@param startColor string colorName or hexColor
 ---@param endColor string colorName or hexColor
----@return string: colored text
+---@return string gradientText
 function AF.GetGradientText(text, startColor, endColor)
     local gradient = ""
     local length = #text
     local r1, g1, b1, r2, g2, b2
 
-    if colors[startColor] then
+    if COLORS[startColor] then
         r1, g1, b1 = AF.ConvertHEXToRGB256(AF.GetColorHex(startColor))
     else
         r1, g1, b1 = AF.ConvertHEXToRGB256(startColor)
     end
 
-    if colors[endColor] then
+    if COLORS[endColor] then
         r2, g2, b2 = AF.ConvertHEXToRGB256(AF.GetColorHex(endColor))
     else
         r2, g2, b2 = AF.ConvertHEXToRGB256(endColor)
@@ -556,40 +701,48 @@ end
 ---------------------------------------------------------------------
 -- button colors
 ---------------------------------------------------------------------
-local button_color_normal = {0.127, 0.127, 0.127, 1}
-local buttonColors = {
-    ["accent"] = {["normal"] = colors["accent"]["normal"], ["hover"] = colors["accent"]["hover"]},
-    ["accent_hover"] = {["normal"] = button_color_normal, ["hover"] = colors["accent"]["hover"]},
-    ["accent_transparent"] = {["normal"] = {0, 0, 0, 0}, ["hover"] = colors["accent"]["hover"]},
+local BUTTON_COLOR_NORMAL = {0.127, 0.127, 0.127, 1}
+local BUTTON_COLORS = {
+    ["accent"] = {["normal"] = COLORS["accent"]["normal"], ["hover"] = COLORS["accent"]["hover"]},
+    ["accent_hover"] = {["normal"] = BUTTON_COLOR_NORMAL, ["hover"] = COLORS["accent"]["hover"]},
+    ["accent_transparent"] = {["normal"] = {0, 0, 0, 0}, ["hover"] = COLORS["accent"]["hover"]},
     ["border_only"] = {["normal"] = {0, 0, 0, 0}, ["hover"] = {0, 0, 0, 0}},
     ["none"] = {["normal"] = {0, 0, 0, 0}, ["hover"] = {0, 0, 0, 0}},
     ["red"] = {["normal"] = {0.6, 0.1, 0.1, 0.6}, ["hover"] = {0.6, 0.1, 0.1, 1}},
-    ["red_hover"] = {["normal"] = button_color_normal, ["hover"] = {0.6, 0.1, 0.1, 1}},
+    ["red_hover"] = {["normal"] = BUTTON_COLOR_NORMAL, ["hover"] = {0.6, 0.1, 0.1, 1}},
     ["green"] = {["normal"] = {0.1, 0.6, 0.1, 0.6}, ["hover"] = {0.1, 0.6, 0.1, 1}},
-    ["green_hover"] = {["normal"] = button_color_normal, ["hover"] = {0.1, 0.6, 0.1, 1}},
+    ["green_hover"] = {["normal"] = BUTTON_COLOR_NORMAL, ["hover"] = {0.1, 0.6, 0.1, 1}},
     ["blue"] = {["normal"] = {0, 0.5, 0.8, 0.6}, ["hover"] = {0, 0.5, 0.8, 1}},
-    ["blue_hover"] = {["normal"] = button_color_normal, ["hover"] = {0, 0.5, 0.8, 1}},
+    ["blue_hover"] = {["normal"] = BUTTON_COLOR_NORMAL, ["hover"] = {0, 0.5, 0.8, 1}},
     ["yellow"] = {["normal"] = {0.7, 0.7, 0, 0.6}, ["hover"] = {0.7, 0.7, 0, 1}},
-    ["yellow_hover"] = {["normal"] = button_color_normal, ["hover"] = {0.7, 0.7, 0, 1}},
+    ["yellow_hover"] = {["normal"] = BUTTON_COLOR_NORMAL, ["hover"] = {0.7, 0.7, 0, 1}},
     ["hotpink"] = {["normal"] = {1, 0.27, 0.4, 0.6}, ["hover"] = {1, 0.27, 0.4, 1}},
     ["lime"] = {["normal"] = {0.8, 1, 0, 0.35}, ["hover"] = {0.8, 1, 0, 0.65}},
     ["lavender"] = {["normal"] = {0.96, 0.73, 1, 0.35}, ["hover"] = {0.96, 0.73, 1, 0.65}},
 }
 
+---@param name string color name
+---@return table normalColor {r, g, b, a}
 function AF.GetButtonNormalColor(name)
-    assert(buttonColors[name], "no such button color:", name)
-    return buttonColors[name]["normal"]
+    assert(BUTTON_COLORS[name], "no such button color:", name)
+    return BUTTON_COLORS[name]["normal"]
 end
 
+---@param name string color name
+---@return table hoverColor {r, g, b, a}
 function AF.GetButtonHoverColor(name)
-    assert(buttonColors[name], "no such button color:", name)
-    return buttonColors[name]["hover"]
+    assert(BUTTON_COLORS[name], "no such button color:", name)
+    return BUTTON_COLORS[name]["hover"]
 end
 
+---@param name string color name
+---@param normalColor table {r, g, b, a}
+---@param hoverColor table {r, g, b, a}
 function AF.AddButtonColor(name, normalColor, hoverColor)
-    buttonColors[name] = {["normal"] = normalColor, ["hover"] = hoverColor}
+    BUTTON_COLORS[name] = {["normal"] = normalColor, ["hover"] = hoverColor}
 end
 
+---@param t table {["name"] = {normalColor = {r, g, b, a}, hoverColor = {r, g, b, a}}, ...}
 function AF.AddButtonColors(t)
     for k, v in pairs(t) do
         AF.AddColor(k, v.normalColor, v.hoverColor)

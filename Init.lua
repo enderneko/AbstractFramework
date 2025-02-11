@@ -1,7 +1,6 @@
-_G.AbstractFramework = {}
-
 ---@class AbstractFramework
-local AF = _G.AbstractFramework
+local AF = {}
+_G.AbstractFramework = AF
 
 -- no operation
 AF.noop = function() end

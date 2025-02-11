@@ -12,6 +12,13 @@
     <Script file="Init.lua"/>
     <Script file="Locales.lua"/>
 
+    <!-- utils -->
+    <Script file="Utils\EventHandler.lua"/>
+    <Script file="Utils\Common.lua"/>
+    <Script file="Utils\CallbackHandler.lua"/>
+    <Script file="Utils\Spell.lua"/>
+    <Script file="Utils\Bleeds.lua"/>
+
     <!-- widgets -->
     <Script file="Widgets\PixelUtil.lua"/>
     <Script file="Widgets\Color.lua"/>
@@ -20,6 +27,7 @@
     <Script file="Widgets\Animation.lua"/>
     <Script file="Widgets\Media.lua"/>
     <Script file="Widgets\Frame.lua"/>
+    <Script file="Widgets\Glow.lua"/>
     <Include file="Widgets\TooltipTemplate.xml"/>
     <Script file="Widgets\Tooltip.lua"/>
     <Script file="Widgets\Mover.lua"/>
@@ -39,13 +47,8 @@
     <Script file="Widgets\Aura.lua"/>
     <Script file="Widgets\Misc.lua"/>
 
-    <!-- utils -->
-    <Script file="Utils\Common.lua"/>
+    <!-- LibSharedMedia -->
     <Script file="Utils\SharedMedia.lua"/>
-    <Script file="Utils\CallbackHandler.lua"/>
-    <Script file="Utils\EventHandler.lua"/>
-    <Script file="Utils\Spell.lua"/>
-    <Script file="Utils\Bleeds.lua"/>
 
     <!-- demo -->
     <Script file="Demo.lua"/>

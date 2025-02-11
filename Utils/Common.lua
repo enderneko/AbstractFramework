@@ -36,6 +36,10 @@ function AF.Round(num, numDecimalPlaces)
     return floor(num + 0.5)
 end
 
+function AF.Interpolate(start, stop, step, maxSteps)
+    return start + (stop - start) * step / maxSteps
+end
+
 ---------------------------------------------------------------------
 -- number
 ---------------------------------------------------------------------

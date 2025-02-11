@@ -4,7 +4,48 @@ local AF = _G.AbstractFramework
 ----------------------------------------------------------------
 -- color picker widget
 ----------------------------------------------------------------
-function AF.CreateColorPicker(parent, label, hasOpacity, onChange, onConfirm)
+---@class AF_ColorPicker
+local AF_ColorPickerMixin = {}
+
+function AF_ColorPickerMixin:EnableAlpha(enabled)
+    AF.HideColorPicker()
+    self.alphaEnabled = enabled
+end
+
+---@param ... number|table r, g, b, a or {r, g, b, a}
+function AF_ColorPickerMixin:SetColor(...)
+    if select("#", ...) == 1 then
+        local t = ...
+        self.color[1] = t[1]
+        self.color[2] = t[2]
+        self.color[3] = t[3]
+        self.color[4] = t[4]
+        self:SetBackdropColor(AF.UnpackColor(t))
+    else
+        local r, g, b, a = ...
+        self.color[1] = r
+        self.color[2] = g
+        self.color[3] = b
+        self.color[4] = a
+        self:SetBackdropColor(r, g, b, a)
+    end
+end
+
+function AF_ColorPickerMixin:GetColorTable()
+    return self.color
+end
+
+function AF_ColorPickerMixin:GetColorRGB()
+    return AF.UnpackColor(self.color)
+end
+
+---@param parent Frame
+---@param label string
+---@param alphaEnabled boolean
+---@param onChange function
+---@param onConfirm function
+---@return AF_ColorPicker|Button cp
+function AF.CreateColorPicker(parent, label, alphaEnabled, onChange, onConfirm)
     local cp = CreateFrame("Button", nil, parent, "BackdropTemplate")
     AF.SetSize(cp, 14, 14)
     AF.SetDefaultBackdrop(cp)
@@ -29,13 +70,9 @@ function AF.CreateColorPicker(parent, label, hasOpacity, onChange, onConfirm)
     AF.SetPoint(cp.mask, "BOTTOMRIGHT", -1, 1)
     cp.mask:Hide()
 
-    cp.hasOpacity = hasOpacity
+    Mixin(cp, AF_ColorPickerMixin)
 
-    function cp:EnableAlpha(enable)
-        AF.HideColorPicker()
-        cp.hasOpacity = enable
-    end
-
+    cp.alphaEnabled = alphaEnabled
     cp.onChange = onChange
     cp.onConfirm = onConfirm
 
@@ -67,34 +104,10 @@ function AF.CreateColorPicker(parent, label, hasOpacity, onChange, onConfirm)
                     cp.onConfirm(r, g, b, a)
                 end
             end
-        end, cp.hasOpacity, unpack(cp.color))
+        end, cp.alphaEnabled, unpack(cp.color))
     end)
 
     cp.color = {1, 1, 1, 1}
-
-    function cp:SetColor(arg1, arg2, arg3, arg4)
-        if type(arg1) == "table" then
-            cp.color[1] = arg1[1]
-            cp.color[2] = arg1[2]
-            cp.color[3] = arg1[3]
-            cp.color[4] = arg1[4]
-            cp:SetBackdropColor(unpack(arg1))
-        else
-            cp.color[1] = arg1
-            cp.color[2] = arg2
-            cp.color[3] = arg3
-            cp.color[4] = arg4
-            cp:SetBackdropColor(arg1, arg2, arg3, arg4)
-        end
-    end
-
-    function cp:GetColorTable()
-        return cp.color
-    end
-
-    function cp:GetColorRGB()
-        return unpack(cp.color)
-    end
 
     cp:SetScript("OnEnable", function()
         cp.label:SetTextColor(AF.GetColorRGB("white"))
@@ -105,12 +118,6 @@ function AF.CreateColorPicker(parent, label, hasOpacity, onChange, onConfirm)
         cp.label:SetTextColor(AF.GetColorRGB("disabled"))
         cp.mask:Show()
     end)
-
-    function cp:UpdatePixels()
-        AF.ReSize(cp)
-        AF.RePoint(cp)
-        AF.ReBorder(cp)
-    end
 
     AF.AddToPixelUpdater(cp)
 

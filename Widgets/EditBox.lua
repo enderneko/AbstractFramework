@@ -4,6 +4,68 @@ local AF = _G.AbstractFramework
 ---------------------------------------------------------------------
 -- edit box
 ---------------------------------------------------------------------
+---@class AF_EditBox
+local AF_EditBoxMixin = {}
+
+function AF_EditBoxMixin:SetConfirmButton(func, isOutside, text, width)
+    self.confirmBtn = AF.CreateButton(self, text, "accent", width or 30, self._height or 20)
+    self.confirmBtn:Hide()
+
+    if not text then
+        self.confirmBtn:SetTexture(AF.GetIcon("Tick"), {16, 16}, {"CENTER", 0, 0})
+    end
+
+    if isOutside then
+        AF.SetPoint(self.confirmBtn, "TOPLEFT", self, "TOPRIGHT", -1, 0)
+    else
+        AF.SetPoint(self.confirmBtn, "TOPRIGHT")
+    end
+
+    self.confirmBtn:SetScript("OnHide", function()
+        self.confirmBtn:Hide()
+    end)
+
+    self.confirmBtn:SetScript("OnClick", function()
+        local text = strtrim(self:GetText())
+        if func then func(text) end
+        self.value = text -- update value
+        self.confirmBtn:Hide()
+        self:ClearFocus()
+    end)
+end
+
+function AF_EditBoxMixin:SetOnEditFocusGained(func)
+    self.onEditFocusGained = func
+end
+
+function AF_EditBoxMixin:SetOnEditFocusLost(func)
+    self.onEditFocusLost = func
+end
+
+function AF_EditBoxMixin:SetOnEnterPressed(func)
+    self.onEnterPressed = func
+end
+
+function AF_EditBoxMixin:SetOnEscapePressed(func)
+    self.onEscapePressed = func
+end
+
+function AF_EditBoxMixin:SetOnTextChanged(func)
+    self.onTextChanged = func
+end
+
+function AF_EditBoxMixin:Clear()
+    self:SetText("")
+end
+
+---@param parent Frame
+---@param label string
+---@param width number
+---@param height number
+---@param isMultiLine? boolean
+---@param isNumeric? boolean
+---@param font? string|Font
+---@return AF_EditBox|EditBox
 function AF.CreateEditBox(parent, label, width, height, isMultiLine, isNumeric, font)
     local eb = CreateFrame("EditBox", nil, parent, "BackdropTemplate")
 
@@ -103,65 +165,7 @@ function AF.CreateEditBox(parent, label, width, height, isMultiLine, isNumeric, 
         eb:SetText(eb.value) -- restore
     end)
 
-    -- confirm button -----------------------------------------------
-    function eb:SetConfirmButton(func, isOutside, text, width)
-        eb.confirmBtn = AF.CreateButton(eb, text, "accent", width or 30, 20)
-        eb.confirmBtn:Hide()
-
-        if not text then
-            eb.confirmBtn:SetTexture(AF.GetIcon("Tick"), {16, 16}, {"CENTER", 0, 0})
-        end
-
-        if isOutside then
-            AF.SetPoint(eb.confirmBtn, "TOPLEFT", eb, "TOPRIGHT", -1, 0)
-        else
-            AF.SetPoint(eb.confirmBtn, "TOPRIGHT")
-        end
-
-        eb.confirmBtn:SetScript("OnHide", function()
-            eb.confirmBtn:Hide()
-        end)
-
-        eb.confirmBtn:SetScript("OnClick", function()
-            local text = strtrim(eb:GetText())
-            if func then func(text) end
-            eb.value = text -- update value
-            eb.confirmBtn:Hide()
-            eb:ClearFocus()
-        end)
-    end
-    -----------------------------------------------------------------
-
-    function eb:SetOnEditFocusGained(func)
-        eb.onEditFocusGained = func
-    end
-
-    function eb:SetOnEditFocusLost(func)
-        eb.onEditFocusLost = func
-    end
-
-    function eb:SetOnEnterPressed(func)
-        eb.onEnterPressed = func
-    end
-
-    function eb:SetOnEscapePressed(func)
-        eb.onEscapePressed = func
-    end
-
-    function eb:SetOnTextChanged(func)
-        eb.onTextChanged = func
-    end
-
-    function eb:Clear()
-        eb:SetText("")
-    end
-
-    function eb:UpdatePixels()
-        AF.ReSize(eb)
-        AF.RePoint(eb)
-        AF.ReBorder(eb)
-        -- eb.confirmBtn:UpdatePixels() already called in pixel updater
-    end
+    Mixin(eb, AF_EditBoxMixin)
 
     AF.AddToPixelUpdater(eb)
 
@@ -171,6 +175,46 @@ end
 ---------------------------------------------------------------------
 -- scroll edit box
 ---------------------------------------------------------------------
+---@class AF_ScrollEditBox
+local AF_ScrollEditBoxMixin = {}
+
+function AF_ScrollEditBoxMixin:SetText(text)
+    self:ResetScroll()
+    self.eb:SetText(text)
+    self.eb:SetCursorPosition(0)
+end
+
+function AF_ScrollEditBoxMixin:GetText()
+    return self.eb:GetText()
+end
+
+function AF_ScrollEditBoxMixin:IsEnabled()
+    return self._isEnabled
+end
+
+function AF_ScrollEditBoxMixin:SetEnabled(enabled)
+    self._isEnabled = enabled
+    self.eb:SetEnabled(enabled)
+    self:EnableMouseWheel(enabled)
+    self.scrollThumb:EnableMouse(enabled)
+    if enabled then
+        self.scrollThumb:SetBackdropColor(AF.GetColorRGB("accent"))
+        self.scrollThumb:SetBackdropBorderColor(AF.GetColorRGB("black"))
+        self.scrollBar:SetBackdropBorderColor(AF.GetColorRGB("black"))
+        self.scrollFrame:SetBackdropBorderColor(AF.GetColorRGB("black"))
+    else
+        self.scrollThumb:SetBackdropColor(AF.GetColorRGB("disabled", 0.7))
+        self.scrollThumb:SetBackdropBorderColor(AF.GetColorRGB("black", 0.7))
+        self.scrollBar:SetBackdropBorderColor(AF.GetColorRGB("black", 0.7))
+        self.scrollFrame:SetBackdropBorderColor(AF.GetColorRGB("black", 0.7))
+    end
+end
+
+function AF_ScrollEditBoxMixin:Clear()
+    self.eb:SetText("")
+end
+
+---@return AF_ScrollEditBox|AF_ScrollFrame frame
 function AF.CreateScrollEditBox(parent, name, label, width, height, scrollStep)
     scrollStep = scrollStep or 1
 
@@ -252,42 +296,8 @@ function AF.CreateScrollEditBox(parent, name, label, width, height, scrollStep)
         eb:SetFocus(true)
     end)
 
-    function frame:SetText(text)
-        frame:ResetScroll()
-        eb:SetText(text)
-        eb:SetCursorPosition(0)
-    end
-
-    function frame:GetText()
-        return eb:GetText()
-    end
-
     frame._isEnabled = true
-    function frame:IsEnabled()
-        return frame._isEnabled
-    end
-
-    function frame:SetEnabled(enabled)
-        frame._isEnabled = enabled
-        eb:SetEnabled(enabled)
-        frame:EnableMouseWheel(enabled)
-        frame.scrollThumb:EnableMouse(enabled)
-        if enabled then
-            frame.scrollThumb:SetBackdropColor(AF.GetColorRGB("accent"))
-            frame.scrollThumb:SetBackdropBorderColor(AF.GetColorRGB("black"))
-            frame.scrollBar:SetBackdropBorderColor(AF.GetColorRGB("black"))
-            frame.scrollFrame:SetBackdropBorderColor(AF.GetColorRGB("black"))
-        else
-            frame.scrollThumb:SetBackdropColor(AF.GetColorRGB("disabled", 0.7))
-            frame.scrollThumb:SetBackdropBorderColor(AF.GetColorRGB("black", 0.7))
-            frame.scrollBar:SetBackdropBorderColor(AF.GetColorRGB("black", 0.7))
-            frame.scrollFrame:SetBackdropBorderColor(AF.GetColorRGB("black", 0.7))
-        end
-    end
-
-    function eb:Clear()
-        eb:SetText("")
-    end
+    Mixin(frame, AF_ScrollEditBoxMixin)
 
     return frame
 end

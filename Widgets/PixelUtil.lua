@@ -325,7 +325,7 @@ AF.DefaultUpdatePixels = DefaultUpdatePixels
 local regions = {}
 AF.regions = regions
 
---- @param fn function
+---@param fn function
 function AF.AddToPixelUpdater(r, fn)
     r.UpdatePixels = fn or r.UpdatePixels or DefaultUpdatePixels
     regions[r] = r:GetName() or true
@@ -651,7 +651,7 @@ end
 ---------------------------------------------------------------------
 -- load position
 ---------------------------------------------------------------------
---- @param pos table
+---@param pos table|string {point, x, y} or "point,x,y"
 function AF.LoadPosition(region, pos)
     region._useOriginalPoints = true
     AF.ClearPoints(region)

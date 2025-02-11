@@ -1,6 +1,9 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 
+---@class AF_Sheet
+local AF_SheetMixin = {}
+
 ---------------------------------------------------------------------
 -- default
 ---------------------------------------------------------------------
@@ -73,7 +76,7 @@ local function Header_Sort(self)
     sheet.sortBy = self.key
 end
 
-local function Sheet_Sort(self, keys)
+function AF_SheetMixin:Sort(keys)
     local key, order = strsplit(":", keys[1])
     if self.sortBy ~= key then
         if self.sortBy then
@@ -193,7 +196,7 @@ local function InitHeader(header, config)
     CreateCells(header, config)
 end
 
-local function Setup(self, config)
+function AF_SheetMixin:Setup(config)
     assert(type(config) == "table", "invalid config")
     self.config = config
 
@@ -209,7 +212,7 @@ end
 ---------------------------------------------------------------------
 -- load
 ---------------------------------------------------------------------
-local function LoadRow(self, row, data)
+function AF_SheetMixin:LoadRow(row, data)
     row.data = data
     for _, cell in ipairs(row) do
         cell.value = data[cell.key]
@@ -217,7 +220,7 @@ local function LoadRow(self, row, data)
     end
 end
 
-local function LoadData(self, data)
+function AF_SheetMixin:LoadData(data)
     self.data = data
     wipe(self.shownRows)
     -- local num = #data
@@ -233,7 +236,7 @@ local function LoadData(self, data)
             CreateCells(row, self.config, true)
         end
         self.shownRows[i] = self.allRows[i]
-        LoadRow(self, self.shownRows[i], t)
+        self:LoadRow(self.shownRows[i], t)
     end
     self.content:SetWidgets(self.shownRows)
     self:SetShownColumns(self.shownColumns)
@@ -243,13 +246,13 @@ end
 -- get
 ---------------------------------------------------------------------
 ---@param index number row number
-local function GetRowByIndex(self, index)
+function AF_SheetMixin:GetRowByIndex(index)
     return self.shownRows[index]
 end
 
 ---@param key string column key
 ---@param value number|string column value
-local function GetRowByKeyValue(self, key, value)
+function AF_SheetMixin:GetRowByKeyValue(key, value)
     key = self.keyToIndex[key]
     if not key then return end
     for i, row in pairs(self.shownRows) do
@@ -263,7 +266,7 @@ end
 -- set shown columns & update size
 ---------------------------------------------------------------------
 ---@param columns table? {[label/key] = true/false}
-local function SetShownColumns(self, columns)
+function AF_SheetMixin:SetShownColumns(columns)
     self.shownColumns = columns
 
     local width = 0
@@ -343,6 +346,7 @@ end
 ---------------------------------------------------------------------
 ---@param config table
 ---@param onSizeChanged function
+---@return AF_Sheet|Frame sheet
 function AF.CreateSheet(parent, name, config, onSizeChanged)
     local sheet = CreateFrame("Frame", name, parent)
     sheet.allRows = {}
@@ -365,13 +369,7 @@ function AF.CreateSheet(parent, name, config, onSizeChanged)
     AF.StylizeFrame(content.slotFrame, "sheet_bg")
 
     sheet.onSizeChanged = onSizeChanged
-    sheet.SetShownColumns = SetShownColumns
-    sheet.LoadRow = LoadRow
-    sheet.LoadData = LoadData
-    sheet.GetRowByIndex = GetRowByIndex
-    sheet.GetRowByKeyValue = GetRowByKeyValue
-    sheet.Setup = Setup
-    sheet.Sort = Sheet_Sort
+    Mixin(sheet, AF_SheetMixin)
 
     if config then
         sheet:Setup(config)

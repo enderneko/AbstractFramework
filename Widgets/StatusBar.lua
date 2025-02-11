@@ -4,8 +4,25 @@ local AF = _G.AbstractFramework
 ---------------------------------------------------------------------
 -- blizzard
 ---------------------------------------------------------------------
---- @param color string color name defined in Color.lua
---- @param borderColor string color name defined in Color.lua
+---@class AF_BlizzardStatusBar
+local AF_BlizzardStatusBarMixin = {}
+
+function AF_BlizzardStatusBarMixin:SetBarValue(v)
+    AF.SetStatusBarValue(self, v)
+end
+
+function AF_BlizzardStatusBarMixin:UpdatePixels()
+    AF.ReSize(self)
+    AF.RePoint(self)
+    AF.ReBorder(self)
+    if self.progressText then
+        AF.RePoint(self.progressText)
+    end
+end
+
+---@param color string color name defined in Color.lua
+---@param borderColor string color name defined in Color.lua
+---@return AF_BlizzardStatusBar|StatusBar bar
 function AF.CreateBlizzardStatusBar(parent, minValue, maxValue, width, height, color, borderColor, progressTextType)
     local bar = CreateFrame("StatusBar", nil, parent, "BackdropTemplate")
     AF.StylizeFrame(bar, AF.GetColorTable(color, 0.9, 0.1), borderColor)
@@ -15,12 +32,14 @@ function AF.CreateBlizzardStatusBar(parent, minValue, maxValue, width, height, c
     maxValue = maxValue or 1
 
     bar._SetMinMaxValues = bar.SetMinMaxValues
-    function bar:SetMinMaxValues(l, h)
-        bar:_SetMinMaxValues(l, h)
-        bar.minValue = l
-        bar.maxValue = h
-    end
-    bar:SetMinMaxValues(minValue, maxValue)
+
+    hooksecurefunc(bar, "SetMinMaxValues", function(self, l, h)
+        self.minValue = l
+        self.maxValue = h
+    end)
+
+    Mixin(bar, SmoothStatusBarMixin) -- SetSmoothedValue
+    Mixin(bar, AF_BlizzardStatusBarMixin)
 
     bar:SetStatusBarTexture(AF.GetPlainTexture())
     bar:SetStatusBarColor(AF.GetColorRGB(color, 0.7))
@@ -49,22 +68,8 @@ function AF.CreateBlizzardStatusBar(parent, minValue, maxValue, width, height, c
         end
     end
 
+    bar:SetMinMaxValues(minValue, maxValue)
     bar:SetValue(minValue)
-
-    function bar:SetBarValue(v)
-        AF.SetStatusBarValue(bar, v)
-    end
-
-    Mixin(bar, SmoothStatusBarMixin) -- SetSmoothedValue
-
-    function bar:UpdatePixels()
-        AF.ReSize(bar)
-        AF.RePoint(bar)
-        AF.ReBorder(bar)
-        if bar.progressText then
-            AF.RePoint(bar.progressText)
-        end
-    end
 
     AF.AddToPixelUpdater(bar)
 
@@ -78,7 +83,7 @@ local Clamp = Clamp
 
 local function UpdateValue(self)
     if self.value == self.min then
-        self.fg.mask:SetWidth(0.0001)
+        self.fg.mask:SetWidth(0.00001)
         self.fg:Hide()
     elseif self.max == self.min then
         self.fg.mask:SetWidth(self:GetBarWidth())
@@ -86,7 +91,7 @@ local function UpdateValue(self)
     else
         self.value = Clamp(self.value, self.min, self.max)
         self.progress = (self.value - self.min) / (self.max - self.min)
-        self.progress = self.progress > 0.0001 and self.progress or 0.0001
+        self.progress = self.progress > 0.00001 and self.progress or 0.00001
         -- if self:GetBarWidth() == 0 then
         --     C_Timer.After(0, function()
         --         self.fg.mask:SetWidth(self.progress * self:GetBarWidth())
@@ -94,160 +99,164 @@ local function UpdateValue(self)
         -- else
         -- end
         self.fg.mask:SetWidth(self.progress * self:GetBarWidth())
-        self.fg:SetShown(self.progress > 0.0001)
+        self.fg:SetShown(self.progress > 0.00001)
     end
 end
 
-local prototype = {
-    -- appearance
-    SetTexture = function(self, texture, lossTexture)
-        self.fg:SetTexture(texture)
-        self.loss:SetTexture(lossTexture or texture)
-    end,
-    SetColor = function(self, r, g, b, a)
-        self.fg.isGradient = false
-        self.fg:SetVertexColor(r, g, b, a)
-    end,
-    SetGradientColor = function(self, ...)
-        self.fg.isGradient = true
-        if select("#", ...) == 2 then
-            local startColor, endColor = ...
-            self.fg:SetGradient("HORIZONTAL", CreateColor(AF.UnpackColor(startColor)), CreateColor(AF.UnpackColor(endColor)))
-        else
-            local r1, g1, b1, a1, r2, g2, b2, a2 = ...
-            self.fg:SetGradient("HORIZONTAL", CreateColor(r1, g1, b1, a1), CreateColor(r2, g2, b2, a2))
-        end
-    end,
-    SetLossColor = function(self, r, g, b, a)
-        self.loss.isGradient = false
-        self.loss:SetVertexColor(r, g, b, a)
-    end,
-    SetGradientLossColor = function(self, ...)
-        self.loss.isGradient = true
-        if select("#", ...) == 2 then
-            local startColor, endColor = ...
-            self.loss:SetGradient("HORIZONTAL", CreateColor(AF.UnpackColor(startColor)), CreateColor(AF.UnpackColor(endColor)))
-        else
-            local r1, g1, b1, a1, r2, g2, b2, a2 = ...
-            self.loss:SetGradient("HORIZONTAL", CreateColor(r1, g1, b1, a1), CreateColor(r2, g2, b2, a2))
-        end
-    end,
-    SetBackgroundColor = function(self, r, g, b, a)
-        self:SetBackdropColor(r, g, b, a)
-    end,
-    SetBorderColor = function(self, r, g, b, a)
-        self:SetBackdropBorderColor(r, g, b, a)
-    end,
-    SnapTextureToEdge = function(self, noGaps)
-        self.noGaps = noGaps
-        AF.ClearPoints(self.fg)
-        AF.ClearPoints(self.loss)
-        if noGaps then
-            AF.SetPoint(self.bg, "TOPLEFT")
-            AF.SetPoint(self.bg, "BOTTOMRIGHT")
-            AF.SetPoint(self.fg, "TOPLEFT")
-            AF.SetPoint(self.fg, "BOTTOMRIGHT")
-            AF.SetPoint(self.fg.mask, "TOPLEFT")
-            AF.SetPoint(self.fg.mask, "BOTTOMLEFT")
-            AF.SetPoint(self.loss, "TOPLEFT")
-            AF.SetPoint(self.loss, "BOTTOMRIGHT")
-            AF.SetPoint(self.loss.mask, "TOPLEFT", self.fg.mask, "TOPRIGHT")
-            AF.SetPoint(self.loss.mask, "BOTTOMLEFT", self.fg.mask, "BOTTOMRIGHT")
-            AF.SetPoint(self.loss.mask, "TOPRIGHT")
-            AF.SetPoint(self.loss.mask, "BOTTOMRIGHT")
-        else
-            AF.SetPoint(self.bg, "TOPLEFT", 1, -1)
-            AF.SetPoint(self.bg, "BOTTOMRIGHT", -1, 1)
-            AF.SetPoint(self.fg, "TOPLEFT", 1, -1)
-            AF.SetPoint(self.fg, "BOTTOMRIGHT", -1, 1)
-            AF.SetPoint(self.fg.mask, "TOPLEFT", 1, -1)
-            AF.SetPoint(self.fg.mask, "BOTTOMLEFT", 1, 1)
-            AF.SetPoint(self.loss, "TOPLEFT", 1, -1)
-            AF.SetPoint(self.loss, "BOTTOMRIGHT", -1, 1)
-            AF.SetPoint(self.loss.mask, "TOPLEFT", self.fg.mask, "TOPRIGHT")
-            AF.SetPoint(self.loss.mask, "BOTTOMLEFT", self.fg.mask, "BOTTOMRIGHT")
-            AF.SetPoint(self.loss.mask, "TOPRIGHT", -1, -1)
-            AF.SetPoint(self.loss.mask, "BOTTOMRIGHT", -1, 1)
-        end
-    end,
+---@class AF_SimpleStatusBar
+local AF_SimpleStatusBarMixin = {}
+-- appearance
+function AF_SimpleStatusBarMixin:SetTexture(texture, lossTexture)
+    self.fg:SetTexture(texture)
+    self.loss:SetTexture(lossTexture or texture)
+end
 
-    -- smooth
-    SetSmoothing = function(self, smoothing)
-        self:ResetSmoothedValue()
-        if smoothing then
-            self.SetBarValue = self.SetSmoothedValue
-            self.SetBarMinMaxValues = self.SetMinMaxSmoothedValue
-        else
-            self.SetBarValue = self.SetValue
-            self.SetBarMinMaxValues = self.SetMinMaxValues
-        end
-    end,
+function AF_SimpleStatusBarMixin:SetColor(r, g, b, a)
+    self.fg.isGradient = false
+    self.fg:SetVertexColor(r, g, b, a)
+end
 
-    -- get
-    GetMinMaxValues = function(self)
-        return self.min, self.max
-    end,
-    GetValue = function(self)
-        return self.value
-    end,
-    GetRemainingValue = function(self)
-        return self.max - self.value
-    end,
-    GetBarSize = function(self)
-        return self.bg:GetSize()
-    end,
-    GetBarWidth = function(self)
-        return self.bg:GetWidth()
-    end,
-    GetBarHeight = function(self)
-        return self.bg:GetHeight()
-    end,
+function AF_SimpleStatusBarMixin:SetGradientColor(...)
+    self.fg.isGradient = true
+    if select("#", ...) == 2 then
+        local startColor, endColor = ...
+        self.fg:SetGradient("HORIZONTAL", CreateColor(AF.UnpackColor(startColor)), CreateColor(AF.UnpackColor(endColor)))
+    else
+        local r1, g1, b1, a1, r2, g2, b2, a2 = ...
+        self.fg:SetGradient("HORIZONTAL", CreateColor(r1, g1, b1, a1), CreateColor(r2, g2, b2, a2))
+    end
+end
 
-    -- set
-    SetMinMaxValues = function(self, min, max)
-        self.min = min
-        self.max = max
-        UpdateValue(self)
-    end,
-    SetValue = function(self, value)
-        self.value = value
-        UpdateValue(self)
-    end,
+function AF_SimpleStatusBarMixin:SetLossColor(r, g, b, a)
+    self.loss.isGradient = false
+    self.loss:SetVertexColor(r, g, b, a)
+end
 
-    -- desaturate
-    Desaturate = function(self, enabled)
-        self.mod:SetShown(enabled)
-    end,
+function AF_SimpleStatusBarMixin:SetGradientLossColor(...)
+    self.loss.isGradient = true
+    if select("#", ...) == 2 then
+        local startColor, endColor = ...
+        self.loss:SetGradient("HORIZONTAL", CreateColor(AF.UnpackColor(startColor)), CreateColor(AF.UnpackColor(endColor)))
+    else
+        local r1, g1, b1, a1, r2, g2, b2, a2 = ...
+        self.loss:SetGradient("HORIZONTAL", CreateColor(r1, g1, b1, a1), CreateColor(r2, g2, b2, a2))
+    end
+end
 
-    -- pixel perfect
-    DefaultUpdatePixels = function(self)
-        AF.ReSize(self)
-        AF.RePoint(self)
-        AF.ReBorder(self)
-        -- AF.ReSize(self.fg.mask)
-        AF.RePoint(self.fg)
-        AF.RePoint(self.fg.mask)
-        AF.RePoint(self.loss)
-        AF.RePoint(self.loss.mask)
-    end,
-}
+function AF_SimpleStatusBarMixin:SetBackgroundColor(r, g, b, a)
+    self:SetBackdropColor(r, g, b, a)
+end
 
+function AF_SimpleStatusBarMixin:SetBorderColor(r, g, b, a)
+    self:SetBackdropBorderColor(r, g, b, a)
+end
+
+function AF_SimpleStatusBarMixin:SnapTextureToEdge(noGaps)
+    self.noGaps = noGaps
+    AF.ClearPoints(self.fg)
+    AF.ClearPoints(self.loss)
+    if noGaps then
+        AF.SetPoint(self.bg, "TOPLEFT")
+        AF.SetPoint(self.bg, "BOTTOMRIGHT")
+        AF.SetPoint(self.fg, "TOPLEFT")
+        AF.SetPoint(self.fg, "BOTTOMRIGHT")
+        AF.SetPoint(self.fg.mask, "TOPLEFT")
+        AF.SetPoint(self.fg.mask, "BOTTOMLEFT")
+        AF.SetPoint(self.loss, "TOPLEFT")
+        AF.SetPoint(self.loss, "BOTTOMRIGHT")
+        AF.SetPoint(self.loss.mask, "TOPRIGHT")
+        AF.SetPoint(self.loss.mask, "BOTTOMRIGHT")
+    else
+        AF.SetPoint(self.bg, "TOPLEFT", 1, -1)
+        AF.SetPoint(self.bg, "BOTTOMRIGHT", -1, 1)
+        AF.SetPoint(self.fg, "TOPLEFT", 1, -1)
+        AF.SetPoint(self.fg, "BOTTOMRIGHT", -1, 1)
+        AF.SetPoint(self.fg.mask, "TOPLEFT", 1, -1)
+        AF.SetPoint(self.fg.mask, "BOTTOMLEFT", 1, 1)
+        AF.SetPoint(self.loss, "TOPLEFT", 1, -1)
+        AF.SetPoint(self.loss, "BOTTOMRIGHT", -1, 1)
+        AF.SetPoint(self.loss.mask, "TOPRIGHT", -1, -1)
+        AF.SetPoint(self.loss.mask, "BOTTOMRIGHT", -1, 1)
+    end
+    AF.SetPoint(self.loss.mask, "TOPLEFT", self.fg.mask, "TOPRIGHT")
+    AF.SetPoint(self.loss.mask, "BOTTOMLEFT", self.fg.mask, "BOTTOMRIGHT")
+end
+
+-- smooth
+function AF_SimpleStatusBarMixin:SetSmoothing(smoothing)
+    self:ResetSmoothedValue()
+    if smoothing then
+        self.SetBarValue = self.SetSmoothedValue
+        self.SetBarMinMaxValues = self.SetMinMaxSmoothedValue
+    else
+        self.SetBarValue = self.SetValue
+        self.SetBarMinMaxValues = self.SetMinMaxValues
+    end
+end
+
+-- get
+function AF_SimpleStatusBarMixin:GetMinMaxValues()
+    return self.min, self.max
+end
+
+function AF_SimpleStatusBarMixin:GetValue()
+    return self.value
+end
+
+function AF_SimpleStatusBarMixin:GetRemainingValue()
+    return self.max - self.value
+end
+
+function AF_SimpleStatusBarMixin:GetBarSize()
+    return self.bg:GetSize()
+end
+
+function AF_SimpleStatusBarMixin:GetBarWidth()
+    return self.bg:GetWidth()
+end
+
+function AF_SimpleStatusBarMixin:GetBarHeight()
+    return self.bg:GetHeight()
+end
+
+-- set
+function AF_SimpleStatusBarMixin:SetMinMaxValues(min, max)
+    self.min = min
+    self.max = max
+    UpdateValue(self)
+end
+
+function AF_SimpleStatusBarMixin:SetValue(value)
+    self.value = value
+    UpdateValue(self)
+end
+
+-- desaturate
+function AF_SimpleStatusBarMixin:Desaturate(enabled)
+    self.mod:SetShown(enabled)
+end
+
+-- pixel perfect
+function AF_SimpleStatusBarMixin:DefaultUpdatePixels()
+    AF.ReSize(self)
+    AF.RePoint(self)
+    AF.ReBorder(self)
+    AF.RePoint(self.fg)
+    AF.RePoint(self.fg.mask)
+    AF.RePoint(self.loss)
+    AF.RePoint(self.loss.mask)
+end
+
+---@return AF_SimpleStatusBar|Frame bar
 function AF.CreateSimpleStatusBar(parent, name, noBackdrop)
-    local bar
+    local bar = CreateFrame("Frame", name, parent)
+    Mixin(bar, AF_SimpleStatusBarMixin)
 
     if noBackdrop then
-        bar = CreateFrame("Frame", name, parent)
-        for k, v in pairs(prototype) do
-            if k ~= "SetBackgroundColor" and k ~= "SetBorderColor" then
-                bar[k] = v
-            end
-        end
+        bar.SetBackgroundColor = nil
+        bar.SetBorderColor = nil
     else
-        bar = CreateFrame("Frame", name, parent, "BackdropTemplate")
         AF.SetDefaultBackdrop(bar)
-        for k, v in pairs(prototype) do
-            bar[k] = v
-        end
     end
 
     -- default value

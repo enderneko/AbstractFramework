@@ -164,7 +164,7 @@ function AF.ShowDemo()
     --                               button group                              --
     -- ----------------------------------------------------------------------- --
     local bf2 = AF.CreateBorderedFrame(demo, nil, 100)
-    bf2:SetTitle("Button Group")
+    bf2:SetLabel("Button Group")
     AF.SetPoint(bf2, "TOPLEFT", eb4, "BOTTOMLEFT", 0, -27)
     AF.SetListHeight(bf2, 3, 20, -1)
 
@@ -257,14 +257,14 @@ function AF.ShowDemo()
         AF.SetScale(value)
     end)
 
-    local sl2 = AF.CreateSlider(demo, "Enabled", 100, 50, 500, 10, true, true)
+    local sl2 = AF.CreateSlider(demo, "Enabled", 100, 0.5, 5, 0.1, true)
     AF.SetPoint(sl2, "TOPLEFT", eb4, "TOPRIGHT", 10, -25)
-    sl2:SetValue(1 * 100) -- for percentage, set value * 100
+    sl2:SetValue(1)
     sl2:SetOnValueChanged(function(value)
-        print("OnSliderValueChanged:", value / 100) -- for percentage, get value / 100
+        print("OnSliderValueChanged:", value)
     end)
     sl2:SetAfterValueChanged(function(value)
-        print("AfterSliderValueChanged:", value / 100) -- for percentage, get value / 100
+        print("AfterSliderValueChanged:", value)
     end)
 
     local cb5 = AF.CreateCheckButton(demo, nil, function(checked, self)
@@ -275,15 +275,15 @@ function AF.ShowDemo()
     AF.SetPoint(cb5, "BOTTOMLEFT", sl2, "TOPLEFT", 0, 1)
     cb5:SetChecked(true)
 
-    local sl3 = AF.CreateVerticalSlider(demo, "Vertical Slider", 100, 0, 100, 1, true)
+    local sl3 = AF.CreateVerticalSlider(demo, "Vertical Slider", 100, -50, 50, 1)
     AF.SetPoint(sl3, "TOPLEFT", sl2, "BOTTOMLEFT", 45, -30)
     sl3:UpdateWordWrap()
-    sl3:SetValue(0 * 100) -- for percentage, set value * 100
+    sl3:SetValue(0) -- for percentage, set value * 100
     sl3:SetOnValueChanged(function(value)
-        print("VERTICAL_OnSliderValueChanged:", value / 100) -- for percentage, get value / 100
+        print("VERTICAL_OnSliderValueChanged:", value) -- for percentage, get value / 100
     end)
     sl3:SetAfterValueChanged(function(value)
-        print("VERTICAL_AfterSliderValueChanged:", value / 100) -- for percentage, get value / 100
+        print("VERTICAL_AfterSliderValueChanged:", value) -- for percentage, get value / 100
     end)
 
     local sl4 = AF.CreateSlider(tp1, "Font Size", 130, -5, 5, 1)
@@ -360,7 +360,7 @@ function AF.ShowDemo()
     local dd5 = AF.CreateDropdown(demo, 150, 10, "font")
     AF.SetPoint(dd5, "TOPLEFT", dd4, "BOTTOMLEFT", 0, -30)
     dd5:SetLabel("Font Dropdown")
-    AF.SetTooltips(dd5, "TOPLEFT", 0, 2, "Font Dropdown", "LibSharedMedia is required")
+    AF.SetTooltips(dd5, "TOPLEFT", 0, 2, "Font Dropdown", "Using LibSharedMedia")
 
     local LSM = LibStub("LibSharedMedia-3.0", true)
     if LSM then
@@ -379,7 +379,7 @@ function AF.ShowDemo()
     local dd6 = AF.CreateDropdown(demo, 150, 10, "texture")
     AF.SetPoint(dd6, "TOPLEFT", dd5, "BOTTOMLEFT", 0, -30)
     dd6:SetLabel("Texture Dropdown")
-    AF.SetTooltips(dd6, "TOPLEFT", 0, 2, "Texture Dropdown", "LibSharedMedia is required")
+    AF.SetTooltips(dd6, "TOPLEFT", 0, 2, "Texture Dropdown", "Using LibSharedMedia")
 
     if LSM then
         local items = {}
@@ -511,7 +511,7 @@ function AF.ShowDemo()
     b9:SetScript("OnClick", function()
         local text = AF.WrapTextInColor("NOTICE", "orange").."\n".."One day, when what has happened behind the scene could be told, developers and gamers will have a whole new level understanding of how much damage a jerk can make."
         local dialog = AF.ShowNotificationDialog(demo, text, 200, true, 3)
-        AF.SetFrameStaticGlow(dialog)
+        AF.ShowNormalGlow(dialog)
         AF.SetNotificationDialogPoint("TOPLEFT", 255, -120)
     end)
 
@@ -522,7 +522,7 @@ function AF.ShowDemo()
     local bf3 = AF.CreateBorderedFrame(demo, nil, 530, 20)
     AF.SetPoint(bf3, "TOPLEFT", bf2, "BOTTOMLEFT", 0, -10)
 
-    local st = AF.CreateScrollText(bf3, 0.01)
+    local st = AF.CreateScrollingText(bf3, 0.01)
     AF.SetPoint(st, "TOPLEFT", 4, 0)
     AF.SetPoint(st, "TOPRIGHT", -4, 0)
     st:SetText("World of Warcraft, often abbreviated as WoW, is a massively multiplayer online roleplaying game (MMORPG) developed by Blizzard Entertainment and released on November 23, 2004, on the 10th anniversary of the Warcraft franchise, three years after its announcement on September 2, 2001. It is the fourth released game set in the Warcraft universe, and takes place four years after the events of Warcraft III: The Frozen Throne.", "gold")
@@ -817,7 +817,7 @@ function AF.ShowDemo()
         local f = AF.CreateBorderedFrame(AF.UIParent, nil, 170, 70)
         tinsert(moverTestFrames, f)
         AF.SetPoint(f, point)
-        f:SetTitle("Mover Test Frame "..id.."\n"..point, "hotpink", nil, true)
+        f:SetLabel("Mover Test Frame "..id.."\n"..point, "hotpink", nil, true)
         AF.CreateMover(f, group, "Test Mover "..id, function(p,x,y) print("MTF"..id..":", p, x, y) end)
     end
 

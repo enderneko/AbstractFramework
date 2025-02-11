@@ -23,7 +23,7 @@ function AF.LSM_GetFont(name)
     return DEFAULT_FONT
 end
 
---- @param fs FontString|EditBox
+---@param fs FontString|EditBox
 function AF.SetFont(fs, font, size, outline, shadow)
     if type(font) == "table" then
         font, size, outline, shadow = unpack(font)

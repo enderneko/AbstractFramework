@@ -198,10 +198,11 @@ end
 ---------------------------------------------------------------------
 -- notification dialog
 ---------------------------------------------------------------------
+---@class AF_NotificationDialog
 local notificationDialog
 
 local function CreateNotificationDialog()
-    notificationDialog = AF.CreateBorderedFrame(AF.UIParent, nil, 200, 100, nil, "accent")
+    notificationDialog = AF.CreateBorderedFrame(AF.UIParent, "AF_NotificationDialog", 200, 100, nil, "accent")
     notificationDialog:Hide() -- for first OnShow
 
     notificationDialog:EnableMouse(true)
@@ -276,6 +277,12 @@ local function CreateNotificationDialog()
 end
 
 -- show
+---@param parent any
+---@param text string
+---@param width number
+---@param showMask boolean
+---@param countdown number
+---@return AF_NotificationDialog|Frame
 function AF.ShowNotificationDialog(parent, text, width, showMask, countdown)
     if not notificationDialog then CreateNotificationDialog() end
 

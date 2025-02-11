@@ -5,153 +5,11 @@ local LCG = AF.LCG
 ---------------------------------------------------------------------
 -- recalc texcoords
 ---------------------------------------------------------------------
+---@param aura AF_AuraButton
+---@param width number
+---@param height number
 function AF.ReCalcTexCoordForAura(aura, width, height)
     aura.icon:SetTexCoord(unpack(AF.CalcTexCoordPreCrop(width, height, 1, 0.12)))
-end
-
----------------------------------------------------------------------
--- cooldown style: vertical progress
----------------------------------------------------------------------
-local function VerticalCooldown_OnUpdate(aura, elapsed)
-    aura.elapsed = aura.elapsed + elapsed
-    if aura.elapsed >= 0.1 then
-        aura:SetValue(aura:GetValue() + aura.elapsed)
-        aura.elapsed = 0
-    end
-end
-
--- for LCG.ButtonGlow_Start
-local function VerticalCooldown_GetCooldownDuration()
-    return 0
-end
-
-local function VerticalCooldown_ShowCooldown(aura, start, duration, _, icon, auraType)
-    if auraType then
-        aura.spark:SetColorTexture(AF.GetAuraTypeColor(auraType))
-    else
-        aura.spark:SetColorTexture(0.5, 0.5, 0.5, 1)
-    end
-    if aura.icon then
-    aura.icon:SetTexture(icon)
-    end
-
-    aura.elapsed = 0.1 -- update immediately
-    aura:SetMinMaxValues(0, duration)
-    aura:SetValue(GetTime() - start)
-    aura:Show()
-end
-
-local function CreateCooldown_Vertical(aura, hasIcon)
-    local cooldown = CreateFrame("StatusBar", nil, aura)
-    aura.cooldown = cooldown
-    cooldown:Hide()
-
-    cooldown.GetCooldownDuration = VerticalCooldown_GetCooldownDuration
-    cooldown.ShowCooldown = VerticalCooldown_ShowCooldown
-    cooldown:SetScript("OnUpdate", VerticalCooldown_OnUpdate)
-
-    AF.SetPoint(cooldown, "TOPLEFT", aura.icon)
-    AF.SetPoint(cooldown, "BOTTOMRIGHT", aura.icon, "BOTTOMRIGHT", 0, 1)
-    cooldown:SetOrientation("VERTICAL")
-    cooldown:SetReverseFill(true)
-    cooldown:SetStatusBarTexture(AF.GetPlainTexture())
-
-    local texture = cooldown:GetStatusBarTexture()
-
-    local spark = cooldown:CreateTexture(nil, "BORDER")
-    cooldown.spark = spark
-    AF.SetHeight(spark, 1)
-    spark:SetBlendMode("ADD")
-    spark:SetPoint("TOPLEFT", texture, "BOTTOMLEFT")
-    spark:SetPoint("TOPRIGHT", texture, "BOTTOMRIGHT")
-
-    if hasIcon then
-        texture:SetAlpha(0)
-
-    local mask = cooldown:CreateMaskTexture()
-    mask:SetTexture(AF.GetPlainTexture(), "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE", "NEAREST")
-    mask:SetPoint("TOPLEFT")
-    mask:SetPoint("BOTTOMRIGHT", texture)
-
-    local icon = cooldown:CreateTexture(nil, "ARTWORK")
-    cooldown.icon = icon
-    icon:SetTexCoord(0.12, 0.88, 0.12, 0.88)
-    icon:SetDesaturated(true)
-    icon:SetAllPoints(aura.icon)
-    icon:SetVertexColor(0.5, 0.5, 0.5, 1)
-    icon:AddMaskTexture(mask)
-    cooldown:SetScript("OnSizeChanged", AF.ReCalcTexCoordForAura)
-    else
-        texture:SetVertexColor(0, 0, 0, 0.8)
-    end
-end
-
----------------------------------------------------------------------
--- cooldown style: clock (w/ or w/o leading edge)
----------------------------------------------------------------------
-local function CreateCooldown_Clock(aura, drawEdge)
-    local cooldown = CreateFrame("Cooldown", nil, aura, "AFCooldownFrameTemplate")
-    aura.cooldown = cooldown
-    cooldown:Hide()
-
-    cooldown:SetAllPoints(aura.icon)
-    cooldown:SetReverse(true)
-    cooldown:SetDrawEdge(drawEdge)
-
-    -- NOTE: shit, why this EDGE not work, but xml does?
-    -- cooldown:SetSwipeTexture(AF.GetPlainTexture())
-    -- cooldown:SetSwipeColor(0, 0, 0, 0.8)
-    -- cooldown:SetEdgeTexture([[Interface\Cooldown\UI-HUD-ActionBar-SecondaryCooldown]], 1, 1, 0, 1)
-
-    -- cooldown text
-    cooldown:SetHideCountdownNumbers(true)
-    -- disable omnicc
-    cooldown.noCooldownCount = true
-    -- prevent some dirty addons from adding cooldown text
-    cooldown.ShowCooldown = cooldown.SetCooldown
-    cooldown.SetCooldown = nil
-end
-
----------------------------------------------------------------------
--- set cooldown style
----------------------------------------------------------------------
-local function Aura_SetCooldownStyle(aura, style)
-    if aura.style == style then return end
-
-    if aura.cooldown then
-        aura.cooldown:SetParent(nil)
-        aura.cooldown:Hide()
-    end
-
-    aura.style = style
-    if style == "vertical" then
-        CreateCooldown_Vertical(aura, true)
-    elseif style == "block_vertical" then
-        CreateCooldown_Vertical(aura, false)
-    elseif strfind(style, "^clock") or strfind(style, "^block_clock") then
-        -- clock, clock_with_leading_edge
-        -- block_clock, block_clock_with_leading_edge
-        CreateCooldown_Clock(aura, strfind(style, "edge$") and true or false)
-    end
-
-    if strfind(style, "^block") then
-        aura.icon:Hide()
-    else
-        aura.icon:Show()
-    end
-end
-
----------------------------------------------------------------------
--- glow
----------------------------------------------------------------------
-local function Aura_CreateGlow(aura)
-    aura.glow = CreateFrame("Frame", nil, aura, "BackdropTemplate")
-    aura.glow:SetAllPoints()
-    aura.glow:SetBackdrop({edgeFile = AF.GetTexture("CalloutGlow"), edgeSize = 7})
-    aura.glow:SetBorderBlendMode("ADD")
-    aura.glow:SetFrameLevel(aura:GetFrameLevel())
-    AF.SetOutside(aura.glow, aura, 4)
-    AF.CreateBlinkAnimation(aura.glow, 0.5)
 end
 
 ---------------------------------------------------------------------
@@ -259,6 +117,18 @@ local function UpdateDuration_NoColor(aura, elapsed)
     end
 end
 
+---@param aura AF_AuraButton
+---@param start number
+---@param duration number
+---@param count number
+---@param icon number
+---@param auraType string
+---@param desaturated boolean
+---@param glow boolean
+---@param r number backdrop color
+---@param g number backdrop color
+---@param b number backdrop color
+---@param a number backdrop color
 function AF.SetAuraCooldown(aura, start, duration, count, icon, auraType, desaturated, glow, r, g, b, a)
     if duration == 0 then
         if aura.cooldown then aura.cooldown:Hide() end
@@ -287,12 +157,9 @@ function AF.SetAuraCooldown(aura, start, duration, count, icon, auraType, desatu
 
     if glow then
         LCG.ButtonGlow_Start(aura, nil, nil, 0)
-        if not aura.glow then
-            Aura_CreateGlow(aura)
-        end
-        aura.glow:Show()
+        AF.ShowCalloutGlow(aura, true)
     else
-        if aura.glow then aura.glow:Hide() end
+        AF.HideCalloutGlow(aura)
         LCG.ButtonGlow_Stop(aura)
     end
 
@@ -309,6 +176,212 @@ function AF.SetAuraCooldown(aura, start, duration, count, icon, auraType, desatu
         aura:Show()
     end
 end
+
+---------------------------------------------------------------------
+-- SetAuraDesaturated
+---------------------------------------------------------------------
+function AF.SetAuraDesaturated(aura, desaturated)
+    aura.icon:SetDesaturated(desaturated)
+end
+
+---------------------------------------------------------------------
+-- SetupAuraStackText
+---------------------------------------------------------------------
+function AF.SetupAuraStackText(aura, config)
+    aura.stack:SetShown(config.enabled)
+    AF.LoadWidgetPosition(aura.stack, config.position, aura)
+    AF.SetFont(aura.stack, unpack(config.font))
+    aura.stack:SetTextColor(unpack(config.color))
+end
+
+---------------------------------------------------------------------
+-- SetupAuraDurationText
+---------------------------------------------------------------------
+function AF.SetupAuraDurationText(aura, config)
+    aura.duration:SetShown(config.enabled)
+    AF.LoadWidgetPosition(aura.duration, config.position, aura)
+    AF.SetFont(aura.duration, unpack(config.font))
+
+    if not config.enabled then
+        aura.UpdateDuration = AF.noop
+        return
+    end
+
+    aura.showSecondsUnit = config.showSecondsUnit
+
+    if config.colorBy == "percent_seconds" then
+        -- [1]normal, [2]percent, [3]seconds
+        aura.durationColor = config.color
+        aura.UpdateDuration = UpdateDuration_ColorByPercentSeconds
+    elseif config.colorBy == "expiring" then
+        -- [1]normal, [2]expiring
+        aura.durationColor = config.color
+        aura.UpdateDuration = UpdateDuration_ColorByExpiring
+    elseif config.colorBy == "none" or not config.colorBy then
+        aura.duration:SetTextColor(unpack(config.color))
+        aura.UpdateDuration = UpdateDuration_NoColor
+    end
+end
+
+
+
+---------------------------------------------------------------------
+-- AF_AuraButtonMixin
+---------------------------------------------------------------------
+---@class AF_AuraButton
+local AF_AuraButtonMixin = {}
+
+
+---------------------------------------------------------------------
+-- cooldown style: vertical progress
+---------------------------------------------------------------------
+local function VerticalCooldown_OnUpdate(aura, elapsed)
+    aura.elapsed = aura.elapsed + elapsed
+    if aura.elapsed >= 0.1 then
+        aura:SetValue(aura:GetValue() + aura.elapsed)
+        aura.elapsed = 0
+    end
+end
+
+-- for LCG.ButtonGlow_Start
+local function VerticalCooldown_GetCooldownDuration()
+    return 0
+end
+
+local function VerticalCooldown_ShowCooldown(aura, start, duration, _, icon, auraType)
+    if auraType then
+        aura.spark:SetColorTexture(AF.GetAuraTypeColor(auraType))
+    else
+        aura.spark:SetColorTexture(0.5, 0.5, 0.5, 1)
+    end
+    if aura.icon then
+    aura.icon:SetTexture(icon)
+    end
+
+    aura.elapsed = 0.1 -- update immediately
+    aura:SetMinMaxValues(0, duration)
+    aura:SetValue(GetTime() - start)
+    aura:Show()
+end
+
+local function CreateCooldown_Vertical(aura, hasIcon)
+    local cooldown = CreateFrame("StatusBar", nil, aura)
+    aura.cooldown = cooldown
+    cooldown:Hide()
+
+    cooldown.GetCooldownDuration = VerticalCooldown_GetCooldownDuration
+    cooldown.ShowCooldown = VerticalCooldown_ShowCooldown
+    cooldown:SetScript("OnUpdate", VerticalCooldown_OnUpdate)
+
+    AF.SetPoint(cooldown, "TOPLEFT", aura.icon)
+    AF.SetPoint(cooldown, "BOTTOMRIGHT", aura.icon, "BOTTOMRIGHT", 0, 1)
+    cooldown:SetOrientation("VERTICAL")
+    cooldown:SetReverseFill(true)
+    cooldown:SetStatusBarTexture(AF.GetPlainTexture())
+
+    local texture = cooldown:GetStatusBarTexture()
+
+    local spark = cooldown:CreateTexture(nil, "BORDER")
+    cooldown.spark = spark
+    AF.SetHeight(spark, 1)
+    spark:SetBlendMode("ADD")
+    spark:SetPoint("TOPLEFT", texture, "BOTTOMLEFT")
+    spark:SetPoint("TOPRIGHT", texture, "BOTTOMRIGHT")
+
+    if hasIcon then
+        texture:SetAlpha(0)
+
+    local mask = cooldown:CreateMaskTexture()
+    mask:SetTexture(AF.GetPlainTexture(), "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE", "NEAREST")
+    mask:SetPoint("TOPLEFT")
+    mask:SetPoint("BOTTOMRIGHT", texture)
+
+    local icon = cooldown:CreateTexture(nil, "ARTWORK")
+    cooldown.icon = icon
+    icon:SetTexCoord(0.12, 0.88, 0.12, 0.88)
+    icon:SetDesaturated(true)
+    icon:SetAllPoints(aura.icon)
+    icon:SetVertexColor(0.5, 0.5, 0.5, 1)
+    icon:AddMaskTexture(mask)
+    cooldown:SetScript("OnSizeChanged", AF.ReCalcTexCoordForAura)
+    else
+        texture:SetVertexColor(0, 0, 0, 0.8)
+    end
+end
+
+
+---------------------------------------------------------------------
+-- cooldown style: clock (w/ or w/o leading edge)
+---------------------------------------------------------------------
+local function CreateCooldown_Clock(aura, drawEdge)
+    local cooldown = CreateFrame("Cooldown", nil, aura, "AFCooldownFrameTemplate")
+    aura.cooldown = cooldown
+    cooldown:Hide()
+
+    cooldown:SetAllPoints(aura.icon)
+    cooldown:SetReverse(true)
+    cooldown:SetDrawEdge(drawEdge)
+
+    -- NOTE: shit, why this EDGE not work, but xml does?
+    -- cooldown:SetSwipeTexture(AF.GetPlainTexture())
+    -- cooldown:SetSwipeColor(0, 0, 0, 0.8)
+    -- cooldown:SetEdgeTexture([[Interface\Cooldown\UI-HUD-ActionBar-SecondaryCooldown]], 1, 1, 0, 1)
+
+    -- cooldown text
+    cooldown:SetHideCountdownNumbers(true)
+    -- disable omnicc
+    cooldown.noCooldownCount = true
+    -- prevent some dirty addons from adding cooldown text
+    cooldown.ShowCooldown = cooldown.SetCooldown
+    cooldown.SetCooldown = nil
+end
+
+
+---------------------------------------------------------------------
+-- cooldown
+---------------------------------------------------------------------
+---@param style string vertical, block_vertical, clock(_with_leading_edge), block_clock(_with_leading_edge)
+function AF_AuraButtonMixin:SetCooldownStyle(style)
+    if self.style == style then return end
+
+    if self.cooldown then
+        self.cooldown:SetParent(nil)
+        self.cooldown:Hide()
+    end
+
+    self.style = style
+    if style == "vertical" then
+        CreateCooldown_Vertical(self, true)
+    elseif style == "block_vertical" then
+        CreateCooldown_Vertical(self, false)
+    elseif strfind(style, "^clock") or strfind(style, "^block_clock") then
+        -- clock, clock_with_leading_edge
+        -- block_clock, block_clock_with_leading_edge
+        CreateCooldown_Clock(self, strfind(style, "edge$") and true or false)
+    end
+
+    if strfind(style, "^block") then
+        self.icon:Hide()
+    else
+        self.icon:Show()
+    end
+end
+
+---@param start number
+---@param duration number
+---@param count number
+---@param icon number
+---@param auraType string
+---@param desaturated boolean
+---@param glow boolean
+---@param r number backdrop color
+---@param g number backdrop color
+---@param b number backdrop color
+---@param a number backdrop color
+function AF_AuraButtonMixin:SetCooldown(start, duration, count, icon, auraType, desaturated, glow, r, g, b, a)
+    AF.SetAuraCooldown(self, start, duration, count, icon, auraType, desaturated, glow, r, g, b, a)
+end
+
 
 ---------------------------------------------------------------------
 -- tooltip
@@ -337,64 +410,57 @@ local function Aura_HideTooltips()
     GameTooltip:Hide()
 end
 
-local function Aura_EnableTooltip(aura, config, isHelpful)
+---@param config table
+---@param isHelpful boolean
+function AF_AuraButtonMixin:EnableTooltip(config, isHelpful)
     if config.enabled then
-        aura.tooltipAnchorTo = config.anchorTo
-        aura.tooltipPosition = config.position
-        aura:SetScript("OnEnter", isHelpful and Aura_ShowBuffTooltip or Aura_ShowDebuffTooltip)
-        aura:SetScript("OnLeave", Aura_HideTooltips)
+        self.tooltipAnchorTo = config.anchorTo
+        self.tooltipPosition = config.position
+        self:SetScript("OnEnter", isHelpful and Aura_ShowBuffTooltip or Aura_ShowDebuffTooltip)
+        self:SetScript("OnLeave", Aura_HideTooltips)
     else
-        aura.tooltipAnchorTo = nil
-        aura.tooltipPosition = nil
-        aura:SetScript("OnEnter", nil)
-        aura:SetScript("OnLeave", nil)
-        aura:EnableMouse(false)
+        self.tooltipAnchorTo = nil
+        self.tooltipPosition = nil
+        self:SetScript("OnEnter", nil)
+        self:SetScript("OnLeave", nil)
+        self:EnableMouse(false)
     end
 end
 
 ---------------------------------------------------------------------
 -- desaturated
 ---------------------------------------------------------------------
-function AF.SetAuraDesaturated(aura, desaturated)
-    aura.icon:SetDesaturated(desaturated)
+---@param desaturated boolean
+function AF_AuraButtonMixin:SetDesaturated(desaturated)
+    AF.SetAuraDesaturated(self, desaturated)
 end
 
 ---------------------------------------------------------------------
 -- stack
 ---------------------------------------------------------------------
-function AF.SetupAuraStackText(aura, config)
-    aura.stack:SetShown(config.enabled)
-    AF.LoadWidgetPosition(aura.stack, config.position, aura)
-    AF.SetFont(aura.stack, unpack(config.font))
-    aura.stack:SetTextColor(unpack(config.color))
+---@param config table
+function AF_AuraButtonMixin:SetupStackText(config)
+    AF.SetupAuraStackText(self, config)
 end
 
 ---------------------------------------------------------------------
 -- duration
 ---------------------------------------------------------------------
-function AF.SetupAuraDurationText(aura, config)
-    aura.duration:SetShown(config.enabled)
-    AF.LoadWidgetPosition(aura.duration, config.position, aura)
-    AF.SetFont(aura.duration, unpack(config.font))
+---@param config table
+function AF_AuraButtonMixin:SetupDurationText(config)
+    AF.SetupAuraDurationText(self, config)
+end
 
-    if not config.enabled then
-        aura.UpdateDuration = AF.noop
-        return
-    end
-
-    aura.showSecondsUnit = config.showSecondsUnit
-
-    if config.colorBy == "percent_seconds" then
-        -- [1]normal, [2]percent, [3]seconds
-        aura.durationColor = config.color
-        aura.UpdateDuration = UpdateDuration_ColorByPercentSeconds
-    elseif config.colorBy == "expiring" then
-        -- [1]normal, [2]expiring
-        aura.durationColor = config.color
-        aura.UpdateDuration = UpdateDuration_ColorByExpiring
-    elseif config.colorBy == "none" or not config.colorBy then
-        aura.duration:SetTextColor(unpack(config.color))
-        aura.UpdateDuration = UpdateDuration_NoColor
+---------------------------------------------------------------------
+-- pixels
+---------------------------------------------------------------------
+function AF_AuraButtonMixin:UpdatePixels()
+    AF.ReSize(self)
+    AF.RePoint(self)
+    AF.ReBorder(self)
+    AF.RePoint(self.icon)
+    if self.cooldown then
+        AF.RePoint(self.cooldown)
     end
 end
 
@@ -403,27 +469,20 @@ end
 ---------------------------------------------------------------------
 local function Aura_OnHide(aura)
     LCG.ButtonGlow_Stop(aura)
+    AF.HideCalloutGlow(aura)
 end
 
 ---------------------------------------------------------------------
--- pixels
+-- create aura
 ---------------------------------------------------------------------
-local function Aura_UpdatePixels(aura)
-    AF.ReSize(aura)
-    AF.RePoint(aura)
-    AF.ReBorder(aura)
-    AF.RePoint(aura.icon)
-    if aura.cooldown then
-        AF.RePoint(aura.cooldown)
-    end
-end
-
----------------------------------------------------------------------
--- create
----------------------------------------------------------------------
-function AF.CreateAura(parent)
+---@param parent Frame
+---@param noPixelUpdates boolean
+---@return AF_AuraButton|Frame aura
+function AF.CreateAura(parent, noPixelUpdates)
     local frame = CreateFrame("Frame", nil, parent, "BackdropTemplate")
     frame:Hide()
+
+    Mixin(frame, AF_AuraButtonMixin)
 
     AF.SetDefaultBackdrop(frame)
     frame:SetBackdropColor(AF.GetColorRGB("black"))
@@ -437,25 +496,14 @@ function AF.CreateAura(parent)
     icon:SetTexCoord(0.12, 0.88, 0.12, 0.88)
     frame:SetScript("OnSizeChanged", AF.ReCalcTexCoordForAura)
 
-    -- stack text
-    local stack = frame:CreateFontString(nil, "OVERLAY")
-    frame.stack = stack
-
-    -- duration text
-    local duration = frame:CreateFontString(nil, "OVERLAY")
-    frame.duration = duration
-
-    -- functions
-    frame.SetCooldown = AF.SetAuraCooldown
-    frame.SetCooldownStyle = Aura_SetCooldownStyle
-    frame.SetupStackText = AF.SetupAuraStackText
-    frame.SetupDurationText = AF.SetupAuraDurationText
-    frame.SetDesaturated = AF.SetAuraDesaturated
-    frame.EnableTooltip = Aura_EnableTooltip
+    -- texts
+    frame.stack = frame:CreateFontString(nil, "OVERLAY")
+    frame.duration = frame:CreateFontString(nil, "OVERLAY")
 
     -- pixels
-    -- AF.AddToPixelUpdater(frame, Aura_UpdatePixels)
-    frame.UpdatePixels = Aura_UpdatePixels
+    if not noPixelUpdates then
+        AF.AddToPixelUpdater(frame, Aura_UpdatePixels)
+    end
 
     return frame
 end

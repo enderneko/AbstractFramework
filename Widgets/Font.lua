@@ -13,13 +13,13 @@ local FONT_CHINESE_NAME = "AF_FONT_CHINESE"
 
 local FONT_TITLE_SIZE = 14
 local FONT_NORMAL_SIZE = 13
-local FONT_CHAT_SIZE = 12
+local FONT_CHAT_SIZE = 13
 local FONT_OUTLINE_SIZE = 13
 local FONT_SMALL_SIZE = 11
 local FONT_CHINESE_SIZE = 14
 
 local BASE_FONT = GameFontNormal:GetFont()
-local BASE_CHAT_FONT = ChatFontNormal:GetFont()
+local BASE_CHAT_FONT = GameFontNormal:GetFont() -- ChatFontNormal:GetFont()
 
 local font_title = CreateFont(FONT_TITLE_NAME)
 font_title:SetFont(BASE_FONT, FONT_TITLE_SIZE, "")

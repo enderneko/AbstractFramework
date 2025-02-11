@@ -266,3 +266,21 @@ function AF.AddSimpleEventHandler(frame)
         end
     end)
 end
+
+
+---------------------------------------------------------------------
+-- create simple event frame
+---------------------------------------------------------------------
+---@param events string separated by comma
+---@param onEventFunc function (self, event, ...)
+function AF.CreateSimpleEventFrame(events, onEventFunc)
+    local frame = CreateFrame("Frame")
+    frame:SetScript("OnEvent", onEventFunc)
+
+    events = events:gsub(" ", "")
+    for _, e in pairs({strsplit(",", events)}) do
+        frame:RegisterEvent(e)
+    end
+
+    return frame
+end

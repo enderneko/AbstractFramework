@@ -6,12 +6,12 @@ local AF = _G.AbstractFramework
 ---------------------------------------------------------------------
 local function RegisterMouseDownUp(b)
     b:SetScript("OnMouseDown", function()
-        if b.onMouseDownText then b.onMouseDownText() end
-        if b.onMouseDownTexture then b.onMouseDownTexture() end
+        if not b._disableTextPushEffect then b:HandleMouseDownText() end
+        if not b._disableTexturePushEffect then b:HandleMouseDownTexture() end
     end)
     b:SetScript("OnMouseUp", function()
-        if b.onMouseUpText then b.onMouseUpText() end
-        if b.onMouseUpTexture then b.onMouseUpTexture() end
+        if not b._disableTextPushEffect then b:HandleMouseUpText() end
+        if not b._disableTexturePushEffect then b:HandleMouseUpTexture() end
     end)
 end
 
@@ -20,14 +20,156 @@ local function UnregisterMouseDownUp(b)
     b:SetScript("OnMouseUp", nil)
 end
 
---- @param color string if strfind(color, "transparent"), border is transparent, but still exists
---- @param noBorder boolean no edgeFile for backdrop
---- @param noBackground boolean remove background texture, not background color
+---@class AF_Button
+local AF_ButtonMixin = {}
+
+function AF_ButtonMixin:HandleMouseDownText()
+    if self._disableTextPushEffect then return end
+    self.text:AdjustPointsOffset(0, -AF.GetOnePixelForRegion(self))
+end
+
+function AF_ButtonMixin:HandleMouseUpText()
+    if self._disableTextPushEffect then return end
+    AF.RePoint(self.text)
+end
+
+function AF_ButtonMixin:HandleMouseDownTexture()
+    if self.texture then
+        self.texture:ClearAllPoints()
+        self.texture:SetPoint(self.point[1], self.point[2], self.point[3] - AF.GetOnePixelForRegion(self))
+    end
+end
+
+function AF_ButtonMixin:HandleMouseUpTexture()
+    if self.texture then
+        self.texture:ClearAllPoints()
+        self.texture:SetPoint(unpack(self.point))
+    end
+end
+
+---@param color string @see
+function AF_ButtonMixin:SetTextHighlightColor(color)
+    if color then
+        self.highlightText = function()
+            self.text:SetColor(color)
+        end
+        self.unhighlightText = function()
+            self.text:SetColor("white")
+        end
+    else
+        self.highlightText = nil
+        self.unhighlightText = nil
+    end
+end
+
+function AF_ButtonMixin:SetText(str)
+    self.text:SetText(str)
+end
+
+function AF_ButtonMixin:GetText()
+    return self.text:GetText()
+end
+
+function AF_ButtonMixin:GetFontString()
+    return self.text
+end
+
+function AF_ButtonMixin:SetTextColor(r, g, b, a)
+    self.text:SetTextColor(r, g, b, a)
+end
+
+function AF_ButtonMixin:SetFontObject(f)
+    self.text:SetFontObject(f)
+end
+
+function AF_ButtonMixin:SetFont(...)
+    self.text:SetFont(...)
+end
+
+function AF_ButtonMixin:GetFont()
+    return self.text:GetFont()
+end
+
+function AF_ButtonMixin:SetJustifyH(justify)
+    self.text:SetJustifyH(justify)
+end
+
+function AF_ButtonMixin:SetBorderHighlightColor(color)
+    if color then
+        self.highlightBorder = function()
+            self:SetBackdropBorderColor(AF.GetColorRGB(color))
+        end
+        self.unhighlightBorder = function()
+            self:SetBackdropBorderColor(AF.GetColorRGB("black"))
+        end
+    else
+        self.highlightBorder = nil
+        self.unhighlightBorder = nil
+    end
+end
+
+---@param tex string
+---@param size table
+---@param point table
+---@param isAtlas boolean
+---@param noPushDownEffect boolean
+function AF_ButtonMixin:SetTexture(tex, size, point, isAtlas, noPushDownEffect)
+    if not self.texture then
+        self.texture = self:CreateTexture(nil, "ARTWORK")
+        self:HookScript("OnEnable", function()
+            self.texture:SetDesaturated(false)
+            self.texture:SetVertexColor(AF.GetColorRGB("white"))
+        end)
+        self:HookScript("OnDisable", function()
+            self.texture:SetDesaturated(true)
+            self.texture:SetVertexColor(AF.GetColorRGB("disabled"))
+        end)
+        assert(#point == 3, "point format error! should be something like {\"CENTER\", 0, 0}")
+        self.point = point
+        AF.SetPoint(self.texture, unpack(point))
+        AF.SetSize(self.texture, unpack(size))
+        AF.ClearPoints(self.text)
+        AF.SetPoint(self.text, "LEFT", self.texture, "RIGHT", 2, 0)
+        AF.SetPoint(self.text, "RIGHT", -2, 0)
+        self._disableTextPushEffect = true
+    end
+    self._disableTexturePushEffect = noPushDownEffect
+    if isAtlas then
+        self.texture:SetAtlas(tex)
+    else
+        self.texture:SetTexture(tex)
+    end
+end
+
+function AF_ButtonMixin:UpdatePixels()
+    AF.ReSize(self)
+    AF.RePoint(self)
+    AF.RePoint(self.text)
+    if not self._noBorder then
+        AF.ReBorder(self)
+    end
+    if self.texture then
+        AF.ReSize(self.texture)
+        AF.RePoint(self.texture)
+    end
+end
+
+function AF_ButtonMixin:SlientClick()
+    self._noSound = true
+    self:Click()
+    self._noSound = nil
+end
+
+---@param color string if strfind(color, "transparent"), border is transparent, but still exists
+---@param noBorder boolean no edgeFile for backdrop
+---@param noBackground boolean remove background texture, not background color
+---@return AF_Button|Button button
 function AF.CreateButton(parent, text, color, width, height, template, noBorder, noBackground, font)
     local b = CreateFrame("Button", nil, parent, template and template..",BackdropTemplate" or "BackdropTemplate")
     if parent then AF.SetFrameLevel(b, 1) end
     AF.SetSize(b, width, height)
 
+    Mixin(b, AF_ButtonMixin)
     RegisterMouseDownUp(b)
 
     -- keep color & hoverColor ------------------
@@ -36,20 +178,11 @@ function AF.CreateButton(parent, text, color, width, height, template, noBorder,
 
     -- text -------------------------------------
     b.text = AF.CreateFontString(b, text, nil, font)
+    AF.RemoveFromPixelUpdater(b.text)
     b.text:SetWordWrap(false)
     AF.SetPoint(b.text, "LEFT", 2, 0)
     AF.SetPoint(b.text, "RIGHT", -2, 0)
     b.text:SetText(text)
-
-    b.onMouseDownText = function()
-        if b._disableTextPushEffect then return end
-        b.text:AdjustPointsOffset(0, -AF.GetOnePixelForRegion(b))
-    end
-
-    b.onMouseUpText = function()
-        if b._disableTextPushEffect then return end
-        AF.RePoint(b.text)
-    end
 
     b:SetScript("OnEnable", function()
         b.text:SetColor("white")
@@ -61,75 +194,14 @@ function AF.CreateButton(parent, text, color, width, height, template, noBorder,
         UnregisterMouseDownUp(b)
     end)
 
-    --- @param color string|nil
-    function b:SetTextHighlightColor(color)
-        if color then
-            b.highlightText = function()
-                b.text:SetColor(color)
-            end
-            b.unhighlightText = function()
-                b.text:SetColor("white")
-            end
-        else
-            b.highlightText = nil
-            b.unhighlightText = nil
-        end
-    end
-
-    function b:SetText(s)
-        b.text:SetText(s)
-    end
-
-    function b:GetText()
-        b.text:GetText()
-    end
-
-    function b:GetFontString()
-        return b.text
-    end
-
-    function b:SetTextColor(r, g, b, a)
-        b.text:SetTextColor(r, g, b, a)
-    end
-
-    function b:SetFontObject(f)
-        b.text:SetFontObject(f)
-    end
-
-    function b:SetFont(...)
-        b.text:SetFont(...)
-    end
-
-    function b:GetFont()
-        return b.text:GetFont()
-    end
-
-    function b:SetJustifyH(justify)
-        b.text:SetJustifyH(justify)
-    end
-
     -- border -----------------------------------
+    b._noBorder = noBorder
     if noBorder then
         AF.SetDefaultBackdrop_NoBorder(b)
     else
         AF.SetDefaultBackdrop(b)
         -- local n = AF.GetOnePixelForRegion(b)
         -- b:SetBackdrop({bgFile=AF.GetPlainTexture(), edgeFile=AF.GetPlainTexture(), edgeSize=n, insets={left=n, right=n, top=n, bottom=n}})
-    end
-
-    --- @param color string|nil
-    function b:SetBorderHighlightColor(color)
-        if color then
-            b.highlightBorder = function()
-                b:SetBackdropBorderColor(AF.GetColorRGB(color))
-            end
-            b.unhighlightBorder = function()
-                b:SetBackdropBorderColor(AF.GetColorRGB("black"))
-            end
-        else
-            b.highlightBorder = nil
-            b.unhighlightBorder = nil
-        end
     end
 
     -- color ------------------------------------
@@ -178,7 +250,7 @@ function AF.CreateButton(parent, text, color, width, height, template, noBorder,
         end
 
         b:SetScript("PostClick", function(self, button, down)
-            if self.noSound then return end
+            if self._noSound then return end
             if b._isSecure then
                 if down == GetCVarBool("ActionButtonUseKeyDown") then
                     PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
@@ -189,75 +261,12 @@ function AF.CreateButton(parent, text, color, width, height, template, noBorder,
         end)
     else
         b:SetScript("PostClick", function()
-            if self.noSound then return end
+            if self._noSound then return end
             PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
         end)
     end
 
-    function b:SlientClick()
-        b.noSound = true
-        b:Click()
-        b.noSound = nil
-    end
-
-    -- texture ----------------------------------
-    function b:SetTexture(tex, size, point, isAtlas, noPushDownEffect)
-        if not b.texture then
-            b.texture = b:CreateTexture(nil, "ARTWORK")
-            -- enable / disable
-            b:HookScript("OnEnable", function()
-                b.texture:SetDesaturated(false)
-                b.texture:SetVertexColor(AF.GetColorRGB("white"))
-            end)
-            b:HookScript("OnDisable", function()
-                b.texture:SetDesaturated(true)
-                b.texture:SetVertexColor(AF.GetColorRGB("disabled"))
-            end)
-
-            assert(#point==3, "point format error! should be something like {\"CENTER\", 0, 0}")
-            AF.SetPoint(b.texture, unpack(point))
-            AF.SetSize(b.texture, unpack(size))
-
-            -- update fontstring point
-            AF.ClearPoints(b.text)
-            AF.SetPoint(b.text, "LEFT", b.texture, "RIGHT", 2, 0)
-            AF.SetPoint(b.text, "RIGHT", -2, 0)
-            -- push effect
-            b._disableTextPushEffect = true
-            if not noPushDownEffect then
-                b.onMouseDownTexture = function()
-                    b.texture:ClearAllPoints()
-                    b.texture:SetPoint(point[1], point[2], point[3]-AF.GetOnePixelForRegion(b))
-                end
-                b.onMouseUpTexture = function()
-                    b.texture:ClearAllPoints()
-                    b.texture:SetPoint(unpack(point))
-                end
-            end
-        end
-
-        if isAtlas then
-            b.texture:SetAtlas(tex)
-        else
-            b.texture:SetTexture(tex)
-        end
-    end
-
-    function b:UpdatePixels()
-        AF.ReSize(b)
-        AF.RePoint(b)
-        AF.RePoint(b.text)
-
-        if not noBorder then
-            AF.ReBorder(b)
-        end
-
-        if b.texture then
-            AF.ReSize(b.texture)
-            AF.RePoint(b.texture)
-        end
-    end
-
+    -- pixel updater ----------------------------
     AF.AddToPixelUpdater(b)
 
     return b
@@ -266,6 +275,13 @@ end
 ---------------------------------------------------------------------
 -- button group
 ---------------------------------------------------------------------
+---@param buttons table
+---@param onClick function
+---@param selectedFn function
+---@param unselectedFn function
+---@param onEnter function
+---@param onLeave function
+---@return function HighlightButton accept button.id as parameter
 function AF.CreateButtonGroup(buttons, onClick, selectedFn, unselectedFn, onEnter, onLeave)
     local function HighlightButton(id)
         for _, b in pairs(buttons) do
@@ -328,8 +344,8 @@ end
 ---------------------------------------------------------------------
 -- icon button
 ---------------------------------------------------------------------
----@param color string|table?
----@param hoverColor string|table?
+---@param color? string|table
+---@param hoverColor? string|table
 function AF.CreateIconButton(parent, icon, width, height, padding, color, hoverColor, noPushDownEffect, filterMode)
     padding = padding or 0
 
@@ -372,6 +388,27 @@ end
 ---------------------------------------------------------------------
 -- check button
 ---------------------------------------------------------------------
+---@class AF_CheckButton
+local AF_CheckButtonMixin = {}
+
+function AF_CheckButtonMixin:SetText(text)
+    self.label:SetText(text)
+    if text and strtrim(text) ~= "" then
+        self:SetHitRectInsets(0, -self.label:GetStringWidth()-5, 0, 0)
+    else
+        self:SetHitRectInsets(0, 0, 0, 0)
+    end
+end
+
+function AF_CheckButtonMixin:UpdatePixels()
+    AF.ReSize(self)
+    AF.RePoint(self)
+    AF.ReBorder(self)
+    AF.RePoint(self.checkedTexture)
+    AF.RePoint(self.highlightTexture)
+end
+
+---@return AF_CheckButton|CheckButton cb
 function AF.CreateCheckButton(parent, label, onClick)
     -- InterfaceOptionsCheckButtonTemplate --> FrameXML\InterfaceOptionsPanels.xml line 19
     -- OptionsBaseCheckButtonTemplate -->  FrameXML\OptionsPanelTemplates.xml line 10
@@ -388,15 +425,7 @@ function AF.CreateCheckButton(parent, label, onClick)
     cb.label = cb:CreateFontString(nil, "OVERLAY", "AF_FONT_NORMAL")
     cb.label:SetPoint("LEFT", cb, "RIGHT", 5, 0)
 
-    function cb:SetText(text)
-        cb.label:SetText(text)
-        if text and strtrim(text) ~= "" then
-            cb:SetHitRectInsets(0, -cb.label:GetStringWidth()-5, 0, 0)
-        else
-            cb:SetHitRectInsets(0, 0, 0, 0)
-        end
-    end
-
+    Mixin(cb, AF_CheckButtonMixin)
     cb:SetText(label)
 
     AF.SetDefaultBackdrop(cb)
@@ -404,11 +433,13 @@ function AF.CreateCheckButton(parent, label, onClick)
     cb:SetBackdropBorderColor(0, 0, 0, 1)
 
     local checkedTexture = cb:CreateTexture(nil, "ARTWORK")
+    cb.checkedTexture = checkedTexture
     checkedTexture:SetColorTexture(AF.GetColorRGB("accent", 0.7))
     AF.SetPoint(checkedTexture, "TOPLEFT", 1, -1)
     AF.SetPoint(checkedTexture, "BOTTOMRIGHT", -1, 1)
 
     local highlightTexture = cb:CreateTexture(nil, "ARTWORK")
+    cb.highlightTexture = highlightTexture
     highlightTexture:SetColorTexture(AF.GetColorRGB("accent", 0.1))
     AF.SetPoint(highlightTexture, "TOPLEFT", 1, -1)
     AF.SetPoint(highlightTexture, "BOTTOMRIGHT", -1, 1)
@@ -429,14 +460,6 @@ function AF.CreateCheckButton(parent, label, onClick)
         cb:SetBackdropBorderColor(0, 0, 0, 0.7)
     end)
 
-    function cb:UpdatePixels()
-        AF.ReSize(cb)
-        AF.RePoint(cb)
-        AF.ReBorder(cb)
-        AF.RePoint(checkedTexture)
-        AF.RePoint(highlightTexture)
-    end
-
     AF.AddToPixelUpdater(cb)
 
     return cb
@@ -445,7 +468,40 @@ end
 ---------------------------------------------------------------------
 -- switch
 ---------------------------------------------------------------------
---- @param labels table {{["text"]=(string), ["value"]=(boolean/string/number), ["onClick"]=(function)}, ...}
+---@class AF_Switch
+local AF_SwitchMixin = {}
+
+function AF_SwitchMixin:SetSelectedValue(value)
+    for _, b in ipairs(self.buttons) do
+        if b.value == value then
+            if not b.isSelected then b.fill:Play() end
+            b.isSelected = true
+        else
+            if b.isSelected then b.empty:Play() end
+            b.isSelected = false
+        end
+    end
+end
+
+function AF_SwitchMixin:GetSelectedValue()
+    return self.selected
+end
+
+-- function AF_SwitchMixin:UpdatePixels()
+--     AF.ReSize(self)
+--     AF.RePoint(self)
+--     AF.ReBorder(self)
+--     -- AF.RePoint(self.highlight)
+
+--     -- update highlights
+--     -- for _, b in ipairs(buttons) do
+--     --     AF.ReSize(b.highlight)
+--     --     AF.RePoint(b.highlight)
+--     -- end
+-- end
+
+---@param labels table {{["text"]=(string), ["value"]=(boolean/string/number), ["onClick"]=(function)}, ...}
+---@return AF_Switch|Frame switch
 function AF.CreateSwitch(parent, width, height, labels)
     local switch = AF.CreateBorderedFrame(parent, nil, width, height, "widget")
 
@@ -467,6 +523,8 @@ function AF.CreateSwitch(parent, width, height, labels)
 
     -- buttons
     local buttons = {}
+    switch.buttons = buttons
+
     for i, l in pairs(labels) do
         buttons[i] = AF.CreateButton(switch, labels[i].text, "none", buttonWidth, height)
         buttons[i].value = labels[i].value or labels[i].text
@@ -569,34 +627,7 @@ function AF.CreateSwitch(parent, width, height, labels)
         end
     end
 
-    function switch:SetSelectedValue(value)
-        for _, b in ipairs(buttons) do
-            if b.value == value then
-                if not b.isSelected then b.fill:Play() end
-                b.isSelected = true
-            else
-                if b.isSelected then b.empty:Play() end
-                b.isSelected = false
-            end
-        end
-    end
-
-    function switch:GetSelectedValue()
-        return switch.selected
-    end
-
-    function switch:UpdatePixels()
-        AF.ReSize(switch)
-        AF.RePoint(switch)
-        AF.ReBorder(switch)
-        AF.RePoint(switch.highlight)
-
-        -- update highlights
-        -- for _, b in ipairs(buttons) do
-        --     AF.ReSize(b.highlight)
-        --     AF.RePoint(b.highlight)
-        -- end
-    end
+    Mixin(switch, AF_SwitchMixin)
 
     AF.AddToPixelUpdater(switch)
 
@@ -606,24 +637,20 @@ end
 ---------------------------------------------------------------------
 -- resize button
 ---------------------------------------------------------------------
-local function ResizeButton_OnEnter(self)
-    SetCursor("UI_RESIZE_CURSOR")
-end
+function AF.CreateResizeButton(target, minWidth, minHeight, maxWidth, maxHeight)
+    local b = CreateFrame("Button", nil, target)
+    Mixin(b, PanelResizeButtonMixin)
 
-local function ResizeButton_OnLeave(self)
-    SetCursor(nil)
-end
-
-function AF.CreateResizeButton(owner, minWidth, minHeight, maxWidth, maxHeight)
-    local b = CreateFrame("Button", nil, owner)
-    owner.resizeButton = b
-    b.owner = owner
+    b:Init(target, minWidth, minHeight, maxWidth, maxHeight)
 
     AF.SetSize(b, 16, 16)
     AF.SetPoint(b, "BOTTOMRIGHT", -1, 1)
 
-    b:SetScript("OnEnter", ResizeButton_OnEnter)
-    b:SetScript("OnLeave", ResizeButton_OnLeave)
+
+    b:SetScript("OnEnter", b.OnEnter)
+    b:SetScript("OnLeave", b.OnLeave)
+    b:SetScript("OnMouseDown", b.OnMouseDown)
+    b:SetScript("OnMouseUp", b.OnMouseUp)
 
     local tex = b:CreateTexture(nil, "ARTWORK")
     b.tex = tex
