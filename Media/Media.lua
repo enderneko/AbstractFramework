@@ -16,17 +16,18 @@ function AF.GetIcon(icon, addon)
 end
 
 ---@param icon string fileName
+---@param size? number
 ---@param addon? string addonFolderName
 ---@return string iconString "|T..:0|t" escape sequence
-function AF.GetIconString(icon, addon)
-    return "|T" .. AF.GetIcon(icon, addon) .. ":0|t"
+function AF.GetIconString(icon, size, addon)
+    return "|T" .. AF.GetIcon(icon, addon) .. ":" .. (size or 0) ..  "|t"
 end
 
 ---@param iconPath string
 ---@param size? number
 ---@return string iconString "|T..:0|t" escape sequence
 function AF.EscapeIcon(iconPath, size)
-    return format("|T%s:%d|t", icon, size or 0)
+    return format("|T%s:%d|t", iconPath, size or 0)
 end
 
 ---------------------------------------------------------------------
