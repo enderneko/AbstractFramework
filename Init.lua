@@ -12,11 +12,23 @@ AF.LSM = LibStub("LibSharedMedia-3.0")
 AF.LCG = LibStub("LibCustomGlow-1.0")
 
 ---------------------------------------------------------------------
--- vars
+-- game version
 ---------------------------------------------------------------------
-AF.isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
-AF.isVanilla = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
-AF.isCata = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC
+AF.isAsian = LOCALE_zhCN or LOCALE_zhTW or LOCALE_koKR
+
+if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+    AF.isRetail = true
+    AF.flavor = "retail"
+elseif WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC then
+    AF.isCata = true
+    AF.flavor = "cata"
+elseif WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC then
+    AF.isWrath = true
+    AF.flavor = "wrath"
+elseif WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
+    AF.isVanilla = true
+    AF.flavor = "vanilla"
+end
 
 ---------------------------------------------------------------------
 -- UIParent
@@ -40,7 +52,6 @@ local function DelayedUpdatePixels()
     timer = C_Timer.NewTimer(1, UpdatePixels)
 end
 
--- hooksecurefunc(UIParent, "SetScale", UpdatePixels)
 AF.UIParent:RegisterEvent("FIRST_FRAME_RENDERED")
 AF.UIParent:SetScript("OnEvent", function(self, event)
     AF.UIParent:UnregisterEvent("FIRST_FRAME_RENDERED")
@@ -52,8 +63,8 @@ end)
 --     AF.UIParent:SetIgnoreParentScale(ignore)
 -- end
 
---! scale CANNOT be TOO SMALL (effectiveScale should >= 0.43)
---! or it will lead to abnormal display of borders
+--! scale should NOT be TOO SMALL
+--! or it will result in abnormal display of borders
 --! since AF has changed SetSnapToPixelGrid / SetTexelSnappingBias
 function AF.SetScale(scale)
     AF.UIParent:SetScale(scale)
@@ -66,9 +77,9 @@ end
 
 function AF.SetUIParentScale(scale)
     UIParent:SetScale(scale)
-    if not AF.UIParent:IsIgnoringParentScale() then
+    -- if not AF.UIParent:IsIgnoringParentScale() then
         UpdatePixels()
-    end
+    -- end
 end
 
 ---------------------------------------------------------------------
@@ -79,41 +90,4 @@ _G["SLASH_ABSTRACTFRAMEWORK2"] = "/afw"
 _G["SLASH_ABSTRACTFRAMEWORK3"] = "/af"
 SlashCmdList.ABSTRACTFRAMEWORK = function()
     AF.ShowDemo()
-end
-
----------------------------------------------------------------------
--- enable / disable
----------------------------------------------------------------------
-function AF.SetEnabled(isEnabled, ...)
-    if isEnabled == nil then isEnabled = false end
-
-    for _, w in pairs({...}) do
-        if w:IsObjectType("FontString") then
-            if isEnabled then
-                w:SetTextColor(AF.GetColorRGB("white"))
-            else
-                w:SetTextColor(AF.GetColorRGB("disabled"))
-            end
-        elseif w:IsObjectType("Texture") then
-            if isEnabled then
-                w:SetDesaturated(false)
-            else
-                w:SetDesaturated(true)
-            end
-        elseif w.SetEnabled then
-            w:SetEnabled(isEnabled)
-        elseif isEnabled then
-            w:Show()
-        else
-            w:Hide()
-        end
-    end
-end
-
-function AF.Enable(...)
-    AF.SetEnabled(true, ...)
-end
-
-function AF.Disable(...)
-    AF.SetEnabled(false, ...)
 end

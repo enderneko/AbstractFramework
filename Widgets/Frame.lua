@@ -22,6 +22,43 @@ do
 end
 
 ---------------------------------------------------------------------
+-- enable / disable
+---------------------------------------------------------------------
+function AF.SetEnabled(isEnabled, ...)
+    if isEnabled == nil then isEnabled = false end
+
+    for _, w in pairs({...}) do
+        if w:IsObjectType("FontString") then
+            if isEnabled then
+                w:SetTextColor(AF.GetColorRGB("white"))
+            else
+                w:SetTextColor(AF.GetColorRGB("disabled"))
+            end
+        elseif w:IsObjectType("Texture") then
+            if isEnabled then
+                w:SetDesaturated(false)
+            else
+                w:SetDesaturated(true)
+            end
+        elseif w.SetEnabled then
+            w:SetEnabled(isEnabled)
+        elseif isEnabled then
+            w:Show()
+        else
+            w:Hide()
+        end
+    end
+end
+
+function AF.Enable(...)
+    AF.SetEnabled(true, ...)
+end
+
+function AF.Disable(...)
+    AF.SetEnabled(false, ...)
+end
+
+---------------------------------------------------------------------
 -- frame level relative to parent
 ---------------------------------------------------------------------
 function AF.SetFrameLevel(frame, level, relativeTo)

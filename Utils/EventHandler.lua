@@ -259,6 +259,7 @@ end
 ---------------------------------------------------------------------
 -- add simple event handler for frame
 ---------------------------------------------------------------------
+---@param frame Frame
 function AF.AddSimpleEventHandler(frame)
     frame:SetScript("OnEvent", function(self, event, ...)
         if self[event] then
