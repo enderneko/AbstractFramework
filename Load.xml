@@ -55,6 +55,11 @@
     <Script file="Widgets\Aura.lua"/>
     <Script file="Widgets\Misc.lua"/>
 
+    <!-- units -->
+    <Script file="Units\Common.lua"/>
+    <Script file="Units\Class.lua"/>
+    <Script file="Units\RangeCheck.lua"/>
+
     <!-- demo -->
     <Script file="Demo.lua"/>
 </Ui>

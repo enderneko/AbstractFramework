@@ -20,7 +20,7 @@ end
 ---@param addon? string addonFolderName
 ---@return string iconString "|T..:0|t" escape sequence
 function AF.GetIconString(icon, size, addon)
-    return "|T" .. AF.GetIcon(icon, addon) .. ":" .. (size or 0) ..  "|t"
+    return "|T" .. AF.GetIcon(icon, addon) .. ":" .. (size or 0) .. "|t"
 end
 
 ---@param iconPath string
@@ -28,6 +28,17 @@ end
 ---@return string iconString "|T..:0|t" escape sequence
 function AF.EscapeIcon(iconPath, size)
     return format("|T%s:%d|t", iconPath, size or 0)
+end
+
+function AF.EscapeRaidIcon(raidIconIndex)
+    raidIconIndex = raidIconIndex - 1
+    local left, right, top, bottom
+    local coordIncrement = 64 / 256
+    left = mod(raidIconIndex, 4) * coordIncrement
+    right = left + coordIncrement
+    top = floor(raidIconIndex / 4) * coordIncrement
+    bottom = top + coordIncrement
+    return string.format("|TInterface\\TargetingFrame\\UI-RaidTargetingIcons:0:0:0:0:64:64:%d:%d:%d:%d|t", left * 64, right * 64, top * 64, bottom * 64)
 end
 
 ---------------------------------------------------------------------

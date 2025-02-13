@@ -1,6 +1,12 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 
+local select, type, tonumber = select, type, tonumber
+local floor, ceil, abs, max, min = math.floor, math.ceil, math.abs, math.max, math.min
+local format, gsub, strlower, strupper, strsplit = string.format, string.gsub, string.lower, string.upper, string.split
+local next, pairs, ipairs = next, pairs, ipairs
+local tinsert, tremove, tsort, tconcat = table.insert, table.remove, table.sort, table.concat
+
 ---------------------------------------------------------------------
 -- misc
 ---------------------------------------------------------------------
@@ -43,7 +49,7 @@ end
 ---------------------------------------------------------------------
 -- number
 ---------------------------------------------------------------------
-local symbol_1K, symbol_10K, symbol_1B
+local symbol_1K, symbol_10K, symbol_1B = "", "", ""
 if LOCALE_zhCN then
     symbol_1K, symbol_10K, symbol_1B = "千", "万", "亿"
 elseif LOCALE_zhTW then
@@ -79,7 +85,7 @@ end
 AF.epsilon = 0.001
 
 function AF.ApproxEqual(a, b, epsilon)
-    return math.abs(a - b) <= (epsilon or AF.epsilon)
+    return abs(a - b) <= (epsilon or AF.epsilon)
 end
 
 function AF.ApproxZero(n)
@@ -111,12 +117,42 @@ function AF.UpperFirst(str, lowerOthers)
     if lowerOthers then
         str = strlower(str)
     end
-    return (str:gsub("^%l", string.upper))
+    return (str:gsub("^%l", strupper))
+end
+
+function AF.SplitString(sep, str)
+    if not str then return end
+
+    local ret = {strsplit(sep, str)}
+    for i, v in ipairs(ret) do
+        ret[i] = tonumber(v) or ret[i] -- keep non number
+    end
+    return unpack(ret)
+end
+
+function AF.StringToTable(str, sep, convertToNum)
+    local t = {}
+    for i, v in pairs({string.split(sep, str)}) do
+        v = strtrim(v)
+        if convertToNum then
+            tinsert(t, tonumber(v) or v)
+        else
+            tinsert(t, v)
+        end
+    end
+    return t
+end
+
+function AF.TableToString(t, sep)
+    return tconcat(t, sep)
 end
 
 ---------------------------------------------------------------------
 -- table
 ---------------------------------------------------------------------
+
+---@param t table
+---@return number
 function AF.Getn(t)
     local count = 0
     for k, v in pairs(t) do
@@ -142,6 +178,8 @@ function AF.GetKeys(t)
     return keys
 end
 
+---@param ... table
+---@return table newTbl
 function AF.Copy(...)
     local newTbl = {}
     for i = 1, select("#", ...) do
@@ -178,11 +216,14 @@ end
 function AF.Remove(t, v)
     for i = #t, 1, -1 do
         if t[i] == v then
-            table.remove(t, i)
+            tremove(t, i)
         end
     end
 end
 
+-- merge into the first table
+---@param t table
+---@param ... table
 function AF.Merge(t, ...)
     for i = 1, select("#", ...) do
         local _t = select(i, ...)
@@ -229,7 +270,11 @@ function AF.RemoveElementsByKeys(tbl, ...)
     end
 end
 
-function AF.ConvertTable(t, value)
+-- transposes a table, swapping its keys and values
+---@param t table the table to transpose
+---@param value any the value to assign to the transposed keys
+---@return table
+function AF.TransposeTable(t, value)
     local temp = {}
     for k, v in ipairs(t) do
         temp[v] = value or k
@@ -237,9 +282,13 @@ function AF.ConvertTable(t, value)
     return temp
 end
 
-function AF.ConvertSpellTable(t, convertIdToName)
+-- transposes the given spell table.
+---@param t table
+---@param convertIdToName boolean?
+---@return table
+function AF.TransposeSpellTable(t, convertIdToName)
     if not convertIdToName then
-        return AF.ConvertTable(t)
+        return AF.TransposeTable(t)
     end
 
     local temp = {}
@@ -250,6 +299,71 @@ function AF.ConvertSpellTable(t, convertIdToName)
         end
     end
     return temp
+end
+
+---------------------------------------------------------------------
+-- table sort
+---------------------------------------------------------------------
+local function CompareField(a, b, key, order)
+    if a[key] ~= b[key] then
+        if order == "ascending" then
+            return a[key] < b[key]
+        else  -- "descending"
+            return a[key] > b[key]
+        end
+    end
+    return nil
+end
+
+local function SortComparator(criteria)
+    return function(a, b)
+        for _, criterion in ipairs(criteria) do
+            local result = CompareField(a, b, criterion.key, criterion.order)
+            if result ~= nil then
+                return result
+            end
+        end
+        return false
+    end
+end
+
+-- order: "ascending" or "descending"
+---@param t table
+---@param ...: key1, order1, key2, order2, ...
+function AF.Sort(t, ...)
+    local criteria = {}
+    for i = 1, select("#", ...), 2 do
+        local key = select(i, ...)
+        local order = select(i + 1, ...)
+        if key and order then
+            tinsert(criteria, {key = key, order = order})
+        end
+    end
+    tsort(t, SortComparator(criteria))
+end
+
+---------------------------------------------------------------------
+-- time
+---------------------------------------------------------------------
+
+function AF.FormatTime(sec)
+    if sec >= 3600 then
+        return "%dh", ceil(sec / 3600)
+    elseif sec >= 60 then
+        return "%dm", ceil(sec / 60)
+    end
+    return "%ds", floor(sec)
+end
+
+local SEC = gsub(_G.SPELL_DURATION_SEC, "%%%.%df", "%%s")
+local MIN = gsub(_G.SPELL_DURATION_MIN, "%%%.%df", "%%s")
+
+function AF.GetLocalizedSeconds(sec)
+    if sec > 60 then
+        return format(MIN, AF.Round(sec / 60, 1))
+    else
+        return format(SEC, AF.Round(sec, 1))
+    end
 end
 
 ---------------------------------------------------------------------

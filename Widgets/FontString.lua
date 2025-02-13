@@ -49,16 +49,17 @@ end
 ---------------------------------------------------------------------
 -- FitStringWidth
 ---------------------------------------------------------------------
+local utf8len, utf8sub = string.utf8len, string.utf8sub
 function AF.TruncateString(fs, text, alignment)
     fs:SetText(text)
     fs:SetWordWrap(false)
 
     if fs:IsTruncated() then
-        for i = 1, string.utf8len(text) do
+        for i = 1, utf8len(text) do
             if strlower(alignment) == "right" then
-                fs:SetText("..."..string.utf8sub(text, i))
+                fs:SetText("..." .. utf8sub(text, i))
             else
-                fs:SetText(string.utf8sub(text, i).."...")
+                fs:SetText(utf8sub(text, i) .. "...")
             end
 
             if not fs:IsTruncated() then

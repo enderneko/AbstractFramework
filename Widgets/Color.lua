@@ -233,6 +233,10 @@ end
 local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 local UnitPowerType = UnitPowerType
 local UnitReaction = UnitReaction
+local UnitIsPlayer = UnitIsPlayer
+local UnitInPartyIsAI = UnitInPartyIsAI
+local UnitClassBase = UnitClassBase
+local UnitGUID = UnitGUID
 
 local COLORS = {
     -- accent
@@ -299,6 +303,10 @@ local COLORS = {
     ["WARLOCK"] = {["hex"] = "ff8788ee", ["t"] = {0.529411792755127, 0.5333333611488342, 0.9333333969116211}},
     ["WARRIOR"] = {["hex"] = "ffc69b6d", ["t"] = {0.7764706611633301, 0.6078431606292725, 0.4274510145187378}},
     ["UNKNOWN"] = {["hex"] = "ff666666", ["t"] = {0.4, 0.4, 0.4}},
+
+    ["PET"] = {["hex"] = "ff7f7fff", ["t"] = {0.5, 0.5, 1}},
+    ["VEHICLE"] = {["hex"] = "ff00ff33", ["t"] = {0, 1, 0.2}},
+    ["NPC"] = {["hex"] = "ff00ff33", ["t"] = {0, 1, 0.2}},
 
     -- faction
     ["Horde"] = {["hex"] = "ffc70000", ["t"] = {0.78, 0, 0}},
@@ -523,10 +531,29 @@ function AF.GetClassColor(class, alpha, saturation)
 
     if RAID_CLASS_COLORS[class] then
         local r, g, b = RAID_CLASS_COLORS[class]:GetRGB()
-        return r * saturation, g * saturation, b * saturation, alpha
+        return r * saturation, g * saturation, b * saturation, alpha or 1
     end
 
     return AF.GetColorRGB("UNKNOWN")
+end
+
+---@param unit string
+---@return number r
+---@return number g
+---@return number b
+---@return number a
+function AF.GetUnitClassColor(unit)
+    local class
+    if UnitIsPlayer(unit) or UnitInPartyIsAI(unit) then -- player
+        class = UnitClassBase(unit)
+    elseif AF.IsPet(unit) then -- pet
+        class = "PET"
+    elseif AF.IsVehicle(UnitGUID(unit)) then -- vehicle
+        class = "VEHICLE"
+    else
+        class = "NPC"
+    end
+    return AF.GetClassColor(class)
 end
 
 ---@param unit string unitId
