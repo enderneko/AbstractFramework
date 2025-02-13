@@ -34,18 +34,6 @@ function AF.Unpack7(t)
     return t[1], t[2], t[3], t[4], t[5], t[6], t[7]
 end
 
-function AF.Round(num, numDecimalPlaces)
-    if numDecimalPlaces and numDecimalPlaces >= 0 then
-        local mult = 10 ^ numDecimalPlaces
-        return floor(num * mult + 0.5) / mult
-    end
-    return floor(num + 0.5)
-end
-
-function AF.Interpolate(start, stop, step, maxSteps)
-    return start + (stop - start) * step / maxSteps
-end
-
 ---------------------------------------------------------------------
 -- number
 ---------------------------------------------------------------------
@@ -98,6 +86,10 @@ function AF.Round(num, numDecimalPlaces)
         return floor(num * mult + 0.5) / mult
     end
     return floor(num + 0.5)
+end
+
+function AF.Interpolate(start, stop, step, maxSteps)
+    return start + (stop - start) * step / maxSteps
 end
 
 function AF.Clamp(value, minValue, maxValue)
