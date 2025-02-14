@@ -27,6 +27,14 @@ else
     end
 end
 
+if C_Spell.DoesSpellExist then
+    AF.SpellExists = C_Spell.DoesSpellExist
+else
+    AF.SpellExists = function(spellId)
+        return GetSpellInfo(spellId) ~= nil
+    end
+end
+
 function AF.RemoveInvalidSpells(t)
     if not t then return end
     for i = #t, 1, -1 do
@@ -36,7 +44,7 @@ function AF.RemoveInvalidSpells(t)
         else -- table
             spellId = t[i]["spellID"] or t[i][1]
         end
-        if not AF.GetSpellInfo(spellId) then
+        if not AF.SpellExists(spellId) then
             tremove(t, i)
         end
     end
