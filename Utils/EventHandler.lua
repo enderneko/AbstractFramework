@@ -257,8 +257,19 @@ end
 
 
 ---------------------------------------------------------------------
--- add simple event handler for frame
+-- simple event handler
 ---------------------------------------------------------------------
+
+---@class AF_BasicEventHandler
+local AF_BasicEventHandlerMixin = {}
+
+function AF_BasicEventHandlerMixin:RegisterEvent(...)
+    for i = 1, select("#", ...) do
+        local event = select(i, ...)
+        _RegisterEvent(self, event)
+    end
+end
+
 ---@param frame Frame
 function AF.AddSimpleEventHandler(frame)
     frame:SetScript("OnEvent", function(self, event, ...)
@@ -266,22 +277,47 @@ function AF.AddSimpleEventHandler(frame)
             self[event](self, ...)
         end
     end)
+    Mixin(frame, AF_BasicEventHandlerMixin)
 end
 
 
----------------------------------------------------------------------
--- create simple event frame
----------------------------------------------------------------------
----@param events string separated by comma
----@param onEventFunc function (self, event, ...)
-function AF.CreateSimpleEventFrame(events, onEventFunc)
-    local frame = CreateFrame("Frame")
-    frame:SetScript("OnEvent", onEventFunc)
+--[[
+    Creates a simple event handler instance that you can extend with custom event functions.
 
-    events = events:gsub(" ", "")
-    for _, e in pairs({strsplit(",", events)}) do
-        frame:RegisterEvent(e)
+    To add event handling functionality, define event methods on the handler using the colon syntax.
+    For example, to handle an event called "EVENT":
+        handler:RegisterEvent("EVENT")
+        function handler:EVENT(...) end
+--]]
+---@param ... string events
+---@return AF_BasicEventHandler handler
+function AF.CreateSimpleEventHandler(...)
+    local handler = CreateFrame("Frame")
+
+    handler:SetScript("OnEvent", function(self, event, ...)
+        if self[event] then
+            self[event](self, ...)
+        end
+    end)
+
+    Mixin(handler, AF_BasicEventHandlerMixin)
+    if select("#", ...) > 0 then
+        handler:RegisterEvent(...)
     end
 
-    return frame
+    return handler
+end
+
+
+---@param onEventFunc function (self, event, ...)
+---@param ... string events
+---@return AF_BasicEventHandler handler
+function AF.CreateBasicEventHandler(onEventFunc, ...)
+    local handler = CreateFrame("Frame")
+    handler:SetScript("OnEvent", onEventFunc)
+
+    Mixin(handler, AF_BasicEventHandlerMixin)
+    handler:RegisterEvent(...)
+
+    return handler
 end

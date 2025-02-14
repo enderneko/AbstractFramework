@@ -1,43 +1,48 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 
--- NOTE: use addon built-in CallbackHandler
--- local callbacks = {
---     -- invoke priority
---     {}, -- 1
---     {}, -- 2
---     {}, -- 3
--- }
+-- NOTE: for better performance, you might want to move these to your addon
 
--- function AF.RegisterCallback(eventName, onEventFuncName, onEventFunc, priority)
---     local t = priority and callbacks[priority] or callbacks[2]
---     if not t[eventName] then t[eventName] = {} end
---     t[eventName][onEventFuncName] = onEventFunc
--- end
+local callbacks = {
+    -- invoke priority
+    high = {},
+    medium = {},
+    low = {},
+}
 
--- function AF.UnregisterCallback(eventName, onEventFuncName)
---     for _, t in pairs(callbacks) do
---         if t[eventName] then
---             t[eventName][onEventFuncName] = nil
---         end
---     end
--- end
+---@param event string
+---@param callback function
+---@param priority string high, medium, low
+function AF.RegisterCallback(event, callback, priority)
+    assert(not priority or priority == "high" or priority == "medium" or priority == "low", "Priority must be high, medium, low or nil.")
+    local t = priority and callbacks[priority or "medium"]
+    if not t[event] then t[event] = {} end
+    t[event][callback] = true
+end
 
--- function AF.UnregisterAllCallbacks(eventName)
---     for _, t in pairs(callbacks) do
---         t[eventName] = nil
---     end
--- end
+function AF.UnregisterCallback(event, callback)
+    for _, t in pairs(callbacks) do
+        if t[event] then
+            t[event][callback] = nil
+        end
+    end
+end
 
--- function AF.Fire(eventName, ...)
---     for _, t in pairs(callbacks) do
---         if t[eventName] then
---             for _, fn in pairs(t[eventName]) do
---                 fn(...)
---             end
---         end
---     end
--- end
+function AF.UnregisterAllCallbacks(event)
+    for _, t in pairs(callbacks) do
+        t[event] = nil
+    end
+end
+
+function AF.Fire(event, ...)
+    for _, t in pairs(callbacks) do
+        if t[event] then
+            for fn in pairs(t[event]) do
+                fn(...)
+            end
+        end
+    end
+end
 
 ---------------------------------------------------------------------
 -- addon loaded

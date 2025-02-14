@@ -58,7 +58,7 @@ local known_spells = {}
 
 local function SPELLS_CHANGED()
     wipe(known_spells)
-    for spell, checkGCD in pairs(INTERRUPT_SPELLS[BFI.vars.playerClass]) do
+    for spell, checkGCD in pairs(INTERRUPT_SPELLS[AF.player.class]) do
         if IsSpellKnownOrOverridesKnown(spell) then
             known_spells[spell] = checkGCD
         end
@@ -70,7 +70,7 @@ local function DELAYED_SPELLS_CHANGED()
     if timer then timer:Cancel() end
     timer = C_Timer.NewTimer(1, SPELLS_CHANGED)
 end
-AF.CreateSimpleEventFrame("SPELLS_CHANGED", DELAYED_SPELLS_CHANGED)
+AF.CreateBasicEventHandler(DELAYED_SPELLS_CHANGED, "SPELLS_CHANGED")
 
 function AF.InterruptUsable()
     for spell, checkGCD in pairs(known_spells) do

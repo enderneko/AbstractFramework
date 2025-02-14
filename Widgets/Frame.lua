@@ -959,7 +959,7 @@ function AF.ApplyCombatProtectionToWidget(widget)
     end)
 end
 
-AF.CreateSimpleEventFrame("PLAYER_REGEN_DISABLED,PLAYER_REGEN_ENABLED", function(self, event)
+AF.CreateBasicEventHandler(function(self, event)
     if event == "PLAYER_REGEN_DISABLED" then
         for f in pairs(protectedFrames) do
             f.combatMask:Show()
@@ -975,4 +975,4 @@ AF.CreateSimpleEventFrame("PLAYER_REGEN_DISABLED,PLAYER_REGEN_ENABLED", function
             w:SetEnabled(true)
         end
     end
-end)
+end, "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED")

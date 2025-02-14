@@ -17,6 +17,9 @@
     <Script file="Utils\Common.lua"/>
     <Script file="Utils\CallbackHandler.lua"/>
 
+    <!-- player -->
+    <Script file="Units\Player.lua"/>
+
     <!-- media -->
     <Script file="Media\Media.lua"/>
     <Script file="Media\SharedMedia.lua"/>
