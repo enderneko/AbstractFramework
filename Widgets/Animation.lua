@@ -236,7 +236,7 @@ end
 ---------------------------------------------------------------------
 -- blink
 ---------------------------------------------------------------------
-function AF.CreateBlinkAnimation(region, duration)
+function AF.CreateBlinkAnimation(region, duration, enableShowHideHook)
     local blink = region:CreateAnimationGroup()
     region.blink = blink
 
@@ -247,7 +247,17 @@ function AF.CreateBlinkAnimation(region, duration)
     alpha:SetDuration(duration or 0.5)
 
     blink:SetLooping("BOUNCE")
-    blink:Play()
+
+    if enableShowHideHook then
+        region:HookScript("OnShow", function()
+            blink:Play()
+        end)
+        region:HookScript("OnHide", function()
+            blink:Stop()
+        end)
+    else
+        blink:Play()
+    end
 end
 
 ---------------------------------------------------------------------

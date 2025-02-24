@@ -251,7 +251,7 @@ function AF.ShowDemo()
     -- ----------------------------------------------------------------------- --
     local sl1 = AF.CreateSlider(tp1, "Scale", 130, 0.5, 2, 0.1)
     AF.SetPoint(sl1, "TOPLEFT", 5, -40)
-    AF.SetTooltips(sl1, "TOPLEFT", 0, 20, "Set scale of AF.UIParent", "If AF.UIParent:GetEffectiveScale() < 0.43, there can be errors")
+    AF.SetTooltips(sl1, "TOPLEFT", 0, 20, "Set scale of AF.UIParent", "If scale is too small, there can be some display issues")
     sl1:SetValue(AF.GetScale())
     sl1:SetAfterValueChanged(function(value)
         AF.SetScale(value)

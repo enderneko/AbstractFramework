@@ -2,7 +2,7 @@
 local AF = _G.AbstractFramework
 
 local select, type, tonumber = select, type, tonumber
-local floor, ceil, abs, max, min = math.floor, math.ceil, math.abs, math.max, math.min
+local floor, ceil, abs, max, min, abs = math.floor, math.ceil, math.abs, math.max, math.min, math.abs
 local format, gsub, strlower, strupper, strsplit = string.format, string.gsub, string.lower, string.upper, string.split
 local next, pairs, ipairs = next, pairs, ipairs
 local tinsert, tremove, tsort, tconcat = table.insert, table.remove, table.sort, table.concat
@@ -37,39 +37,6 @@ end
 ---------------------------------------------------------------------
 -- number
 ---------------------------------------------------------------------
-local symbol_1K, symbol_10K, symbol_1B = "", "", ""
-if LOCALE_zhCN then
-    symbol_1K, symbol_10K, symbol_1B = "千", "万", "亿"
-elseif LOCALE_zhTW then
-    symbol_1K, symbol_10K, symbol_1B = "千", "萬", "億"
-elseif LOCALE_koKR then
-    symbol_1K, symbol_10K, symbol_1B = "천", "만", "억"
-end
-
-function AF.FormatNumber_Asian(n)
-    if abs(n) >= 100000000 then
-        return tonumber(format("%.2f", n/100000000)) .. symbol_1B
-    elseif abs(n) >= 10000 then
-        return tonumber(format("%.2f", n/10000)) .. symbol_10K
-    -- elseif abs(n) >= 1000 then
-    --     return tonumber(format("%.1f", n/1000)) .. symbol_1K
-    else
-        return n
-    end
-end
-
-function AF.FormatNumber(n)
-    if abs(n) >= 1000000000 then
-        return tonumber(format("%.2f", n/1000000000)) .. "B"
-    elseif abs(n) >= 1000000 then
-        return tonumber(format("%.2f", n/1000000)) .. "M"
-    elseif abs(n) >= 1000 then
-        return tonumber(format("%.1f", n/1000)) .. "K"
-    else
-        return n
-    end
-end
-
 AF.epsilon = 0.001
 
 function AF.ApproxEqual(a, b, epsilon)
@@ -100,6 +67,39 @@ function AF.Clamp(value, minValue, maxValue)
         return minValue
     end
     return value
+end
+
+local symbol_1K, symbol_10K, symbol_1B = "", "", ""
+if LOCALE_zhCN then
+    symbol_1K, symbol_10K, symbol_1B = "千", "万", "亿"
+elseif LOCALE_zhTW then
+    symbol_1K, symbol_10K, symbol_1B = "千", "萬", "億"
+elseif LOCALE_koKR then
+    symbol_1K, symbol_10K, symbol_1B = "천", "만", "억"
+end
+
+local Round = AF.Round
+
+function AF.FormatNumber_Asian(n)
+    if abs(n) >= 100000000 then
+        return Round(n / 100000000, 2) .. symbol_1B
+    elseif abs(n) >= 10000 then
+        return Round(n / 10000, 1) .. symbol_10K
+    else
+        return n
+    end
+end
+
+function AF.FormatNumber(n)
+    if abs(n) >= 1000000000 then
+        return Round(n / 1000000000, 2) .. "B"
+    elseif abs(n) >= 1000000 then
+        return Round(n / 1000000, 2) .. "M"
+    elseif abs(n) >= 1000 then
+        return Round(n / 1000, 1) .. "K"
+    else
+        return n
+    end
 end
 
 ---------------------------------------------------------------------

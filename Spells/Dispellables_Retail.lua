@@ -112,8 +112,8 @@ else
         -- update dispellable
         wipe(dispellable)
         local activeConfigID = C_ClassTalents.GetActiveConfigID()
-        if activeConfigID and dispelNodeIDs[BFI.vars.playerSpecID] then
-            for dispelType, value in pairs(dispelNodeIDs[BFI.vars.playerSpecID]) do
+        if activeConfigID and dispelNodeIDs[AF.player.specID] then
+            for dispelType, value in pairs(dispelNodeIDs[AF.player.specID]) do
                 if type(value) == "boolean" then
                     dispellable[dispelType] = value
                 elseif type(value) == "table" then -- more than one trait
