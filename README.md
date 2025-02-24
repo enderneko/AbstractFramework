@@ -6,4 +6,5 @@ It's easy to use and ensures pixel-perfect precision, making it ideal for develo
 ## Screenshot
 
 ![demo](https://raw.githubusercontent.com/enderneko/ImagePosts/main/1/af_demo.png)
+
 Demo: `/abstract` or `/afw` or `/af`
