@@ -160,9 +160,15 @@ function AF_ButtonMixin:SlientClick()
     self._noSound = nil
 end
 
+---@param parent Frame
+---@param text string
 ---@param color string if strfind(color, "transparent"), border is transparent, but still exists
+---@param width number
+---@param height number
+---@param template string
 ---@param noBorder boolean no edgeFile for backdrop
 ---@param noBackground boolean remove background texture, not background color
+---@param font string
 ---@return AF_Button|Button button
 function AF.CreateButton(parent, text, color, width, height, template, noBorder, noBackground, font)
     local b = CreateFrame("Button", nil, parent, template and template..",BackdropTemplate" or "BackdropTemplate")
