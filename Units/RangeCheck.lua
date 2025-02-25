@@ -47,7 +47,7 @@ local friendSpells = {
 }
 
 local deadSpells = {
-    ["EVOKER"] = 461526, -- resurrection range, need separately for evoker
+    ["EVOKER"] = 361227, -- resurrection range, need separately for evoker
 }
 
 local petSpells = {
@@ -143,16 +143,16 @@ local rc = CreateFrame("Frame")
 rc:RegisterEvent("SPELLS_CHANGED")
 
 local spell_friend, spell_pet, spell_harm, spell_dead
-CELL_RANGE_CHECK_FRIENDLY = {}
-CELL_RANGE_CHECK_HOSTILE = {}
-CELL_RANGE_CHECK_DEAD = {}
-CELL_RANGE_CHECK_PET = {}
+AF_RANGE_CHECK_FRIENDLY = {}
+AF_RANGE_CHECK_HOSTILE = {}
+AF_RANGE_CHECK_DEAD = {}
+AF_RANGE_CHECK_PET = {}
 
 local function SPELLS_CHANGED()
-    spell_friend = CELL_RANGE_CHECK_FRIENDLY[playerClass] or friendSpells[playerClass]
-    spell_harm = CELL_RANGE_CHECK_HOSTILE[playerClass] or harmSpells[playerClass]
-    spell_dead = CELL_RANGE_CHECK_DEAD[playerClass] or deadSpells[playerClass]
-    spell_pet = CELL_RANGE_CHECK_PET[playerClass] or petSpells[playerClass]
+    spell_friend = AF_RANGE_CHECK_FRIENDLY[playerClass] or friendSpells[playerClass]
+    spell_harm = AF_RANGE_CHECK_HOSTILE[playerClass] or harmSpells[playerClass]
+    spell_dead = AF_RANGE_CHECK_DEAD[playerClass] or deadSpells[playerClass]
+    spell_pet = AF_RANGE_CHECK_PET[playerClass] or petSpells[playerClass]
 
     if spell_friend and IsSpellKnownOrOverridesKnown(spell_friend) then
         spell_friend = AF.GetSpellInfo(spell_friend)
@@ -184,7 +184,7 @@ end
 
 rc:SetScript("OnEvent", DELAYED_SPELLS_CHANGED)
 
-function AF.IsInRange(unit)
+function AF.IsInRange(unit, check)
     if not UnitIsVisible(unit) then
         return false
     end
@@ -192,13 +192,14 @@ function AF.IsInRange(unit)
     if UnitIsUnit("player", unit) then
         return true
 
-    -- elseif not check and AF.UnitInGroup(unit) then
-    --     -- NOTE: UnitInRange only works with group players/pets --! but not available for PLAYER PET when SOLO
-    --     local inRange, checked = UnitInRange(unit)
-    --     if not checked then
-    --         return AF.IsInRange(unit, true)
-    --     end
-    --     return inRange
+    elseif not check and AF.UnitInGroup(unit) then
+        -- NOTE: UnitInRange only works with group players/pets
+        --! but not available for PLAYER PET when SOLO
+        local inRange, checked = UnitInRange(unit)
+        if not checked then
+            return AF.IsInRange(unit, true)
+        end
+        return inRange
 
     else
         if UnitCanAssist("player", unit) or UnitCanCooperate("player", unit) then
