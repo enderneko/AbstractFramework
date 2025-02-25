@@ -255,7 +255,7 @@ end
 -- create color editbox
 -------------------------------------------------
 local function CreateEB(label, width, height, isNumeric, group)
-    local eb = AF.CreateEditBox(colorPickerFrame, nil, width, height, false, isNumeric)
+    local eb = AF.CreateEditBox(colorPickerFrame, nil, width, height, isNumeric and "number" or "trim")
     eb.label2 = AF.CreateFontString(eb, label)
     AF.SetPoint(eb.label2, "BOTTOMLEFT", eb, "TOPLEFT", 0, 2)
 

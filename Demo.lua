@@ -117,7 +117,7 @@ function AF.ShowDemo()
     end)
     eb1:SetText("Hello!")
 
-    local eb2 = AF.CreateEditBox(demo, "Number Only", 200, 20, false, true)
+    local eb2 = AF.CreateEditBox(demo, "Number Only", 200, 20, "number")
     AF.SetPoint(eb2, "TOPLEFT", eb1, "BOTTOMLEFT", 0, -10)
     eb2:SetConfirmButton(function(text)
         print("ConfirmButtonClicked:", text)

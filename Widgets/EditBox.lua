@@ -12,7 +12,7 @@ local AF_EditBoxMixin = {}
 ---@param text string?
 ---@param width number?
 ---@param mode string? "trim"|"number"|nil
-function AF_EditBoxMixin:SetConfirmButton(func, isOutside, text, width, mode)
+function AF_EditBoxMixin:SetConfirmButton(func, isOutside, text, width)
     self.confirmBtn = self.confirmBtn or AF.CreateButton(self, text, "accent", width or 30, self._height or 20)
     self.confirmBtn:Hide()
 
@@ -34,13 +34,7 @@ function AF_EditBoxMixin:SetConfirmButton(func, isOutside, text, width, mode)
     end)
 
     self.confirmBtn:SetScript("OnClick", function()
-        local value = self:GetText()
-
-        if mode == "number" then
-            value = tonumber(value) or 0
-        elseif mode == "trim" then
-            value = strtrim(value)
-        end
+        local value = self:GetValue()
 
         if func then func(value) end
 
@@ -74,15 +68,42 @@ function AF_EditBoxMixin:Clear()
     self:SetText("")
 end
 
+---@param mode string? "multiline"|"number"|"trim"|nil
+function AF_EditBoxMixin:SetMode(mode)
+    if not mode then return end
+
+    mode = strlower(mode)
+    self.mode = mode
+
+    if mode == "multiline" then
+        self:SetMultiLine(true)
+        self.GetValue = function(self)
+            return self:GetText()
+        end
+    elseif mode == "number" then
+        self:SetNumeric(true)
+        self.GetValue = function(self)
+            return tonumber(self:GetText()) or 0
+        end
+    elseif mode == "trim" then
+        self.GetValue = function(self)
+            return strtrim(self:GetText())
+        end
+    end
+end
+
+function AF_EditBoxMixin:GetValue()
+    return self:GetText()
+end
+
 ---@param parent Frame
 ---@param label string
 ---@param width number
 ---@param height number
----@param isMultiLine? boolean
----@param isNumeric? boolean
+---@param mode string? "multiline"|"number"|"trim"|nil
 ---@param font? string|Font
 ---@return AF_EditBox|EditBox
-function AF.CreateEditBox(parent, label, width, height, isMultiLine, isNumeric, font)
+function AF.CreateEditBox(parent, label, width, height, mode, font)
     local eb = CreateFrame("EditBox", nil, parent, "BackdropTemplate")
 
     AF.StylizeFrame(eb, "widget")
@@ -96,8 +117,8 @@ function AF.CreateEditBox(parent, label, width, height, isMultiLine, isNumeric, 
     eb.label:SetWordWrap(false)
     eb.label:SetTextColor(AF.GetColorRGB("disabled"))
 
-    eb:SetMultiLine(isMultiLine)
-    eb:SetNumeric(isNumeric)
+    Mixin(eb, AF_EditBoxMixin)
+    eb:SetMode(mode)
     eb:SetFontObject(font or "AF_FONT_CHAT")
     eb:SetMaxLetters(0)
     eb:SetJustifyH("LEFT")
@@ -153,8 +174,8 @@ function AF.CreateEditBox(parent, label, width, height, isMultiLine, isNumeric, 
     eb.value = "" -- init value
 
     eb:SetScript("OnTextChanged", function(self, userChanged)
-        local text = strtrim(eb:GetText())
-        if text == "" then
+        local value = eb:GetValue()
+        if value == "" then
             eb.label:Show()
         else
             eb.label:Hide()
@@ -163,25 +184,23 @@ function AF.CreateEditBox(parent, label, width, height, isMultiLine, isNumeric, 
         if userChanged then
             -- NOTE: if confirmBtn is set, onTextChanged will not invoke
             if eb.confirmBtn then
-                if eb.value ~= text then
+                if eb.value ~= value then
                     eb.confirmBtn:Show()
                 else
                     eb.confirmBtn:Hide()
                 end
             elseif eb.onTextChanged then
-                eb.onTextChanged(text)
-                eb.value = text -- update value
+                eb.onTextChanged(value)
+                eb.value = value -- update value
             end
         else
-            eb.value = text -- update value
+            eb.value = value -- update value
         end
     end)
 
     eb:SetScript("OnHide", function()
         eb:SetText(eb.value) -- restore
     end)
-
-    Mixin(eb, AF_EditBoxMixin)
 
     AF.AddToPixelUpdater(eb)
 
@@ -255,7 +274,7 @@ function AF.CreateScrollEditBox(parent, name, label, width, height, scrollStep)
     end)
 
     -- edit box
-    local eb = AF.CreateEditBox(frame.scrollContent, label, 10, 20, true)
+    local eb = AF.CreateEditBox(frame.scrollContent, label, 10, 20, "multiline")
     frame.eb = eb
     eb.UpdatePixels = function() end
     eb:ClearBackdrop()
