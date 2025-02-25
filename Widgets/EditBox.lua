@@ -7,14 +7,22 @@ local AF = _G.AbstractFramework
 ---@class AF_EditBox
 local AF_EditBoxMixin = {}
 
-function AF_EditBoxMixin:SetConfirmButton(func, isOutside, text, width)
-    self.confirmBtn = AF.CreateButton(self, text, "accent", width or 30, self._height or 20)
+---@param func function?
+---@param isOutside boolean?
+---@param text string?
+---@param width number?
+---@param mode string? "trim"|"number"|nil
+function AF_EditBoxMixin:SetConfirmButton(func, isOutside, text, width, mode)
+    self.confirmBtn = self.confirmBtn or AF.CreateButton(self, text, "accent", width or 30, self._height or 20)
     self.confirmBtn:Hide()
 
-    if not text then
+    if text then
+        self.confirmBtn:SetText(text)
+    else
         self.confirmBtn:SetTexture(AF.GetIcon("Tick"), {16, 16}, {"CENTER", 0, 0})
     end
 
+    AF.ClearPoints(self.confirmBtn)
     if isOutside then
         AF.SetPoint(self.confirmBtn, "TOPLEFT", self, "TOPRIGHT", -1, 0)
     else
@@ -26,9 +34,17 @@ function AF_EditBoxMixin:SetConfirmButton(func, isOutside, text, width)
     end)
 
     self.confirmBtn:SetScript("OnClick", function()
-        local text = strtrim(self:GetText())
-        if func then func(text) end
-        self.value = text -- update value
+        local value = self:GetText()
+
+        if mode == "number" then
+            value = tonumber(value) or 0
+        elseif mode == "trim" then
+            value = strtrim(value)
+        end
+
+        if func then func(value) end
+
+        self.value = value -- update value
         self.confirmBtn:Hide()
         self:ClearFocus()
     end)
