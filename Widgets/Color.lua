@@ -444,21 +444,8 @@ function AF.GetAuraTypeColor(auraType)
     end
 end
 
-local ADDONS = {}
----@param addon string addonFolderName
-function AF.RegisterAddonForAccentColor(addon)
-    ADDONS[addon] = true
-end
-
-local PATTERN = AF.isRetail and "\n%[Interface/AddOns/([^/]+)/" or "@Interface/AddOns/([^/]+)/"
-
-local function GetAddon()
-    for addon in string.gmatch(debugstack(2), PATTERN) do
-        if ADDONS[addon] then
-            return addon
-        end
-    end
-end
+local ADDONS = AF.REGISTERED_ADDONS
+local GetAddon = AF.GetAddon
 
 local function BuildColorTable(color)
     if type(color) == "string" then

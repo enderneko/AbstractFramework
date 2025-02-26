@@ -16,6 +16,7 @@
     <Script file="Utils\EventHandler.lua"/>
     <Script file="Utils\Common.lua"/>
     <Script file="Utils\CallbackHandler.lua"/>
+    <Script file="Utils\Addon.lua"/>
 
     <!-- player -->
     <Script file="Units\Player.lua"/>
