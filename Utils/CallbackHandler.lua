@@ -12,13 +12,30 @@ local callbacks = {
 
 ---@param event string
 ---@param callback function
----@param priority string high, medium, low
----@param tag string just for UnregisterCallback
+---@param priority string? "high"|"medium"|"low", default is "medium"
+---@param tag string? for Unregister/Get
 function AF.RegisterCallback(event, callback, priority, tag)
     assert(not priority or priority == "high" or priority == "medium" or priority == "low", "Priority must be high, medium, low or nil.")
     local t = callbacks[priority or "medium"]
     if not t[event] then t[event] = {} end
     t[event][callback] = tag or true
+end
+
+---@param event string
+---@param tag string
+---@return table callbacks list of functions, can be empty
+function AF.GetCallback(event, tag)
+    local result = {}
+    for _, t in pairs(callbacks) do
+        if t[event] then
+            for fn, v in pairs(t[event]) do
+                if v == tag then
+                    tinsert(result, fn)
+                end
+            end
+        end
+    end
+    return result
 end
 
 ---@param event string
@@ -47,11 +64,21 @@ function AF.UnregisterAllCallbacks(event)
 end
 
 function AF.Fire(event, ...)
-    for _, t in pairs(callbacks) do
-        if t[event] then
-            for fn in pairs(t[event]) do
+    if callbacks.high[event] then
+        for fn in pairs(callbacks.high[event]) do
                 fn(...)
             end
+    end
+
+    if callbacks.medium[event] then
+        for fn in pairs(callbacks.medium[event]) do
+            fn(...)
+        end
+    end
+
+    if callbacks.low[event] then
+        for fn in pairs(callbacks.low[event]) do
+            fn(...)
         end
     end
 end
