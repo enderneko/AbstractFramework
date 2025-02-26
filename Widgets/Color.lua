@@ -277,6 +277,7 @@ local COLORS = {
     ["tomato"] = {["hex"] = "ffff6348", ["t"] = {1, 0.39, 0.28, 1}},
     ["lightred"] = {["hex"] = "ffff4757", ["t"] = {1, 0.28, 0.34, 1}},
     ["classicrose"] = {["hex"] = "fffbcce7", ["t"] = {0.98, 0.8, 0.91, 1}},
+    ["lavender"] = {["hex"] = "fff5baff", ["t"] = {0.96, 0.73, 1, 1}},
     ["pink"] = {["hex"] = "ffff6b81", ["t"] = {1, 0.42, 0.51, 1}},
     ["hotpink"] = {["hex"] = "ffff4466", ["t"] = {1, 0.27, 0.4, 1}},
     ["lime"] = {["hex"] = "ff7bed9f", ["t"] = {0.48, 0.93, 0.62, 1}},
@@ -459,27 +460,53 @@ local function GetAddon()
     end
 end
 
----@param color string|table colorName|colorHex|colorTable
----@param alias string?
-function AF.SetAccentColor(color, alias)
-    local addon = GetAddon()
-    assert(addon, "no registered addon found")
-
+local function BuildColorTable(color)
     if type(color) == "string" then
         if COLORS[color] then
-            COLORS[addon] = COLORS[color]
+            return COLORS[color]
         else
             color = color:gsub("#", "")
             color = strlower(color)
             local hex = strlen(color) == 6 and "ff" .. color or color
-            COLORS[addon] = {["hex"] = hex, ["t"] = {AF.ConvertHEXToRGB(hex)}}
+            return {["hex"] = hex, ["t"] = {AF.ConvertHEXToRGB(hex)}}
         end
     elseif type(color) == "table" then
         if #color == 3 then
             color[4] = 1
         end
-        COLORS[addon] = {["hex"] = AF.ConvertRGBToHEX(AF.UnpackColor(color)), ["t"] = color}
+        return {["hex"] = AF.ConvertRGBToHEX(AF.UnpackColor(color)), ["t"] = color}
     end
+end
+
+---@param color string|table colorName, colorHex, colorTable
+---@param buttonNormalColor? string|table
+---@param buttonHoverColor? string|table
+---@param alias string?
+function AF.SetAccentColor(color, buttonNormalColor, buttonHoverColor, alias)
+    local addon = GetAddon()
+    assert(addon, "no registered addon found")
+
+    local t = BuildColorTable(color)
+
+    -- normal
+    local normal
+    if buttonNormalColor then
+        normal = BuildColorTable(buttonNormalColor)["t"]
+    else
+        normal = AF.Copy(t["t"])
+        normal[4] = 0.3
+    end
+
+    -- hover
+    local hover
+    if buttonHoverColor then
+        hover = BuildColorTable(buttonHoverColor)["t"]
+    else
+        hover = AF.Copy(t["t"])
+        hover[4] = 0.6
+    end
+
+    COLORS[addon] = {["hex"] = t["hex"], ["t"] = t["t"], ["normal"] = normal, ["hover"] = hover}
 
     if alias then
         COLORS[alias] = COLORS[addon]
@@ -728,38 +755,81 @@ end
 ---------------------------------------------------------------------
 -- button colors
 ---------------------------------------------------------------------
-local BUTTON_COLOR_NORMAL = {0.127, 0.127, 0.127, 1}
+local BUTTON_COLOR_NORMAL = COLORS.widget.t
+local BUTTON_COLOR_TRANSPARENT = COLORS.none.t
 local BUTTON_COLORS = {
-    ["accent"] = {["normal"] = COLORS["accent"]["normal"], ["hover"] = COLORS["accent"]["hover"]},
-    ["accent_hover"] = {["normal"] = BUTTON_COLOR_NORMAL, ["hover"] = COLORS["accent"]["hover"]},
-    ["accent_transparent"] = {["normal"] = {0, 0, 0, 0}, ["hover"] = COLORS["accent"]["hover"]},
-    ["border_only"] = {["normal"] = {0, 0, 0, 0}, ["hover"] = {0, 0, 0, 0}},
-    ["none"] = {["normal"] = {0, 0, 0, 0}, ["hover"] = {0, 0, 0, 0}},
+    -- ["accent"] = {["normal"] = COLORS["accent"]["normal"], ["hover"] = COLORS["accent"]["hover"]},
+    -- ["accent_hover"] = {["normal"] = BUTTON_COLOR_NORMAL, ["hover"] = COLORS["accent"]["hover"]},
+    -- ["accent_transparent"] = {["normal"] = BUTTON_COLOR_TRANSPARENT, ["hover"] = COLORS["accent"]["hover"]},
+    ["border_only"] = {["normal"] = BUTTON_COLOR_TRANSPARENT, ["hover"] = BUTTON_COLOR_TRANSPARENT},
+    ["none"] = {["normal"] = BUTTON_COLOR_TRANSPARENT, ["hover"] = BUTTON_COLOR_TRANSPARENT},
     ["red"] = {["normal"] = {0.6, 0.1, 0.1, 0.6}, ["hover"] = {0.6, 0.1, 0.1, 1}},
-    ["red_hover"] = {["normal"] = BUTTON_COLOR_NORMAL, ["hover"] = {0.6, 0.1, 0.1, 1}},
+    -- ["red_hover"] = {["normal"] = BUTTON_COLOR_NORMAL, ["hover"] = {0.6, 0.1, 0.1, 1}},
     ["green"] = {["normal"] = {0.1, 0.6, 0.1, 0.6}, ["hover"] = {0.1, 0.6, 0.1, 1}},
-    ["green_hover"] = {["normal"] = BUTTON_COLOR_NORMAL, ["hover"] = {0.1, 0.6, 0.1, 1}},
+    -- ["green_hover"] = {["normal"] = BUTTON_COLOR_NORMAL, ["hover"] = {0.1, 0.6, 0.1, 1}},
     ["blue"] = {["normal"] = {0, 0.5, 0.8, 0.6}, ["hover"] = {0, 0.5, 0.8, 1}},
-    ["blue_hover"] = {["normal"] = BUTTON_COLOR_NORMAL, ["hover"] = {0, 0.5, 0.8, 1}},
-    ["yellow"] = {["normal"] = {0.7, 0.7, 0, 0.6}, ["hover"] = {0.7, 0.7, 0, 1}},
-    ["yellow_hover"] = {["normal"] = BUTTON_COLOR_NORMAL, ["hover"] = {0.7, 0.7, 0, 1}},
-    ["hotpink"] = {["normal"] = {1, 0.27, 0.4, 0.6}, ["hover"] = {1, 0.27, 0.4, 1}},
-    ["lime"] = {["normal"] = {0.8, 1, 0, 0.35}, ["hover"] = {0.8, 1, 0, 0.65}},
-    ["lavender"] = {["normal"] = {0.96, 0.73, 1, 0.35}, ["hover"] = {0.96, 0.73, 1, 0.65}},
+    -- ["blue_hover"] = {["normal"] = BUTTON_COLOR_NORMAL, ["hover"] = {0, 0.5, 0.8, 1}},
+    -- ["yellow"] = {["normal"] = {0.7, 0.7, 0, 0.6}, ["hover"] = {0.7, 0.7, 0, 1}},
+    -- ["yellow_hover"] = {["normal"] = BUTTON_COLOR_NORMAL, ["hover"] = {0.7, 0.7, 0, 1}},
+    -- ["hotpink"] = {["normal"] = {1, 0.27, 0.4, 0.6}, ["hover"] = {1, 0.27, 0.4, 1}},
+    -- ["lime"] = {["normal"] = {0.8, 1, 0, 0.35}, ["hover"] = {0.8, 1, 0, 0.65}},
+    -- ["lavender"] = {["normal"] = {0.96, 0.73, 1, 0.35}, ["hover"] = {0.96, 0.73, 1, 0.65}},
 }
 
 ---@param name string color name
 ---@return table normalColor {r, g, b, a}
 function AF.GetButtonNormalColor(name)
-    assert(BUTTON_COLORS[name], "no such button color:", name)
+    name = name or GetAddon() or "accent"
+
+    if name:find("transparent$") then
+        return BUTTON_COLOR_TRANSPARENT
+    end
+
+    if name:find("hover$") then
+        return BUTTON_COLOR_NORMAL
+    end
+
+    if name:find("^accent") then
+        return COLORS["accent"]["normal"]
+    end
+
+    if BUTTON_COLORS[name] then
     return BUTTON_COLORS[name]["normal"]
+    end
+
+    if COLORS[name] then
+        if COLORS[name]["normal"] then
+            return COLORS[name]["normal"]
+        else
+            return {COLORS[name]["t"][1], COLORS[name]["t"][2], COLORS[name]["t"][3], 0.3}
+        end
+    end
+
+    error("no such button normal color: " .. name)
 end
 
 ---@param name string color name
 ---@return table hoverColor {r, g, b, a}
 function AF.GetButtonHoverColor(name)
-    assert(BUTTON_COLORS[name], "no such button color:", name)
+    name = name or GetAddon() or "accent"
+
+    if name:find("^accent") then
+        return COLORS["accent"]["hover"]
+    end
+
+    if BUTTON_COLORS[name] then
     return BUTTON_COLORS[name]["hover"]
+    end
+
+    if COLORS[name] then
+        if COLORS[name]["hover"] then
+            return COLORS[name]["hover"]
+        else
+            return {COLORS[name]["t"][1], COLORS[name]["t"][2], COLORS[name]["t"][3], 0.6}
+        end
+    end
+
+    error("no such button hover color: " .. name)
 end
 
 ---@param name string color name
@@ -769,7 +839,7 @@ function AF.AddButtonColor(name, normalColor, hoverColor)
     BUTTON_COLORS[name] = {["normal"] = normalColor, ["hover"] = hoverColor}
 end
 
----@param t table {["name"] = {normalColor = {r, g, b, a}, hoverColor = {r, g, b, a}}, ...}
+---@param t table {["name"] = {normal = {r, g, b, a}, hover = {r, g, b, a}}, ...}
 function AF.AddButtonColors(t)
     for k, v in pairs(t) do
         AF.AddColor(k, v.normalColor, v.hoverColor)
