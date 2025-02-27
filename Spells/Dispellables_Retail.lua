@@ -11,19 +11,19 @@ end
 local dispelNodeIDs = {
     -- DRUID ----------------
         -- 102 - Balance
-        [102] = {["Curse"] = 82205, ["Poison"] = 82205},
+        [102] = {["Curse"] = 82241, ["Poison"] = 82241},
         -- 103 - Feral
-        [103] = {["Curse"] = 82204, ["Poison"] = 82204},
+        [103] = {["Curse"] = 82241, ["Poison"] = 82241},
         -- 104 - Guardian
-        [104] = {["Curse"] = 82215, ["Poison"] = 82215},
+        [104] = {["Curse"] = 82241, ["Poison"] = 82241},
         -- Restoration
-        [105] = {["Curse"] = 82203, ["Magic"] = true, ["Poison"] = 82203},
+        [105] = {["Curse"] = true, ["Magic"] = true, ["Poison"] = true},
     -------------------------
 
     -- EVOKER ---------------
         -- 1467 - Devastation
         [1467] = {["Curse"] = 93294, ["Disease"] = 93294, ["Poison"] = {93306, 93294}, ["Bleed"] = 93294},
-        -- 1468 - Preservation
+        -- 1468	- Preservation
         [1468] = {["Curse"] = 93294, ["Disease"] = 93294, ["Magic"] = true, ["Poison"] = true, ["Bleed"] = 93294},
         -- 1473 - Augmentation
         [1473] = {["Curse"] = 93294, ["Disease"] = 93294, ["Poison"] = {93306, 93294}, ["Bleed"] = 93294},
@@ -40,11 +40,11 @@ local dispelNodeIDs = {
 
     -- MONK -----------------
         -- 268 - Brewmaster
-        [268] = {["Disease"] = 81633, ["Poison"] = 81633},
+        [268] = {["Disease"] = 101090, ["Poison"] = 101090},
         -- 269 - Windwalker
-        [269] = {["Disease"] = 80606, ["Poison"] = 80606},
+        [269] = {["Disease"] = 101150, ["Poison"] = 101150},
         -- 270 - Mistweaver
-        [270] = {["Disease"] = 81634, ["Magic"] = true, ["Poison"] = 81634},
+        [270] = {["Disease"] = 101089, ["Magic"] = true, ["Poison"] = 101089},
     -------------------------
 
     -- PALADIN --------------
@@ -67,11 +67,11 @@ local dispelNodeIDs = {
 
     -- SHAMAN ---------------
         -- 262 - Elemental
-        [262] = {["Curse"] = 81075, ["Poison"] = 81093},
+        [262] = {["Curse"] = 103608, ["Poison"] = 103609},
         -- 263 - Enhancement
-        [263] = {["Curse"] = 81077, ["Poison"] = 81093},
+        [263] = {["Curse"] = 103608, ["Poison"] = 103609},
         -- 264 - Restoration
-        [264] = {["Curse"] = 81073, ["Magic"] = true, ["Poison"] = 81093},
+        [264] = {["Curse"] = 81073, ["Magic"] = true, ["Poison"] = 103609},
     -------------------------
 
     -- WARLOCK --------------
@@ -119,14 +119,14 @@ else
                 elseif type(value) == "table" then -- more than one trait
                     for _, v in pairs(value) do
                         local nodeInfo = C_Traits.GetNodeInfo(activeConfigID, v)
-                        if nodeInfo and nodeInfo.ranksPurchased ~= 0 then
+                        if nodeInfo and nodeInfo.activeRank ~= 0 then
                             dispellable[dispelType] = true
                             break
                         end
                     end
                 else -- number: check node info
                     local nodeInfo = C_Traits.GetNodeInfo(activeConfigID, value)
-                    if nodeInfo and nodeInfo.ranksPurchased ~= 0 then
+                    if nodeInfo and nodeInfo.activeRank ~= 0 then
                         dispellable[dispelType] = true
                     end
                 end
