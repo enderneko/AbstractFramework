@@ -51,6 +51,90 @@ function AF.RemoveInvalidSpells(t)
 end
 
 ---------------------------------------------------------------------
+-- classic spell rank
+---------------------------------------------------------------------
+if AF.isWrath or AF.isVanilla then
+    local GetSpellInfo = GetSpellInfo
+    local GetNumSpellTabs = GetNumSpellTabs
+    local GetSpellTabInfo = GetSpellTabInfo
+    local GetSpellBookItemName = GetSpellBookItemName
+    local PATTERN = TRADESKILL_RANK_HEADER:gsub(" ", ""):gsub("%%d", "%%s*(%%d+)")
+
+    function AF.GetMaxSpellRank(spellId)
+        local spellName = select(1, GetSpellInfo(spellId))
+        if not spellName then return end
+
+        local maxRank = 0
+        local bookType = BOOKTYPE_SPELL
+
+        local totalSpells = 0
+        for tab = 1, GetNumSpellTabs() do
+            local name, texture, offset, numSpells = GetSpellTabInfo(tab)
+            totalSpells = totalSpells + numSpells
+        end
+
+        for i = 1, totalSpells do
+            local name, subText = GetSpellBookItemName(i, bookType)
+            if name == spellName and subText then
+                local rank = tonumber(subText:match(PATTERN))
+                if rank and rank > maxRank then
+                    maxRank = rank
+                end
+            end
+        end
+
+        return maxRank
+    end
+end
+
+---------------------------------------------------------------------
+-- spell cooldown
+---------------------------------------------------------------------
+if C_Spell.GetSpellCooldown then
+    local GetSpellCooldown = C_Spell.GetSpellCooldown
+
+    ---@param spellId number
+    ---@return number startTime
+    ---@return number duration
+    AF.GetSpellCooldown = function(spellId)
+        local info = GetSpellCooldown(spellId)
+        if info then
+            return info.startTime, info.duration
+        end
+    end
+else
+    local GetSpellCooldown = GetSpellCooldown
+
+    ---@param spellId number
+    ---@return number startTime
+    ---@return number duration
+    AF.GetSpellCooldown = function(spellId)
+        local start, duration = GetSpellCooldown(spellId)
+        return start, duration
+    end
+end
+
+local GetTime = GetTime
+
+---@param spellId number
+---@return boolean isReady
+---@return number? cdLeft
+function AF.IsSpellReady(spellId)
+    local start, duration = AF.GetSpellCooldown(spellId)
+    if start == 0 or duration == 0 then
+        return true
+    else
+        local _, gcd = AF.GetSpellCooldown(61304) --! check gcd
+        if duration == gcd then -- spell ready
+            return true
+        else
+            local cdLeft = start + duration - GetTime()
+            return false, cdLeft
+        end
+    end
+end
+
+---------------------------------------------------------------------
 -- auras
 ---------------------------------------------------------------------
 local GetAuraDataByIndex = C_UnitAuras.GetAuraDataByIndex
