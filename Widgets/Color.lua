@@ -804,8 +804,12 @@ function AF.GetButtonHoverColor(name)
         return COLORS["accent"]["hover"]
     end
 
+    local baseName = name:gsub("_hover$", "")
+
     if BUTTON_COLORS[name] then
-    return BUTTON_COLORS[name]["hover"]
+        return BUTTON_COLORS[name]["hover"]
+    elseif BUTTON_COLORS[baseName] then
+        return BUTTON_COLORS[baseName]["hover"]
     end
 
     if COLORS[name] then
@@ -813,6 +817,12 @@ function AF.GetButtonHoverColor(name)
             return COLORS[name]["hover"]
         else
             return {COLORS[name]["t"][1], COLORS[name]["t"][2], COLORS[name]["t"][3], 0.6}
+        end
+    elseif COLORS[baseName] then
+        if COLORS[baseName]["hover"] then
+            return COLORS[baseName]["hover"]
+        else
+            return {COLORS[baseName]["t"][1], COLORS[baseName]["t"][2], COLORS[baseName]["t"][3], 0.6}
         end
     end
 

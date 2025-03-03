@@ -211,26 +211,26 @@ function AF.CalcPoint(owner)
     if isAnchorLocked then
         point, _, _, x, y = owner:GetPoint()
     else
-    local centerX, centerY = AF.UIParent:GetCenter()
-    local width = AF.UIParent:GetRight()
-        x, y = owner:GetCenter()
+        local centerX, centerY = AF.UIParent:GetCenter()
+        local width = AF.UIParent:GetRight()
+            x, y = owner:GetCenter()
 
-    if y >= centerY then
-        point = "TOP"
-            y = -(AF.UIParent:GetTop() - owner:GetTop())
-    else
-        point = "BOTTOM"
-            y = owner:GetBottom()
-    end
+        if y >= centerY then
+            point = "TOP"
+                y = -(AF.UIParent:GetTop() - owner:GetTop())
+        else
+            point = "BOTTOM"
+                y = owner:GetBottom()
+        end
 
-    if x >= (width * 2 / 3) then
-        point = point.."RIGHT"
-            x = owner:GetRight() - width
-    elseif x <= (width / 3) then
-        point = point.."LEFT"
-            x = owner:GetLeft()
-    else
-        x = x - centerX
+        if x >= (width * 2 / 3) then
+            point = point.."RIGHT"
+                x = owner:GetRight() - width
+        elseif x <= (width / 3) then
+            point = point.."LEFT"
+                x = owner:GetLeft()
+        else
+            x = x - centerX
         end
     end
 
