@@ -16,7 +16,7 @@ function AF.GetNearestPixelSize(uiUnitSize, layoutScale, minPixels)
     end
 
     local uiUnitFactor = AF.GetPixelFactor()
-    local numPixels = Round((uiUnitSize * layoutScale) / uiUnitFactor)
+    local numPixels = AF.Round((uiUnitSize * layoutScale) / uiUnitFactor)
     if minPixels then
         if uiUnitSize < 0.0 then
             if numPixels > -minPixels then
