@@ -4,10 +4,11 @@ local AF = _G.AbstractFramework
 ---------------------------------------------------------------------
 -- dialog
 ---------------------------------------------------------------------
+---@class AF_Dialog
 local dialog
 
 local function CreateDialog()
-    dialog = AF.CreateBorderedFrame(AF.UIParent, nil, 200, 100, nil, "accent")
+    dialog = AF.CreateBorderedFrame(AF.UIParent, "AF_Dialog", 200, 100, nil, "accent")
     dialog:Hide() -- for first OnShow
 
     dialog:EnableMouse(true)
