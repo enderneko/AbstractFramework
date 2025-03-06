@@ -192,7 +192,7 @@ function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata,
     -- f:SetIgnoreParentScale(true)
     -- f:SetResizable(false)
     f:SetMovable(true)
-    f:SetUserPlaced(not notUserPlaced)
+    -- f:SetUserPlaced(not notUserPlaced)
     f:SetFrameStrata(frameStrata or "HIGH")
     f:SetFrameLevel(frameLevel or 1)
     f:SetClampedToScreen(true)
