@@ -50,6 +50,7 @@
     <Script file="Widgets\SmoothStatusBarMixin.lua"/>
     <Script file="Widgets\StatusBar.lua"/>
     <Script file="Widgets\Dropdown.lua"/>
+    <Script file="Widgets\CascadingMenu.lua"/>
     <Script file="Widgets\ColorPicker.lua"/>
     <Script file="Widgets\Dialog.lua"/>
     <Script file="Widgets\Popup.lua"/>

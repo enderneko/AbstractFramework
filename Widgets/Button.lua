@@ -113,32 +113,63 @@ end
 ---@param point table
 ---@param isAtlas boolean
 ---@param noPushDownEffect boolean
-function AF_ButtonMixin:SetTexture(tex, size, point, isAtlas, noPushDownEffect)
+---@param borderColor? string no texture border if nil
+function AF_ButtonMixin:SetTexture(tex, size, point, isAtlas, noPushDownEffect, borderColor)
     if not self.texture then
-        self.texture = self:CreateTexture(nil, "ARTWORK")
+        self.texture = self:CreateTexture(nil, "ARTWORK", nil, -2)
         self:HookScript("OnEnable", function()
-            self.texture:SetDesaturated(false)
-            self.texture:SetVertexColor(AF.GetColorRGB("white"))
+            self.realTexture:SetDesaturated(false)
+            self.realTexture:SetVertexColor(AF.GetColorRGB("white"))
         end)
         self:HookScript("OnDisable", function()
-            self.texture:SetDesaturated(true)
-            self.texture:SetVertexColor(AF.GetColorRGB("disabled"))
+            self.realTexture:SetDesaturated(true)
+            self.realTexture:SetVertexColor(AF.GetColorRGB("disabled"))
         end)
         assert(#point == 3, "point format error! should be something like {\"CENTER\", 0, 0}")
         self.point = point
         AF.SetPoint(self.texture, unpack(point))
         AF.SetSize(self.texture, unpack(size))
-        AF.ClearPoints(self.text)
-        AF.SetPoint(self.text, "LEFT", self.texture, "RIGHT", 2, 0)
-        AF.SetPoint(self.text, "RIGHT", -2, 0)
-        self._disableTextPushEffect = true
     end
-    self._disableTexturePushEffect = noPushDownEffect
-    if isAtlas then
-        self.texture:SetAtlas(tex)
+
+    AF.ClearPoints(self.text)
+    AF.SetPoint(self.text, "LEFT", self.texture, "RIGHT", 2, 0)
+    AF.SetPoint(self.text, "RIGHT", -2, 0)
+    self._disableTextPushEffect = true
+
+    if borderColor then
+        if not self.textureFG then
+            self.textureFG = self:CreateTexture(nil, "ARTWORK", nil, 0)
+            AF.SetInside(self.textureFG, self.texture, 1)
+        end
+        self.texture:SetColorTexture(AF.GetColorRGB(borderColor))
+        self.realTexture = self.textureFG
     else
-        self.texture:SetTexture(tex)
+        if self.textureFG then
+            self.textureFG:Hide()
+        end
+        self.realTexture = self.texture
     end
+
+    self._disableTexturePushEffect = noPushDownEffect
+
+    if isAtlas then
+        self.realTexture:SetAtlas(tex)
+    else
+        self.realTexture:SetTexture(tex)
+    end
+end
+
+function AF_ButtonMixin:HideTexture()
+    if self.texture then
+        self.texture:Hide()
+    end
+    if self.textureFG then
+        self.textureFG:Hide()
+    end
+    AF.ClearPoints(self.text)
+    AF.SetPoint(self.text, "LEFT", 2, 0)
+    AF.SetPoint(self.text, "RIGHT", -2, 0)
+    self._disableTextPushEffect = self._isTransparent and true or false
 end
 
 function AF_ButtonMixin:UpdatePixels()
@@ -151,6 +182,9 @@ function AF_ButtonMixin:UpdatePixels()
     if self.texture then
         AF.ReSize(self.texture)
         AF.RePoint(self.texture)
+    end
+    if self.textureFG then
+        AF.RePoint(self.textureFG)
     end
 end
 

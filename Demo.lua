@@ -7,9 +7,9 @@ function AF.ShowDemo()
         return
     end
 
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     --                              headered frame                             --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     local demo = AF.CreateHeaderedFrame(AF.UIParent, "AF_DEMO", AF.GetIconString("AF", 16) .. AF.GetGradientText("AbstractFramework", "accent", "accent_alt") .. AF.WrapTextInColor(" Demo", "white"), 710, 500)
     AF.SetPoint(demo, "BOTTOMLEFT", 500, 270)
     demo:SetFrameLevel(100)
@@ -53,15 +53,15 @@ function AF.ShowDemo()
     AF.SetPoint(fps, "RIGHT", ns, "LEFT", -230, 0)
 
 
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     --                         apply combat protection                         --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     AF.ApplyCombatProtectionToFrame(demo)
 
 
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     --                                  button                                 --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     local b1 = AF.CreateButton(demo, "Button A", "accent", 100, 20)
     AF.SetPoint(b1, "TOPLEFT", 10, -10)
     AF.SetTooltips(b1, "ANCHOR_TOPLEFT", 0, 2, "Tooltip Title", "This is a tooltip")
@@ -90,9 +90,9 @@ function AF.ShowDemo()
     b6:SetEnabled(false)
 
 
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     --                               check button                              --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     local cb1 = AF.CreateCheckButton(demo, "Check boxes")
     AF.SetPoint(cb1, "TOPLEFT", b1, "BOTTOMLEFT", 0, -10)
     AF.SetTooltips(cb1, "ANCHOR_TOPLEFT", 0, 3, "Check Button", "The hit rectangle of these check buttons are different")
@@ -107,9 +107,9 @@ function AF.ShowDemo()
     AF.SetPoint(cb3, "TOPLEFT", cb2, "BOTTOMLEFT", 0, -7)
 
 
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     --                                 edit box                                --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     local eb1 = AF.CreateEditBox(demo, "Edit Box", 200, 20)
     AF.SetPoint(eb1, "TOPLEFT", cb3, "BOTTOMLEFT", 0, -10)
     eb1:SetOnTextChanged(function(text)
@@ -139,61 +139,61 @@ function AF.ShowDemo()
     cb4:SetChecked(true)
 
 
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     --                              bordered frame                             --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     local bf1 = AF.CreateBorderedFrame(demo, nil, 150, 150, nil, "accent")
     AF.SetPoint(bf1, "TOPLEFT", b3, "BOTTOMLEFT", 0, -10)
 
 
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     --                               font string                               --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     local fs1 = AF.CreateFontString(bf1, "Bordered Frame", "gray")
     AF.SetPoint(fs1, "TOPLEFT", 5, -5)
 
 
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     --                               titled pane                               --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     local tp1 = AF.CreateTitledPane(demo, "Titled Pane", 140, 100)
     AF.SetPoint(tp1, "TOPLEFT", bf1, 5, -30)
 
 
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     --                               button group                              --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     local bf2 = AF.CreateBorderedFrame(demo, nil, 100)
     bf2:SetLabel("Button Group")
     AF.SetPoint(bf2, "TOPLEFT", eb4, "BOTTOMLEFT", 0, -27)
     AF.SetListHeight(bf2, 3, 20, -1)
 
-    local b6 = AF.CreateButton(bf2, "Item A", "accent_transparent", 100, 20)
-    b6.id = "b6"
-    AF.SetPoint(b6, "TOPLEFT")
-    AF.SetPoint(b6, "RIGHT")
-    AF.SetTooltips(b6, "LEFT", -2, 0, "Item A")
+    local gb1 = AF.CreateButton(bf2, "Item A", "accent_transparent", 100, 20)
+    gb1.id = "gb1"
+    AF.SetPoint(gb1, "TOPLEFT")
+    AF.SetPoint(gb1, "RIGHT")
+    AF.SetTooltips(gb1, "LEFT", -2, 0, "Item A")
 
-    local b7 = AF.CreateButton(bf2, "Item B", "accent_transparent", 100, 20)
-    b7.id = "b7"
-    AF.SetPoint(b7, "TOPLEFT", b6, "BOTTOMLEFT", 0, 1)
-    AF.SetPoint(b7, "RIGHT")
-    AF.SetTooltips(b7, "LEFT", -2, 0, "Item B")
+    local gb2 = AF.CreateButton(bf2, "Item B", "accent_transparent", 100, 20)
+    gb2.id = "gb2"
+    AF.SetPoint(gb2, "TOPLEFT", gb1, "BOTTOMLEFT", 0, 1)
+    AF.SetPoint(gb2, "RIGHT")
+    AF.SetTooltips(gb2, "LEFT", -2, 0, "Item B")
 
-    local b8 = AF.CreateButton(bf2, "Item C", "accent_transparent", 100, 20)
-    b8.id = "b8"
-    AF.SetPoint(b8, "TOPLEFT", b7, "BOTTOMLEFT", 0, 1)
-    AF.SetPoint(b8, "RIGHT")
-    AF.SetTooltips(b8, "LEFT", -2, 0, "Item C")
+    local gb3 = AF.CreateButton(bf2, "Item C", "accent_transparent", 100, 20)
+    gb3.id = "gb3"
+    AF.SetPoint(gb3, "TOPLEFT", gb2, "BOTTOMLEFT", 0, 1)
+    AF.SetPoint(gb3, "RIGHT")
+    AF.SetTooltips(gb3, "LEFT", -2, 0, "Item C")
 
-    AF.CreateButtonGroup({b6, b7, b8}, function(id)
+    AF.CreateButtonGroup({gb1, gb2, gb3}, function(id)
         print("selected", id)
     end)
 
 
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     --                               scroll frame                              --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     local sf1 = AF.CreateScrollFrame(demo, nil, 150, 150)
     AF.SetPoint(sf1, "TOPLEFT", bf1, "BOTTOMLEFT", 0, -10)
     -- AF.SetPoint(sf1, "TOPRIGHT", bf1, "BOTTOMRIGHT", 0, -10)
@@ -209,9 +209,9 @@ function AF.ShowDemo()
     sf1:SetContentHeight(20)
 
 
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     --                                  switch                                 --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     local sw1 = AF.CreateSwitch(demo, 150, 20, {
         {
             ["text"] = "20",
@@ -246,9 +246,9 @@ function AF.ShowDemo()
     sw1:SetSelectedValue(20)
 
 
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     --                                  slider                                 --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     local sl1 = AF.CreateSlider(tp1, "Scale", 130, 0.5, 2, 0.1)
     AF.SetPoint(sl1, "TOPLEFT", 5, -40)
     AF.SetTooltips(sl1, "TOPLEFT", 0, 20, "Set scale of AF.UIParent", "If scale is too small, there can be some display issues")
@@ -294,9 +294,9 @@ function AF.ShowDemo()
     end)
 
 
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     --                               scroll list                               --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     local slist1 = AF.CreateScrollList(demo, nil, 150, 5, 5, 7, 20, 5)
     AF.SetPoint(slist1, "TOPLEFT", bf1, "TOPRIGHT", 10, 0)
     local widgets = {}
@@ -306,12 +306,12 @@ function AF.ShowDemo()
     slist1:SetWidgets(widgets)
 
 
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     --                                 dropdown                                --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     -- normal dropdown (items <= 10)
     local dd1 = AF.CreateDropdown(demo, 150)
-    AF.SetPoint(dd1, "TOPLEFT", slist1, "TOPRIGHT", 10, 0)
+    AF.SetPoint(dd1, "TOPLEFT", slist1, "TOPRIGHT", 10, -11)
     AF.SetTooltips(dd1, "TOPLEFT", 0, 2, "Normal Dropdown 1")
     dd1:SetLabel("Normal Dropdown 1")
     dd1:SetOnClick(function(value)
@@ -418,9 +418,17 @@ function AF.ShowDemo()
     dd8:SetItems(items)
 
 
-    -- ----------------------------------------------------------------------- --
-    --                               color picker                              --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
+    --                             cascading menu                              --
+    -----------------------------------------------------------------------------
+    local cm = AF.CreateCascadingMenu(demo, 150)
+    AF.SetPoint(cm, "TOP", b6)
+    AF.SetPoint(cm, "LEFT", dd1)
+
+
+    -----------------------------------------------------------------------------
+    --                              color picker                               --
+    -----------------------------------------------------------------------------
     local cp1 = AF.CreateColorPicker(demo, "Color Picker", true, function(r, g, b, a)
         print("ColorPicker1_OnChange:", r, g, b, a)
     end, function(r, g, b, a)
@@ -439,9 +447,9 @@ function AF.ShowDemo()
     cp3:SetEnabled(false)
 
 
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     --                                 dialog1                                 --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     local b7 = AF.CreateButton(demo, "Dialog1", "accent_hover", 150, 20)
     AF.SetPoint(b7, "TOPLEFT", cp3, "BOTTOMLEFT", 0, -10)
     b7:SetScript("OnClick", function()
@@ -454,9 +462,9 @@ function AF.ShowDemo()
     end)
 
 
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     --                                 dialog2                                 --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     local b8 = AF.CreateButton(demo, "Dialog2", "accent_hover", 150, 20)
     AF.SetPoint(b8, "TOPLEFT", b7, "BOTTOMLEFT", 0, -7)
 
@@ -503,9 +511,9 @@ function AF.ShowDemo()
     end)
 
 
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     --                            notificator dialog                           --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     local b9 = AF.CreateButton(demo, "NotificationDialog", "accent_hover", 150, 20)
     AF.SetPoint(b9, "TOPLEFT", b8, "BOTTOMLEFT", 0, -7)
     b9:SetScript("OnClick", function()
@@ -516,9 +524,9 @@ function AF.ShowDemo()
     end)
 
 
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     --                               scroll text                               --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     local bf3 = AF.CreateBorderedFrame(demo, nil, 530, 20)
     AF.SetPoint(bf3, "TOPLEFT", bf2, "BOTTOMLEFT", 0, -10)
 
@@ -528,9 +536,9 @@ function AF.ShowDemo()
     st:SetText("World of Warcraft, often abbreviated as WoW, is a massively multiplayer online roleplaying game (MMORPG) developed by Blizzard Entertainment and released on November 23, 2004, on the 10th anniversary of the Warcraft franchise, three years after its announcement on September 2, 2001. It is the fourth released game set in the Warcraft universe, and takes place four years after the events of Warcraft III: The Frozen Throne.", "gold")
 
 
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     --                             animated resize                             --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     local b10 = AF.CreateButton(demo, "Animated Resize", "accent_hover", 150, 20)
     AF.SetPoint(b10, "TOPLEFT", bf3, "BOTTOMLEFT", 0, -10)
 
@@ -645,9 +653,9 @@ function AF.ShowDemo()
     end)
 
 
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     --                                status bar                               --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     local function OnUpdate(self, elapsed)
         self.elapsed = (self.elapsed or 0) + elapsed
         if self.elapsed >= 0.02 then
@@ -694,9 +702,9 @@ function AF.ShowDemo()
     end)
 
 
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     --                                  popups                                 --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     AF.CreatePopupMover("general", "Popups")
 
     local bf5 = AF.CreateBorderedFrame(demo, nil, 370, 20)
@@ -740,9 +748,9 @@ function AF.ShowDemo()
         end
     end)
 
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     --                                 calendar                                --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     local dw = AF.CreateDateWidget(demo, time())
     AF.SetPoint(dw, "TOPLEFT", bf5, "TOPRIGHT", 10, 0)
     local niceDays = {}
@@ -759,9 +767,9 @@ function AF.ShowDemo()
         print(dt.year, dt.month, dt.day, dt.timestamp)
     end)
 
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     --                                  mover                                  --
-    -- ----------------------------------------------------------------------- --
+    -----------------------------------------------------------------------------
     local mbf = AF.CreateBorderedFrame(demo, nil, 290, 20)
     AF.SetPoint(mbf, "TOPLEFT", bar3, "TOPRIGHT", 10, 0)
 
