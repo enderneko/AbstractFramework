@@ -1,6 +1,7 @@
 ---@class AbstractFramework
 local AF = {}
 _G.AbstractFramework = AF
+AF.name = "AbstractFramework"
 
 -- no operation
 AF.noop = function() end
@@ -37,6 +38,13 @@ AF.UIParent = CreateFrame("Frame", "AFParent", UIParent)
 AF.UIParent:SetAllPoints(UIParent)
 AF.UIParent:SetFrameLevel(0)
 
+AF.UIParent:SetScript("OnEvent", function(self, event, ...)
+    if self[event] then
+        self[event](self, ...)
+    end
+end)
+
+-- update pixels
 local function UpdatePixels()
     if InCombatLockdown() then
         AF.UIParent:RegisterEvent("PLAYER_REGEN_ENABLED")
@@ -53,11 +61,26 @@ local function DelayedUpdatePixels()
 end
 
 AF.UIParent:RegisterEvent("FIRST_FRAME_RENDERED")
-AF.UIParent:SetScript("OnEvent", function(self, event)
+
+function AF.UIParent:FIRST_FRAME_RENDERED()
     AF.UIParent:UnregisterEvent("FIRST_FRAME_RENDERED")
     AF.UIParent:RegisterEvent("UI_SCALE_CHANGED")
-    AF.UIParent:SetScript("OnEvent", DelayedUpdatePixels)
-end)
+end
+
+function AF.UIParent:UI_SCALE_CHANGED()
+    DelayedUpdatePixels()
+end
+
+-- loaded
+AF.UIParent:RegisterEvent("ADDON_LOADED")
+function AF.UIParent:ADDON_LOADED(addon)
+    if addon == AF.name then
+        AF.UIParent:UnregisterEvent("ADDON_LOADED")
+        if type(AFConfig) ~= "table" then
+            AFConfig = {}
+        end
+    end
+end
 
 -- function AF.SetIgnoreParentScale(ignore)
 --     AF.UIParent:SetIgnoreParentScale(ignore)
