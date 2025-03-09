@@ -129,6 +129,8 @@ function AF_ButtonMixin:SetTexture(tex, size, point, isAtlas, noPushDownEffect, 
         AF.SetSize(self.texture, unpack(size))
     end
 
+    self.texture:Show()
+
     AF.ClearPoints(self.text)
     AF.SetPoint(self.text, "LEFT", self.texture, "RIGHT", 2, 0)
     AF.SetPoint(self.text, "RIGHT", -2, 0)
@@ -141,6 +143,7 @@ function AF_ButtonMixin:SetTexture(tex, size, point, isAtlas, noPushDownEffect, 
         end
         self.texture:SetColorTexture(AF.GetColorRGB(borderColor))
         self.realTexture = self.textureFG
+        self.textureFG:Show()
     else
         if self.textureFG then
             self.textureFG:Hide()

@@ -94,6 +94,7 @@ local function LoadItems(items, maxShownItems, level)
             end)
         else
             b:SetScript("OnClick", function()
+                if item.notClickable then return end
                 if current_root and current_root.SetItem then
                     current_root:SetItem(item)
                 end
@@ -199,7 +200,7 @@ end
 function AF_CascadingMenuButtonMixin:SetItem(item)
     self:SetText(item.text)
     if item.icon then
-        self:SetTexture(item.icon, {14, 14}, {"LEFT", 2, 0}, item.isIconAtlas, nil, item.iconBorderColor)
+        self:SetTexture(item.icon, {14, 14}, {"LEFT", 3, 0}, item.isIconAtlas, nil, item.iconBorderColor)
     else
         self:HideTexture()
     end
