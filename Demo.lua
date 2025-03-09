@@ -77,15 +77,15 @@ function AF.ShowDemo()
     b3:SetBorderHighlightColor("accent")
 
     local b4 = AF.CreateButton(demo, "Button D", "red", 100, 20)
-    b4:SetTexture("classicon-"..strlower(PlayerUtil.GetClassFile()), {16, 16}, {"LEFT", 2, 0}, true)
+    b4:SetTexture("classicon-" .. strlower(PlayerUtil.GetClassFile()), {16, 16}, {"LEFT", 2, 0}, true)
     AF.SetPoint(b4, "TOPLEFT", b3, "TOPRIGHT", 10, 0)
 
     local b5 = AF.CreateButton(demo, nil, "accent", 20, 20)
-    b5:SetTexture("classicon-"..strlower(PlayerUtil.GetClassFile()), {16, 16}, {"CENTER", 0, 0}, true, true)
+    b5:SetTexture("classicon-" .. strlower(PlayerUtil.GetClassFile()), {16, 16}, {"CENTER", 0, 0}, true, true)
     AF.SetPoint(b5, "TOPLEFT", b4, "TOPRIGHT", 10, 0)
 
     local b6 = AF.CreateButton(demo, nil, "accent", 20, 20)
-    b6:SetTexture("classicon-"..strlower(PlayerUtil.GetClassFile()), {16, 16}, {"CENTER", 0, 0}, true, true)
+    b6:SetTexture("classicon-" .. strlower(PlayerUtil.GetClassFile()), {16, 16}, {"CENTER", 0, 0}, true, true)
     AF.SetPoint(b6, "TOPLEFT", b5, "TOPRIGHT", 10, 0)
     b6:SetEnabled(false)
 
@@ -301,7 +301,7 @@ function AF.ShowDemo()
     AF.SetPoint(slist1, "TOPLEFT", bf1, "TOPRIGHT", 10, 0)
     local widgets = {}
     for i = 1, 20 do
-        tinsert(widgets, AF.CreateButton(slist1.slotFrame, "Item "..i, "accent_hover", 20, 20))
+        tinsert(widgets, AF.CreateButton(slist1.slotFrame, "Item " .. i, "accent_hover", 20, 20))
     end
     slist1:SetWidgets(widgets)
 
@@ -319,7 +319,7 @@ function AF.ShowDemo()
     end)
     local items = {}
     for i = 1, 7 do
-        tinsert(items, {["text"] = "Item "..i})
+        tinsert(items, {["text"] = "Item " .. i})
     end
     dd1:SetItems(items)
 
@@ -333,7 +333,7 @@ function AF.ShowDemo()
     end)
     local items = {}
     for i = 1, 20 do
-        tinsert(items, {["text"] = "Item "..i})
+        tinsert(items, {["text"] = "Item " .. i})
     end
     dd2:SetItems(items)
 
@@ -400,7 +400,7 @@ function AF.ShowDemo()
     local items = {}
     for i = 1, 5 do
         tinsert(items, {
-            ["text"] = "VMini "..i
+            ["text"] = "VMini " .. i
         })
     end
     dd7:SetItems(items)
@@ -412,7 +412,7 @@ function AF.ShowDemo()
     local items = {}
     for i = 1, 3 do
         tinsert(items, {
-            ["text"] = "HMini "..i
+            ["text"] = "HMini " .. i
         })
     end
     dd8:SetItems(items)
@@ -453,7 +453,7 @@ function AF.ShowDemo()
     local b7 = AF.CreateButton(demo, "Dialog1", "accent_hover", 150, 20)
     AF.SetPoint(b7, "TOPLEFT", cp3, "BOTTOMLEFT", 0, -10)
     b7:SetScript("OnClick", function()
-        local text = AF.WrapTextInColor("Test Message", "firebrick").."\nReload UI now?\n"..AF.WrapTextInColor("The quick brown fox jumps over the lazy dog", "gray")
+        local text = AF.WrapTextInColor("Test Message", "firebrick") .. "\nReload UI now?\n" .. AF.WrapTextInColor("The quick brown fox jumps over the lazy dog", "gray")
         AF.ShowDialog(demo, text, 200, nil, nil, true)
         AF.SetDialogPoint("TOPLEFT", 255, -170)
         AF.SetDialogOnConfirm(function()
@@ -482,7 +482,7 @@ function AF.ShowDemo()
     -- AF.SetPoint(dd9, "TOPRIGHT", eb5, "BOTTOMRIGHT", 0, -7)
     local items = {}
     for i = 1, 7 do
-        tinsert(items, {["text"] = "Item "..i})
+        tinsert(items, {["text"] = "Item " .. i})
     end
     dd9:SetItems(items)
 
@@ -517,7 +517,7 @@ function AF.ShowDemo()
     local b9 = AF.CreateButton(demo, "NotificationDialog", "accent_hover", 150, 20)
     AF.SetPoint(b9, "TOPLEFT", b8, "BOTTOMLEFT", 0, -7)
     b9:SetScript("OnClick", function()
-        local text = AF.WrapTextInColor("NOTICE", "orange").."\n".."One day, when what has happened behind the scene could be told, developers and gamers will have a whole new level understanding of how much damage a jerk can make."
+        local text = AF.WrapTextInColor("NOTICE", "orange") .. "\n" .. "One day, when what has happened behind the scene could be told, developers and gamers will have a whole new level understanding of how much damage a jerk can make."
         local dialog = AF.ShowNotificationDialog(demo, text, 200, true, 3)
         AF.ShowNormalGlow(dialog)
         AF.SetNotificationDialogPoint("TOPLEFT", 255, -120)
@@ -730,10 +730,10 @@ function AF.ShowDemo()
     AF.SetTooltips(b15, "ANCHOR_TOPLEFT", 0, 2, "Confirm Popup", "With \"Yes\" & \"No\" buttons", "Won't hide automatically")
     b15:SetScript("OnClick", function()
         for i = 1, 3 do
-            AF.ShowConfirmPopup("Confirm "..i, function()
-                print("Confirm "..i, "yes")
+            AF.ShowConfirmPopup("Confirm " .. i, function()
+                print("Confirm " .. i, "yes")
             end, function()
-                print("Confirm "..i, "no")
+                print("Confirm " .. i, "no")
             end)
         end
     end)
@@ -744,25 +744,25 @@ function AF.ShowDemo()
     b16:SetScript("OnClick", function()
         for i = 1, 3 do
             local timeout = random(2, 7)
-            AF.ShowNotificationPopup("Notification "..AF.WrapTextInColor(timeout.."sec", "gray"), timeout)
+            AF.ShowNotificationPopup("Notification " .. AF.WrapTextInColor(timeout .. "sec", "gray"), timeout)
         end
     end)
 
     -----------------------------------------------------------------------------
     --                                 calendar                                --
     -----------------------------------------------------------------------------
-    local dw = AF.CreateDateWidget(demo, time())
-    AF.SetPoint(dw, "TOPLEFT", bf5, "TOPRIGHT", 10, 0)
+    local dw = AF.CreateCalendarButton(demo, time(), 150, "TOPLEFT")
+    AF.SetPoint(dw, "TOPLEFT", b9, "BOTTOMLEFT", 0, -7)
     local niceDays = {}
     local colors = {"firebrick", "hotpink", "chartreuse", "vividblue"}
     local today = date("*t")
     for i = 1, 7 do
         local str = string.format("%04d%02d%02d", today.year, today.month, random(1, 27))
         if not niceDays[str] then
-            niceDays[str] = {color=colors[random(1,4)], tooltips={"Nice Day", str}}
+            niceDays[str] = {color = colors[random(1, 4)], tooltips = {"Nice Day", str}}
         end
     end
-    dw:SetMarksForDays(niceDays)
+    dw:SetMarksInfo(niceDays)
     dw:SetOnDateChanged(function(dt)
         print(dt.year, dt.month, dt.day, dt.timestamp)
     end)
@@ -825,8 +825,8 @@ function AF.ShowDemo()
         local f = AF.CreateBorderedFrame(AF.UIParent, nil, 170, 70)
         tinsert(moverTestFrames, f)
         AF.SetPoint(f, point)
-        f:SetLabel("Mover Test Frame "..id.."\n"..point, "hotpink", nil, true)
-        AF.CreateMover(f, group, "Test Mover "..id, function(p,x,y) print("MTF"..id..":", p, x, y) end)
+        f:SetLabel("Mover Test Frame " .. id .. "\n" .. point, "hotpink", nil, true)
+        AF.CreateMover(f, group, "Test Mover " .. id, function(p, x, y) print("MTF" .. id .. ":", p, x, y) end)
     end
 
     -- group1

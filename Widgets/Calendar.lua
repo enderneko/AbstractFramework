@@ -28,7 +28,7 @@ local function GetMonthInfo(year, month)
     else
         numDays = days_in_month[month]
     end
-    firstWeekday = tonumber(date("%u", time{["day"]=1, ["month"]=month, ["year"]=year}))
+    firstWeekday = tonumber(date("%u", time {["day"] = 1, ["month"] = month, ["year"] = year}))
     return numDays, firstWeekday
 end
 
@@ -72,7 +72,7 @@ local function FillDays(year, month)
     -- show "today" mark
     local today = date("*t")
     if month == today.month and year == today.year then
-        calendar.todayMark:SetParent(calendar.days[start+today.day-1])
+        calendar.todayMark:SetParent(calendar.days[start + today.day - 1])
         AF.ClearPoints(calendar.todayMark)
         AF.SetPoint(calendar.todayMark, "BOTTOM", 0, 3)
         calendar.todayMark:Show()
@@ -174,10 +174,10 @@ local function CreateCalendar()
         headers[i] = AF.CreateBorderedFrame(calendar, nil, 27, 20, "widget", "black")
 
         local weekday
-        if AF.FIRST_WEEKDAY+(i-1)>7 then
-            weekday = AF.FIRST_WEEKDAY+(i-1)-7
+        if AF.FIRST_WEEKDAY + (i - 1) > 7 then
+            weekday = AF.FIRST_WEEKDAY + (i - 1) - 7
         else
-            weekday = AF.FIRST_WEEKDAY+(i-1)
+            weekday = AF.FIRST_WEEKDAY + (i - 1)
         end
         headers[i].weekday = weekday
 
@@ -193,7 +193,7 @@ local function CreateCalendar()
         if i == 1 then
             AF.SetPoint(headers[i], "TOPLEFT", 1, -26)
         else
-            AF.SetPoint(headers[i], "TOPLEFT", headers[i-1], "TOPRIGHT", -1, 0)
+            AF.SetPoint(headers[i], "TOPLEFT", headers[i - 1], "TOPRIGHT", -1, 0)
         end
     end
 
@@ -212,9 +212,9 @@ local function CreateCalendar()
         if i == 1 then
             AF.SetPoint(days[i], "TOPLEFT", 1, -51)
         elseif i % 7 == 1 then
-            AF.SetPoint(days[i], "TOPLEFT", days[i-7], "BOTTOMLEFT", 0, 1)
+            AF.SetPoint(days[i], "TOPLEFT", days[i - 7], "BOTTOMLEFT", 0, 1)
         else
-            AF.SetPoint(days[i], "TOPLEFT", days[i-1], "TOPRIGHT", -1, 0)
+            AF.SetPoint(days[i], "TOPLEFT", days[i - 1], "TOPRIGHT", -1, 0)
         end
     end
 
@@ -259,6 +259,7 @@ local function CreateCalendar()
         local width3 = AF.ConvertPixelsForRegion(1, calendar) * 6
         calendar:SetWidth(width1 + width2 - width3)
     end
+
     calendar:UpdatePixels()
 
     -- set date
@@ -324,56 +325,67 @@ end
 -- %Y  full year (1998)
 -- %y  two-digit year (98) [00-99]
 
----@param date string|number|table "YYYYMMDD", a epoch unix timestamp in seconds, or a "*t" table
-function AF.CreateDateWidget(parent, date, width, calendarPosition)
-    local w = AF.CreateButton(parent, "", "accent", width or 110, 20)
-    w:SetTexture(AF.GetIcon("Calendar"), {16, 16},  {"LEFT", 2, 0})
+---@class AF_CalendarButton
+local AF_CalendarButtonMixin = {}
 
-    w.date = {} -- save show date info
-    w.info = { -- store dates with extra info
+function AF_CalendarButtonMixin:SetDate(d)
+    if type(d) == "string" then
+        local _y, _m, _d = d:match("(%d%d%d%d)(%d%d)(%d%d)")
+        self.date.year = tonumber(_y)
+        self.date.month = tonumber(_m)
+        self.date.day = tonumber(_d)
+        self.date.timestamp = time {year = _y, month = _m, day = _d}
+    elseif type(d) == "number" then
+        local dt = _G.date("*t", d)
+        self.date.year = dt.year
+        self.date.month = dt.month
+        self.date.day = dt.day
+        self.date.timestamp = time(self.date)
+    elseif type(d) == "table" then
+        self.date.year = d.year
+        self.date.month = d.month
+        self.date.day = d.day
+        self.date.timestamp = time(self.date)
+    end
+    self:SetText(self.date.year .. "/" .. self.date.month .. "/" .. self.date.day)
+end
+
+function AF_CalendarButtonMixin:SetMarksInfo(info)
+    self.info = info
+    if calendar and calendar:IsShown() and calendar.parent == self then
+        calendar.info = self.info
+        FillDays(self.date.year, self.date.month)
+    end
+end
+
+function AF_CalendarButtonMixin:SetOnDateChanged(onDateChanged)
+    self.onDateChanged = onDateChanged
+end
+
+---@param date? string|number|table "YYYYMMDD", a epoch unix timestamp in seconds, or a "*t" table
+---@param width? number default is 110
+---@param calendarPosition? string "BOTTOMLEFT", "BOTTOMRIGHT", "TOPLEFT", "TOPRIGHT".
+---@return AF_CalendarButton|AF_Button
+function AF.CreateCalendarButton(parent, date, width, calendarPosition)
+    local button = AF.CreateButton(parent, "", "accent", width or 110, 20)
+    button:SetTexture(AF.GetIcon("Calendar"), {16, 16}, {"LEFT", 2, 0})
+
+    button.date = {} -- save show date info
+    button.info = { -- store dates with extra info
         -- ["20240214"] = {
         --     ["tooltips"] = {strings},
         --     ["color"] = (string), -- in Color.lua
         -- },
     }
 
-    function w:SetDate(d)
-        local t
-        if type(d) == "string" then
-            local _y, _m, _d = d:match("(%d%d%d%d)(%d%d)(%d%d)")
-            w.date.year = tonumber(_y)
-            w.date.month = tonumber(_m)
-            w.date.day = tonumber(_d)
-            w.date.timestamp = time{year=_y, month=_m, day=_d}
-        elseif type(d) == "number" then
-            local dt = _G.date("*t", d)
-            w.date.year = dt.year
-            w.date.month = dt.month
-            w.date.day = dt.day
-            w.date.timestamp = time(w.date)
-        elseif type(d) == "table" then
-            w.date.year = d.year
-            w.date.month = d.month
-            w.date.day = d.day
-            w.date.timestamp = time(w.date)
-        end
-        w:SetText(w.date.year.."/"..w.date.month.."/"..w.date.day)
-    end
-    w:SetDate(date or time())
+    Mixin(button, AF_CalendarButtonMixin)
+    button:SetDate(date or time())
 
-    function w:SetMarksForDays(info)
-        w.info = info
-    end
-
-    function w:SetOnDateChanged(onDateChanged)
-        w.onDateChanged = onDateChanged
-    end
-
-    w:SetScript("OnClick", function()
-        ShowCalendar(w, w.date, w.info, calendarPosition, w.onDateChanged)
+    button:SetScript("OnClick", function()
+        ShowCalendar(button, button.date, button.info, calendarPosition, button.onDateChanged)
     end)
 
-    AF.RegisterForCloseDropdown(w)
+    AF.RegisterForCloseDropdown(button)
 
-    return w
+    return button
 end
