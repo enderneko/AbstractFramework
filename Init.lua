@@ -59,6 +59,7 @@ local function DelayedUpdatePixels()
     if timer then timer:Cancel() end
     timer = C_Timer.NewTimer(1, UpdatePixels)
 end
+hooksecurefunc(UIParent, "SetScale", DelayedUpdatePixels)
 
 AF.UIParent:RegisterEvent("FIRST_FRAME_RENDERED")
 
