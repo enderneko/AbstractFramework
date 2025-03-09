@@ -5,6 +5,8 @@ local AF = _G.AbstractFramework
 -- spells
 ---------------------------------------------------------------------
 if AF.isWrath then
+    ---@return number spellId
+    ---@return number spellIcon
     function AF.GetSpellInfo(spellId)
         if not spellId then return end
         local name, _, icon = GetSpellInfo(spellId)
@@ -15,6 +17,8 @@ else
     local GetSpellName = C_Spell.GetSpellName
     local GetSpellTexture = C_Spell.GetSpellTexture
 
+    ---@return number spellId
+    ---@return number spellIcon
     function AF.GetSpellInfo(spellId)
         local info = GetSpellInfo(spellId)
         if not info then return end

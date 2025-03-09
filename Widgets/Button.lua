@@ -24,26 +24,24 @@ end
 local AF_ButtonMixin = {}
 
 function AF_ButtonMixin:HandleMouseDownText()
-    if self._disableTextPushEffect then return end
+    -- if self._disableTextPushEffect then return end
     self.text:AdjustPointsOffset(0, -AF.GetOnePixelForRegion(self))
 end
 
 function AF_ButtonMixin:HandleMouseUpText()
-    if self._disableTextPushEffect then return end
+    -- if self._disableTextPushEffect then return end
     AF.RePoint(self.text)
 end
 
 function AF_ButtonMixin:HandleMouseDownTexture()
     if self.texture then
-        self.texture:ClearAllPoints()
-        self.texture:SetPoint(self.point[1], self.point[2], self.point[3] - AF.GetOnePixelForRegion(self))
+        self.texture:AdjustPointsOffset(0, -AF.GetOnePixelForRegion(self))
     end
 end
 
 function AF_ButtonMixin:HandleMouseUpTexture()
     if self.texture then
-        self.texture:ClearAllPoints()
-        self.texture:SetPoint(unpack(self.point))
+        AF.RePoint(self.texture)
     end
 end
 
@@ -116,7 +114,7 @@ end
 ---@param borderColor? string no texture border if nil
 function AF_ButtonMixin:SetTexture(tex, size, point, isAtlas, noPushDownEffect, borderColor)
     if not self.texture then
-        self.texture = self:CreateTexture(nil, "ARTWORK", nil, -2)
+        self.texture = self:CreateTexture(nil, "BORDER")
         self:HookScript("OnEnable", function()
             self.realTexture:SetDesaturated(false)
             self.realTexture:SetVertexColor(AF.GetColorRGB("white"))
@@ -138,8 +136,8 @@ function AF_ButtonMixin:SetTexture(tex, size, point, isAtlas, noPushDownEffect, 
 
     if borderColor then
         if not self.textureFG then
-            self.textureFG = self:CreateTexture(nil, "ARTWORK", nil, 0)
-            AF.SetInside(self.textureFG, self.texture, 1)
+            self.textureFG = self:CreateTexture(nil, "ARTWORK")
+            AF.SetOnePixelInside(self.textureFG, self.texture)
         end
         self.texture:SetColorTexture(AF.GetColorRGB(borderColor))
         self.realTexture = self.textureFG
@@ -155,6 +153,11 @@ function AF_ButtonMixin:SetTexture(tex, size, point, isAtlas, noPushDownEffect, 
     if isAtlas then
         self.realTexture:SetAtlas(tex)
     else
+        if type(tex) == "number" then
+            self.realTexture:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+        else
+            self.realTexture:SetTexCoord(0, 1, 0, 1)
+        end
         self.realTexture:SetTexture(tex)
     end
 end

@@ -9,13 +9,22 @@ local current_root
 local menus = {}
 
 local function CreateMenu(level)
-    local menu = AF.CreateScrollList(level > 1 and AF.UIParent or menus[level - 1], "AFCascadingMenu" .. level, 10, 1, 1, 10, 18, 0, "widget", "accent")
+    local menu = AF.CreateScrollList(level > 1 and menus[level - 1] or AF.UIParent, "AFCascadingMenu" .. level, 10, 1, 1, 10, 18, 0, "widget", "accent")
     menu:SetClampedToScreen(true)
+    menu:EnableMouse(true)
     menu:Hide()
+
+    menu.hiddenText = menu:CreateFontString(nil, "OVERLAY", "AF_FONT_NORMAL")
+    menu.hiddenText:SetPoint("BOTTOM", menu, "TOP")
+    menu.hiddenText:Hide()
 
     menus[level] = menu
     menu.buttons = {}
     menu.createdButtons = {}
+
+    menu:SetScript("OnShow", function()
+        AF.SetFrameLevel(menu, 5)
+    end)
 
     menu:SetScript("OnHide", function()
         menu:Hide()
@@ -30,6 +39,9 @@ end
 local function LoadItems(items, maxShownItems, level)
     local menu = menus[level] or CreateMenu(level)
     wipe(menu.buttons)
+
+    local width = 10
+    local maxTextWidth = 0
 
     for i, item in pairs(items) do
         local b
@@ -47,11 +59,13 @@ local function LoadItems(items, maxShownItems, level)
 
             -- sub menu
             b:HookScript("OnEnter", function()
-                if b.items then
-                    LoadItems(b.items, maxShownItems, level + 1)
+                if b.childrenItems then
+                    LoadItems(b.childrenItems, maxShownItems, level + 1)
                     AF.ClearPoints(menus[level + 1])
-                    AF.SetPoint(menus[level + 1], "TOPLEFT", b, "TOPRIGHT", -2, 2)
+                    AF.SetPoint(menus[level + 1], "TOPLEFT", b, "TOPRIGHT", -5, 2)
                     menus[level + 1]:Show()
+                elseif menus[level + 1] then
+                    menus[level + 1]:Hide()
                 end
             end)
         end
@@ -59,36 +73,62 @@ local function LoadItems(items, maxShownItems, level)
         b:SetText(item.text)
         b:SetEnabled(not item.disabled)
 
+        menu.hiddenText:SetText(item.text)
+        maxTextWidth = max(maxTextWidth, menu.hiddenText:GetWidth())
+
         if item.icon then
-            b:SetTexture(item.icon, {16, 16}, {"LEFT", 2, 0}, nil, true, item.iconBorderColor)
+            width = width + AF.ConvertPixels(16)
+            b:SetTexture(item.icon, {14, 14}, {"LEFT", 2, 0}, item.isIconAtlas, true, item.iconBorderColor)
         else
             b:HideTexture()
         end
 
         if item.onClick then
             b:SetScript("OnClick", function()
+                if item.notClickable then return end
                 item.onClick(item.value)
-                if current_root and current_root.SetValue then
-                    current_root:SetValue(item.value)
+                if current_root and current_root.SetItem then
+                    current_root:SetItem(item)
                 end
                 menus[1]:Hide()
             end)
         else
-            b:SetScript("OnClick", nil)
+            b:SetScript("OnClick", function()
+                if current_root and current_root.SetItem then
+                    current_root:SetItem(item)
+                end
+                menus[1]:Hide()
+            end)
         end
 
         if item.children then
-            b.items = item.children
+            b.childrenItems = item.children
             b.childrenSymbol:Show()
         else
-            b.items = nil
+            b.childrenItems = nil
             b.childrenSymbol:Hide()
         end
 
         tinsert(menu.buttons, b)
-        menu:SetSlotNum(maxShownItems)
-        menu:SetWidgets(menu.buttons)
     end
+
+    AF.SetWidth(menu, maxTextWidth + width)
+    menu:SetSlotNum(min(maxShownItems, #menu.buttons))
+    menu:SetWidgets(menu.buttons)
+end
+
+---------------------------------------------------------------------
+-- close menu
+---------------------------------------------------------------------
+function AF.CloseCascadingMenu()
+    if menus[1] then
+        menus[1]:Hide()
+    end
+end
+
+function AF.RegisterForCloseCascadingMenu(f)
+    assert(f and f.HasScript and f:HasScript("OnMouseDown"), "no OnMouseDown for this region!")
+    f:HookScript("OnMouseDown", AF.CloseCascadingMenu)
 end
 
 ---------------------------------------------------------------------
@@ -100,6 +140,8 @@ end
 --         ["value"] = (any),
 --         ["icon"] = (string|number),
 --         ["iconBorderColor"] = (string),
+--         ["isIconAtlas"] = (boolean),
+--         ["notClickable"] = (boolean),
 --         ["onClick"] = (function),
 --         ["disabled"] = (boolean),
 --         ["children"] = {...},
@@ -126,19 +168,10 @@ end
 ---------------------------------------------------------------------
 -- cascading menu button
 ---------------------------------------------------------------------
----@class AF_CascadingMenu
-local AF_CascadingMenuMixin = {}
+---@class AF_CascadingMenuButton
+local AF_CascadingMenuButtonMixin = {}
 
-function AF_CascadingMenuMixin:SetValue(text, value, icon, iconBorderColor)
-    self:SetText(text)
-    if icon then
-        self:SetTexture(icon, {16, 16}, {"LEFT", 2, 0}, nil, nil, iconBorderColor)
-    else
-        self:HideTexture()
-    end
-end
-
-function AF_CascadingMenuMixin:SetLabel(label, color, font)
+function AF_CascadingMenuButtonMixin:SetLabel(label, color, font)
     if not self.label then
         self.label = AF.CreateFontString(self, label, color or "white", font)
         self.label:SetJustifyH("LEFT")
@@ -150,7 +183,7 @@ function AF_CascadingMenuMixin:SetLabel(label, color, font)
     self.label:SetText(label)
 end
 
-function AF_CascadingMenuMixin:SetEnabled(enabled)
+function AF_CascadingMenuButtonMixin:SetEnabled(enabled)
     self.enabled = enabled
     self:_SetEnabled(enabled)
 
@@ -163,37 +196,69 @@ function AF_CascadingMenuMixin:SetEnabled(enabled)
     end
 end
 
-function AF_CascadingMenuMixin:SetItems(items, maxShownItems)
-    -- validate item.value
-    for _, item in ipairs(items) do
-        if not item.value then item.value = item.text end
+function AF_CascadingMenuButtonMixin:SetItem(item)
+    self:SetText(item.text)
+    if item.icon then
+        self:SetTexture(item.icon, {14, 14}, {"LEFT", 2, 0}, item.isIconAtlas, nil, item.iconBorderColor)
+    else
+        self:HideTexture()
     end
-    self.items = items
-    self.maxShownItems = maxShownItems
 end
 
-function AF_CascadingMenuMixin:LoadItems()
+local function UpdateValueForItem(item)
+    if not item.value then
+        item.value = item.text
+    end
+    if item.children then
+        for _, child in ipairs(item.children) do
+            UpdateValueForItem(child)
+        end
+    end
+end
+
+function AF_CascadingMenuButtonMixin:SetItems(items)
+    -- validate item.value
+    for _, item in ipairs(items) do
+        UpdateValueForItem(item)
+    end
+    self.items = items
+end
+
+function AF_CascadingMenuButtonMixin:LoadItems()
     if not self.items then return end
     current_root = self
     LoadItems(self.items, self.maxShownItems, 1)
+    menus[1]:SetParent(self)
     AF.ClearPoints(menus[1])
     AF.SetPoint(menus[1], "TOPLEFT", self, "BOTTOMLEFT", 0, -2)
     AF.SetPoint(menus[1], "TOPRIGHT", self, "BOTTOMRIGHT", 0, -2)
     menus[1]:Show()
 end
 
+function AF_CascadingMenuButtonMixin:ToggleMenu()
+    if current_root == self and menus[1] and menus[1]:IsShown() then
+        menus[1]:Hide()
+    else
+        self:LoadItems()
+    end
+end
+
 ---@param parent Frame
 ---@param width number
 ---@param items table
 ---@param maxShownItems number? default is 10
----@return AF_CascadingMenu|AF_Button|Button
-function AF.CreateCascadingMenu(parent, width)
+---@return AF_CascadingMenuButton|AF_Button|Button
+function AF.CreateCascadingMenuButton(parent, width, maxShownItems)
     local menu = AF.CreateButton(parent, "", "accent_hover", width, 20)
+    menu:SetJustifyH("LEFT")
 
+    menu.maxShownItems = maxShownItems or 10
+    menu.enabled = true
     menu._SetEnabled = menu.SetEnabled
-    Mixin(menu, AF_CascadingMenuMixin)
+    Mixin(menu, AF_CascadingMenuButtonMixin)
 
-    menu:SetScript("OnClick", menu.LoadItems)
+    menu:SetScript("OnClick", menu.ToggleMenu)
+    AF.RegisterForCloseDropdown(menu)
 
     return menu
 end

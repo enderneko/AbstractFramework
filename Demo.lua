@@ -306,12 +306,58 @@ function AF.ShowDemo()
     slist1:SetWidgets(widgets)
 
 
+
+    -----------------------------------------------------------------------------
+    --                             cascading menu                              --
+    -----------------------------------------------------------------------------
+    local cm = AF.CreateCascadingMenuButton(demo, 150)
+    AF.SetPoint(cm, "TOP", b6, 0, -15)
+    AF.SetPoint(cm, "LEFT", slist1, "RIGHT", 10, 0)
+    cm:SetLabel("Cascading Menu")
+
+    do
+        local data = {
+            druid = {774, 8936, 190984},
+            monk = {119611, 124682, 450805},
+            priest = {139, 41635, 17},
+        }
+
+        local items = {}
+        for class, spells in pairs(data) do
+            local t = {
+                ["text"] = class,
+                ["icon"] = "classicon-" .. class,
+                ["isIconAtlas"] = true,
+                ["notClickable"] = true,
+                ["children"] = {}
+            }
+            for _, spellID in ipairs(spells) do
+                local name, icon = AF.GetSpellInfo(spellID)
+                tinsert(t.children, {
+                    ["text"] = name,
+                    ["icon"] = icon,
+                    ["iconBorderColor"] = "black",
+                    ["onClick"] = function()
+                        print("SpellID:", spellID)
+                    end
+                })
+            end
+            tinsert(items, t)
+        end
+
+        tinsert(items, {["text"] = "Item 1"})
+        tinsert(items, {["text"] = "Item 2"})
+        tinsert(items, {["text"] = "Item 3"})
+
+        cm:SetItems(items)
+    end
+
     -----------------------------------------------------------------------------
     --                                 dropdown                                --
     -----------------------------------------------------------------------------
     -- normal dropdown (items <= 10)
     local dd1 = AF.CreateDropdown(demo, 150)
-    AF.SetPoint(dd1, "TOPLEFT", slist1, "TOPRIGHT", 10, -11)
+    AF.SetPoint(dd1, "TOPLEFT", cm, "BOTTOMLEFT", 0, -30)
     AF.SetTooltips(dd1, "TOPLEFT", 0, 2, "Normal Dropdown 1")
     dd1:SetLabel("Normal Dropdown 1")
     dd1:SetOnClick(function(value)
@@ -416,14 +462,6 @@ function AF.ShowDemo()
         })
     end
     dd8:SetItems(items)
-
-
-    -----------------------------------------------------------------------------
-    --                             cascading menu                              --
-    -----------------------------------------------------------------------------
-    local cm = AF.CreateCascadingMenu(demo, 150)
-    AF.SetPoint(cm, "TOP", b6)
-    AF.SetPoint(cm, "LEFT", dd1)
 
 
     -----------------------------------------------------------------------------

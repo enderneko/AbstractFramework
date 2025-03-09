@@ -100,10 +100,14 @@ end
 -- close dropdown
 ---------------------------------------------------------------------
 function AF.CloseDropdown()
-    list:Hide()
-    horizontalList:Hide()
-    if list.dropdown and not list.dropdown.isMini then
-        list.dropdown.button:SetTexture(AF.GetIcon("ArrowDown"))
+    if list then
+        list:Hide()
+        if list.dropdown and not list.dropdown.isMini then
+            list.dropdown.button:SetTexture(AF.GetIcon("ArrowDown"))
+        end
+    end
+    if horizontalList then
+        horizontalList:Hide()
     end
 end
 
@@ -510,6 +514,8 @@ function AF.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
             if not isMini then dropdown.button:SetTexture(AF.GetIcon("ArrowUp")) end
         end
     end)
+
+    AF.RegisterForCloseCascadingMenu(dropdown.button)
 
     return dropdown
 end

@@ -730,6 +730,7 @@ local function UpdateMetatable(obj)
 end
 
 local obj = CreateFrame("Frame")
+-- UpdateMetatable(obj)
 UpdateMetatable(CreateFrame("StatusBar"))
 UpdateMetatable(obj:CreateTexture())
 UpdateMetatable(obj:CreateMaskTexture())
