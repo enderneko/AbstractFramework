@@ -160,6 +160,7 @@ end
 ---------------------------------------------------------------------
 -- point
 ---------------------------------------------------------------------
+
 function AF.SetPoint(region, ...)
     if not region._points then region._points = {} end
     local point, relativeTo, relativePoint, offsetX, offsetY

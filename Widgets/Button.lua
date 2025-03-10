@@ -194,7 +194,7 @@ function AF_ButtonMixin:UpdatePixels()
     end
 end
 
-function AF_ButtonMixin:SlientClick()
+function AF_ButtonMixin:SilentClick()
     self._noSound = true
     self:Click()
     self._noSound = nil
@@ -519,12 +519,16 @@ local AF_SwitchMixin = {}
 
 function AF_SwitchMixin:SetSelectedValue(value)
     for _, b in ipairs(self.buttons) do
+        -- if b.value == value then
+        --     if not b.isSelected then b.fill:Play() end
+        --     b.isSelected = true
+        -- else
+        --     if b.isSelected then b.empty:Play() end
+        --     b.isSelected = false
+        -- end
         if b.value == value then
-            if not b.isSelected then b.fill:Play() end
-            b.isSelected = true
-        else
-            if b.isSelected then b.empty:Play() end
-            b.isSelected = false
+            b:SilentClick()
+            break
         end
     end
 end
@@ -546,33 +550,23 @@ end
 --     -- end
 -- end
 
----@param labels table {{["text"]=(string), ["value"]=(boolean/string/number), ["onClick"]=(function)}, ...}
----@return AF_Switch|Frame switch
-function AF.CreateSwitch(parent, width, height, labels)
-    local switch = AF.CreateBorderedFrame(parent, nil, width, height, "widget")
+---@param labels table {{["text"]=(string), ["value"]=(any), ["onClick"]=(function)}, ...}
+function AF_SwitchMixin:SetLabels(labels)
+    if type(labels) ~= "table" then return end
 
-    switch.highlight = AF.CreateTexture(switch, nil, AF.GetColorTable("accent", 0.07))
-    AF.SetPoint(switch.highlight, "TOPLEFT", 1, -1)
-    AF.SetPoint(switch.highlight, "BOTTOMRIGHT", -1, 1)
-    switch.highlight:Hide()
+    local buttons = self.buttons
+    for _, b in ipairs(buttons) do
+        b:Hide()
+    end
+    wipe(buttons)
 
-    switch:SetScript("OnEnter", function()
-        switch.highlight:Show()
-    end)
-
-    switch:SetScript("OnLeave", function()
-        switch.highlight:Hide()
-    end)
-
+    local switch = self
     local n = #labels
-    local buttonWidth = width / n
-
-    -- buttons
-    local buttons = {}
-    switch.buttons = buttons
+    local width = self._width / n
+    local height = self._height
 
     for i, l in pairs(labels) do
-        buttons[i] = AF.CreateButton(switch, labels[i].text, "none", buttonWidth, height)
+        buttons[i] = AF.CreateButton(switch, labels[i].text, "none", width, height)
         buttons[i].value = labels[i].value or labels[i].text
         buttons[i].isSelected = false
 
@@ -655,11 +649,11 @@ function AF.CreateSwitch(parent, width, height, labels)
             end
         end)
 
-        buttons[i]:SetScript("OnEnter", function(self)
+        buttons[i]:SetScript("OnEnter", function()
             switch:GetScript("OnEnter")()
         end)
 
-        buttons[i]:SetScript("OnLeave", function(self)
+        buttons[i]:SetScript("OnLeave", function()
             switch:GetScript("OnLeave")()
         end)
 
@@ -672,8 +666,31 @@ function AF.CreateSwitch(parent, width, height, labels)
             AF.SetPoint(buttons[i], "TOPLEFT", buttons[i-1], "TOPRIGHT", -1, 0)
         end
     end
+end
+
+---@param labels table? {{["text"]=(string), ["value"]=(any), ["onClick"]=(function)}, ...}
+---@return AF_Switch|Frame switch
+function AF.CreateSwitch(parent, width, height, labels)
+    local switch = AF.CreateBorderedFrame(parent, nil, width, height, "widget")
+
+    switch.highlight = AF.CreateTexture(switch, nil, AF.GetColorTable("accent", 0.07))
+    AF.SetPoint(switch.highlight, "TOPLEFT", 1, -1)
+    AF.SetPoint(switch.highlight, "BOTTOMRIGHT", -1, 1)
+    switch.highlight:Hide()
+
+    switch:SetScript("OnEnter", function()
+        switch.highlight:Show()
+    end)
+
+    switch:SetScript("OnLeave", function()
+        switch.highlight:Hide()
+    end)
+
+    -- buttons
+    switch.buttons = {}
 
     Mixin(switch, AF_SwitchMixin)
+    switch:SetLabels(labels)
 
     AF.AddToPixelUpdater(switch)
 
