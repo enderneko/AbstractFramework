@@ -83,6 +83,13 @@ function AF.Fire(event, ...)
     end
 end
 
+function AF.GetFireFunc(event, ...)
+    local args = {...}
+    return function()
+        AF.Fire(event, unpack(args))
+    end
+end
+
 ---------------------------------------------------------------------
 -- addon loaded
 ---------------------------------------------------------------------
