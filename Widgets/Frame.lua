@@ -138,9 +138,35 @@ end
 ---------------------------------------------------------------------
 -- normal frame
 ---------------------------------------------------------------------
+
+---@class AF_Frame
+local AF_FrameMixin = {}
+
+function AF_FrameMixin:SetOnShow(func)
+    self:SetScript("OnShow", func)
+end
+
+function AF_FrameMixin:SetOnHide(func)
+    self:SetScript("OnHide", func)
+end
+
+function AF_FrameMixin:SetOnEnter(func)
+    self:SetScript("OnEnter", func)
+end
+
+function AF_FrameMixin:SetOnLeave(func)
+    self:SetScript("OnLeave", func)
+end
+
+function AF_FrameMixin:SetOnUpdate(func)
+    self:SetScript("OnUpdate", func)
+end
+
+---@return AF_Frame|Frame frame
 function AF.CreateFrame(parent, name, width, height)
     local f = CreateFrame("Frame", name, parent)
     AF.SetSize(f, width, height)
+    Mixin(f, AF_FrameMixin)
     AF.AddToPixelUpdater(f)
     return f
 end
@@ -184,7 +210,7 @@ end
 -- function AF_HeaderedFrameMixin:SetHeaderColor(color)
 -- end
 
----@return AF_HeaderedFrame|Frame headeredFrame
+---@return AF_HeaderedFrame|AF_Frame|Frame headeredFrame
 function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata, frameLevel, notUserPlaced)
     local f = CreateFrame("Frame", name, parent, "BackdropTemplate")
     f:Hide()
@@ -254,6 +280,7 @@ function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata,
     -- AF.SetPoint(header.tex, "TOPLEFT", 1, -1)
     -- AF.SetPoint(header.tex, "BOTTOMRIGHT", -1, 1)
 
+    Mixin(f, AF_FrameMixin)
     Mixin(f, AF_HeaderedFrameMixin)
     AF.AddToPixelUpdater(f)
 
@@ -284,12 +311,13 @@ end
 
 ---@param color string|table color name / table
 ---@param borderColor string|table color name / table
----@return AF_BorderedFrame|Frame borderedFrame
+---@return AF_BorderedFrame|AF_Frame|Frame borderedFrame
 function AF.CreateBorderedFrame(parent, name, width, height, color, borderColor)
     local f = CreateFrame("Frame", name, parent, "BackdropTemplate")
     AF.StylizeFrame(f, color, borderColor)
     AF.SetSize(f, width, height)
 
+    Mixin(f, AF_FrameMixin)
     Mixin(f, AF_BorderedFrameMixin)
     AF.AddToPixelUpdater(f)
 
