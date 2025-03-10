@@ -338,18 +338,73 @@ function AF.ShowDemo()
                     ["icon"] = icon,
                     ["iconBorderColor"] = "black",
                     ["onClick"] = function()
-                        print("SpellID:", spellID)
+                        print(string.format("Class: %s, SpellID: %d, SpellName: %s", class, spellID, name))
                     end
                 })
             end
             tinsert(items, t)
         end
 
+        local fireballName, fireballIcon = AF.GetSpellInfo(133)
+        tinsert(items, {
+            ["text"] = fireballName,
+            ["icon"] = fireballIcon,
+            ["iconBorderColor"] = "black",
+            ["onClick"] = function()
+                print(string.format("SpellID: %d, SpellName: %s", 133, fireballName))
+            end,
+            ["children"] = {
+                {
+                    ["text"] = "Rank 1",
+                    ["onClick"] = function()
+                        print("Fireball Rank 1")
+                    end
+                },
+                {
+                    ["text"] = "Rank 2",
+                    ["onClick"] = function()
+                        print("Fireball Rank 2")
+                    end
+                },
+                {
+                    ["text"] = "Rank 3",
+                    ["onClick"] = function()
+                        print("Fireball Rank 3")
+                    end
+                }
+            }
+        })
+
         tinsert(items, {["text"] = "Item 1"})
-        tinsert(items, {["text"] = "Item 2"})
-        tinsert(items, {["text"] = "Item 3"})
+        tinsert(items, {
+            ["text"] = "Item 2",
+            ["children"] = {
+                {
+                    ["text"] = "Item 2-1",
+                },
+                {
+                    ["text"] = "Item 2-2",
+                    ["children"] = {
+                        {
+                            ["text"] = "Item 2-2-1",
+                        },
+                        {
+                            ["text"] = "Item 2-2-2",
+                        }
+                    }
+                }
+            }
+        })
 
         cm:SetItems(items)
+
+        hooksecurefunc(cm, "OnMenuSelection", function(self, item, path)
+            local paths = {}
+            for _, v in ipairs(path) do
+                tinsert(paths, v.text)
+            end
+            print("OnMenuSelection:", table.concat(paths, AF.WrapTextInColor(" > ", "gray")))
+        end)
     end
 
     -----------------------------------------------------------------------------

@@ -566,10 +566,16 @@ function AF_ScrollListMixin:UpdateSlots()
             end
         end
         self.slots[i]:Show()
+        if self.slots[i].widget then
+            self.slots[i].widget:Show()
+        end
     end
     -- hide unused slots
     for i = self.slotNum+1, #self.slots do
         self.slots[i]:Hide()
+        if self.slots[i].widget then
+            self.slots[i].widget:Hide()
+        end
     end
 end
 

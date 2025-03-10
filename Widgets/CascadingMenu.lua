@@ -2,6 +2,7 @@
 local AF = _G.AbstractFramework
 
 local current_root
+local selection_path = {}
 
 ---------------------------------------------------------------------
 -- create
@@ -30,15 +31,21 @@ local function CreateMenu(level)
         menu:Hide()
         if level == 1 then
             current_root = nil
+            wipe(selection_path)
         end
     end)
 
     return menu
 end
 
-local function LoadItems(items, maxShownItems, level)
+local function LoadItems(items, maxShownItems, level, parentItem)
     local menu = menus[level] or CreateMenu(level)
     wipe(menu.buttons)
+
+    -- Update selection_path if we have a parent item
+    if parentItem then
+        selection_path[level - 1] = parentItem
+    end
 
     local width = 10
     local maxTextWidth = 0
@@ -60,7 +67,7 @@ local function LoadItems(items, maxShownItems, level)
             -- sub menu
             b:HookScript("OnEnter", function()
                 if b.childrenItems then
-                    LoadItems(b.childrenItems, maxShownItems, level + 1)
+                    LoadItems(b.childrenItems, maxShownItems, level + 1, b.item)
                     AF.ClearPoints(menus[level + 1])
                     AF.SetPoint(menus[level + 1], "TOPLEFT", b, "TOPRIGHT", -5, 2)
                     menus[level + 1]:Show()
@@ -87,24 +94,29 @@ local function LoadItems(items, maxShownItems, level)
             b:SetScript("OnClick", function()
                 if item.notClickable then return end
                 item.onClick(item.value)
-                if current_root and current_root.SetItem then
-                    current_root:SetItem(item)
+                if current_root and current_root.OnMenuSelection then
+                    tinsert(selection_path, item)
+                    current_root:OnMenuSelection(item, selection_path)
                 end
                 menus[1]:Hide()
             end)
         else
             b:SetScript("OnClick", function()
                 if item.notClickable then return end
-                if current_root and current_root.SetItem then
-                    current_root:SetItem(item)
+                if current_root and current_root.OnMenuSelection then
+                    tinsert(selection_path, item)
+                    current_root:OnMenuSelection(item, selection_path)
                 end
                 menus[1]:Hide()
             end)
         end
 
+        -- save for onEnter
+        b.item = item
         if item.children then
             b.childrenItems = item.children
             b.childrenSymbol:Show()
+            width = width + 10
         else
             b.childrenItems = nil
             b.childrenSymbol:Hide()
@@ -149,7 +161,7 @@ end
 --     }, ...
 -- }
 
--- when an item is clicked, will call parent:SetValue(text, value, icon, iconBorderColor), if exists
+-- when an item is clicked, will call parent:OnMenuSelection(item, path), if exists
 ---@param parent Frame
 ---@param items table
 ---@param maxShownItems number? default is 10
@@ -197,7 +209,10 @@ function AF_CascadingMenuButtonMixin:SetEnabled(enabled)
     end
 end
 
-function AF_CascadingMenuButtonMixin:SetItem(item)
+-- override this function to handle the selection of the menu
+---@param item table item that was clicked
+---@param path table path to the item
+function AF_CascadingMenuButtonMixin:OnMenuSelection(item, path)
     self:SetText(item.text)
     if item.icon then
         self:SetTexture(item.icon, {14, 14}, {"LEFT", 3, 0}, item.isIconAtlas, nil, item.iconBorderColor)
