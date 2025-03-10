@@ -106,6 +106,10 @@ function AF_ButtonMixin:SetBorderHighlightColor(color)
     end
 end
 
+function AF_ButtonMixin:SetOnClick(func)
+    self:SetScript("OnClick", func)
+end
+
 ---@param tex string
 ---@param size table
 ---@param point table
