@@ -11,6 +11,7 @@ AF.noop = function() end
 ---------------------------------------------------------------------
 AF.LSM = LibStub("LibSharedMedia-3.0")
 AF.LCG = LibStub("LibCustomGlow-1.0")
+AF.MD5 = LibStub("MD5")
 
 ---------------------------------------------------------------------
 -- game version

@@ -4,6 +4,7 @@
     <Script file="Libs\utf8.lua"/>
     <Script file="Libs\LibStub\LibStub.lua"/>
     <Script file="Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua"/>
+    <Script file="Libs\md5.lua"/>
     <Include file="Libs\TaintLess\TaintLess.xml"/>
     <Include file="Libs\LibSharedMedia-3.0\lib.xml"/>
     <Script file="Libs\LibCustomGlow-1.0\LibCustomGlow-1.0.lua"/>
