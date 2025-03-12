@@ -92,6 +92,12 @@ function AF_ButtonMixin:SetJustifyH(justify)
     self.text:SetJustifyH(justify)
 end
 
+function AF_ButtonMixin:SetTextPadding(padding)
+    AF.ClearPoints(self.text)
+    AF.SetPoint(self.text, "LEFT", padding, 0)
+    AF.SetPoint(self.text, "RIGHT", -padding, 0)
+end
+
 function AF_ButtonMixin:SetBorderHighlightColor(color)
     if color then
         self.highlightBorder = function()
