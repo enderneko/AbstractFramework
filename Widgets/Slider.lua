@@ -58,7 +58,7 @@ end
 ---@return AF_Slider slider
 function AF.CreateSlider(parent, text, width, low, high, step, isPercentage, showLowHighText)
     local slider = CreateFrame("Slider", nil, parent, "BackdropTemplate")
-    AF.StylizeFrame(slider, "widget")
+    AF.ApplyDefaultBackdropWithColors(slider, "widget")
 
     slider.isPercentage = isPercentage
 
@@ -320,7 +320,7 @@ end
 ---@return AF_VerticalSlider|AF_Slider slider
 function AF.CreateVerticalSlider(parent, text, height, low, high, step, isPercentage, showLowHighText)
     local slider = AF.CreateSlider(parent, text, 10, low, high, step, isPercentage, showLowHighText)
-    AF.StylizeFrame(slider, "widget")
+    AF.ApplyDefaultBackdropWithColors(slider, "widget")
 
     slider:SetOrientation("VERTICAL")
     AF.SetHeight(slider, height)

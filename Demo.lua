@@ -21,7 +21,7 @@ function AF.ShowDemo()
     demo:SetScript("OnShow", function()
         if not DEV_BACKGROUND then
             DEV_BACKGROUND = CreateFrame("Frame", "DEV_BACKGROUND", nil, "BackdropTemplate")
-            AF.SetDefaultBackdrop_NoBorder(DEV_BACKGROUND)
+            AF.ApplyDefaultBackdrop_NoBorder(DEV_BACKGROUND)
             DEV_BACKGROUND:SetBackdropColor(0.3, 0.3, 0.3, 1)
             DEV_BACKGROUND:SetAllPoints(UIParent)
             DEV_BACKGROUND:SetFrameStrata("BACKGROUND")

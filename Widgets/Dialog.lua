@@ -199,6 +199,8 @@ end
 ---------------------------------------------------------------------
 -- notification dialog
 ---------------------------------------------------------------------
+local notificationDialogQueue = AF.NewQueue()
+
 ---@class AF_NotificationDialog
 local notificationDialog
 

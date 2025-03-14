@@ -253,9 +253,9 @@ function AF.CreateButton(parent, text, color, width, height, template, noBorder,
     -- border -----------------------------------
     b._noBorder = noBorder
     if noBorder then
-        AF.SetDefaultBackdrop_NoBorder(b)
+        AF.ApplyDefaultBackdrop_NoBorder(b)
     else
-        AF.SetDefaultBackdrop(b)
+        AF.ApplyDefaultBackdrop(b)
         -- local n = AF.GetOnePixelForRegion(b)
         -- b:SetBackdrop({bgFile=AF.GetPlainTexture(), edgeFile=AF.GetPlainTexture(), edgeSize=n, insets={left=n, right=n, top=n, bottom=n}})
     end
@@ -484,7 +484,7 @@ function AF.CreateCheckButton(parent, label, onClick)
     Mixin(cb, AF_CheckButtonMixin)
     cb:SetText(label)
 
-    AF.SetDefaultBackdrop(cb)
+    AF.ApplyDefaultBackdrop(cb)
     cb:SetBackdropColor(AF.GetColorRGB("widget"))
     cb:SetBackdropBorderColor(0, 0, 0, 1)
 

@@ -106,7 +106,7 @@ end
 function AF.CreateEditBox(parent, label, width, height, mode, font)
     local eb = CreateFrame("EditBox", nil, parent, "BackdropTemplate")
 
-    AF.StylizeFrame(eb, "widget")
+    AF.ApplyDefaultBackdropWithColors(eb, "widget")
     AF.SetWidth(eb, width or 40)
     AF.SetHeight(eb, height or 20)
 
@@ -254,8 +254,8 @@ function AF.CreateScrollEditBox(parent, name, label, width, height, scrollStep)
     scrollStep = scrollStep or 1
 
     local frame = AF.CreateScrollFrame(parent, name, width, height, "none", "none")
-    AF.StylizeFrame(frame.scrollFrame, "widget")
-    AF.StylizeFrame(frame.scrollBar)
+    AF.ApplyDefaultBackdropWithColors(frame.scrollFrame, "widget")
+    AF.ApplyDefaultBackdropWithColors(frame.scrollBar)
 
     -- highlight
     local highlight = AF.CreateTexture(frame.scrollFrame, nil, AF.GetColorTable("accent", 0.07))

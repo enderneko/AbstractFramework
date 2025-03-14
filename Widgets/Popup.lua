@@ -433,7 +433,7 @@ function AF.ShowNotificationPopup(text, timeout, width, justify)
     AF.SetWidth(p, width or DEFAULT_WIDTH)
     p:SetTimeout(timeout or DEFAULT_NOTIFICATION_TIMEOUT)
     p.text:SetJustifyH("CENTER" or justify)
-    -- AF.StylizeFrame(p, color, borderColor)
+    -- AF.ApplyDefaultBackdropWithColors(p, color, borderColor)
 
     tinsert(popups, p)
     p.index = #popups

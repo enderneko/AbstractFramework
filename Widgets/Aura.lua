@@ -484,7 +484,7 @@ function AF.CreateAura(parent, noPixelUpdates)
 
     Mixin(frame, AF_AuraButtonMixin)
 
-    AF.SetDefaultBackdrop(frame)
+    AF.ApplyDefaultBackdrop(frame)
     frame:SetBackdropColor(AF.GetColorRGB("black"))
 
     frame:SetScript("OnHide", Aura_OnHide)

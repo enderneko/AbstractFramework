@@ -48,7 +48,7 @@ end
 function AF.CreateColorPicker(parent, label, alphaEnabled, onChange, onConfirm)
     local cp = CreateFrame("Button", nil, parent, "BackdropTemplate")
     AF.SetSize(cp, 14, 14)
-    AF.SetDefaultBackdrop(cp)
+    AF.ApplyDefaultBackdrop(cp)
     cp:SetBackdropBorderColor(0, 0, 0, 1)
 
     cp.label = AF.CreateFontString(cp, label)
@@ -219,7 +219,7 @@ end
 local function CreateColorSliderHolder(onValueChanged)
     local holder = CreateFrame("Frame", nil, colorPickerFrame, "BackdropTemplate")
     AF.SetSize(holder, 20, 132)
-    AF.StylizeFrame(holder)
+    AF.ApplyDefaultBackdropWithColors(holder)
 
     local slider = CreateFrame("Slider", nil, holder)
     holder.slider = slider
@@ -396,8 +396,8 @@ local preset3 = {
 local function CreateColorPickerFrame()
     colorPickerFrame = AF.CreateHeaderedFrame(UIParent, "AFColorPicker", _G.COLOR_PICKER, 269, 297, "DIALOG")
     colorPickerFrame.header.closeBtn:Hide()
-    -- AF.StylizeFrame(colorPickerFrame, nil, "accent")
-    -- AF.StylizeFrame(colorPickerFrame.header, "header", "accent")
+    -- AF.ApplyDefaultBackdropWithColors(colorPickerFrame, nil, "accent")
+    -- AF.ApplyDefaultBackdropWithColors(colorPickerFrame.header, "header", "accent")
     AF.SetPoint(colorPickerFrame, "CENTER")
     AF.PixelPerfectPoint(colorPickerFrame)
 

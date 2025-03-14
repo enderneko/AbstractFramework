@@ -83,7 +83,7 @@ end
 local function CreateTooltip(name, hasIcon)
     local tooltip = CreateFrame("GameTooltip", name, AF.UIParent, "AFTooltipTemplate,BackdropTemplate")
     -- local tooltip = CreateFrame("GameTooltip", name, AF.UIParent, "SharedTooltipTemplate,BackdropTemplate")
-    AF.SetDefaultBackdrop(tooltip)
+    AF.ApplyDefaultBackdrop(tooltip)
     tooltip:SetBackdropColor(0.1, 0.1, 0.1, 0.9)
     tooltip:SetBackdropBorderColor(AF.GetColorRGB("accent"))
     tooltip:SetOwner(AF.UIParent, "ANCHOR_NONE")

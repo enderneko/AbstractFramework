@@ -25,7 +25,7 @@ end
 ---@return AF_BlizzardStatusBar|StatusBar bar
 function AF.CreateBlizzardStatusBar(parent, minValue, maxValue, width, height, color, borderColor, progressTextType)
     local bar = CreateFrame("StatusBar", nil, parent, "BackdropTemplate")
-    AF.StylizeFrame(bar, AF.GetColorTable(color, 0.9, 0.1), borderColor)
+    AF.ApplyDefaultBackdropWithColors(bar, AF.GetColorTable(color, 0.9, 0.1), borderColor)
     AF.SetSize(bar, width, height)
 
     minValue = minValue or 1
@@ -256,7 +256,7 @@ function AF.CreateSimpleStatusBar(parent, name, noBackdrop)
         bar.SetBackgroundColor = nil
         bar.SetBorderColor = nil
     else
-        AF.SetDefaultBackdrop(bar)
+        AF.ApplyDefaultBackdrop(bar)
     end
 
     -- default value

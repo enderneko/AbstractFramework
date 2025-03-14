@@ -156,7 +156,7 @@ local function CreateCells(parent, config, isCell)
                 AF.SetPoint(parent[i].text, "RIGHT", -2, 0)
             end
             -- on enter/leave
-            AF.SetDefaultBackdrop_NoBackground(parent[i])
+            AF.ApplyDefaultBackdrop_NoBackground(parent[i])
             parent[i]:SetBackdropBorderColor(AF.GetColorRGB("black"))
             parent[i]:SetScript("OnEnter", Row_OnEnter)
             parent[i]:SetScript("OnLeave", Row_OnLeave)
@@ -229,7 +229,7 @@ function AF_SheetMixin:LoadData(data)
             --! create
             local row = CreateFrame("Button", nil, self.content.slotFrame)
             self.allRows[i] = row
-            AF.SetDefaultBackdrop_NoBorder(row)
+            AF.ApplyDefaultBackdrop_NoBorder(row)
             row:SetBackdropColor(AF.GetColorRGB("none"))
             row:SetScript("OnEnter", Row_OnEnter)
             row:SetScript("OnLeave", Row_OnLeave)
@@ -365,8 +365,8 @@ function AF.CreateSheet(parent, name, config, onSizeChanged)
 
     -- update backdrop
     content:ClearBackdrop()
-    AF.SetDefaultBackdrop(content.slotFrame)
-    AF.StylizeFrame(content.slotFrame, "sheet_bg")
+    AF.ApplyDefaultBackdrop(content.slotFrame)
+    AF.ApplyDefaultBackdropWithColors(content.slotFrame, "sheet_bg")
 
     sheet.onSizeChanged = onSizeChanged
     Mixin(sheet, AF_SheetMixin)

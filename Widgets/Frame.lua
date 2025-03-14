@@ -70,15 +70,43 @@ function AF.SetFrameLevel(frame, level, relativeTo)
 end
 
 ---------------------------------------------------------------------
--- style
+-- backdrops
 ---------------------------------------------------------------------
+function AF.ApplyDefaultBackdrop(frame, borderSize)
+    if not frame.SetBackdrop then
+        Mixin(frame, BackdropTemplateMixin)
+    end
+    local n = AF.ConvertPixelsForRegion(borderSize or 1, frame)
+    frame:SetBackdrop({bgFile=AF.GetPlainTexture(), edgeFile=AF.GetPlainTexture(), edgeSize=n, insets={left=n, right=n, top=n, bottom=n}})
+end
+
+function AF.ApplyDefaultBackdrop_NoBackground(frame, borderSize)
+    if not frame.SetBackdrop then
+        Mixin(frame, BackdropTemplateMixin)
+    end
+    frame:SetBackdrop({edgeFile=AF.GetPlainTexture(), edgeSize=AF.ConvertPixelsForRegion(borderSize or 1, frame)})
+end
+
+function AF.ApplyDefaultBackdrop_NoBorder(frame)
+    if not frame.SetBackdrop then
+        Mixin(frame, BackdropTemplateMixin)
+    end
+    frame:SetBackdrop({bgFile=AF.GetPlainTexture()})
+end
+
+function AF.ApplyDefaultBackdropColors(frame)
+    frame:SetBackdropColor(AF.GetColorRGB("background"))
+    frame:SetBackdropBorderColor(AF.GetColorRGB("border"))
+end
+
+---@param frame Frame
 ---@param color string|table color name defined in Color.lua or color table
 ---@param borderColor string|table color name defined in Color.lua or color table
-function AF.StylizeFrame(frame, color, borderColor)
+function AF.ApplyDefaultBackdropWithColors(frame, color, borderColor)
     color = color or "background"
     borderColor = borderColor or "border"
 
-    AF.SetDefaultBackdrop(frame)
+    AF.ApplyDefaultBackdrop(frame)
     if type(color) == "string" then
         frame:SetBackdropColor(AF.GetColorRGB(color))
     else
@@ -89,36 +117,6 @@ function AF.StylizeFrame(frame, color, borderColor)
     else
         frame:SetBackdropBorderColor(unpack(borderColor))
     end
-end
-
----------------------------------------------------------------------
--- backdrop
----------------------------------------------------------------------
-function AF.SetDefaultBackdrop(frame, borderSize)
-    if not frame.SetBackdrop then
-        Mixin(frame, BackdropTemplateMixin)
-    end
-    local n = AF.ConvertPixelsForRegion(borderSize or 1, frame)
-    frame:SetBackdrop({bgFile=AF.GetPlainTexture(), edgeFile=AF.GetPlainTexture(), edgeSize=n, insets={left=n, right=n, top=n, bottom=n}})
-end
-
-function AF.SetDefaultBackdrop_NoBackground(frame, borderSize)
-    if not frame.SetBackdrop then
-        Mixin(frame, BackdropTemplateMixin)
-    end
-    frame:SetBackdrop({edgeFile=AF.GetPlainTexture(), edgeSize=AF.ConvertPixelsForRegion(borderSize or 1, frame)})
-end
-
-function AF.SetDefaultBackdrop_NoBorder(frame)
-    if not frame.SetBackdrop then
-        Mixin(frame, BackdropTemplateMixin)
-    end
-    frame:SetBackdrop({bgFile=AF.GetPlainTexture()})
-end
-
-function AF.ApplyDefaultBackdropColors(frame)
-    frame:SetBackdropColor(AF.GetColorRGB("background"))
-    frame:SetBackdropBorderColor(AF.GetColorRGB("border"))
 end
 
 ---------------------------------------------------------------------
@@ -225,7 +223,7 @@ function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata,
     f:SetClampRectInsets(0, 0, AF.ConvertPixelsForRegion(20, f), 0)
     AF.SetSize(f, width, height)
     f:SetPoint("CENTER")
-    AF.StylizeFrame(f)
+    AF.ApplyDefaultBackdropWithColors(f)
 
     -- header
     local header = CreateFrame("Frame", nil, f, "BackdropTemplate")
@@ -242,7 +240,7 @@ function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata,
     AF.SetPoint(header, "RIGHT")
     AF.SetPoint(header, "BOTTOM", f, "TOP", 0, -1)
     AF.SetHeight(header, 20)
-    AF.StylizeFrame(header, "header")
+    AF.ApplyDefaultBackdropWithColors(header, "header")
 
     header.text = AF.CreateFontString(header, title, AF.GetAccentColorName(), "AF_FONT_TITLE")
     header.text:SetPoint("CENTER")
@@ -314,7 +312,7 @@ end
 ---@return AF_BorderedFrame|AF_Frame|Frame borderedFrame
 function AF.CreateBorderedFrame(parent, name, width, height, color, borderColor)
     local f = CreateFrame("Frame", name, parent, "BackdropTemplate")
-    AF.StylizeFrame(f, color, borderColor)
+    AF.ApplyDefaultBackdropWithColors(f, color, borderColor)
     AF.SetSize(f, width, height)
 
     Mixin(f, AF_FrameMixin)
