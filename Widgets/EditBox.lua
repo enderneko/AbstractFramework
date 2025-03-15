@@ -8,13 +8,14 @@ local AF = _G.AbstractFramework
 local AF_EditBoxMixin = {}
 
 ---@param func function?
----@param isOutside boolean?
 ---@param text string?
----@param width number?
----@param mode string? "trim"|"number"|nil
-function AF_EditBoxMixin:SetConfirmButton(func, isOutside, text, width)
-    self.confirmBtn = self.confirmBtn or AF.CreateButton(self, text, "accent", width or 30, self._height or 20)
+---@param position string? "right_inside"|"right_outside"|"bottom"|"bottomleft"|"bottomright"|nil, default "right_inside".
+---@param width number? default is 30, but use editbox width if position is "bottom".
+---@param height number? default is 20.
+function AF_EditBoxMixin:SetConfirmButton(func, text, position, width, height)
+    self.confirmBtn = self.confirmBtn or AF.CreateButton(self, text, "accent", width or 30, height or 20)
     self.confirmBtn:Hide()
+    AF.SetFrameLevel(self.confirmBtn, 5)
 
     if text then
         self.confirmBtn:SetText(text)
@@ -23,7 +24,15 @@ function AF_EditBoxMixin:SetConfirmButton(func, isOutside, text, width)
     end
 
     AF.ClearPoints(self.confirmBtn)
-    if isOutside then
+    position = position and strlower(position) or "right_inside"
+    if position == "bottom" then
+        AF.SetPoint(self.confirmBtn, "TOPLEFT", self, "BOTTOMLEFT", 0, 1)
+        AF.SetPoint(self.confirmBtn, "TOPRIGHT", self, "BOTTOMRIGHT", 0, 1)
+    elseif position == "bottomleft" then
+        AF.SetPoint(self.confirmBtn, "TOPLEFT", self, "BOTTOMLEFT", 0, 1)
+    elseif position == "bottomright" then
+        AF.SetPoint(self.confirmBtn, "TOPRIGHT", self, "BOTTOMRIGHT", 0, 1)
+    elseif position == "right_outside" then
         AF.SetPoint(self.confirmBtn, "TOPLEFT", self, "TOPRIGHT", -1, 0)
     else
         AF.SetPoint(self.confirmBtn, "TOPRIGHT")
@@ -66,6 +75,12 @@ end
 
 function AF_EditBoxMixin:Clear()
     self:SetText("")
+end
+
+function AF_EditBoxMixin:GetBytes()
+    local value = self:GetValue()
+    if type(value) ~= "string" then value = tostring(value) end
+    return #value
 end
 
 ---@param mode string? "multiline"|"number"|"trim"|nil
@@ -182,16 +197,16 @@ function AF.CreateEditBox(parent, label, width, height, mode, font)
         end
 
         if userChanged then
-            -- NOTE: if confirmBtn is set, onTextChanged will not invoke
+            if eb.onTextChanged then
+                eb.onTextChanged(value)
+            end
+
             if eb.confirmBtn then
                 if eb.value ~= value then
                     eb.confirmBtn:Show()
                 else
                     eb.confirmBtn:Hide()
                 end
-            elseif eb.onTextChanged then
-                eb.onTextChanged(value)
-                eb.value = value -- update value
             end
         else
             eb.value = value -- update value
@@ -243,6 +258,50 @@ function AF_ScrollEditBoxMixin:SetEnabled(enabled)
         self.scrollBar:SetBackdropBorderColor(AF.GetColorRGB("black", 0.7))
         self.scrollFrame:SetBackdropBorderColor(AF.GetColorRGB("black", 0.7))
     end
+end
+
+function AF_ScrollEditBoxMixin:SetOnTextChanged(func)
+    self.eb:SetOnTextChanged(func)
+end
+
+---@param func function?
+---@param text string?
+---@param position string? "right_inside"|"right_outside"|"bottom"|"bottomleft"|"bottomright"|nil, default "bottomleft".
+---@param width number? default is 30, but use editbox width if position is "bottom".
+---@param height number? default is 20.
+function AF_ScrollEditBoxMixin:SetConfirmButton(func, text, position, width, height)
+    self.eb:SetConfirmButton(func, text, nil, width, height)
+
+    local confirmBtn = self.eb.confirmBtn
+    confirmBtn:SetParent(self.scrollFrame)
+    AF.SetFrameLevel(confirmBtn, 5, self.scrollFrame)
+
+    AF.ClearPoints(confirmBtn)
+    position = position and strlower(position) or "bottomleft"
+    if position == "bottom" then
+        AF.SetPoint(confirmBtn, "TOPLEFT", self.scrollFrame, "BOTTOMLEFT", 0, 1)
+        AF.SetPoint(confirmBtn, "TOPRIGHT", self.scrollFrame, "BOTTOMRIGHT", 0, 1)
+    elseif position == "bottomleft" then
+        AF.SetPoint(confirmBtn, "TOPLEFT", self.scrollFrame, "BOTTOMLEFT", 0, 1)
+    elseif position == "bottomright" then
+        AF.SetPoint(confirmBtn, "TOPRIGHT", self.scrollFrame, "BOTTOMRIGHT", 0, 1)
+    elseif position == "right_outside" then
+        AF.SetPoint(confirmBtn, "TOPLEFT", self.scrollFrame, "TOPRIGHT", -1, 0)
+    else
+        AF.SetPoint(confirmBtn, "TOPRIGHT", self.scrollFrame)
+    end
+end
+
+function AF_ScrollEditBoxMixin:SetMaxLetters(maxLetters)
+    self.eb:SetMaxLetters(maxLetters)
+end
+
+function AF_ScrollEditBoxMixin:SetMaxBytes(maxBytes)
+    self.eb:SetMaxBytes(maxBytes)
+end
+
+function AF_ScrollEditBoxMixin:GetBytes()
+    return self.eb:GetBytes()
 end
 
 function AF_ScrollEditBoxMixin:Clear()
@@ -307,24 +366,9 @@ function AF.CreateScrollEditBox(parent, name, label, width, height, scrollStep)
         if frame.scrollFrame:GetVerticalScroll() > frame.scrollFrame:GetVerticalScrollRange() then frame:ScrollToBottom() end
     end)
 
-    function frame:SetOnTextChanged(func)
-        eb:SetOnTextChanged(func)
-    end
-
-    eb:SetScript("OnTextChanged", function(self, userChanged)
-        local text = strtrim(eb:GetText())
-        if text == "" then
-            eb.label:Show()
-        else
-            eb.label:Hide()
-        end
-
+    eb:HookScript("OnTextChanged", function()
         -- NOTE: should not use SetContentHeight
         frame.scrollContent:SetHeight(eb:GetHeight())
-
-        if eb.onTextChanged then
-            eb.onTextChanged(text)
-        end
     end)
 
     frame.scrollFrame:SetScript("OnMouseDown", function()
