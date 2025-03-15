@@ -617,6 +617,7 @@ function AF_ScrollListMixin:SetSlotNum(newSlotNum)
 end
 
 function AF_ScrollListMixin:SetWidgets(widgets)
+    self:Reset()
     self.widgets = widgets
     self.widgetNum = #widgets
     self:SetScroll(1)
@@ -634,7 +635,7 @@ end
 
 -- reset
 function AF_ScrollListMixin:Reset()
-    wipe(self.widgets)
+    self.widgets = {}
     self.widgetNum = 0
     -- hide slot widgets
     for _, s in ipairs(self.slots) do
