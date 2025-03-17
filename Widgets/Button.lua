@@ -45,7 +45,7 @@ function AF_ButtonMixin:HandleMouseUpTexture()
     end
 end
 
----@param color string @see
+---@param color string
 function AF_ButtonMixin:SetTextHighlightColor(color)
     if color then
         self.highlightText = function()
@@ -110,6 +110,27 @@ function AF_ButtonMixin:SetBorderHighlightColor(color)
         self.highlightBorder = nil
         self.unhighlightBorder = nil
     end
+end
+
+---@param color string
+function AF_ButtonMixin:SetColor(color)
+    -- keep color & hoverColor ------------------
+    self._color = AF.GetButtonNormalColor(color)
+    self._hoverColor = AF.GetButtonHoverColor(color)
+
+    self:SetBackdropColor(AF.UnpackColor(self._color))
+
+    -- OnEnter / OnLeave ------------------------
+    self:SetScript("OnEnter", function()
+        if color ~= "none" then self:SetBackdropColor(AF.UnpackColor(self._hoverColor)) end
+        if self.highlightText then self.highlightText() end
+        if self.highlightBorder then self.highlightBorder() end
+    end)
+    self:SetScript("OnLeave", function()
+        if color ~= "none" then self:SetBackdropColor(AF.UnpackColor(self._color)) end
+        if self.unhighlightText then self.unhighlightText() end
+        if self.unhighlightBorder then self.unhighlightBorder() end
+    end)
 end
 
 function AF_ButtonMixin:SetOnClick(func)
@@ -228,10 +249,6 @@ function AF.CreateButton(parent, text, color, width, height, template, noBorder,
     Mixin(b, AF_ButtonMixin)
     RegisterMouseDownUp(b)
 
-    -- keep color & hoverColor ------------------
-    b._color = AF.GetButtonNormalColor(color)
-    b._hoverColor = AF.GetButtonHoverColor(color)
-
     -- text -------------------------------------
     b.text = AF.CreateFontString(b, text, nil, font)
     AF.RemoveFromPixelUpdater(b.text)
@@ -283,19 +300,7 @@ function AF.CreateButton(parent, text, color, width, height, template, noBorder,
         b:SetBackdropBorderColor(0, 0, 0, 1)
     end
 
-    b:SetBackdropColor(unpack(b._color))
-
-    -- OnEnter / OnLeave ------------------------
-    b:SetScript("OnEnter", function()
-        if color ~= "none" then b:SetBackdropColor(unpack(b._hoverColor)) end
-        if b.highlightText then b.highlightText() end
-        if b.highlightBorder then b.highlightBorder() end
-    end)
-    b:SetScript("OnLeave", function()
-        if color ~= "none" then b:SetBackdropColor(unpack(b._color)) end
-        if b.unhighlightText then b.unhighlightText() end
-        if b.unhighlightBorder then b.unhighlightBorder() end
-    end)
+    b:SetColor(color)
 
     -- click sound ------------------------------
     if not AF.isVanilla then
