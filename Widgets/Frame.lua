@@ -876,7 +876,6 @@ end
 function AF.ShowMask(parent, text, tlX, tlY, brX, brY)
     if not parent.mask then
         parent.mask = AF.CreateBorderedFrame(parent, nil, nil, nil, AF.GetColorTable("widget", 0.7), "none")
-        AF.SetFrameLevel(parent.mask, 30, parent)
         parent.mask:EnableMouse(true)
         -- parent.mask:EnableMouseWheel(true) -- not enough
         parent.mask:SetScript("OnMouseWheel", function(self, delta)
@@ -898,6 +897,7 @@ function AF.ShowMask(parent, text, tlX, tlY, brX, brY)
     -- else
     --     AF.SetOnePixelInside(parent.mask, parent)
     -- end
+    AF.SetFrameLevel(parent.mask, 30, parent)
     parent.mask:Show()
 
     return parent.mask

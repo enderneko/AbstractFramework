@@ -137,6 +137,14 @@ function AF_ButtonMixin:SetOnClick(func)
     self:SetScript("OnClick", func)
 end
 
+function AF_ButtonMixin:HookOnEnter(func)
+    self:HookScript("OnEnter", func)
+end
+
+function AF_ButtonMixin:HookOnLeave(func)
+    self:HookScript("OnLeave", func)
+end
+
 ---@param tex string
 ---@param size table
 ---@param point table

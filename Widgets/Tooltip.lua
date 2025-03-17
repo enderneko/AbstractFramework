@@ -11,10 +11,15 @@ local anchorOverride = {
     ["BOTTOMRIGHT"] = "TOPRIGHT",
 }
 
-function AF.ShowTooltips(widget, anchor, x, y, content)
+---@param widget Frame
+---@param anchor string
+---@param x number
+---@param y number
+---@param lines string[]
+function AF.ShowTooltips(widget, anchor, x, y, lines)
     local tooltip = _G["AFTooltip"]
 
-    if type(content) ~= "table" or #content == 0 then
+    if type(lines) ~= "table" or #lines == 0 then
         tooltip:Hide()
         return
     end
@@ -35,10 +40,10 @@ function AF.ShowTooltips(widget, anchor, x, y, content)
         tooltip:SetOwner(widget, anchor or "ANCHOR_TOP", x or 0, y or 0)
     end
 
-    tooltip:AddLine(content[1], AF.GetColorRGB("accent"))
-    for i = 2, #content do
-        if content[i] then
-            tooltip:AddLine(content[i], 1, 1, 1)
+    tooltip:AddLine(lines[1], AF.GetColorRGB("accent"))
+    for i = 2, #lines do
+        if lines[i] then
+            tooltip:AddLine(lines[i], 1, 1, 1)
         end
     end
 
@@ -47,6 +52,11 @@ function AF.ShowTooltips(widget, anchor, x, y, content)
     tooltip:Show()
 end
 
+---@param widget Frame
+---@param anchor string
+---@param x number
+---@param y number
+---@param ... string
 function AF.SetTooltips(widget, anchor, x, y, ...)
     if type(select(1, ...)) == "table" then
         widget._tooltips = ...
