@@ -244,7 +244,7 @@ local COLORS = {
     ["accent_alt"] = {["hex"] = "ffff0066", ["t"] = {1, 0, 0.4, 1}, ["normal"] = {1, 0, 0.4, 0.3}, ["hover"] = {1, 0, 0.4, 0.6}},
 
     -- for regions
-    ["background"] = {["hex"] = "e61a1a1a", ["t"] = {0.1, 0.1, 0.1, 0.9}},
+    ["background"] = {["hex"] = "d91a1a1a", ["t"] = {0.1, 0.1, 0.1, 0.85}},
     ["border"] = {["hex"] = "ff000000", ["t"] = {0, 0, 0, 1}},
     ["header"] = {["hex"] = "ff202020", ["t"] = {0.127, 0.127, 0.127, 1}}, -- header background
     ["widget"] = {["hex"] = "ff262626", ["t"] = {0.15, 0.15, 0.15, 1}}, -- widget background
