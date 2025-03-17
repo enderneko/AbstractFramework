@@ -108,3 +108,36 @@ function AF.GetFont(font, addon)
         return "Interface\\AddOns\\AbstractFramework\\Media\\Fonts\\" .. font .. ".ttf"
     end
 end
+
+---------------------------------------------------------------------
+-- get profession icon
+---------------------------------------------------------------------
+local professions = {
+    [171] = "Alchemy",
+    [164] = "Blacksmithing",
+    [333] = "Enchanting",
+    [202] = "Engineering",
+    [773] = "Inscription",
+    [755] = "Jewelcrafting",
+    [165] = "Leatherworking",
+    [393] = "Skinning",
+    [197] = "Tailoring",
+    [182] = "Herbalism",
+    [186] = "Mining",
+    [185] = "Cooking",
+    [356] = "Fishing",
+    [794] = "Archaeology",
+    [129] = "FirstAid",
+}
+
+---@param profession number|string professionID or professionName(EN)
+function AF.GetProfessionIcon(profession)
+    if type(profession) == "number" then
+        profession = professions[profession]
+    end
+    if profession then
+        return AF.GetIcon("Profession_" .. profession)
+    else
+        return AF.GetIcon("QuestionMark")
+    end
+end
