@@ -1,5 +1,6 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
+local L = AF.L
 
 local select, type, tonumber = select, type, tonumber
 local floor, ceil, abs, max, min, abs = math.floor, math.ceil, math.abs, math.max, math.min, math.abs
@@ -366,6 +367,32 @@ function AF.GetLocalizedSeconds(sec)
     else
         return format(SEC, AF.Round(sec, 1))
     end
+end
+
+function AF.FormatRelativeTime(sec)
+    sec = time() - sec
+
+    local suffix = sec < 0 and L["%s from now"] or L["%s ago"]
+    sec = abs(sec)
+
+    if sec == 0 then
+        sec = L["just now"]
+    elseif sec < 60 then
+        sec = suffix:format(L["%d seconds"]:format(sec))
+    elseif sec < 3600 then
+        sec = suffix:format(L["%d minutes"]:format(sec / 60))
+    elseif sec < 86400 then
+        sec = suffix:format(L["%d hours"]:format(sec / 3600))
+    elseif sec < 604800 then
+        sec = suffix:format(L["%d days"]:format(sec / 86400))
+    elseif sec < 2419200 then
+        sec = suffix:format(L["%d weeks"]:format(sec / 604800))
+    elseif sec < 29030400 then
+        sec = suffix:format(L["%d months"]:format(sec / 2419200))
+    else
+        sec = suffix:format(L["%d years"]:format(sec / 29030400))
+    end
+    return sec
 end
 
 ---------------------------------------------------------------------
