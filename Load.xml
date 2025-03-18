@@ -14,9 +14,11 @@
     <Script file="Locales.lua"/>
 
     <!-- utils -->
+    <Script file="Utils\Queue.lua"/>
+    <Script file="Utils\OnUpdateExecutor.lua"/>
     <Script file="Utils\EventHandler.lua"/>
-    <Script file="Utils\Common.lua"/>
     <Script file="Utils\CallbackHandler.lua"/>
+    <Script file="Utils\Common.lua"/>
     <Script file="Utils\Addon.lua"/>
 
     <!-- player -->
