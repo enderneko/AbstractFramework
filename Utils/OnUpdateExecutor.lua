@@ -84,8 +84,8 @@ function AF_OnUpdateExecutorMixin:OnHide()
     self.status = STATUS_IDLE
 end
 
----@param taskHandler function accept 4 arguments: executor, task, numRemainingTasks, numTotalTasks
----@param onFinishedCallback function? accept 1 argument: executor
+---@param taskHandler fun(executor: AF_OnUpdateExecutor, task: any, numRemainingTasks: number, numTotalTasks: number)
+---@param onFinishedCallback? fun(executor: AF_OnUpdateExecutor)
 ---@return AF_OnUpdateExecutor executor
 function AF.BuildOnUpdateExecutor(taskHandler, onFinishedCallback)
     local executor = CreateFrame("Frame")
