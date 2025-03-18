@@ -405,3 +405,31 @@ function AF.FormatRelativeTime(sec)
     end
     return sec
 end
+
+---------------------------------------------------------------------
+-- compress and serialize
+---------------------------------------------------------------------
+local LibDeflate = AF.Libs.LibDeflate
+local deflateConfig = {level = 9}
+local LibSerialize = AF.Libs.LibSerialize
+
+function AF.Serialize(data)
+    local serialized = LibSerialize:Serialize(data) -- serialize
+    local compressed = LibDeflate:CompressDeflate(serialized, deflateConfig) -- compress
+    return LibDeflate:EncodeForPrint(compressed) -- encode
+end
+
+function AF.Deserialize(encoded)
+    local decoded = LibDeflate:DecodeForPrint(encoded) -- decode
+    local decompressed = LibDeflate:DecompressDeflate(decoded) -- decompress
+    if not decompressed then
+        AF.Debug("Error decompressing")
+        return
+    end
+    local success, data = LibSerialize:Deserialize(decompressed) -- deserialize
+    if not success then
+        AF.Debug("Error deserializing")
+        return
+    end
+    return data
+end
