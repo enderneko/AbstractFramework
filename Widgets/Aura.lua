@@ -1,6 +1,6 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
-local LCG = AF.LCG
+local LCG = AF.Libs.LCG
 
 ---------------------------------------------------------------------
 -- recalc texcoords

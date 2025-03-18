@@ -9,9 +9,13 @@ AF.noop = function() end
 ---------------------------------------------------------------------
 -- libs
 ---------------------------------------------------------------------
-AF.LSM = LibStub("LibSharedMedia-3.0")
-AF.LCG = LibStub("LibCustomGlow-1.0")
-AF.MD5 = LibStub("MD5")
+AF.Libs = {}
+AF.Libs.LSM = LibStub("LibSharedMedia-3.0")
+AF.Libs.LCG = LibStub("LibCustomGlow-1.0")
+AF.Libs.MD5 = LibStub("MD5")
+AF.Libs.LibDeflate = LibStub("LibDeflate")
+AF.Libs.LibSerialize = LibStub("LibSerialize")
+AF.Libs.Comm = LibStub("AceComm-3.0")
 
 ---------------------------------------------------------------------
 -- game version

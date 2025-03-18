@@ -1,6 +1,6 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
-local LSM = AF.LSM
+local LSM = AF.Libs.LSM
 
 local DEFAULT_BAR_TEXTURE = AF.GetPlainTexture()
 local DEFAULT_FONT = GameFontNormal:GetFont()
