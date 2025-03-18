@@ -79,7 +79,9 @@ function AF.UIParent:ADDON_LOADED(addon)
     if addon == AF.name then
         AF.UIParent:UnregisterEvent("ADDON_LOADED")
         if type(AFConfig) ~= "table" then
-            AFConfig = {}
+            AFConfig = {
+                debugMode = false,
+            }
         end
     end
 end
