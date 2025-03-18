@@ -22,7 +22,8 @@ end
 
 ---@param color string color name defined in Color.lua
 ---@param borderColor string color name defined in Color.lua
----@return AF_BlizzardStatusBar|StatusBar bar
+---@param progressTextType string? "percentage" or "current_value" or "current_max".
+---@return AF_BlizzardStatusBar|AF_SmoothStatusBar bar
 function AF.CreateBlizzardStatusBar(parent, minValue, maxValue, width, height, color, borderColor, progressTextType)
     local bar = CreateFrame("StatusBar", nil, parent, "BackdropTemplate")
     AF.ApplyDefaultBackdropWithColors(bar, AF.GetColorTable(color, 0.9, 0.1), borderColor)
@@ -38,7 +39,7 @@ function AF.CreateBlizzardStatusBar(parent, minValue, maxValue, width, height, c
         self.maxValue = h
     end)
 
-    Mixin(bar, SmoothStatusBarMixin) -- SetSmoothedValue
+    Mixin(bar, SmoothStatusBarMixin) -- SetSmoothedValue/ResetSmoothedValue/SetMinMaxSmoothedValue
     Mixin(bar, AF_BlizzardStatusBarMixin)
 
     bar:SetStatusBarTexture(AF.GetPlainTexture())
@@ -57,11 +58,11 @@ function AF.CreateBlizzardStatusBar(parent, minValue, maxValue, width, height, c
             bar:SetScript("OnValueChanged", function()
                 bar.progressText:SetFormattedText("%d%%", (bar:GetValue()-bar.minValue)/bar.maxValue*100)
             end)
-        elseif progressTextType == "value" then
+        elseif progressTextType == "current_value" then
             bar:SetScript("OnValueChanged", function()
                 bar.progressText:SetFormattedText("%d", bar:GetValue())
             end)
-        elseif progressTextType == "value-max" then
+        elseif progressTextType == "current_max" then
             bar:SetScript("OnValueChanged", function()
                 bar.progressText:SetFormattedText("%d/%d", bar:GetValue(), bar.maxValue)
             end)
@@ -79,27 +80,21 @@ end
 ---------------------------------------------------------------------
 -- simple
 ---------------------------------------------------------------------
-local Clamp = Clamp
+local ClampedPercentageBetween = AF.ClampedPercentageBetween
+local ApproxEqual = AF.ApproxEqual
 
 local function UpdateValue(self)
-    if self.value == self.min then
+    self.progress = ClampedPercentageBetween(self.value, self.min, self.max)
+
+    if ApproxEqual(self.progress, 0.0) then
         self.fg.mask:SetWidth(0.00001)
         self.fg:Hide()
-    elseif self.max == self.min then
+    elseif ApproxEqual(self.progress, 1.0) then
         self.fg.mask:SetWidth(self:GetBarWidth())
         self.fg:Show()
     else
-        self.value = Clamp(self.value, self.min, self.max)
-        self.progress = (self.value - self.min) / (self.max - self.min)
-        self.progress = self.progress > 0.00001 and self.progress or 0.00001
-        -- if self:GetBarWidth() == 0 then
-        --     C_Timer.After(0, function()
-        --         self.fg.mask:SetWidth(self.progress * self:GetBarWidth())
-        --     end)
-        -- else
-        -- end
         self.fg.mask:SetWidth(self.progress * self:GetBarWidth())
-        self.fg:SetShown(self.progress > 0.00001)
+        self.fg:Show()
     end
 end
 
@@ -112,12 +107,10 @@ function AF_SimpleStatusBarMixin:SetTexture(texture, lossTexture)
 end
 
 function AF_SimpleStatusBarMixin:SetColor(r, g, b, a)
-    self.fg.isGradient = false
     self.fg:SetVertexColor(r, g, b, a)
 end
 
 function AF_SimpleStatusBarMixin:SetGradientColor(...)
-    self.fg.isGradient = true
     if select("#", ...) == 2 then
         local startColor, endColor = ...
         self.fg:SetGradient("HORIZONTAL", CreateColor(AF.UnpackColor(startColor)), CreateColor(AF.UnpackColor(endColor)))
@@ -128,12 +121,10 @@ function AF_SimpleStatusBarMixin:SetGradientColor(...)
 end
 
 function AF_SimpleStatusBarMixin:SetLossColor(r, g, b, a)
-    self.loss.isGradient = false
     self.loss:SetVertexColor(r, g, b, a)
 end
 
 function AF_SimpleStatusBarMixin:SetGradientLossColor(...)
-    self.loss.isGradient = true
     if select("#", ...) == 2 then
         local startColor, endColor = ...
         self.loss:SetGradient("HORIZONTAL", CreateColor(AF.UnpackColor(startColor)), CreateColor(AF.UnpackColor(endColor)))
@@ -151,11 +142,11 @@ function AF_SimpleStatusBarMixin:SetBorderColor(r, g, b, a)
     self:SetBackdropBorderColor(r, g, b, a)
 end
 
-function AF_SimpleStatusBarMixin:SnapTextureToEdge(noGaps)
-    self.noGaps = noGaps
+function AF_SimpleStatusBarMixin:SnapTextureToEdge(noInset)
+    self.noInset = noInset
     AF.ClearPoints(self.fg)
     AF.ClearPoints(self.loss)
-    if noGaps then
+    if noInset then
         AF.SetPoint(self.bg, "TOPLEFT")
         AF.SetPoint(self.bg, "BOTTOMRIGHT")
         AF.SetPoint(self.fg, "TOPLEFT")
@@ -247,7 +238,7 @@ function AF_SimpleStatusBarMixin:DefaultUpdatePixels()
     AF.RePoint(self.loss.mask)
 end
 
----@return AF_SimpleStatusBar|Frame bar
+---@return AF_SimpleStatusBar bar
 function AF.CreateSimpleStatusBar(parent, name, noBackdrop)
     local bar = CreateFrame("Frame", name, parent)
     Mixin(bar, AF_SimpleStatusBarMixin)

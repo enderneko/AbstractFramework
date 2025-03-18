@@ -371,6 +371,7 @@ end
 ---------------------------------------------------------------------
 -- statusbar
 ---------------------------------------------------------------------
+local ClampedPercentageBetween = ClampedPercentageBetween
 function AF.SetStatusBarValue(statusBar, value)
     local width = statusBar:GetWidth()
     if width and width > 0.0 then

@@ -38,7 +38,7 @@ end
 ---------------------------------------------------------------------
 -- number
 ---------------------------------------------------------------------
-AF.epsilon = 0.001
+AF.epsilon = 0.00001
 
 function AF.ApproxEqual(a, b, epsilon)
     return abs(a - b) <= (epsilon or AF.epsilon)
@@ -78,6 +78,17 @@ function AF.Clamp(value, minValue, maxValue)
         return minValue
     end
     return value
+end
+
+function AF.PercentageBetween(value, startValue, endValue)
+    if startValue == endValue then
+        return 0.0
+    end
+    return (value - startValue) / (endValue - startValue)
+end
+
+function AF.ClampedPercentageBetween(value, startValue, endValue)
+    return AF.Clamp(AF.PercentageBetween(value, startValue, endValue), 0.0, 1.0)
 end
 
 local symbol_1K, symbol_10K, symbol_1B = "", "", ""

@@ -2,6 +2,7 @@
 local AF = _G.AbstractFramework
 
 local FrameDeltaLerp = FrameDeltaLerp
+local abs = math.abs
 
 local g_updatingBars = {}
 
@@ -9,7 +10,7 @@ local function IsCloseEnough(bar, newValue, targetValue)
     local min, max = bar:GetMinMaxValues()
     local range = max - min
     if range > 0.0 then
-        return math.abs((newValue - targetValue) / range) < .00001
+        return abs((newValue - targetValue) / range) < 0.00001
     end
 
     return true
@@ -30,9 +31,11 @@ end
 
 C_Timer.NewTicker(0, ProcessSmoothStatusBars)
 
-AF.SmoothStatusBarMixin = {}
+---@class AF_SmoothStatusBar
+local SmoothStatusBarMixin = {}
+AF.SmoothStatusBarMixin = SmoothStatusBarMixin
 
-function AF.SmoothStatusBarMixin:ResetSmoothedValue(value) --If nil, tries to set to the last target value
+function SmoothStatusBarMixin:ResetSmoothedValue(value) --If nil, tries to set to the last target value
     local targetValue = g_updatingBars[self]
     if targetValue then
         g_updatingBars[self] = nil
@@ -42,11 +45,11 @@ function AF.SmoothStatusBarMixin:ResetSmoothedValue(value) --If nil, tries to se
     end
 end
 
-function AF.SmoothStatusBarMixin:SetSmoothedValue(value)
+function SmoothStatusBarMixin:SetSmoothedValue(value)
     g_updatingBars[self] = value
 end
 
-function AF.SmoothStatusBarMixin:SetMinMaxSmoothedValue(min, max)
+function SmoothStatusBarMixin:SetMinMaxSmoothedValue(min, max)
     self:SetMinMaxValues(min, max)
 
     local targetValue = g_updatingBars[self]
