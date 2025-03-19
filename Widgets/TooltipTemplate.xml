@@ -2,6 +2,13 @@
     xsi:schemaLocation="http://www.blizzard.com/wow/ui/ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI_shared.xsd">
 
     <GameTooltip name="AFTooltipTemplate" mixin="GameTooltipDataMixin" frameStrata="TOOLTIP" clampedToScreen="true" hidden="true" virtual="true">
+        <!-- <KeyValues>
+            <KeyValue key="textLeft1Font" value="AF_FONT_TITLE" type="string"/>
+            <KeyValue key="textRight1Font" value="AF_FONT_TITLE" type="string"/>
+            <KeyValue key="textLeft2Font" value="AF_FONT_NORMAL" type="string"/>
+            <KeyValue key="textRight2Font" value="AF_FONT_NORMAL" type="string"/>
+            <KeyValue key="layoutType" value="TooltipDefaultLayout" type="string"/>
+        </KeyValues> -->
         <Layers>
             <Layer level="ARTWORK">
                 <FontString name="$parentTextLeft1" inherits="AF_FONT_TITLE" justifyH="LEFT" hidden="true"/>
@@ -10,8 +17,8 @@
 						<Anchor point="RIGHT" relativeTo="$parentTextLeft1" relativePoint="LEFT" x="40" y="0"/>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentTextLeft2" inherits="AF_FONT_NORMAL" hidden="true"/>
-				<FontString name="$parentTextRight2" inherits="AF_FONT_NORMAL" hidden="true">
+				<FontString name="$parentTextLeft2" inherits="AF_FONT_NORMAL" justifyH="LEFT" hidden="true"/>
+				<FontString name="$parentTextRight2" inherits="AF_FONT_NORMAL" justifyH="RIGHT" hidden="true">
 					<Anchors>
 						<Anchor point="RIGHT" relativeTo="$parentTextLeft2" relativePoint="LEFT" x="40" y="0"/>
 					</Anchors>

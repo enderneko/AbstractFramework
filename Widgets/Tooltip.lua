@@ -40,15 +40,18 @@ function AF.ShowTooltips(widget, anchor, x, y, lines)
         tooltip:SetOwner(widget, anchor or "ANCHOR_TOP", x or 0, y or 0)
     end
 
-    tooltip:AddLine(lines[1], AF.GetColorRGB("accent"))
+    local r, g, b = AF.GetColorRGB("accent")
+    tooltip:AddLine(lines[1], r, g, b)
     for i = 2, #lines do
         if lines[i] then
-            tooltip:AddLine(lines[i], 1, 1, 1)
+            tooltip:AddLine(lines[i], 1, 1, 1, true)
         end
     end
 
     tooltip:SetFrameStrata("TOOLTIP")
     tooltip:SetToplevel(true)
+    -- tooltip:SetCustomLineSpacing(5)
+    tooltip:SetCustomWordWrapMinWidth(300)
     tooltip:Show()
 end
 
