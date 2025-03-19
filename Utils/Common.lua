@@ -4,7 +4,7 @@ local L = AF.L
 
 local select, type, tonumber = select, type, tonumber
 local floor, ceil, abs, max, min, abs = math.floor, math.ceil, math.abs, math.max, math.min, math.abs
-local format, gsub, strlower, strupper, strsplit = string.format, string.gsub, string.lower, string.upper, string.split
+local format, gsub, strlower, strupper, strsplit, strtrim = string.format, string.gsub, string.lower, string.upper, string.split, string.trim
 local next, pairs, ipairs = next, pairs, ipairs
 local tinsert, tremove, tsort, tconcat = table.insert, table.remove, table.sort, table.concat
 
@@ -159,6 +159,13 @@ end
 
 function AF.TableToString(t, sep)
     return tconcat(t, sep)
+end
+
+function AF.IsBlank(str)
+    if type(str) ~= "string" then
+        return true
+    end
+    return str == "" or strtrim(str) == ""
 end
 
 ---------------------------------------------------------------------
