@@ -95,6 +95,9 @@ function AF.ApplyDefaultBackdrop_NoBorder(frame)
 end
 
 function AF.ApplyDefaultBackdropColors(frame)
+    if not frame.SetBackdrop then
+        Mixin(frame, BackdropTemplateMixin)
+    end
     frame:SetBackdropColor(AF.GetColorRGB("background"))
     frame:SetBackdropBorderColor(AF.GetColorRGB("border"))
 end
@@ -161,8 +164,8 @@ function AF_FrameMixin:SetOnUpdate(func)
 end
 
 ---@return AF_Frame|Frame frame
-function AF.CreateFrame(parent, name, width, height)
-    local f = CreateFrame("Frame", name, parent)
+function AF.CreateFrame(parent, name, width, height, template)
+    local f = CreateFrame("Frame", name, parent, template)
     AF.SetSize(f, width, height)
     Mixin(f, AF_FrameMixin)
     AF.AddToPixelUpdater(f)
@@ -875,7 +878,9 @@ end
 ---@return Frame
 function AF.ShowMask(parent, text, tlX, tlY, brX, brY)
     if not parent.mask then
-        parent.mask = AF.CreateBorderedFrame(parent, nil, nil, nil, AF.GetColorTable("widget", 0.7), "none")
+        parent.mask = AF.CreateFrame(parent)
+        AF.ApplyDefaultBackdrop_NoBorder(parent.mask)
+        parent.mask:SetBackdropColor(AF.GetColorRGB("mask"))
         parent.mask:EnableMouse(true)
         -- parent.mask:EnableMouseWheel(true) -- not enough
         parent.mask:SetScript("OnMouseWheel", function(self, delta)
@@ -891,12 +896,12 @@ function AF.ShowMask(parent, text, tlX, tlY, brX, brY)
     parent.mask.text:SetText(text)
 
     AF.ClearPoints(parent.mask)
-    -- if tlX then
+    if tlX or tlY or brX or brY then
         AF.SetPoint(parent.mask, "TOPLEFT", tlX, tlY)
         AF.SetPoint(parent.mask, "BOTTOMRIGHT", brX, brY)
-    -- else
-    --     AF.SetOnePixelInside(parent.mask, parent)
-    -- end
+    else
+        AF.SetOnePixelInside(parent.mask, parent)
+    end
     AF.SetFrameLevel(parent.mask, 30, parent)
     parent.mask:Show()
 
@@ -914,7 +919,9 @@ end
 -- combat mask (+100 frame level)
 ---------------------------------------------------------------------
 local function CreateCombatMask(parent, tlX, tlY, brX, brY)
-    parent.combatMask = AF.CreateBorderedFrame(parent, nil, nil, nil, AF.GetColorTable("darkred", 0.8), "none")
+    parent.combatMask = AF.CreateFrame(parent)
+    AF.ApplyDefaultBackdrop_NoBorder(parent.combatMask)
+    parent.combatMask:SetBackdropColor(AF.GetColorRGB("combat_mask"))
 
     AF.SetFrameLevel(parent.combatMask, 100, parent)
     parent.combatMask:EnableMouse(true)
@@ -930,7 +937,7 @@ local function CreateCombatMask(parent, tlX, tlY, brX, brY)
     parent.combatMask.text:SetText(_G.ERR_AFFECTING_COMBAT)
 
     AF.ClearPoints(parent.combatMask)
-    if tlX then
+    if tlX or tlY or brX or brY then
         AF.SetPoint(parent.combatMask, "TOPLEFT", tlX, tlY)
         AF.SetPoint(parent.combatMask, "BOTTOMRIGHT", brX, brY)
     else
