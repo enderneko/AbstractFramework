@@ -253,8 +253,9 @@ local COLORS = {
     ["disabled"] = {["hex"] = "ff666666", ["t"] = {0.4, 0.4, 0.4, 1}},
     ["none"] = {["hex"] = "00000000", ["t"] = {0, 0, 0, 0}},
     ["sheet_bg"] = {["t"] = {0.15, 0.15, 0.15, 0.9}},
-    ["sheet_cell_highlight"] = {["t"] = {1, 1, 1, 0.1}},
-    ["sheet_row_highlight"] = {["t"] = {0.7, 0.7, 0.7, 0.1}},
+    ["sheet_bg2"] = {["t"] = {0.17, 0.17, 0.17, 0.9}},
+    ["sheet_row_highlight"] = {["t"] = {0.2, 0.2, 0.2, 0.9}},
+    ["sheet_cell_highlight"] = {["t"] = {0.3, 0.3, 0.3, 0.9}},
 
     -- common
     ["red"] = {["hex"] = "ffff0000", ["t"] = {1, 0, 0, 1}},
@@ -772,7 +773,11 @@ local BUTTON_COLORS = {
 function AF.GetButtonNormalColor(name)
     name = name or GetAddon() or "accent"
 
-    if name:find("transparent") then
+    if BUTTON_COLORS[name] then
+        return BUTTON_COLORS[name]["normal"]
+    end
+
+    if name:find("transparent$") then
         return BUTTON_COLOR_TRANSPARENT
     end
 
@@ -784,15 +789,11 @@ function AF.GetButtonNormalColor(name)
         return COLORS["accent"]["normal"]
     end
 
-    if BUTTON_COLORS[name] then
-        return BUTTON_COLORS[name]["normal"]
-    end
-
     if COLORS[name] then
         if COLORS[name]["normal"] then
             return COLORS[name]["normal"]
         else
-            return {COLORS[name]["t"][1], COLORS[name]["t"][2], COLORS[name]["t"][3], 0.3}
+            return {COLORS[name]["t"][1], COLORS[name]["t"][2], COLORS[name]["t"][3], min(0.3, COLORS[name]["t"][4] or 1)}
         end
     end
 
@@ -804,29 +805,29 @@ end
 function AF.GetButtonHoverColor(name)
     name = name or GetAddon() or "accent"
 
-    if name:find("^accent") then
-        return COLORS["accent"]["hover"]
-    end
-
-    local baseName = name:gsub("_hover$", "")
-
     if BUTTON_COLORS[name] then
         return BUTTON_COLORS[name]["hover"]
     elseif BUTTON_COLORS[baseName] then
         return BUTTON_COLORS[baseName]["hover"]
     end
 
+    if name:find("^accent") then
+        return COLORS["accent"]["hover"]
+    end
+
+    local baseName = name:gsub("_hover$", ""):gsub("_transparent$", "")
+
     if COLORS[name] then
         if COLORS[name]["hover"] then
             return COLORS[name]["hover"]
         else
-            return {COLORS[name]["t"][1], COLORS[name]["t"][2], COLORS[name]["t"][3], 0.6}
+            return {COLORS[name]["t"][1], COLORS[name]["t"][2], COLORS[name]["t"][3], min(0.6, COLORS[name]["t"][4] or 1)}
         end
     elseif COLORS[baseName] then
         if COLORS[baseName]["hover"] then
             return COLORS[baseName]["hover"]
         else
-            return {COLORS[baseName]["t"][1], COLORS[baseName]["t"][2], COLORS[baseName]["t"][3], 0.6}
+            return {COLORS[baseName]["t"][1], COLORS[baseName]["t"][2], COLORS[baseName]["t"][3], min(0.6, COLORS[baseName]["t"][4] or 1)}
         end
     end
 

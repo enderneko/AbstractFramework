@@ -123,22 +123,28 @@ function AF_ButtonMixin:SetBorderHighlightColor(color)
     end
 end
 
----@param color string
+---@param color string|table if table, color[1] is normal color, color[2] is hover color
 function AF_ButtonMixin:SetColor(color)
     -- keep color & hoverColor ------------------
-    self._color = AF.GetButtonNormalColor(color)
-    self._hoverColor = AF.GetButtonHoverColor(color)
+    if type(color) == "table" then
+        assert(#color == 2, "color table must have 2 elements")
+        self._color = type(color[1]) == "table" and color[1] or AF.GetButtonNormalColor(color[1])
+        self._hoverColor = type(color[2]) == "table" and color[2] or AF.GetButtonHoverColor(color[2])
+    else
+        self._color = AF.GetButtonNormalColor(color)
+        self._hoverColor = AF.GetButtonHoverColor(color)
+    end
 
     self:SetBackdropColor(AF.UnpackColor(self._color))
 
     -- OnEnter / OnLeave ------------------------
     self:SetScript("OnEnter", function()
-        if color ~= "none" then self:SetBackdropColor(AF.UnpackColor(self._hoverColor)) end
+        self:SetBackdropColor(AF.UnpackColor(self._hoverColor))
         if self.highlightText then self.highlightText() end
         if self.highlightBorder then self.highlightBorder() end
     end)
     self:SetScript("OnLeave", function()
-        if color ~= "none" then self:SetBackdropColor(AF.UnpackColor(self._color)) end
+        self:SetBackdropColor(AF.UnpackColor(self._color))
         if self.unhighlightText then self.unhighlightText() end
         if self.unhighlightBorder then self.unhighlightBorder() end
     end)
@@ -252,7 +258,7 @@ end
 
 ---@param parent Frame
 ---@param text string
----@param color? string
+---@param color? string|table if table, color[1] is normal color, color[2] is hover color
 ---@param width number
 ---@param height number
 ---@param template? string

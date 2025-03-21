@@ -175,14 +175,14 @@ function AF.ShowDemo()
     AF.SetPoint(gb1, "RIGHT")
     AF.SetTooltips(gb1, "LEFT", -2, 0, "Item A")
 
-    local gb2 = AF.CreateButton(bf2, "Item B", "accent_transparent", 100, 20, nil, "none", "")
+    local gb2 = AF.CreateButton(bf2, "Item B", "red_transparent", 100, 20, nil, "none", "")
     gb2.id = "gb2"
     gb2:SetJustifyH("LEFT")
     AF.SetPoint(gb2, "TOPLEFT", gb1, "BOTTOMLEFT", 0, 1)
     AF.SetPoint(gb2, "RIGHT")
     AF.SetTooltips(gb2, "LEFT", -2, 0, "Item B")
 
-    local gb3 = AF.CreateButton(bf2, "Item C", "accent_transparent", 100, 20, nil, "none", "")
+    local gb3 = AF.CreateButton(bf2, "Item C", "lime_transparent", 100, 20, nil, "none", "")
     gb3.id = "gb3"
     gb3:SetJustifyH("LEFT")
     AF.SetPoint(gb3, "TOPLEFT", gb2, "BOTTOMLEFT", 0, 1)
