@@ -65,16 +65,18 @@ function AF.CreateColorPicker(parent, label, alphaEnabled, onChange, onConfirm)
         cp.label:SetColor("white")
     end)
 
-    cp.mask = AF.CreateTexture(cp, nil, {0.15, 0.15, 0.15, 0.75})
-    AF.SetPoint(cp.mask, "TOPLEFT", 1, -1)
-    AF.SetPoint(cp.mask, "BOTTOMRIGHT", -1, 1)
-    cp.mask:Hide()
+    -- cp.mask = AF.CreateTexture(cp, nil, {0.15, 0.15, 0.15, 0.75})
+    -- AF.SetPoint(cp.mask, "TOPLEFT", 1, -1)
+    -- AF.SetPoint(cp.mask, "BOTTOMRIGHT", -1, 1)
+    -- cp.mask:Hide()
 
     Mixin(cp, AF_ColorPickerMixin)
 
     cp.alphaEnabled = alphaEnabled
     cp.onChange = onChange
     cp.onConfirm = onConfirm
+
+    cp.color = {1, 1, 1, 1}
 
     cp:SetScript("OnClick", function()
         -- reset temp
@@ -111,12 +113,14 @@ function AF.CreateColorPicker(parent, label, alphaEnabled, onChange, onConfirm)
 
     cp:SetScript("OnEnable", function()
         cp.label:SetTextColor(AF.GetColorRGB("white"))
-        cp.mask:Hide()
+        cp:SetBackdropColor(AF.UnpackColor(cp.color))
+        -- cp.mask:Hide()
     end)
 
     cp:SetScript("OnDisable", function()
         cp.label:SetTextColor(AF.GetColorRGB("disabled"))
-        cp.mask:Show()
+        cp:SetBackdropColor(AF.ConvertToGrayscale(AF.UnpackColor(cp.color)))
+        -- cp.mask:Show()
     end)
 
     AF.AddToPixelUpdater(cp)
