@@ -1,5 +1,9 @@
 # AbstractFramework
 
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/m/enderneko/AbstractFramework)](https://github.com/enderneko/AbstractFramework/commits/master)
+[![last commit](https://img.shields.io/github/last-commit/enderneko/AbstractFramework)](https://github.com/enderneko/AbstractFramework/commits/master)
+![wakatime](https://wakatime.com/badge/user/b2ffce60-8269-440f-81a0-7316f36a6085/project/3776f414-881d-4242-a1ed-2e4938c18d1b.svg)
+
 **AbstractFramework** is a minimalist World of Warcraft addon framework for fast widget creation.  
 It's easy to use and ensures pixel-perfect precision, making it ideal for developers seeking a clean and efficient interface.
 
