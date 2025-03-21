@@ -41,8 +41,10 @@ local function CreateListFrame()
 
     -- do not use OnShow, since it only triggers when hide -> show
     hooksecurefunc(list, "Show", function()
+        list:UpdatePixels()
         horizontalList:Hide()
         if list.dropdown.selected then
+            highlight:UpdatePixels()
             if list.dropdown.selected > list.slotNum then
                 list:SetScroll(list.dropdown.selected - list.slotNum + 1)
             else

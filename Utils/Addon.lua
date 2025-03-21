@@ -10,6 +10,7 @@ local tinsert, tconcat = table.insert, table.concat
 local IsAddOnLoaded = C_AddOns.IsAddOnLoaded or IsAddOnLoaded
 local DevTools_Dump = DevTools_Dump
 
+---@return string addon, string|boolean alias
 function AF.GetAddon()
     for addon in strmatch(debugstack(2), PATTERN) do
         if AF.REGISTERED_ADDONS[addon] then

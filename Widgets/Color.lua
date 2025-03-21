@@ -246,8 +246,7 @@ end
 ---@param color string|table colorName, colorHex, colorTable
 ---@param buttonNormalColor? string|table
 ---@param buttonHoverColor? string|table
----@param alias string?
-function AF.SetAccentColor(color, buttonNormalColor, buttonHoverColor, alias)
+function AF.SetAccentColor(color, buttonNormalColor, buttonHoverColor)
     local addon = GetAddon()
     assert(addon, "no registered addon found")
 
@@ -273,14 +272,18 @@ function AF.SetAccentColor(color, buttonNormalColor, buttonHoverColor, alias)
 
     COLORS[addon] = {["hex"] = t["hex"], ["t"] = t["t"], ["normal"] = normal, ["hover"] = hover}
 
-    if alias then
-        COLORS[alias] = COLORS[addon]
+    if type(AF.REGISTERED_ADDONS[addon]) == "string" then
+        COLORS[AF.REGISTERED_ADDONS[addon]] = COLORS[addon]
     end
 end
 
 ---@return string accentColorName registered addon folder name or "accent"
 function AF.GetAccentColorName()
-    return GetAddon() or "accent"
+    local addon = GetAddon()
+    if addon and COLORS[addon] then
+        return addon
+    end
+    return "accent"
 end
 
 ---@param alpha? number

@@ -336,22 +336,44 @@ local function DefaultUpdatePixels(self)
 end
 AF.DefaultUpdatePixels = DefaultUpdatePixels
 
-local regions = {}
-AF.pixelPerfectRegions = regions
+local components = {}
+AF.PIXEL_PERFECT_COMPONENTS = components
+local addonComponents = {}
+AF.PIXEL_PERFECT_ADDON_COMPONENTS = addonComponents
 
 ---@param fn function
-function AF.AddToPixelUpdater(r, fn)
-    r.UpdatePixels = fn or r.UpdatePixels or DefaultUpdatePixels
-    regions[r] = r:GetName() or true
+function AF.AddToPixelUpdater(comp, fn)
+    comp.UpdatePixels = fn or comp.UpdatePixels or DefaultUpdatePixels
+    components[comp] = comp:GetName() or true
+    -- addon
+    local addon = AF.GetAddon()
+    if addon then
+        if not addonComponents[addon] then addonComponents[addon] = {} end
+        addonComponents[addon][comp] = comp:GetName() or true
+    end
 end
 
 function AF.RemoveFromPixelUpdater(r)
-    regions[r] = nil
+    components[r] = nil
+    -- addon
+    local addon = AF.GetAddon()
+    if addon and addonComponents[addon] then
+        addonComponents[addon][r] = nil
+    end
 end
 
 function AF.UpdatePixels()
-    for r in next, regions do
+    for r in next, components do
         r:UpdatePixels()
+    end
+end
+
+function AF.UpdatePixelsForAddon(addon)
+    addon = addon or AF.GetAddon()
+    if addon and addonComponents[addon] then
+        for r in next, addonComponents[addon] do
+            r:UpdatePixels()
+        end
     end
 end
 
