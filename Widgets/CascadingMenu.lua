@@ -35,6 +35,11 @@ local function CreateMenu(level)
         end
     end)
 
+    if level == 1 then
+        -- make menu closable by pressing ESC
+        tinsert(UISpecialFrames, "AFCascadingMenu1")
+    end
+
     return menu
 end
 
@@ -47,16 +52,19 @@ local function LoadItems(items, maxShownItems, level, parentItem)
         selection_path[level - 1] = parentItem
     end
 
-    local width = 10
     local maxTextWidth = 0
+    local hasIcon, hasChildrenSymbol
 
     for i, item in pairs(items) do
         local b
         if menu.createdButtons[i] then
             b = menu.createdButtons[i]
         else
-            b = AF.CreateButton(menu, "AFCascadingMenu" .. level .. "Button" .. i, "accent_transparent", 18, 18, nil, true)
+            b = AF.CreateButton(menu, "AFCascadingMenu" .. level .. "Button" .. i, "accent_transparent", 18, 18, nil, "", "")
             menu.createdButtons[i] = b
+
+            b:EnablePushEffect(false)
+            b:SetJustifyH("LEFT")
 
             -- children symbol
             b.childrenSymbol = b:CreateFontString(nil, "OVERLAY", "AF_FONT_NORMAL")
@@ -80,12 +88,12 @@ local function LoadItems(items, maxShownItems, level, parentItem)
         b:SetText(item.text)
         b:SetEnabled(not item.disabled)
 
-        menu.hiddenText:SetText(item.text)
-        maxTextWidth = max(maxTextWidth, menu.hiddenText:GetWidth())
+        menu.hiddenText:SetText(item.text:gsub(" ", "_"))
+        maxTextWidth = max(maxTextWidth, menu.hiddenText:GetStringWidth())
 
         if item.icon then
-            width = width + AF.ConvertPixels(16)
-            b:SetTexture(item.icon, {14, 14}, {"LEFT", 2, 0}, item.isIconAtlas, true, item.iconBorderColor)
+            hasIcon = true
+            b:SetTexture(item.icon, {14, 14}, {"LEFT", 2, 0}, item.isIconAtlas, item.iconBorderColor)
         else
             b:HideTexture()
         end
@@ -114,15 +122,23 @@ local function LoadItems(items, maxShownItems, level, parentItem)
         -- save for onEnter
         b.item = item
         if item.children then
+            hasChildrenSymbol = true
             b.childrenItems = item.children
             b.childrenSymbol:Show()
-            width = width + 10
         else
             b.childrenItems = nil
             b.childrenSymbol:Hide()
         end
 
         tinsert(menu.buttons, b)
+    end
+
+    local width = 10
+    if hasIcon then
+        width = width + AF.ConvertPixels(18)
+    end
+    if hasChildrenSymbol then
+        width = width + 10
     end
 
     AF.SetWidth(menu, maxTextWidth + width)
@@ -215,7 +231,7 @@ end
 function AF_CascadingMenuButtonMixin:OnMenuSelection(item, path)
     self:SetText(item.text)
     if item.icon then
-        self:SetTexture(item.icon, {14, 14}, {"LEFT", 3, 0}, item.isIconAtlas, nil, item.iconBorderColor)
+        self:SetTexture(item.icon, {14, 14}, {"LEFT", 3, 0}, item.isIconAtlas, item.iconBorderColor)
     else
         self:HideTexture()
     end

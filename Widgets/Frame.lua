@@ -77,21 +77,21 @@ function AF.ApplyDefaultBackdrop(frame, borderSize)
         Mixin(frame, BackdropTemplateMixin)
     end
     local n = AF.ConvertPixelsForRegion(borderSize or 1, frame)
-    frame:SetBackdrop({bgFile=AF.GetPlainTexture(), edgeFile=AF.GetPlainTexture(), edgeSize=n, insets={left=n, right=n, top=n, bottom=n}})
+    AF.SetBackdrop(frame, {bgFile=AF.GetPlainTexture(), edgeFile=AF.GetPlainTexture(), edgeSize=n, insets={left=n, right=n, top=n, bottom=n}})
 end
 
 function AF.ApplyDefaultBackdrop_NoBackground(frame, borderSize)
     if not frame.SetBackdrop then
         Mixin(frame, BackdropTemplateMixin)
     end
-    frame:SetBackdrop({edgeFile=AF.GetPlainTexture(), edgeSize=AF.ConvertPixelsForRegion(borderSize or 1, frame)})
+    AF.SetBackdrop(frame, {edgeFile=AF.GetPlainTexture(), edgeSize=AF.ConvertPixelsForRegion(borderSize or 1, frame)})
 end
 
 function AF.ApplyDefaultBackdrop_NoBorder(frame)
     if not frame.SetBackdrop then
         Mixin(frame, BackdropTemplateMixin)
     end
-    frame:SetBackdrop({bgFile=AF.GetPlainTexture()})
+    AF.SetBackdrop(frame, {bgFile=AF.GetPlainTexture()})
 end
 
 function AF.ApplyDefaultBackdropColors(frame)
@@ -186,9 +186,9 @@ local AF_HeaderedFrameMixin = {}
 function AF_HeaderedFrameMixin:SetTitleJustify(justify)
     AF.ClearPoints(self.header.text)
     if justify == "LEFT" then
-        AF.SetPoint(self.header.text, "LEFT", 7, 0)
+        AF.SetPoint(self.header.text, "LEFT", 5, 0)
     elseif justify == "RIGHT" then
-        AF.SetPoint(self.header.text, "RIGHT", self.header.closeBtn, "LEFT", -7, 0)
+        AF.SetPoint(self.header.text, "RIGHT", self.header.closeBtn, "LEFT", -5, 0)
     else
         AF.SetPoint(self.header.text, "CENTER")
     end

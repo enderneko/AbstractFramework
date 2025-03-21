@@ -146,6 +146,8 @@ end
 
 function AF.StringToTable(str, sep, convertToNum)
     local t = {}
+    if str == "" then return t end
+
     for i, v in pairs({string.split(sep, str)}) do
         v = strtrim(v)
         if convertToNum then
@@ -368,12 +370,7 @@ end
 ---------------------------------------------------------------------
 
 function AF.FormatTime(sec)
-    if sec >= 3600 then
-        return "%dh", ceil(sec / 3600)
-    elseif sec >= 60 then
-        return "%dm", ceil(sec / 60)
-    end
-    return "%ds", floor(sec)
+    -- TODO:
 end
 
 local SEC = gsub(_G.SPELL_DURATION_SEC, "%%%.%df", "%%s")

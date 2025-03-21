@@ -70,7 +70,7 @@ function AF.ShowDemo()
     AF.SetPoint(b2, "TOPLEFT", b1, "TOPRIGHT", 10, 0)
     b2:SetEnabled(false)
 
-    local b3 = AF.CreateButton(demo, "Button C", "border_only", 100, 20)
+    local b3 = AF.CreateButton(demo, "Button C", "static", 100, 20)
     AF.SetPoint(b3, "TOPLEFT", b2, "TOPRIGHT", 10, 0)
     AF.SetTooltips(b3, "ANCHOR_TOPLEFT", 0, 2, "Another Style", "SetTextHighlightColor", "SetBorderHighlightColor")
     b3:SetTextHighlightColor("accent")
@@ -81,11 +81,11 @@ function AF.ShowDemo()
     AF.SetPoint(b4, "TOPLEFT", b3, "TOPRIGHT", 10, 0)
 
     local b5 = AF.CreateButton(demo, nil, "accent", 20, 20)
-    b5:SetTexture("classicon-" .. strlower(PlayerUtil.GetClassFile()), {16, 16}, {"CENTER", 0, 0}, true, true)
+    b5:SetTexture("classicon-" .. strlower(PlayerUtil.GetClassFile()), {16, 16}, {"CENTER", 0, 0}, true)
     AF.SetPoint(b5, "TOPLEFT", b4, "TOPRIGHT", 10, 0)
 
     local b6 = AF.CreateButton(demo, nil, "accent", 20, 20)
-    b6:SetTexture("classicon-" .. strlower(PlayerUtil.GetClassFile()), {16, 16}, {"CENTER", 0, 0}, true, true)
+    b6:SetTexture("classicon-" .. strlower(PlayerUtil.GetClassFile()), {16, 16}, {"CENTER", 0, 0}, true)
     AF.SetPoint(b6, "TOPLEFT", b5, "TOPRIGHT", 10, 0)
     b6:SetEnabled(false)
 
@@ -168,20 +168,23 @@ function AF.ShowDemo()
     AF.SetPoint(bf2, "TOPLEFT", eb4, "BOTTOMLEFT", 0, -27)
     AF.SetListHeight(bf2, 3, 20, -1)
 
-    local gb1 = AF.CreateButton(bf2, "Item A", "accent_transparent", 100, 20)
+    local gb1 = AF.CreateButton(bf2, "Item A", "accent_transparent", 100, 20, nil, "none", "")
     gb1.id = "gb1"
+    gb1:SetJustifyH("LEFT")
     AF.SetPoint(gb1, "TOPLEFT")
     AF.SetPoint(gb1, "RIGHT")
     AF.SetTooltips(gb1, "LEFT", -2, 0, "Item A")
 
-    local gb2 = AF.CreateButton(bf2, "Item B", "accent_transparent", 100, 20)
+    local gb2 = AF.CreateButton(bf2, "Item B", "accent_transparent", 100, 20, nil, "none", "")
     gb2.id = "gb2"
+    gb2:SetJustifyH("LEFT")
     AF.SetPoint(gb2, "TOPLEFT", gb1, "BOTTOMLEFT", 0, 1)
     AF.SetPoint(gb2, "RIGHT")
     AF.SetTooltips(gb2, "LEFT", -2, 0, "Item B")
 
-    local gb3 = AF.CreateButton(bf2, "Item C", "accent_transparent", 100, 20)
+    local gb3 = AF.CreateButton(bf2, "Item C", "accent_transparent", 100, 20, nil, "none", "")
     gb3.id = "gb3"
+    gb3:SetJustifyH("LEFT")
     AF.SetPoint(gb3, "TOPLEFT", gb2, "BOTTOMLEFT", 0, 1)
     AF.SetPoint(gb3, "RIGHT")
     AF.SetTooltips(gb3, "LEFT", -2, 0, "Item C")

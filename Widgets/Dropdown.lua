@@ -43,7 +43,11 @@ local function CreateListFrame()
     hooksecurefunc(list, "Show", function()
         horizontalList:Hide()
         if list.dropdown.selected then
-            list:SetScroll(list.dropdown.selected)
+            if list.dropdown.selected > list.slotNum then
+                list:SetScroll(list.dropdown.selected - list.slotNum + 1)
+            else
+                list:SetScroll(1)
+            end
         end
     end)
 end
@@ -124,10 +128,9 @@ local AF_DropdownMixin = {}
 
 -- selection ------------------------------------
 local function SetSelected(dropdown, type, v)
-    local valid
+    local found
     for i, item in pairs(dropdown.items) do
         if item[type] == v then
-            valid = true
             dropdown.selected = i
             dropdown.text:SetText(item.text)
             if dropdown.type == "texture" then
@@ -136,15 +139,28 @@ local function SetSelected(dropdown, type, v)
             elseif dropdown.type == "font" then
                 dropdown.text:SetFont(AF.GetFontProps(item.font))
             end
+
+            if item.icon then
+                AF.SetPoint(dropdown.text, "LEFT", dropdown.iconBG, "RIGHT", 2, 0)
+                dropdown.icon:SetTexture(item.icon)
+                dropdown.iconBG:Show()
+                dropdown.icon:Show()
+            else
+                AF.SetPoint(dropdown.text, "LEFT", 5, 0)
+                dropdown.iconBG:Hide()
+                dropdown.icon:Hide()
+            end
+
+            found = true
             break
         end
     end
-    if not valid then
+    if not found then
         dropdown:ClearSelected()
     end
 end
 
-function AF_DropdownMixin:SetSelected(text)
+function AF_DropdownMixin:SetSelectedText(text)
     SetSelected(self, "text", text)
 end
 
@@ -159,12 +175,12 @@ function AF_DropdownMixin:ClearSelected()
     self.list:SetHighlightItem()
 end
 
--- return value first, then text
+---@return any value
+---@return string text
 function AF_DropdownMixin:GetSelected()
     if self.selected then
-        return self.items[self.selected].value or self.items[self.selected].text
+        return self.items[self.selected].value, self.items[self.selected].text
     end
-    return nil
 end
 -------------------------------------------------
 
@@ -181,6 +197,19 @@ function AF_DropdownMixin:SetLabel(label, color, font)
     self.label:SetText(label)
 end
 
+-- iconBGColor
+function AF_DropdownMixin:SetIconBGColor(color)
+    self.iconBGColor = color
+    if color then
+        self.iconBG:SetColorTexture(AF.GetColorRGB(color))
+        AF.SetOnePixelInside(self.icon, self.iconBG)
+    else
+        self.iconBG:SetColorTexture(0, 0, 0, 0)
+        AF.SetAllPoints(self.icon, self.iconBG)
+    end
+    self.reloadRequired = true
+end
+
 -- update items ---------------------------------
 function AF_DropdownMixin:SetItems(items)
     -- validate item.value
@@ -191,10 +220,14 @@ function AF_DropdownMixin:SetItems(items)
     self.reloadRequired = true
 end
 
-function AF_DropdownMixin:AddItem(item)
+function AF_DropdownMixin:AddItem(item, pos)
     -- validate item.value
     if not item.value then item.value = item.text end
-    tinsert(self.items, item)
+    if pos then
+        tinsert(self.items, pos, item)
+    else
+        tinsert(self.items, item)
+    end
     self.reloadRequired = true
 end
 
@@ -244,8 +277,10 @@ function AF_DropdownMixin:LoadItems()
         local b
         if not self.list.buttons[i] then
             -- create new button
-            b = AF.CreateButton(self.isHorizontal and self.list or self.list.slotFrame, item.text, "accent_transparent", 18 ,18, nil, true) --! width is not important
+            b = AF.CreateButton(self.isHorizontal and self.list or self.list.slotFrame, item.text, "accent_transparent", 18, 18, nil, "", "")
             table.insert(self.list.buttons, b)
+
+            b:EnablePushEffect(false)
 
             b.bgTexture = AF.CreateTexture(b)
             AF.SetPoint(b.bgTexture, "TOPLEFT", 1, -1)
@@ -270,19 +305,13 @@ function AF_DropdownMixin:LoadItems()
 
         tinsert(self.buttons, b)
         b:SetEnabled(not item.disabled)
-        -- b:Show() NOTE: show/hide is done in SetScroll
 
-        local fs = b.text
-        if self.isMini then
-            fs:SetJustifyH(self.justify or "CENTER")
-            AF.ClearPoints(fs)
-            AF.SetPoint(fs, "LEFT", 1, 0)
-            AF.SetPoint(fs, "RIGHT", -1, 0)
+        -- icon
+        if item.icon then
+            b:SetTexture(item.icon, {16, 16}, {"LEFT", 1, 0}, nil, self.iconBGColor)
+            b.realTexture:SetDesaturated(item.disabled)
         else
-            fs:SetJustifyH(self.justify or "LEFT")
-            AF.ClearPoints(fs)
-            AF.SetPoint(fs, "LEFT", 5, 0)
-            AF.SetPoint(fs, "RIGHT", -5, 0)
+            b:HideTexture()
         end
 
         -- texture
@@ -320,6 +349,13 @@ function AF_DropdownMixin:LoadItems()
             if not self.isMini then self.button:SetTexture(AF.GetIcon("ArrowDown")) end
         end)
 
+        -- text justify
+        if self.isMini then
+            b:SetJustifyH(self.justify or "CENTER")
+        else
+            b:SetJustifyH(self.justify or "LEFT")
+        end
+
         -- update point
         if self.isMini and self.isHorizontal then
             AF.SetWidth(b, self.width)
@@ -328,6 +364,7 @@ function AF_DropdownMixin:LoadItems()
             else
                 AF.SetPoint(b, "TOPLEFT", self.list.buttons[i-1], "TOPRIGHT")
             end
+            b:Show()
         end
     end
 
@@ -362,8 +399,11 @@ function AF_DropdownMixin:SetEnabled(enabled)
     self.button:SetEnabled(enabled)
     self.text:SetColor(enabled and "white" or "disabled")
 
+    self.icon:SetDesaturated(not enabled)
+
     if self.bgTexture then
         self.bgTexture:SetAlpha(enabled and 1 or 0.25)
+        self.bgTexture:SetDesaturated(not enabled)
     end
 
     if self.label then
@@ -401,13 +441,14 @@ function AF.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
 
     -- button: open/close menu list
     if isMini then
-        dropdown.button = AF.CreateButton(dropdown, nil, "accent_transparent", 20, 20)
+        dropdown.button = AF.CreateButton(dropdown, nil, "accent_hover", 20, 20)
         dropdown.button:SetAllPoints(dropdown)
-        -- selected item
+
+        -- text
         dropdown.text = AF.CreateFontString(dropdown.button)
-        AF.SetPoint(dropdown.text, "LEFT", 1, 0)
-        AF.SetPoint(dropdown.text, "RIGHT", -1, 0)
-        dropdown.text:SetJustifyH("CENTER")
+        AF.SetPoint(dropdown.text, "LEFT", 5, 0)
+        AF.SetPoint(dropdown.text, "RIGHT", -5, 0)
+        dropdown.text:SetJustifyH(justify or "CENTER")
     else
         dropdown.button = AF.CreateButton(dropdown, nil, "accent_hover", 18, 20)
         dropdown.button:SetPoint("TOPRIGHT")
@@ -415,12 +456,24 @@ function AF.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
         dropdown.button:SetTexture(AF.GetIcon("ArrowDown"), {16, 16}, {"CENTER", 0, 0})
         -- menu.button:SetBackdropColor(AF.GetColorRGB("none"))
         -- menu.button._color = AF.GetColorTable("none")
-        -- selected item
+
+        -- text
         dropdown.text = AF.CreateFontString(dropdown)
         AF.SetPoint(dropdown.text, "LEFT", 5, 0)
         AF.SetPoint(dropdown.text, "RIGHT", dropdown.button, "LEFT", -5, 0)
-        dropdown.text:SetJustifyH("LEFT")
+        dropdown.text:SetJustifyH(justify or "LEFT")
     end
+
+    -- iconBG
+    dropdown.iconBG = AF.CreateTexture(isMini and dropdown.button or dropdown, nil, nil, "ARTWORK", -2)
+    AF.SetSize(dropdown.iconBG, 16, 16)
+    AF.SetPoint(dropdown.iconBG, "TOPLEFT", 2, -2)
+    dropdown.iconBG:Hide()
+
+    -- icon
+    dropdown.icon = AF.CreateTexture(isMini and dropdown.button or dropdown, nil, nil, "ARTWORK", 0)
+    dropdown.icon:Hide()
+    dropdown:SetIconBGColor("black")
 
     AF.AddToFontSizeUpdater(dropdown.text)
 
@@ -461,9 +514,10 @@ function AF.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
     dropdown.items = {
         -- {
         --     ["text"] = (string),
-        --     ["value"] = (obj),
+        --     ["value"] = (any),
         --     ["texture"] = (string),
         --     ["font"] = (string),
+        --     ["icon"] = (string),
         --     ["disabled"] = (boolean),
         --     ["onClick"] = (function)
         -- },

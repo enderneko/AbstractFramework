@@ -99,32 +99,45 @@ end
 local function Separator_UpdatePixels(self)
     AF.ReSize(self)
     AF.RePoint(self)
-    AF.ReSize(self.shadow)
-    AF.RePoint(self.shadow)
+    if self.shadow then
+        AF.ReSize(self.shadow)
+        AF.RePoint(self.shadow)
+    end
 end
 
+---@param color table|string
 ---@return Texture separator
-function AF.CreateSeparator(parent, width, height, color)
+function AF.CreateSeparator(parent, size, thickness, color, isVertical, noShadow)
     if type(color) == "string" then color = AF.GetColorTable(color) end
     color = color or AF.GetColorTable("accent")
 
     local separator = parent:CreateTexture(nil, "ARTWORK", nil, 0)
-    AF.SetSize(separator, width, height)
     separator:SetColorTexture(unpack(color))
+    if isVertical then
+        AF.SetSize(separator, thickness, size)
+    else
+        AF.SetSize(separator, size, thickness)
+    end
 
-    local shadow = parent:CreateTexture(nil, "ARTWORK", nil, -1)
-    separator.shadow = shadow
-    AF.SetSize(shadow, height)
-    AF.SetPoint(shadow, "TOPLEFT", separator, 1, -1)
-    AF.SetPoint(shadow, "TOPRIGHT", separator, 1, -1)
-    shadow:SetColorTexture(AF.GetColorRGB("black", color[4])) -- use line alpha
+    if not noShadow then
+        local shadow = parent:CreateTexture(nil, "ARTWORK", nil, -1)
+        separator.shadow = shadow
+        shadow:SetColorTexture(AF.GetColorRGB("black", color[4])) -- use line alpha
+        if isVertical then
+            AF.SetSize(shadow, thickness, size)
+            AF.SetPoint(shadow, "TOPLEFT", separator, "TOPRIGHT", 0, -thickness)
+        else
+            AF.SetSize(shadow, size, thickness)
+            AF.SetPoint(shadow, "TOPLEFT", separator, "BOTTOMLEFT", thickness, 0)
+        end
 
-    hooksecurefunc(separator, "Show", function()
-        shadow:Show()
-    end)
-    hooksecurefunc(separator, "Hide", function()
-        shadow:Hide()
-    end)
+        hooksecurefunc(separator, "Show", function()
+            shadow:Show()
+        end)
+        hooksecurefunc(separator, "Hide", function()
+            shadow:Hide()
+        end)
+    end
 
     AF.AddToPixelUpdater(separator, Separator_UpdatePixels)
 

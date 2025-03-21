@@ -634,7 +634,7 @@ local function CreateColorPickerFrame()
     ---------------------------------------------
     -- color grids
     ---------------------------------------------
-    local sep = AF.CreateSeparator(colorPickerFrame, 1, 269, AF.GetColorTable("disabled", 0.25))
+    local sep = AF.CreateSeparator(colorPickerFrame, 269, 1, AF.GetColorTable("disabled", 0.25), true)
     AF.SetPoint(sep, "TOPLEFT", originalPane, "TOPRIGHT", 7, -7)
 
     local grids = {}

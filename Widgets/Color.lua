@@ -671,7 +671,7 @@ end
 -- coloring
 ---------------------------------------------------------------------
 ---@param fs FontString
----@param color
+---@param color string
 function AF.ColorFontString(fs, color)
     local r, g, b, a = AF.GetColorRGB(color)
     fs:SetTextColor(r, g, b, a)
@@ -751,8 +751,9 @@ local BUTTON_COLORS = {
     -- ["accent"] = {["normal"] = COLORS["accent"]["normal"], ["hover"] = COLORS["accent"]["hover"]},
     -- ["accent_hover"] = {["normal"] = BUTTON_COLOR_NORMAL, ["hover"] = COLORS["accent"]["hover"]},
     -- ["accent_transparent"] = {["normal"] = BUTTON_COLOR_TRANSPARENT, ["hover"] = COLORS["accent"]["hover"]},
-    ["border_only"] = {["normal"] = BUTTON_COLOR_TRANSPARENT, ["hover"] = BUTTON_COLOR_TRANSPARENT},
+    ["static"] = {["normal"] = BUTTON_COLOR_NORMAL, ["hover"] = BUTTON_COLOR_NORMAL},
     ["none"] = {["normal"] = BUTTON_COLOR_TRANSPARENT, ["hover"] = BUTTON_COLOR_TRANSPARENT},
+    ["gray_hover"] = {["normal"] = BUTTON_COLOR_TRANSPARENT, ["hover"] = {1, 1, 1, 0.1}},
     ["red"] = {["normal"] = {0.6, 0.1, 0.1, 0.6}, ["hover"] = {0.6, 0.1, 0.1, 1}},
     -- ["red_hover"] = {["normal"] = BUTTON_COLOR_NORMAL, ["hover"] = {0.6, 0.1, 0.1, 1}},
     ["green"] = {["normal"] = {0.1, 0.6, 0.1, 0.6}, ["hover"] = {0.1, 0.6, 0.1, 1}},
@@ -771,7 +772,7 @@ local BUTTON_COLORS = {
 function AF.GetButtonNormalColor(name)
     name = name or GetAddon() or "accent"
 
-    if name:find("transparent$") then
+    if name:find("transparent") then
         return BUTTON_COLOR_TRANSPARENT
     end
 
@@ -784,7 +785,7 @@ function AF.GetButtonNormalColor(name)
     end
 
     if BUTTON_COLORS[name] then
-    return BUTTON_COLORS[name]["normal"]
+        return BUTTON_COLORS[name]["normal"]
     end
 
     if COLORS[name] then

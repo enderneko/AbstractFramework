@@ -140,8 +140,8 @@ local function CreateMoverDialog()
     AF.SetPoint(moverGroups, "RIGHT", undo, "LEFT", -7, 0)
     local items = {}
 
-     -- OnShow
-     moverDialog:SetScript("OnShow", function()
+    -- OnShow
+    moverDialog:SetScript("OnShow", function()
         C_Timer.After(0, function()
             AF.SetWidth(moverDialog, AF.Round(max(desc:GetWidth(), tips:GetWidth()) + 40))
         end)
