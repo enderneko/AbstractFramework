@@ -131,7 +131,7 @@ end
 local function CreateCells(parent, config, isCell)
     for i, col in ipairs(config.columns) do
         parent[i] = CreateFrame("Button", nil, parent)
-        parent[i].text = parent[i]:CreateFontString(nil, "OVERLAY", "AF_FONT_CHAT")
+        parent[i].text = parent[i]:CreateFontString(nil, "OVERLAY", "AF_FONT_NORMAL")
         parent[i].SetValue = col.setValue or Cell_SetValue
 
         -- text alignment

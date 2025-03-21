@@ -135,7 +135,7 @@ function AF.CreateEditBox(parent, label, width, height, mode, font)
 
     Mixin(eb, AF_EditBoxMixin)
     eb:SetMode(mode)
-    eb:SetFontObject(font or "AF_FONT_CHAT")
+    eb:SetFontObject(font or "AF_FONT_NORMAL")
     eb:SetMaxLetters(0)
     eb:SetJustifyH("LEFT")
     eb:SetJustifyV("MIDDLE")

@@ -19,7 +19,7 @@ local FONT_SMALL_SIZE = 11
 local FONT_CHINESE_SIZE = 14
 
 local BASE_FONT = GameFontNormal:GetFont()
-local BASE_CHAT_FONT = GameFontNormal:GetFont() -- ChatFontNormal:GetFont()
+local BASE_CHAT_FONT = ChatFontNormal:GetFont()
 
 local font_title = CreateFont(FONT_TITLE_NAME)
 font_title:SetFont(BASE_FONT, FONT_TITLE_SIZE, "")
