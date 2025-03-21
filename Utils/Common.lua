@@ -48,22 +48,24 @@ function AF.ApproxZero(n)
     return AF.ApproxEqual(n, 0)
 end
 
-function AF.Round(num, numDecimalPlaces)
-    if numDecimalPlaces and numDecimalPlaces >= 0 then
-        local mult = 10 ^ numDecimalPlaces
-        num = num * mult
-        if num >= 0 then
-            return floor(num + 0.5) / mult
-        else
-            return ceil(num - 0.5) / mult
-        end
-    end
-
-    if num >= 0 then
-        return floor(num + 0.5)
-    else
+function AF.Round(num)
+    if num < 0.0 then
         return ceil(num - 0.5)
     end
+    return floor(num + 0.5)
+end
+
+function AF.RoundToDecimal(num, numDecimalPlaces)
+    local mult = 10 ^ numDecimalPlaces
+    num = num * mult
+    if num < 0.0 then
+        return ceil(num - 0.5) / mult
+    end
+    return floor(num + 0.5) / mult
+end
+
+function AF.RoundToNearestMultiple(num, multiplier)
+    return AF.Round(num / multiplier) * multiplier
 end
 
 function AF.Interpolate(start, stop, step, maxSteps)
@@ -100,13 +102,11 @@ elseif LOCALE_koKR then
     symbol_1K, symbol_10K, symbol_1B = "천", "만", "억"
 end
 
-local Round = AF.Round
-
 function AF.FormatNumber_Asian(n)
     if abs(n) >= 100000000 then
-        return Round(n / 100000000, 2) .. symbol_1B
+        return AF.RoundToDecimal(n / 100000000, 2) .. symbol_1B
     elseif abs(n) >= 10000 then
-        return Round(n / 10000, 1) .. symbol_10K
+        return AF.RoundToDecimal(n / 10000, 1) .. symbol_10K
     else
         return n
     end
@@ -114,11 +114,11 @@ end
 
 function AF.FormatNumber(n)
     if abs(n) >= 1000000000 then
-        return Round(n / 1000000000, 2) .. "B"
+        return AF.RoundToDecimal(n / 1000000000, 2) .. "B"
     elseif abs(n) >= 1000000 then
-        return Round(n / 1000000, 2) .. "M"
+        return AF.RoundToDecimal(n / 1000000, 2) .. "M"
     elseif abs(n) >= 1000 then
-        return Round(n / 1000, 1) .. "K"
+        return AF.RoundToDecimal(n / 1000, 1) .. "K"
     else
         return n
     end

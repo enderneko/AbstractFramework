@@ -236,8 +236,8 @@ function AF.CalcPoint(owner)
 
     -- x = tonumber(string.format("%.2f", x))
     -- y = tonumber(string.format("%.2f", y))
-    x = AF.Round(x, 1)
-    y = AF.Round(y, 1)
+    x = AF.RoundToDecimal(x, 1)
+    y = AF.RoundToDecimal(y, 1)
 
     return point, x, y
 end
@@ -423,8 +423,8 @@ UpdatePositionAdjustmentFrame = function(owner)
     positionAdjustmentFrame.tp:SetTitle(owner.mover.text:GetText())
 
     local p, _, _, x, y = owner:GetPoint()
-    x = AF.Round(x, 1)
-    y = AF.Round(y, 1)
+    x = AF.RoundToDecimal(x, 1)
+    y = AF.RoundToDecimal(y, 1)
 
     positionAdjustmentFrame.x:ClearFocus()
     positionAdjustmentFrame.y:ClearFocus()
@@ -658,8 +658,8 @@ function AF.CreateMover(owner, group, text, save)
         if mover.isDragging then return end
 
         local point, _, _, startX, startY = owner:GetPoint()
-        startX = AF.Round(startX, 1)
-        startY = AF.Round(startY, 1)
+        startX = AF.RoundToDecimal(startX, 1)
+        startY = AF.RoundToDecimal(startY, 1)
 
         mover.moved = true
 
@@ -720,7 +720,7 @@ function AF.CreateMover(owner, group, text, save)
     mover:SetScript("OnShow", function()
         if not mover._original then
             local p, _, _, x, y = owner:GetPoint()
-            mover._original = {p, AF.Round(x, 1), AF.Round(y, 1)}
+            mover._original = {p, AF.RoundToDecimal(x, 1), AF.RoundToDecimal(y, 1)}
         end
     end)
 end

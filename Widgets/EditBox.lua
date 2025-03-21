@@ -84,12 +84,22 @@ function AF_EditBoxMixin:GetBytes()
     return #value
 end
 
----@param mode string? "multiline"|"number"|"trim"|nil
+---@param mode string? "multiline"|"number"|"decimal"|"trim"|nil
 function AF_EditBoxMixin:SetMode(mode)
-    if not mode then return end
+    self:SetMultiLine(false)
+    self:SetNumeric(false)
+
+    if not mode then
+        self.mode = nil
+        self.GetValue = function(self)
+            return self:GetText()
+        end
+        return
+    end
 
     mode = strlower(mode)
     self.mode = mode
+
 
     if mode == "multiline" then
         self:SetMultiLine(true)
@@ -100,6 +110,17 @@ function AF_EditBoxMixin:SetMode(mode)
         self:SetNumeric(true)
         self.GetValue = function(self)
             return tonumber(self:GetText()) or 0
+        end
+    elseif mode == "decimal" then
+        self.GetValue = function(self)
+            local text = string.gsub(self:GetText(), "[^%d%.]", "")
+
+            local firstDecimal = string.find(text, "%.")
+            if firstDecimal then
+                text = string.sub(text, 1, firstDecimal) ..
+                    string.gsub(string.sub(text, firstDecimal + 1), "%.", "")
+            end
+            return tonumber(text) or 0
         end
     elseif mode == "trim" then
         self.GetValue = function(self)
@@ -190,12 +211,13 @@ function AF.CreateEditBox(parent, label, width, height, mode, font)
     eb.value = "" -- init value
 
     eb:SetScript("OnTextChanged", function(self, userChanged)
-        local value = eb:GetValue()
-        if value == "" then
+        if eb:GetText() == "" then
             eb.label:Show()
         else
             eb.label:Hide()
         end
+
+        local value = eb:GetValue()
 
         if eb.onTextChanged then
             eb.onTextChanged(value, userChanged)

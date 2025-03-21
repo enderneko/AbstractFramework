@@ -11,14 +11,13 @@ local AF_SliderMixin = {}
 
 function AF_SliderMixin:GetValue()
     local value = self.value
-    value = tonumber(string.format("%.2f", value))
     return value
 end
 
 function AF_SliderMixin:SetValue(value)
-    value = tonumber(string.format("%.2f", value))
-    self:_SetValue(value)
+    value = AF.RoundToNearestMultiple(value, self.step)
     self.value = value
+    self:_SetValue(value)
     self.eb:SetText(value * (self.isPercentage and 100 or 1))
 end
 
@@ -35,6 +34,24 @@ function AF_SliderMixin:SetLabel(text)
     self.label:SetText(text)
 end
 
+function AF_SliderMixin:SetLowHighTextShown(show)
+    if show then
+        self.lowText:Show()
+        self.highText:Show()
+    else
+        self.lowText:Hide()
+        self.highText:Hide()
+    end
+end
+
+function AF_SliderMixin:SetEditBoxShown(show)
+    if show then
+        self.eb:Show()
+    else
+        self.eb:Hide()
+    end
+end
+
 -- OnEnterPressed / dragging
 ---@param func function
 function AF_SliderMixin:SetOnValueChanged(func)
@@ -45,6 +62,49 @@ end
 ---@param func function
 function AF_SliderMixin:SetAfterValueChanged(func)
     self.afterValueChanged = func
+end
+
+---@private
+function AF_SliderMixin:OnEnter()
+    self.thumb:SetColor("accent")
+    self.highlight:Show()
+    self.valueBeforeClick = self.value
+end
+
+---@private
+function AF_SliderMixin:OnLeave()
+    self.thumb:SetColor(AF.GetColorTable("accent", 0.7))
+    self.highlight:Hide()
+end
+
+---@private
+function AF_SliderMixin:OnDisable()
+    self.label:SetColor("disabled")
+    self.eb:SetEnabled(false)
+    self.thumb:SetColor(AF.GetColorTable("disabled", 0.7))
+    self.thumbBG:SetColor(AF.GetColorTable("black", 0.7))
+    self.thumbBG2:SetColor(AF.GetColorTable("disabled", 0.25))
+    self.lowText:SetColor("disabled")
+    self.highText:SetColor("disabled")
+    self.percentSign:SetColor("disabled")
+    self:SetScript("OnEnter", nil)
+    self:SetScript("OnLeave", nil)
+    self:SetBackdropBorderColor(AF.GetColorRGB("black", 0.7))
+end
+
+---@private
+function AF_SliderMixin:OnEnable()
+    self.label:SetColor("white")
+    self.eb:SetEnabled(true)
+    self.thumb:SetColor(AF.GetColorTable("accent", 0.7))
+    self.thumbBG:SetColor(AF.GetColorTable("black", 1))
+    self.thumbBG2:SetColor(AF.GetColorTable("accent", 0.25))
+    self.lowText:SetColor("gray")
+    self.highText:SetColor("gray")
+    self.percentSign:SetColor("gray")
+    self:SetScript("OnEnter", self.OnEnter)
+    self:SetScript("OnLeave", self.OnLeave)
+    self:SetBackdropBorderColor(AF.GetColorRGB("black", 1))
 end
 
 ---@param parent Frame
@@ -61,6 +121,7 @@ function AF.CreateSlider(parent, text, width, low, high, step, isPercentage, sho
     AF.ApplyDefaultBackdropWithColors(slider, "widget")
 
     slider.isPercentage = isPercentage
+    slider.step = step or 1
 
     slider:SetValueStep(step or 1)
     slider:SetObeyStepOnDrag(true)
@@ -112,14 +173,16 @@ function AF.CreateSlider(parent, text, width, low, high, step, isPercentage, sho
     slider.eb = eb
     AF.SetPoint(eb, "TOPLEFT", slider, "BOTTOMLEFT", math.ceil(width / 2 - 24), -1)
     eb:SetJustifyH("CENTER")
+    eb:SetMode("decimal")
 
     eb:SetScript("OnEnterPressed", function()
         eb:ClearFocus()
-        local value = tonumber(eb:GetText())
+        local value = eb:GetValue()
 
         if value then
-            value = tonumber(string.format("%.2f", value))
-            value = AF.Clamp(value / (isPercentage and 100 or 1), slider.low, slider.high)
+            value = value / (isPercentage and 100 or 1)
+            value = AF.RoundToNearestMultiple(value, step)
+            value = AF.Clamp(value, slider.low, slider.high)
 
             if slider.value ~= value then
                 if slider.onValueChanged then slider.onValueChanged(value) end
@@ -127,15 +190,15 @@ function AF.CreateSlider(parent, text, width, low, high, step, isPercentage, sho
             end
 
             slider.value = value
+            slider:_SetValue(value) -- update thumb position
             eb:SetText(value * (isPercentage and 100 or 1))
-            slider:SetValue(value) -- update thumb position
         else
             eb:SetText(slider.value * (isPercentage and 100 or 1))
         end
     end)
 
     eb:SetScript("OnShow", function(self)
-        if slider.value then self:SetText(slider.value) end
+        if slider.value then self:SetText(slider.value * (isPercentage and 100 or 1)) end
     end)
     -----------------------------------------------------------------
 
@@ -143,7 +206,7 @@ function AF.CreateSlider(parent, text, width, low, high, step, isPercentage, sho
     local unit = isPercentage and "%" or ""
     slider.unit = unit
 
-    local percentSign = AF.CreateFontString(slider, "%", "gray")
+    local percentSign = AF.CreateFontString(eb, "%", "gray")
     slider.percentSign = percentSign
     AF.SetPoint(percentSign, "LEFT", eb, "RIGHT", 2, 0)
     if isPercentage then
@@ -168,28 +231,14 @@ function AF.CreateSlider(parent, text, width, low, high, step, isPercentage, sho
     Mixin(slider, AF_SliderMixin)
     slider:SetMinMaxValues(low, high)
 
-    -- NOTE: OnEnter / OnLeave will still trigger even if disabled
     -- OnEnter ------------------------------------------------------
-    local valueBeforeClick
-    local function OnEnter()
-        thumb:SetColor("accent")
-        highlight:Show()
-        valueBeforeClick = slider.value
-    end
-    slider:SetScript("OnEnter", OnEnter)
-    -----------------------------------------------------------------
-
-    -- OnLeave ------------------------------------------------------
-    local function OnLeave()
-        thumb:SetColor(AF.GetColorTable("accent", 0.7))
-        highlight:Hide()
-    end
-    slider:SetScript("OnLeave", OnLeave)
+    slider:SetScript("OnEnter", slider.OnEnter)
+    slider:SetScript("OnLeave", slider.OnLeave)
     -----------------------------------------------------------------
 
     -- OnValueChanged -----------------------------------------------
     slider:SetScript("OnValueChanged", function(self, value, userChanged)
-        value = tonumber(string.format("%.2f", value))
+        value = AF.RoundToNearestMultiple(value, step)
         if slider.value == value then return end
 
         if userChanged then -- IsDraggingThumb()
@@ -207,8 +256,8 @@ function AF.CreateSlider(parent, text, width, low, high, step, isPercentage, sho
         if not slider:IsEnabled() then return end
 
         -- slider.value here == newValue, OnMouseUp called after OnValueChanged
-        if valueBeforeClick ~= slider.value and slider.afterValueChanged then
-            valueBeforeClick = slider.value
+        if self.valueBeforeClick ~= slider.value and slider.afterValueChanged then
+            self.valueBeforeClick = slider.value
             slider.afterValueChanged(slider.value)
         end
     end)
@@ -240,34 +289,10 @@ function AF.CreateSlider(parent, text, width, low, high, step, isPercentage, sho
     end)
     ]]
 
-    slider:SetScript("OnDisable", function()
-        label:SetColor("disabled")
-        eb:SetEnabled(false)
-        thumb:SetColor(AF.GetColorTable("disabled", 0.7))
-        thumbBG:SetColor(AF.GetColorTable("black", 0.7))
-        thumbBG2:SetColor(AF.GetColorTable("disabled", 0.25))
-        lowText:SetColor("disabled")
-        highText:SetColor("disabled")
-        percentSign:SetColor("disabled")
-        slider:SetScript("OnEnter", nil)
-        slider:SetScript("OnLeave", nil)
-        slider:SetBackdropBorderColor(AF.GetColorRGB("black", 0.7))
-    end)
+    slider:SetScript("OnEnable", slider.OnEnable)
+    slider:SetScript("OnDisable", slider.OnDisable)
 
-    slider:SetScript("OnEnable", function()
-        label:SetColor("white")
-        eb:SetEnabled(true)
-        thumb:SetColor(AF.GetColorTable("accent", 0.7))
-        thumbBG:SetColor(AF.GetColorTable("black", 1))
-        thumbBG2:SetColor(AF.GetColorTable("accent", 0.25))
-        lowText:SetColor("gray")
-        highText:SetColor("gray")
-        percentSign:SetColor("gray")
-        slider:SetScript("OnEnter", OnEnter)
-        slider:SetScript("OnLeave", OnLeave)
-        slider:SetBackdropBorderColor(AF.GetColorRGB("black", 1))
-    end)
-
+    slider:SetValue(low)
     AF.AddToPixelUpdater(slider)
 
     return slider
@@ -280,9 +305,9 @@ end
 local AF_VerticalSliderMixin = {}
 
 function AF_VerticalSliderMixin:SetValue(value)
-    value = tonumber(string.format("%.2f", self.high - value + self.low))
-    self:_SetValue(value)
+    value = AF.RoundToNearestMultiple(self.high - value + self.low, self.step)
     self.value = value
+    self:_SetValue(value)
     self.eb:SetText(value * (self.isPercentage and 100 or 1))
 end
 
@@ -330,6 +355,8 @@ function AF.CreateVerticalSlider(parent, text, height, low, high, step, isPercen
 
     slider.low = low
     slider.high = high
+    slider.isPercentage = isPercentage
+    slider.step = step
 
     -- label --------------------------------------------------------
     AF.ClearPoints(slider.label)
@@ -363,7 +390,7 @@ function AF.CreateVerticalSlider(parent, text, height, low, high, step, isPercen
 
     -- OnValueChanged -----------------------------------------------
     slider:SetScript("OnValueChanged", function(self, value, userChanged)
-        value = tonumber(string.format("%.2f", self.high - value + self.low))
+        value = AF.RoundToNearestMultiple(self.high - value + self.low, step)
         if slider.value == value then return end
 
         if userChanged then -- IsDraggingThumb()

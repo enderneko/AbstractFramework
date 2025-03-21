@@ -17,10 +17,10 @@ local AF = _G.AbstractFramework
 ---@return number a
 function AF.ConvertToRGB(r, g, b, a, saturation)
     saturation = saturation or 1
-    r = AF.Round(r / 255 * saturation, 5)
-    g = AF.Round(g / 255 * saturation, 5)
-    b = AF.Round(b / 255 * saturation, 5)
-    a = a and AF.Round(a / 255, 5)
+    r = AF.RoundToDecimal(r / 255 * saturation, 5)
+    g = AF.RoundToDecimal(g / 255 * saturation, 5)
+    b = AF.RoundToDecimal(b / 255 * saturation, 5)
+    a = a and AF.RoundToDecimal(a / 255, 5)
     return r, g, b, a
 end
 
