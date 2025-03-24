@@ -162,8 +162,26 @@ function AF.StringToTable(str, sep, convertToNum)
     return t
 end
 
-function AF.TableToString(t, sep)
-    return tconcat(t, sep)
+---@param t table
+---@param sep string
+---@param useKey boolean
+---@param useValue boolean
+function AF.TableToString(t, sep, useKey, useValue)
+    if useKey or useValue then
+        local str = ""
+        for k, v in pairs(t) do
+            if useKey and useValue then
+                str = str .. k .. "=" .. v .. sep
+            elseif useKey then
+                str = str .. k .. sep
+            elseif useValue then
+                str = str .. v .. sep
+            end
+        end
+        return str:sub(1, -2)
+    else
+        return tconcat(t, sep)
+    end
 end
 
 function AF.IsBlank(str)
