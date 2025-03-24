@@ -388,6 +388,7 @@ end
 ----------------------------------------------------------------
 
 local function md5_update(self, s)
+    s = tostring(s)
     self.pos = self.pos + #s
     s = self.buf .. s
     for ii = 1, #s - 63, 64 do
