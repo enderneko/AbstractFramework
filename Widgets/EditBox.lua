@@ -133,6 +133,10 @@ function AF_EditBoxMixin:GetValue()
     return self:GetText()
 end
 
+function AF_EditBoxMixin:SetNotUserChangable(notUserChangable)
+    self.notUserChangable = notUserChangable
+end
+
 ---@param parent Frame
 ---@param label string
 ---@param width number
@@ -224,6 +228,11 @@ function AF.CreateEditBox(parent, label, width, height, mode, font)
         end
 
         if userChanged then
+            if eb.notUserChangable then
+                eb:SetText(eb.value) -- restore
+                return
+            end
+
             if eb.confirmBtn then
                 if eb.value ~= value then
                     eb.confirmBtn:Show()
@@ -329,6 +338,10 @@ end
 
 function AF_ScrollEditBoxMixin:Clear()
     self.eb:SetText("")
+end
+
+function AF_ScrollEditBoxMixin:SetNotUserChangable(notUserChangable)
+    self.eb:SetNotUserChangable(notUserChangable)
 end
 
 ---@return AF_ScrollEditBox|AF_ScrollFrame frame
