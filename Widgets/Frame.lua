@@ -685,6 +685,7 @@ function AF_ScrollListMixin:SetScroll(startIndex)
         else
             w:Show()
             w:SetAllPoints(self.slots[slotIndex])
+            w._slotIndex = slotIndex
             if w.Update then
                 -- NOTE: fix some widget issues, define them manually
                 w:Update()
