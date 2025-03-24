@@ -7,6 +7,7 @@ local floor, ceil, abs, max, min, abs = math.floor, math.ceil, math.abs, math.ma
 local format, gsub, strlower, strupper, strsplit, strtrim = string.format, string.gsub, string.lower, string.upper, string.split, string.trim
 local next, pairs, ipairs = next, pairs, ipairs
 local tinsert, tremove, tsort, tconcat = table.insert, table.remove, table.sort, table.concat
+local date, time = date, time
 
 ---------------------------------------------------------------------
 -- misc
@@ -401,9 +402,12 @@ end
 ---------------------------------------------------------------------
 -- time
 ---------------------------------------------------------------------
-
-function AF.FormatTime(sec)
-    -- TODO:
+-- https://strftime.net
+-- https://warcraft.wiki.gg/wiki/API_date
+function AF.FormatTime(sec, format)
+    format = format or "%Y/%m/%d %H:%M:%S"
+    -- date() is equivalent to date("%c")
+    return date("%Y/%m/%d %H:%M:%S", sec)
 end
 
 local SEC = gsub(_G.SPELL_DURATION_SEC, "%%%.%df", "%%s")
