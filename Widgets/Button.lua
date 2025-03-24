@@ -1,9 +1,6 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 
----------------------------------------------------------------------
--- button
----------------------------------------------------------------------
 local function RegisterMouseDownUp(b)
     b:SetScript("OnMouseDown", function()
         if b._pushEffectEnabled then
@@ -23,6 +20,10 @@ local function UnregisterMouseDownUp(b)
     b:SetScript("OnMouseDown", nil)
     b:SetScript("OnMouseUp", nil)
 end
+
+---------------------------------------------------------------------
+-- button
+---------------------------------------------------------------------
 
 ---@class AF_Button
 local AF_ButtonMixin = {}
@@ -430,9 +431,26 @@ end
 ---------------------------------------------------------------------
 -- icon button
 ---------------------------------------------------------------------
+---@class AF_IconButton
+local AF_IconButtonMixin = {}
+
+function AF_IconButtonMixin:HandleMouseDownTexture()
+    self.icon:ClearAllPoints()
+    self.icon:SetPoint("CENTER", 0, -AF.GetOnePixelForRegion(self))
+end
+
+function AF_IconButtonMixin:HandleMouseUpTexture()
+    self.icon:ClearAllPoints()
+    self.icon:SetPoint("CENTER")
+end
+
+function AF_IconButtonMixin:EnablePushEffect(enabled)
+    self._pushEffectEnabled = enabled
+end
+
 ---@param color? string|table
 ---@param hoverColor? string|table
-function AF.CreateIconButton(parent, icon, width, height, padding, color, hoverColor, noPushDownEffect, filterMode)
+function AF.CreateIconButton(parent, icon, width, height, padding, color, hoverColor, filterMode, noPushDownEffect)
     padding = padding or 0
 
     local b = CreateFrame("Button", nil, parent)
@@ -454,17 +472,11 @@ function AF.CreateIconButton(parent, icon, width, height, padding, color, hoverC
         b.icon:SetVertexColor(AF.UnpackColor(b.color))
     end)
 
-    if not noPushDownEffect then
-        RegisterMouseDownUp(b)
-        b.onMouseDownTexture = function()
-            b.icon:ClearAllPoints()
-            b.icon:SetPoint("CENTER", 0, -AF.GetOnePixelForRegion(b))
-        end
-        b.onMouseUpTexture = function()
-            b.icon:ClearAllPoints()
-            b.icon:SetPoint("CENTER")
-        end
-    end
+    Mixin(b, AF_IconButtonMixin)
+    RegisterMouseDownUp(b)
+    b:EnablePushEffect(not noPushDownEffect)
+    b.HandleMouseDownText = AF.noop
+    b.HandleMouseUpText = AF.noop
 
     AF.AddToPixelUpdater(b)
 
