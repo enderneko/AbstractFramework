@@ -109,18 +109,27 @@ function AF_ButtonMixin:SetTextPadding(padding)
     AF.SetPoint(self.text, "RIGHT", -padding, 0)
 end
 
+---@param color string
 function AF_ButtonMixin:SetBorderHighlightColor(color)
     if color then
         self.highlightBorder = function()
             self:SetBackdropBorderColor(AF.GetColorRGB(color))
         end
+
+        self._borderColor = self._borderColor or AF.GetColorTable("black")
         self.unhighlightBorder = function()
-            self:SetBackdropBorderColor(AF.GetColorRGB("black"))
+            self:SetBackdropBorderColor(AF.UnpackColor(self._borderColor))
         end
     else
         self.highlightBorder = nil
         self.unhighlightBorder = nil
     end
+end
+
+---@param color string
+function AF_ButtonMixin:SetBorderColor(color)
+    self._borderColor = AF.GetColorTable(color)
+    self:SetBackdropBorderColor(AF.UnpackColor(self._borderColor))
 end
 
 ---@param color string|table if table, color[1] is normal color, color[2] is hover color
@@ -402,6 +411,8 @@ end
 -- close button
 ---------------------------------------------------------------------
 function AF.CreateCloseButton(parent, frameToHide, width, height, padding)
+    width = width or 16
+    height = height or 16
     padding = padding or 6
 
     local b = AF.CreateButton(parent, nil, "red", width, height)
