@@ -147,13 +147,16 @@ end
 function AF.StringToTable(str, sep, convertToNum)
     local t = {}
     if str == "" then return t end
+    assert(sep, "separator is nil")
 
-    for i, v in pairs({string.split(sep, str)}) do
-        v = strtrim(v)
-        if convertToNum then
+    if convertToNum then
+        for i, v in pairs({string.split(sep, str)}) do
+            v = strtrim(v)
             tinsert(t, tonumber(v) or v)
-        else
-            tinsert(t, v)
+        end
+    else
+        for i, v in pairs({string.split(sep, str)}) do
+            tinsert(t, strtrim(v))
         end
     end
     return t
@@ -301,6 +304,18 @@ function AF.TransposeTable(t, value)
     local temp = {}
     for k, v in ipairs(t) do
         temp[v] = value or k
+    end
+    return temp
+end
+
+-- converts a table using a processor function
+---@param t table the table to convert
+---@param processor function the processor function to use, returns newKey, newValue
+function AF.ConvertTable(t, processor)
+    local temp = {}
+    for k, v in ipairs(t) do
+        local newKey, newValue = processor(k, v)
+        temp[newKey] = newValue
     end
     return temp
 end
