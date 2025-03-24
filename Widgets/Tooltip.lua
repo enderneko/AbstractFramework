@@ -43,8 +43,10 @@ function AF.ShowTooltips(widget, anchor, x, y, lines)
     local r, g, b = AF.GetColorRGB("accent")
     tooltip:AddLine(lines[1], r, g, b)
     for i = 2, #lines do
-        if lines[i] then
+        if type(lines[i]) == "string" then
             tooltip:AddLine(lines[i], 1, 1, 1, true)
+        elseif type(lines[i]) == "table" then
+            tooltip:AddDoubleLine(lines[i][1], lines[i][2], 1, 1, 1, 1, 1, 1)
         end
     end
 
