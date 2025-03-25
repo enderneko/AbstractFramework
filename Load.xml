@@ -18,6 +18,7 @@
     <Script file="Locales.lua"/>
 
     <!-- utils -->
+    <Script file="Utils\Pool.lua"/>
     <Script file="Utils\Queue.lua"/>
     <Script file="Utils\OnUpdateExecutor.lua"/>
     <Script file="Utils\EventHandler.lua"/>
