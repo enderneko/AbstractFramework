@@ -4,7 +4,7 @@ local AF = _G.AbstractFramework
 ----------------------------------------------------------------
 -- color picker widget
 ----------------------------------------------------------------
----@class AF_ColorPicker
+---@class AF_ColorPicker:Button
 local AF_ColorPickerMixin = {}
 
 function AF_ColorPickerMixin:EnableAlpha(enabled)
@@ -44,7 +44,7 @@ end
 ---@param alphaEnabled boolean
 ---@param onChange function
 ---@param onConfirm function
----@return AF_ColorPicker|Button cp
+---@return AF_ColorPicker cp
 function AF.CreateColorPicker(parent, label, alphaEnabled, onChange, onConfirm)
     local cp = CreateFrame("Button", nil, parent, "BackdropTemplate")
     AF.SetSize(cp, 14, 14)

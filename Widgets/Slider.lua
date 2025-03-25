@@ -6,7 +6,7 @@ local AF = _G.AbstractFramework
 ---------------------------------------------------------------------
 -- slider
 ---------------------------------------------------------------------
----@class AF_Slider
+---@class AF_Slider:Slider
 local AF_SliderMixin = {}
 
 function AF_SliderMixin:GetValue()
@@ -301,7 +301,7 @@ end
 ---------------------------------------------------------------------
 -- vertical slider
 ---------------------------------------------------------------------
----@class AF_VerticalSlider
+---@class AF_VerticalSlider:AF_Slider
 local AF_VerticalSliderMixin = {}
 
 function AF_VerticalSliderMixin:SetValue(value)
@@ -342,7 +342,7 @@ end
 ---@param step number
 ---@param isPercentage boolean
 ---@param showLowHighText boolean
----@return AF_VerticalSlider|AF_Slider slider
+---@return AF_VerticalSlider slider
 function AF.CreateVerticalSlider(parent, text, height, low, high, step, isPercentage, showLowHighText)
     local slider = AF.CreateSlider(parent, text, 10, low, high, step, isPercentage, showLowHighText)
     AF.ApplyDefaultBackdropWithColors(slider, "widget")

@@ -228,7 +228,7 @@ end
 ---------------------------------------------------------------------
 -- AF_AuraButtonMixin
 ---------------------------------------------------------------------
----@class AF_AuraButton
+---@class AF_AuraButton:Frame
 local AF_AuraButtonMixin = {}
 
 
@@ -477,7 +477,7 @@ end
 ---------------------------------------------------------------------
 ---@param parent Frame
 ---@param noPixelUpdates boolean
----@return AF_AuraButton|Frame aura
+---@return AF_AuraButton aura
 function AF.CreateAura(parent, noPixelUpdates)
     local frame = CreateFrame("Frame", nil, parent, "BackdropTemplate")
     frame:Hide()

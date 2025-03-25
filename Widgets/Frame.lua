@@ -189,8 +189,7 @@ end
 ---------------------------------------------------------------------
 -- normal frame
 ---------------------------------------------------------------------
-
----@class AF_Frame
+---@class AF_Frame:Frame
 local AF_FrameMixin = {}
 
 function AF_FrameMixin:SetOnEnter(func)
@@ -205,7 +204,7 @@ function AF_FrameMixin:SetOnUpdate(func)
     self:SetScript("OnUpdate", func)
 end
 
----@return AF_Frame|Frame frame
+---@return AF_Frame frame
 function AF.CreateFrame(parent, name, width, height, template)
     local f = CreateFrame("Frame", name, parent, template)
     AF.SetSize(f, width, height)
@@ -222,7 +221,7 @@ local function HeaderedFrame_SetTitleBackgroundColor(self, color)
     color = color or AF.GetColorTable("accent")
 end
 
----@class AF_HeaderedFrame
+---@class AF_HeaderedFrame:AF_Frame
 local AF_HeaderedFrameMixin = {}
 
 function AF_HeaderedFrameMixin:SetTitleJustify(justify)
@@ -275,7 +274,7 @@ end
 -- function AF_HeaderedFrameMixin:SetHeaderColor(color)
 -- end
 
----@return AF_HeaderedFrame|AF_Frame|Frame headeredFrame
+---@return AF_HeaderedFrame headeredFrame
 function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata, frameLevel, notUserPlaced)
     local f = CreateFrame("Frame", name, parent, "BackdropTemplate")
     f:Hide()
@@ -358,7 +357,7 @@ end
 ---------------------------------------------------------------------
 -- bordered frame
 ---------------------------------------------------------------------
----@class AF_BorderedFrame
+---@class AF_BorderedFrame:AF_Frame
 local AF_BorderedFrameMixin = {}
 
 function AF_BorderedFrameMixin:SetLabel(label, fontColor, font, isInside)
@@ -379,7 +378,7 @@ end
 
 ---@param color string|table color name / table
 ---@param borderColor string|table color name / table
----@return AF_BorderedFrame|AF_Frame|Frame borderedFrame
+---@return AF_BorderedFrame borderedFrame
 function AF.CreateBorderedFrame(parent, name, width, height, color, borderColor)
     local f = CreateFrame("Frame", name, parent, "BackdropTemplate")
     AF.ApplyDefaultBackdropWithColors(f, color, borderColor)
@@ -446,7 +445,7 @@ end
 ---------------------------------------------------------------------
 -- scroll frame
 ---------------------------------------------------------------------
----@class AF_ScrollFrame
+---@class AF_ScrollFrame:AF_BorderedFrame
 local AF_ScrollFrameMixin = {}
 
 -- reset scrollContent height (reset scroll range)
@@ -525,7 +524,7 @@ function AF_ScrollFrameMixin:UpdatePixels()
     self:ResetScroll()
 end
 
----@return AF_ScrollFrame|Frame scrollParent
+---@return AF_ScrollFrame scrollParent
 function AF.CreateScrollFrame(parent, name, width, height, color, borderColor)
     local scrollParent = AF.CreateBorderedFrame(parent, name, width, height, color, borderColor)
 
@@ -647,7 +646,7 @@ end
 ---------------------------------------------------------------------
 -- scroll list (filled with widgets)
 ---------------------------------------------------------------------
----@class AF_ScrollList
+---@class AF_ScrollList:AF_BorderedFrame
 local AF_ScrollListMixin = {}
 
 ---@private
@@ -825,7 +824,7 @@ end
 ---@param verticalMargins number top/bottom margin
 ---@param horizontalMargins number left/right margin
 ---@param slotSpacing number spacing between widgets next to each other
----@return AF_ScrollList|Frame scrollList
+---@return AF_ScrollList scrollList
 function AF.CreateScrollList(parent, name, width, verticalMargins, horizontalMargins, slotNum, slotHeight, slotSpacing, color, borderColor)
     local scrollList = AF.CreateBorderedFrame(parent, name, width, nil, color, borderColor)
     AF.SetListHeight(scrollList, slotNum, slotHeight, slotSpacing, verticalMargins*2)

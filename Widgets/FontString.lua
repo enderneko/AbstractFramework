@@ -4,7 +4,7 @@ local AF = _G.AbstractFramework
 ---------------------------------------------------------------------
 -- font string
 ---------------------------------------------------------------------
----@class AF_FontString
+---@class AF_FontString:FontString
 local AF_FontStringMixin = {}
 
 ---@param color string
@@ -14,7 +14,7 @@ end
 
 ---@param color string color name defined in Color.lua
 ---@param font string color name defined in Font.lua
----@return AF_FontString|FontString fs
+---@return AF_FontString fs
 function AF.CreateFontString(parent, text, color, font, layer)
     local fs = parent:CreateFontString(nil, layer or "OVERLAY", font or "AF_FONT_NORMAL")
     Mixin(fs, AF_FontStringMixin)
@@ -158,7 +158,7 @@ end
 ---------------------------------------------------------------------
 -- scrolling text
 ---------------------------------------------------------------------
----@class AF_ScrollingText
+---@class AF_ScrollingText:ScrollFrame
 local AF_ScrollingTextMixin = {}
 
 function AF_ScrollingTextMixin:SetText(str, color)
@@ -181,7 +181,7 @@ end
 ---@param step number
 ---@param startDelay number
 ---@param endDelay number
----@return AF_ScrollingText|ScrollFrame scroller
+---@return AF_ScrollingText scroller
 function AF.CreateScrollingText(parent, frequency, step, startDelay, endDelay)
     -- vars -------------------------------------
     frequency = frequency or 0.02

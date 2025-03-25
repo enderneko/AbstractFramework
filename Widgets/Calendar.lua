@@ -325,7 +325,7 @@ end
 -- %Y  full year (1998)
 -- %y  two-digit year (98) [00-99]
 
----@class AF_CalendarButton
+---@class AF_CalendarButton:AF_Button
 local AF_CalendarButtonMixin = {}
 
 function AF_CalendarButtonMixin:SetDate(d)
@@ -365,7 +365,7 @@ end
 ---@param date? string|number|table "YYYYMMDD", a epoch unix timestamp in seconds, or a "*t" table
 ---@param width? number default is 110
 ---@param calendarPosition? string "BOTTOMLEFT", "BOTTOMRIGHT", "TOPLEFT", "TOPRIGHT".
----@return AF_CalendarButton|AF_Button
+---@return AF_CalendarButton
 function AF.CreateCalendarButton(parent, date, width, calendarPosition)
     local button = AF.CreateButton(parent, "", "accent", width or 110, 20)
     button:SetTexture(AF.GetIcon("Calendar"), {16, 16}, {"LEFT", 2, 0})

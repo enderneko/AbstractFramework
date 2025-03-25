@@ -125,7 +125,7 @@ end
 ---------------------------------------------------------------------
 -- dropdown menu
 ---------------------------------------------------------------------
----@class AF_Dropdown
+---@class AF_Dropdown:AF_BorderedFrame
 local AF_DropdownMixin = {}
 
 -- selection ------------------------------------
@@ -418,7 +418,7 @@ function AF_DropdownMixin:SetEnabled(enabled)
 end
 
 ---@param maxSlots number max shown items
----@return AF_Dropdown|Frame
+---@return AF_Dropdown
 function AF.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHorizontal, justify, textureAlpha)
     if not list then CreateListFrame() end
     if not horizontalList then CreateHorizontalList() end

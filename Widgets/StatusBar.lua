@@ -4,7 +4,7 @@ local AF = _G.AbstractFramework
 ---------------------------------------------------------------------
 -- blizzard
 ---------------------------------------------------------------------
----@class AF_BlizzardStatusBar
+---@class AF_BlizzardStatusBar:AF_SmoothStatusBar
 local AF_BlizzardStatusBarMixin = {}
 
 function AF_BlizzardStatusBarMixin:SetBarValue(v)
@@ -23,7 +23,7 @@ end
 ---@param color string color name defined in Color.lua
 ---@param borderColor string color name defined in Color.lua
 ---@param progressTextType string? "percentage" or "current_value" or "current_max".
----@return AF_BlizzardStatusBar|AF_SmoothStatusBar bar
+---@return AF_BlizzardStatusBar bar
 function AF.CreateBlizzardStatusBar(parent, minValue, maxValue, width, height, color, borderColor, progressTextType)
     local bar = CreateFrame("StatusBar", nil, parent, "BackdropTemplate")
     AF.ApplyDefaultBackdropWithColors(bar, AF.GetColorTable(color, 0.9, 0.1), borderColor)
@@ -98,7 +98,7 @@ local function UpdateValue(self)
     end
 end
 
----@class AF_SimpleStatusBar
+---@class AF_SimpleStatusBar:Frame
 local AF_SimpleStatusBarMixin = {}
 -- appearance
 function AF_SimpleStatusBarMixin:SetTexture(texture, lossTexture)

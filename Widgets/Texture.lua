@@ -4,7 +4,7 @@ local AF = _G.AbstractFramework
 ---------------------------------------------------------------------
 -- texture
 ---------------------------------------------------------------------
----@class AF_Texture
+---@class AF_Texture:Texture
 local AF_TextureMixin = {}
 
 function AF_TextureMixin:SetColor(color)
@@ -18,7 +18,7 @@ function AF_TextureMixin:SetColor(color)
 end
 
 ---@param color table|string
----@return AF_TextureMixin|Texture tex
+---@return AF_TextureMixin tex
 function AF.CreateTexture(parent, texture, color, drawLayer, subLevel, wrapModeHorizontal, wrapModeVertical, filterMode)
     local tex = parent:CreateTexture(nil, drawLayer or "ARTWORK", nil, subLevel)
     Mixin(tex, AF_TextureMixin)

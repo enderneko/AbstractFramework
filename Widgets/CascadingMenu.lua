@@ -197,7 +197,7 @@ end
 ---------------------------------------------------------------------
 -- cascading menu button
 ---------------------------------------------------------------------
----@class AF_CascadingMenuButton
+---@class AF_CascadingMenuButton:AF_Button
 local AF_CascadingMenuButtonMixin = {}
 
 function AF_CascadingMenuButtonMixin:SetLabel(label, color, font)
@@ -279,7 +279,7 @@ end
 ---@param width number
 ---@param items table
 ---@param maxShownItems number? default is 10
----@return AF_CascadingMenuButton|AF_Button|Button
+---@return AF_CascadingMenuButton
 function AF.CreateCascadingMenuButton(parent, width, maxShownItems)
     local menu = AF.CreateButton(parent, "", "accent_hover", width, 20)
     menu:SetJustifyH("LEFT")

@@ -1,7 +1,7 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 
----@class AF_Sheet
+---@class AF_Sheet:Frame
 local AF_SheetMixin = {}
 
 ---------------------------------------------------------------------
@@ -346,7 +346,7 @@ end
 ---------------------------------------------------------------------
 ---@param config table
 ---@param onSizeChanged function
----@return AF_Sheet|Frame sheet
+---@return AF_Sheet sheet
 function AF.CreateSheet(parent, name, config, onSizeChanged)
     local sheet = CreateFrame("Frame", name, parent)
     sheet.allRows = {}

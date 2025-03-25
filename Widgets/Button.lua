@@ -25,7 +25,7 @@ end
 -- button
 ---------------------------------------------------------------------
 
----@class AF_Button
+---@class AF_Button:Button
 local AF_ButtonMixin = {}
 
 function AF_ButtonMixin:HandleMouseDownText()
@@ -293,7 +293,7 @@ end
 ---@param borderColor? string default is "black", set to "" to remove border
 ---@param backgroundColor? string default is "background", set to "" to remove background
 ---@param font? string?
----@return AF_Button|Button button
+---@return AF_Button button
 function AF.CreateButton(parent, text, color, width, height, template, borderColor, backgroundColor, font)
     local b = CreateFrame("Button", nil, parent, template and template..",BackdropTemplate" or "BackdropTemplate")
     if parent then AF.SetFrameLevel(b, 1) end
@@ -508,7 +508,7 @@ end
 ---------------------------------------------------------------------
 -- check button
 ---------------------------------------------------------------------
----@class AF_CheckButton
+---@class AF_CheckButton:CheckButton
 local AF_CheckButtonMixin = {}
 
 function AF_CheckButtonMixin:SetText(text)
@@ -528,7 +528,7 @@ function AF_CheckButtonMixin:UpdatePixels()
     AF.RePoint(self.highlightTexture)
 end
 
----@return AF_CheckButton|CheckButton cb
+---@return AF_CheckButton cb
 function AF.CreateCheckButton(parent, label, onClick)
     -- InterfaceOptionsCheckButtonTemplate --> FrameXML\InterfaceOptionsPanels.xml line 19
     -- OptionsBaseCheckButtonTemplate -->  FrameXML\OptionsPanelTemplates.xml line 10
@@ -590,7 +590,7 @@ end
 ---------------------------------------------------------------------
 -- switch
 ---------------------------------------------------------------------
----@class AF_Switch
+---@class AF_Switch:AF_BorderedFrame
 local AF_SwitchMixin = {}
 
 function AF_SwitchMixin:SetSelectedValue(value)
@@ -745,7 +745,7 @@ function AF_SwitchMixin:SetLabels(labels)
 end
 
 ---@param labels table? {{["text"]=(string), ["value"]=(any), ["onClick"]=(function)}, ...}
----@return AF_Switch|Frame switch
+---@return AF_Switch switch
 function AF.CreateSwitch(parent, width, height, labels)
     local switch = AF.CreateBorderedFrame(parent, nil, width, height, "widget")
 

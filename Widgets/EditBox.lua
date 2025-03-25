@@ -4,7 +4,7 @@ local AF = _G.AbstractFramework
 ---------------------------------------------------------------------
 -- edit box
 ---------------------------------------------------------------------
----@class AF_EditBox
+---@class AF_EditBox:EditBox
 local AF_EditBoxMixin = {}
 
 ---@param func function?
@@ -143,7 +143,7 @@ end
 ---@param height number
 ---@param mode string? "multiline"|"number"|"trim"|nil
 ---@param font? string|Font
----@return AF_EditBox|EditBox
+---@return AF_EditBox
 function AF.CreateEditBox(parent, label, width, height, mode, font)
     local eb = CreateFrame("EditBox", nil, parent, "BackdropTemplate")
 
@@ -259,7 +259,7 @@ end
 ---------------------------------------------------------------------
 -- scroll edit box
 ---------------------------------------------------------------------
----@class AF_ScrollEditBox
+---@class AF_ScrollEditBox:AF_ScrollFrame
 local AF_ScrollEditBoxMixin = {}
 
 function AF_ScrollEditBoxMixin:SetText(text)
@@ -346,7 +346,7 @@ function AF_ScrollEditBoxMixin:SetNotUserChangable(notUserChangable)
     self.eb:SetNotUserChangable(notUserChangable)
 end
 
----@return AF_ScrollEditBox|AF_ScrollFrame frame
+---@return AF_ScrollEditBox frame
 function AF.CreateScrollEditBox(parent, name, label, width, height, scrollStep)
     scrollStep = scrollStep or 1
 

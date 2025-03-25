@@ -201,7 +201,7 @@ end
 ---------------------------------------------------------------------
 local notificationDialogQueue = AF.NewQueue()
 
----@class AF_NotificationDialog
+---@class AF_NotificationDialog:AF_BorderedFrame
 local notificationDialog
 
 local function CreateNotificationDialog()
@@ -285,7 +285,7 @@ end
 ---@param width number
 ---@param showMask boolean
 ---@param countdown number
----@return AF_NotificationDialog|Frame
+---@return AF_NotificationDialog
 function AF.ShowNotificationDialog(parent, text, width, showMask, countdown)
     if not notificationDialog then CreateNotificationDialog() end
 
