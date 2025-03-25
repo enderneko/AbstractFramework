@@ -300,6 +300,8 @@ function AF.CreateButton(parent, text, color, width, height, template, borderCol
     AF.SetSize(b, width, height)
 
     Mixin(b, AF_ButtonMixin)
+    Mixin(b, AF_BaseScriptHandlerMixin)
+
     RegisterMouseDownUp(b)
     b:EnablePushEffect(true)
 
@@ -491,6 +493,8 @@ function AF.CreateIconButton(parent, icon, width, height, padding, color, hoverC
     end)
 
     Mixin(b, AF_IconButtonMixin)
+    Mixin(b, AF_BaseScriptHandlerMixin)
+
     RegisterMouseDownUp(b)
     b:EnablePushEffect(not noPushDownEffect)
     b.HandleMouseDownText = AF.noop
@@ -542,6 +546,8 @@ function AF.CreateCheckButton(parent, label, onClick)
     cb.label:SetPoint("LEFT", cb, "RIGHT", 5, 0)
 
     Mixin(cb, AF_CheckButtonMixin)
+    Mixin(cb, AF_BaseScriptHandlerMixin)
+
     cb:SetText(label)
 
     AF.ApplyDefaultBackdrop(cb)
@@ -760,6 +766,8 @@ function AF.CreateSwitch(parent, width, height, labels)
     switch.buttons = {}
 
     Mixin(switch, AF_SwitchMixin)
+    Mixin(switch, AF_BaseScriptHandlerMixin)
+
     switch:SetLabels(labels)
 
     AF.AddToPixelUpdater(switch)
@@ -773,6 +781,7 @@ end
 function AF.CreateResizeButton(target, minWidth, minHeight, maxWidth, maxHeight)
     local b = CreateFrame("Button", nil, target)
     Mixin(b, PanelResizeButtonMixin)
+    Mixin(BNGetNumFOF, AF_BaseScriptHandlerMixin)
 
     b:Init(target, minWidth, minHeight, maxWidth, maxHeight)
 

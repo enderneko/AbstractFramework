@@ -22,6 +22,56 @@ do
 end
 
 ---------------------------------------------------------------------
+-- show / hide
+---------------------------------------------------------------------
+---@class AF_BaseScriptHandlerMixin
+AF_BaseScriptHandlerMixin = {}
+
+function AF_BaseScriptHandlerMixin:SetOnShow(func)
+    self:SetScript("OnShow", func)
+end
+
+function AF_BaseScriptHandlerMixin:SetOnHide(func)
+    self:SetScript("OnHide", func)
+end
+
+function AF_BaseScriptHandlerMixin:SetOnEnter(func)
+    self:SetScript("OnEnter", func)
+end
+
+function AF_BaseScriptHandlerMixin:SetOnLeave(func)
+    self:SetScript("OnLeave", func)
+end
+
+function AF_BaseScriptHandlerMixin:SetOnMouseDown(func)
+    self:SetScript("OnMouseDown", func)
+end
+
+function AF_BaseScriptHandlerMixin:SetOnMouseUp(func)
+    self:SetScript("OnMouseUp", func)
+end
+
+function AF_BaseScriptHandlerMixin:SetOnMouseWheel(func)
+    self:SetScript("OnMouseWheel", func)
+end
+
+function AF_BaseScriptHandlerMixin:SetOnLoad(func)
+    self:SetScript("OnLoad", func)
+end
+
+function AF_BaseScriptHandlerMixin:SetOnEnable(func)
+    if self:HasScript("OnEnable") then
+        self:SetScript("OnEnable", func)
+    end
+end
+
+function AF_BaseScriptHandlerMixin:SetOnDisable(func)
+    if self:HasScript("OnDisable") then
+        self:SetScript("OnDisable", func)
+    end
+end
+
+---------------------------------------------------------------------
 -- enable / disable
 ---------------------------------------------------------------------
 function AF.SetEnabled(isEnabled, ...)
@@ -143,14 +193,6 @@ end
 ---@class AF_Frame
 local AF_FrameMixin = {}
 
-function AF_FrameMixin:SetOnShow(func)
-    self:SetScript("OnShow", func)
-end
-
-function AF_FrameMixin:SetOnHide(func)
-    self:SetScript("OnHide", func)
-end
-
 function AF_FrameMixin:SetOnEnter(func)
     self:SetScript("OnEnter", func)
 end
@@ -194,6 +236,28 @@ function AF_HeaderedFrameMixin:SetTitleJustify(justify)
     end
 end
 
+function AF_HeaderedFrameMixin:SetTitle(title)
+    self.header.text:SetText(title)
+end
+
+function AF_HeaderedFrameMixin:SetMovable(movable)
+    self:_SetMovable(movable)
+    if movable then
+        self.header:SetScript("OnDragStart", function()
+            self:StartMoving()
+            if self.notUserPlaced then
+                self:SetUserPlaced(false)
+            end
+        end)
+        self.header:SetScript("OnDragStop", function()
+            self:StopMovingOrSizing()
+        end)
+    else
+        self.header:SetScript("OnDragStart", nil)
+        self.header:SetScript("OnDragStop", nil)
+    end
+end
+
 function AF_HeaderedFrameMixin:UpdatePixels()
     self:SetClampRectInsets(0, 0, AF.ConvertPixelsForRegion(20, self), 0)
     AF.ReSize(self)
@@ -215,10 +279,12 @@ end
 function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata, frameLevel, notUserPlaced)
     local f = CreateFrame("Frame", name, parent, "BackdropTemplate")
     f:Hide()
+
+    f.notUserPlaced = notUserPlaced
+
     f:EnableMouse(true)
     -- f:SetIgnoreParentScale(true)
     -- f:SetResizable(false)
-    f:SetMovable(true)
     -- f:SetUserPlaced(not notUserPlaced)
     f:SetFrameStrata(frameStrata or "HIGH")
     f:SetFrameLevel(frameLevel or 1)
@@ -234,14 +300,9 @@ function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata,
     header:EnableMouse(true)
     header:SetClampedToScreen(true)
     header:RegisterForDrag("LeftButton")
-    header:SetScript("OnDragStart", function()
-        f:StartMoving()
-        if notUserPlaced then f:SetUserPlaced(false) end
-    end)
-    header:SetScript("OnDragStop", function() f:StopMovingOrSizing() end)
-    AF.SetPoint(header, "LEFT")
-    AF.SetPoint(header, "RIGHT")
-    AF.SetPoint(header, "BOTTOM", f, "TOP", 0, -1)
+
+    AF.SetPoint(header, "BOTTOMLEFT", f, "TOPLEFT", 0, -1)
+    AF.SetPoint(header, "BOTTOMRIGHT", f, "TOPRIGHT", 0, -1)
     AF.SetHeight(header, 20)
     AF.ApplyDefaultBackdropWithColors(header, "header")
 
@@ -281,8 +342,14 @@ function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata,
     -- AF.SetPoint(header.tex, "TOPLEFT", 1, -1)
     -- AF.SetPoint(header.tex, "BOTTOMRIGHT", -1, 1)
 
+    f._SetMovable = f.SetMovable
+
     Mixin(f, AF_FrameMixin)
     Mixin(f, AF_HeaderedFrameMixin)
+    Mixin(f, AF_BaseScriptHandlerMixin)
+
+    f:SetMovable(true)
+
     AF.AddToPixelUpdater(f)
 
     return f
@@ -320,6 +387,7 @@ function AF.CreateBorderedFrame(parent, name, width, height, color, borderColor)
 
     Mixin(f, AF_FrameMixin)
     Mixin(f, AF_BorderedFrameMixin)
+    Mixin(f, AF_BaseScriptHandlerMixin)
     AF.AddToPixelUpdater(f)
 
     return f
@@ -370,6 +438,7 @@ function AF.CreateTitledPane(parent, title, width, height, color)
     end
 
     AF.AddToPixelUpdater(pane)
+    Mixin(pane, AF_BaseScriptHandlerMixin)
 
     return pane
 end
