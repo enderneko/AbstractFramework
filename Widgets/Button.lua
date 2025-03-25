@@ -29,12 +29,16 @@ end
 local AF_ButtonMixin = {}
 
 function AF_ButtonMixin:HandleMouseDownText()
-    if self.texture and self.texture:IsShown() then return end
+    if self.texture and self.texture:IsShown()
+    and self.textureJustifyH ~= "RIGHT" -- NOTE: not sure why the text wont move if texture is on the right
+    then return end
     self.text:AdjustPointsOffset(0, -AF.GetOnePixelForRegion(self))
 end
 
 function AF_ButtonMixin:HandleMouseUpText()
-    if self.texture and self.texture:IsShown() then return end
+    if self.texture and self.texture:IsShown()
+    and self.textureJustifyH ~= "RIGHT" -- NOTE: not sure why the text wont move if texture is on the right
+    then return end
     AF.RePoint(self.text)
 end
 
@@ -103,11 +107,15 @@ function AF_ButtonMixin:SetTextPadding(padding)
     self.textPadding = padding
     AF.ClearPoints(self.text)
     if self.texture and self.texture:IsShown() then
-        -- AF.SetPoint(self.text, "LEFT", self.texture, "RIGHT", padding, 0)
+        if self.textureJustifyH == "RIGHT" then
+            AF.SetPoint(self.text, "LEFT", padding, 0)
+        else
+            AF.SetPoint(self.text, "RIGHT", -padding, 0)
+        end
     else
         AF.SetPoint(self.text, "LEFT", padding, 0)
+        AF.SetPoint(self.text, "RIGHT", -padding, 0)
     end
-    AF.SetPoint(self.text, "RIGHT", -padding, 0)
 end
 
 ---@param color string
@@ -177,28 +185,38 @@ end
 ---@param point? table default is {"CENTER", 0, 0}
 ---@param isAtlas boolean
 ---@param bgColor? string no texture border if nil
-function AF_ButtonMixin:SetTexture(tex, size, point, isAtlas, bgColor)
+---@param justifyH? string default is "LEFT"
+function AF_ButtonMixin:SetTexture(tex, size, point, isAtlas, bgColor, justifyH)
     if not self.texture then
         self.texture = self:CreateTexture(nil, "BORDER")
+
         self:HookScript("OnEnable", function()
             self.realTexture:SetDesaturated(false)
             self.realTexture:SetVertexColor(AF.GetColorRGB("white"))
         end)
+
         self:HookScript("OnDisable", function()
             self.realTexture:SetDesaturated(true)
             self.realTexture:SetVertexColor(AF.GetColorRGB("disabled"))
         end)
+
         size = size or {16, 16}
         self.point = point or {"CENTER", 0, 0}
         AF.SetPoint(self.texture, unpack(self.point))
         AF.SetSize(self.texture, unpack(size))
+
+        self.textureJustifyH = justifyH or "LEFT"
+        AF.ClearPoints(self.text)
+        if self.textureJustifyH == "RIGHT" then
+            AF.SetPoint(self.text, "LEFT", self.textPadding, 0)
+            AF.SetPoint(self.text, "RIGHT", self.texture, "LEFT", -2, 0)
+        else
+            AF.SetPoint(self.text, "LEFT", self.texture, "RIGHT", 2, 0)
+            AF.SetPoint(self.text, "RIGHT", -self.textPadding, 0)
+        end
     end
 
     self.texture:Show()
-
-    AF.ClearPoints(self.text)
-    AF.SetPoint(self.text, "LEFT", self.texture, "RIGHT", 2, 0)
-    AF.SetPoint(self.text, "RIGHT", -self.textPadding, 0)
 
     if bgColor then
         if not self.textureFG then
