@@ -64,7 +64,7 @@ local function LoadItems(items, maxShownItems, level, parentItem)
             menu.createdButtons[i] = b
 
             b:EnablePushEffect(false)
-            b:SetJustifyH("LEFT")
+            b:SetTextJustifyH("LEFT")
 
             -- children symbol
             b.childrenSymbol = b:CreateFontString(nil, "OVERLAY", "AF_FONT_NORMAL")
@@ -282,7 +282,7 @@ end
 ---@return AF_CascadingMenuButton
 function AF.CreateCascadingMenuButton(parent, width, maxShownItems)
     local menu = AF.CreateButton(parent, "", "accent_hover", width, 20)
-    menu:SetJustifyH("LEFT")
+    menu:SetTextJustifyH("LEFT")
 
     menu.maxShownItems = maxShownItems or 10
     menu.enabled = true

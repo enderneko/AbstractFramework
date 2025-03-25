@@ -353,9 +353,9 @@ function AF_DropdownMixin:LoadItems()
 
         -- text justify
         if self.isMini then
-            b:SetJustifyH(self.justify or "CENTER")
+            b:SetTextJustifyH(self.justify or "CENTER")
         else
-            b:SetJustifyH(self.justify or "LEFT")
+            b:SetTextJustifyH(self.justify or "LEFT")
         end
 
         -- update point

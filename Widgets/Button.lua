@@ -99,9 +99,13 @@ function AF_ButtonMixin:GetFont()
     return self.text:GetFont()
 end
 
-function AF_ButtonMixin:SetJustifyH(justify)
+function AF_ButtonMixin:SetTextJustifyH(justify)
     self.text:SetJustifyH(justify)
 end
+
+-- function AF_ButtonMixin:SetTextJustifyV(justify)
+--     self.text:SetJustifyV(justify)
+-- end
 
 function AF_ButtonMixin:SetTextPadding(padding)
     self.textPadding = padding

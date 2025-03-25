@@ -17,7 +17,12 @@ local CreateObjectPool = CreateObjectPool
 
 local AF_ObjectPoolMixin = {}
 function AF_ObjectPoolMixin:GetAllActives()
-    return self.activeObjects
+    -- return self.activeObjects -- secure
+    local actives = {}
+    for obj in self:EnumerateActive() do
+        table.insert(actives, obj)
+    end
+    return actives
 end
 
 ---@param creationFunc function
