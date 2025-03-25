@@ -256,6 +256,23 @@ function AF_ButtonMixin:SetTextureColor(color)
     end
 end
 
+function AF_ButtonMixin:ShowTexture()
+    if self.texture then
+        self.texture:Show()
+    end
+    if self.textureFG then
+        self.textureFG:Show()
+    end
+    AF.ClearPoints(self.text)
+    if self.textureJustifyH == "RIGHT" then
+        AF.SetPoint(self.text, "LEFT", self.textPadding, 0)
+        AF.SetPoint(self.text, "RIGHT", self.texture, "LEFT", -2, 0)
+    else
+        AF.SetPoint(self.text, "LEFT", self.texture, "RIGHT", 2, 0)
+        AF.SetPoint(self.text, "RIGHT", -self.textPadding, 0)
+    end
+end
+
 function AF_ButtonMixin:HideTexture()
     if self.texture then
         self.texture:Hide()
