@@ -6,4 +6,7 @@
 ## IconTexture: Interface\AddOns\AbstractFramework\Media\Icons\AF
 ## SavedVariables: AFConfig
 
+## X-Curse-Project-ID: 1131087
+## X-Wago-ID: mKOv2E6x
+
 Load.xml
