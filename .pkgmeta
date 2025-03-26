@@ -28,7 +28,6 @@ ignore:
   - Libs/LibCustomGlow-1.0/LibCustomGlow-1.0.toc
   - Libs/LibCustomGlow-1.0/README.md
   - Libs/LibDataBroker-1.1/README.textile
-  - generate_changelog.sh
 
 manual-changelog:
   filename: CHANGELOG.md
