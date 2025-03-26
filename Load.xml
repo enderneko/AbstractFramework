@@ -8,10 +8,12 @@
     <Script file="Libs\sha256.lua"/>
     <Include file="Libs\TaintLess\TaintLess.xml"/>
     <Include file="Libs\LibSharedMedia-3.0\lib.xml"/>
-    <Script file="Libs\LibCustomGlow-1.0\LibCustomGlow-1.0.lua"/>
+    <Include file="Libs\LibCustomGlow-1.0\LibCustomGlow-1.0.xml"/>
     <Include file="Libs\AceComm-3.0\AceComm-3.0.xml"/>
     <Include file="Libs\LibSerialize\lib.xml"/>
     <Include file="Libs\LibDeflate\lib.xml"/>
+    <Script file="Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua"/>
+    <Include file="Libs\LibDBIcon-1.0\lib.xml"/>
 
     <!-- init -->
     <Script file="Init.lua"/>

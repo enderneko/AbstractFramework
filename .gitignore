@@ -1,1 +1,10 @@
 .vscode/
+.release/
+.utils/*.csv
+
+#external libraries
+Libs/*
+
+!Libs/md5.lua
+!Libs/sha256.lua
+!Libs/utf8.lua
