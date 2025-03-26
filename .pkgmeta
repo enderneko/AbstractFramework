@@ -16,10 +16,18 @@ externals:
     commit: default
 
 ignore:
+  - Libs/LibStub/tests
+  - Libs/LibStub/LibStub.toc
   - Libs/LibDeflate/docs
   - Libs/LibDeflate/examples
   - Libs/LibDeflate/CONTRIBUTING.md
-  - Libs/LibStub/tests
+  - Libs/LibDeflate/changelog.md
+  - Libs/LibDeflate/LibDeflate.toc
+  - Libs/LibDeflate/README.md
+  - Libs/LibCustomGlow-1.0/cspell.json
+  - Libs/LibCustomGlow-1.0/LibCustomGlow-1.0.toc
+  - Libs/LibCustomGlow-1.0/README.md
+  - Libs/LibDataBroker-1.1/README.textile
   - generate_changelog.sh
 
 manual-changelog:
