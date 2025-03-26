@@ -667,7 +667,7 @@ function AF_SwitchMixin:SetLabels(labels)
         buttons[i].value = labels[i].value or labels[i].text
         buttons[i].isSelected = false
 
-        buttons[i].highlight = AF.CreateTexture(buttons[i], nil, AF.GetColorTable("accent", 0.8))
+        buttons[i].highlight = AF.CreateTexture(buttons[i], nil, AF.GetColorTable("accent", 0.7))
         AF.SetPoint(buttons[i].highlight, "BOTTOMLEFT", 1, 1)
         AF.SetPoint(buttons[i].highlight, "BOTTOMRIGHT", -1, 1)
         AF.SetHeight(buttons[i].highlight, 1)
