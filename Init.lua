@@ -91,11 +91,16 @@ AF.UIParent:RegisterEvent("ADDON_LOADED")
 function AF.UIParent:ADDON_LOADED(addon)
     if addon == AF.name then
         AF.UIParent:UnregisterEvent("ADDON_LOADED")
-        if type(AFConfig) ~= "table" then
-            AFConfig = {
-                debugMode = false,
-            }
-        end
+        if type(AFConfig) ~= "table" then AFConfig = {} end
+
+        -- debug
+        if type(AFConfig.debugMode) ~= "boolean" then AFConfig.debugMode = false end
+
+        -- scale
+        if type(AFConfig.scale) ~= "number" then AFConfig.scale = 1 end
+        AF.SetScale(AFConfig.scale)
+        -- if type(AFConfig.uiScale) ~= "number" then AFConfig.uiScale = UIParent:GetScale() end
+        -- UIParent:SetScale(AFConfig.uiScale)
     end
 end
 
@@ -107,18 +112,20 @@ end
 --! or it will result in abnormal display of borders
 --! since AF has changed SetSnapToPixelGrid / SetTexelSnappingBias
 function AF.SetScale(scale)
+    AFConfig.scale = scale
+    AF.scale = scale
     AF.UIParent:SetScale(scale)
     UpdatePixels()
 end
 
 function AF.GetScale()
-    return AF.UIParent:GetScale()
+    return AFConfig.scale
 end
 
 function AF.SetUIParentScale(scale)
     UIParent:SetScale(scale)
     -- if not AF.UIParent:IsIgnoringParentScale() then
-        UpdatePixels()
+    --     UpdatePixels()
     -- end
 end
 
