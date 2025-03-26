@@ -15,8 +15,8 @@ Demo: `/abstract` or `/afw` or `/af`
 
 ## VS Code
 
-1. Clone this repository to your local computer.
-2. Add the repository directory to your system environment variables (e.g., `AF_HOME`).
+1. Clone this repository to your local computer or install the addon directly.
+2. Add the `AbstractFramework` directory to your system environment variables (e.g., `AF_HOME`).
 3. Install the Lua extension ([sumneko.lua](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)).
 4. In your workspace's settings.json, add the following:
 
