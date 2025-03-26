@@ -46,7 +46,7 @@ function AF.ShowTooltips(widget, anchor, x, y, lines)
         if type(lines[i]) == "string" then
             tooltip:AddLine(lines[i], 1, 1, 1, true)
         elseif type(lines[i]) == "table" then
-            tooltip:AddDoubleLine(lines[i][1], lines[i][2], 1, 1, 1, 1, 1, 1)
+            tooltip:AddDoubleLine(lines[i][1], lines[i][2], 1, 0.82, 0, 1, 1, 1)
         end
     end
 
