@@ -29,6 +29,7 @@
     <Script file="Utils\Communication.lua"/>
     <Script file="Utils\Color.lua"/>
     <Script file="Utils\Addon.lua"/>
+    <Script file="Utils\DataBroker.lua"/>
 
     <!-- player -->
     <Script file="Units\Player.lua"/>
