@@ -8,6 +8,7 @@ local strmatch = string.gmatch
 local debugstack, print, type = debugstack, print, type
 local tinsert, tconcat = table.insert, table.concat
 local IsAddOnLoaded = C_AddOns.IsAddOnLoaded or IsAddOnLoaded
+local GetAddOnMetadata = C_AddOns.GetAddOnMetadata or GetAddOnMetadata
 local DevTools_Dump = DevTools_Dump
 
 ---@return string addon, string|boolean alias
@@ -18,6 +19,17 @@ function AF.GetAddon()
         end
     end
     return nil
+end
+
+---@param fieldName string
+---@param addon string?
+---@return string? fieldValue
+function AF.GetAddOnMetadata(fieldName, addon)
+    assert(fieldName, "fieldName is required")
+    addon = addon or AF.GetAddon()
+    if addon then
+        return GetAddOnMetadata(addon, fieldName)
+    end
 end
 
 local function GetPrefix()
