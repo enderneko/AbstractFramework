@@ -41,8 +41,8 @@ local function UpdateLines()
     local halfWidth, halfHeight = width / 2, height / 2
 
     -- center cross
-    local centerX = math.floor((width-1) / 2)
-    local centerY = math.floor((height-1) / 2)
+    local centerX = math.floor((width - 1) / 2)
+    local centerY = math.floor((height - 1) / 2)
 
     -- v center
     CreateLine("v0", "red", 0.75, 0, 0, 1, height, 1)
@@ -213,22 +213,22 @@ function AF.CalcPoint(owner)
     else
         local centerX, centerY = AF.UIParent:GetCenter()
         local width = AF.UIParent:GetRight()
-            x, y = owner:GetCenter()
+        x, y = owner:GetCenter()
 
         if y >= centerY then
             point = "TOP"
-                y = -(AF.UIParent:GetTop() - owner:GetTop())
+            y = -(AF.UIParent:GetTop() - owner:GetTop())
         else
             point = "BOTTOM"
-                y = owner:GetBottom()
+            y = owner:GetBottom()
         end
 
         if x >= (width * 2 / 3) then
-            point = point.."RIGHT"
-                x = owner:GetRight() - width
+            point = point .. "RIGHT"
+            x = owner:GetRight() - width
         elseif x <= (width / 3) then
-            point = point.."LEFT"
-                x = owner:GetLeft()
+            point = point .. "LEFT"
+            x = owner:GetLeft()
         else
             x = x - centerX
         end
@@ -356,8 +356,8 @@ local function CreatePositionAdjustmentFrame()
                 v = max(-mv, v)
                 v = min(v, 0)
             else
-                v = max(v, -mv/2)
-                v = min(v, mv/2)
+                v = max(v, -mv / 2)
+                v = min(v, mv / 2)
             end
 
             owner:ClearAllPoints()
@@ -392,8 +392,8 @@ local function CreatePositionAdjustmentFrame()
                 v = max(-mv, v)
                 v = min(v, 0)
             else
-                v = max(v, -mv/2)
-                v = min(v, mv/2)
+                v = max(v, -mv / 2)
+                v = min(v, mv / 2)
             end
 
             owner:ClearAllPoints()
@@ -568,7 +568,7 @@ function AF.CreateMover(owner, group, text, save)
     mover:EnableMouse(true)
     mover:Hide()
 
-    mover.text = AF.CreateFontString(mover, text,  nil, "AF_FONT_OUTLINE", "OVERLAY")
+    mover.text = AF.CreateFontString(mover, text, nil, "AF_FONT_OUTLINE", "OVERLAY")
     mover.text:SetPoint("CENTER")
     mover.text:SetText(text)
 
@@ -585,24 +585,24 @@ function AF.CreateMover(owner, group, text, save)
 
         if strfind(point, "^BOTTOM") then
             minY = 0
-            maxY = AF.UIParent:GetHeight()-owner:GetHeight()
+            maxY = AF.UIParent:GetHeight() - owner:GetHeight()
         elseif strfind(point, "^TOP") then
-            minY = -(AF.UIParent:GetHeight()-owner:GetHeight())
+            minY = -(AF.UIParent:GetHeight() - owner:GetHeight())
             maxY = 0
         else -- LEFT/RIGHT/CENTER
-            minY = -((AF.UIParent:GetHeight()-owner:GetHeight())/2)
-            maxY = (AF.UIParent:GetHeight()-owner:GetHeight())/2
+            minY = -((AF.UIParent:GetHeight() - owner:GetHeight()) / 2)
+            maxY = (AF.UIParent:GetHeight() - owner:GetHeight()) / 2
         end
 
         if strfind(point, "LEFT$") then
             minX = 0
-            maxX = AF.UIParent:GetWidth()-owner:GetWidth()
+            maxX = AF.UIParent:GetWidth() - owner:GetWidth()
         elseif strfind(point, "RIGHT$") then
-            minX = -(AF.UIParent:GetWidth()-owner:GetWidth())
+            minX = -(AF.UIParent:GetWidth() - owner:GetWidth())
             maxX = 0
         else -- TOP/BOTTOM/CENTER
-            minX = -((AF.UIParent:GetWidth()-owner:GetWidth())/2)
-            maxX = (AF.UIParent:GetWidth()-owner:GetWidth())/2
+            minX = -((AF.UIParent:GetWidth() - owner:GetWidth()) / 2)
+            maxX = (AF.UIParent:GetWidth() - owner:GetWidth()) / 2
         end
 
         local lastX = mouseX
