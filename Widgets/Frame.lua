@@ -31,37 +31,75 @@ function AF_BaseWidgetMixin:SetOnShow(func)
     self:SetScript("OnShow", func)
 end
 
+function AF_BaseWidgetMixin:HookOnShow(func)
+    self:HookScript("OnShow", func)
+end
+
 function AF_BaseWidgetMixin:SetOnHide(func)
     self:SetScript("OnHide", func)
+end
+
+function AF_BaseWidgetMixin:HookOnHide(func)
+    self:HookScript("OnHide", func)
 end
 
 function AF_BaseWidgetMixin:SetOnEnter(func)
     self:SetScript("OnEnter", func)
 end
 
+function AF_BaseWidgetMixin:HookOnEnter(func)
+    self:HookScript("OnEnter", func)
+end
+
 function AF_BaseWidgetMixin:SetOnLeave(func)
     self:SetScript("OnLeave", func)
+end
+
+function AF_BaseWidgetMixin:HookOnLeave(func)
+    self:HookScript("OnLeave", func)
 end
 
 function AF_BaseWidgetMixin:SetOnMouseDown(func)
     self:SetScript("OnMouseDown", func)
 end
 
+function AF_BaseWidgetMixin:HookOnMouseDown(func)
+    self:HookScript("OnMouseDown", func)
+end
+
 function AF_BaseWidgetMixin:SetOnMouseUp(func)
     self:SetScript("OnMouseUp", func)
+end
+
+function AF_BaseWidgetMixin:HookOnMouseUp(func)
+    self:HookScript("OnMouseUp", func)
 end
 
 function AF_BaseWidgetMixin:SetOnMouseWheel(func)
     self:SetScript("OnMouseWheel", func)
 end
 
+function AF_BaseWidgetMixin:HookOnMouseWheel(func)
+    self:HookScript("OnMouseWheel", func)
+end
+
 function AF_BaseWidgetMixin:SetOnLoad(func)
     self:SetScript("OnLoad", func)
+end
+
+function AF_BaseWidgetMixin:HookOnLoad(func)
+    self:HookScript("OnLoad", func)
 end
 
 function AF_BaseWidgetMixin:SetOnEnable(func)
     if self:HasScript("OnEnable") then
         self:SetScript("OnEnable", func)
+    end
+end
+
+function AF_BaseWidgetMixin:HookOnEnable(func)
+    if self:HasScript("OnEnable") then
+        self:HookScript("OnEnable", func)
     end
 end
 
@@ -71,9 +109,33 @@ function AF_BaseWidgetMixin:SetOnDisable(func)
     end
 end
 
+function AF_BaseWidgetMixin:HookOnDisable(func)
+    if self:HasScript("OnDisable") then
+        self:HookScript("OnDisable", func)
+    end
+end
+
 function AF_BaseWidgetMixin:SetOnUpdate(func)
     if self:HasScript("OnUpdate") then
         self:SetScript("OnUpdate", func)
+    end
+end
+
+function AF_BaseWidgetMixin:HookOnUpdate(func)
+    if self:HasScript("OnUpdate") then
+        self:HookScript("OnUpdate", func)
+    end
+end
+
+function AF_BaseWidgetMixin:SetOnSizeChanged(func)
+    if self:HasScript("OnSizeChanged") then
+        self:SetScript("OnSizeChanged", func)
+    end
+end
+
+function AF_BaseWidgetMixin:HookOnSizeChanged(func)
+    if self:HasScript("OnSizeChanged") then
+        self:HookScript("OnSizeChanged", func)
     end
 end
 
