@@ -458,7 +458,7 @@ function AF.CreateCloseButton(parent, frameToHide, width, height, padding)
     padding = padding or 6
 
     local b = AF.CreateButton(parent, nil, "red", width, height)
-    b:SetTexture(AF.GetIcon("Close"), {width - padding, height - padding}, {"CENTER", 0, 0})
+    b:SetTexture(AF.GetIcon("Close1"), {width - padding, height - padding}, {"CENTER", 0, 0})
     b:SetScript("OnClick", function()
         if frameToHide then
             frameToHide:Hide()
