@@ -41,6 +41,10 @@ function AF.EscapeRaidIcon(raidIconIndex)
     return string.format("|TInterface\\TargetingFrame\\UI-RaidTargetingIcons:0:0:0:0:64:64:%d:%d:%d:%d|t", left * 64, right * 64, top * 64, bottom * 64)
 end
 
+function AF.GetLogo(brand)
+    return "Interface\\AddOns\\AbstractFramework\\Media\\Logos\\" .. brand
+end
+
 ---------------------------------------------------------------------
 -- get texture
 ---------------------------------------------------------------------
