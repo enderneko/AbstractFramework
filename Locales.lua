@@ -15,6 +15,7 @@ AF.L = setmetatable({
 local L = AF.L
 
 if LOCALE_zhCN then
+    L["About"] = "关于"
     L["Undo"] = "撤消"
     L["Close this dialog to exit Edit Mode"] = "关闭此窗口以退出编辑模式"
     L["Left Drag"] = "左键拖动"
