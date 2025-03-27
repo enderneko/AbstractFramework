@@ -159,7 +159,7 @@ function AF.CreateEditBox(parent, label, width, height, mode, font)
     eb.label:SetTextColor(AF.GetColorRGB("disabled"))
 
     Mixin(eb, AF_EditBoxMixin)
-    Mixin(eb, AF_BaseScriptHandlerMixin)
+    Mixin(eb, AF_BaseWidgetMixin)
 
     eb:SetMode(mode)
     eb:SetFontObject(font or "AF_FONT_NORMAL")
@@ -415,7 +415,7 @@ function AF.CreateScrollEditBox(parent, name, label, width, height, scrollStep)
 
     frame._isEnabled = true
     Mixin(frame, AF_ScrollEditBoxMixin)
-    Mixin(frame, AF_BaseScriptHandlerMixin)
+    Mixin(frame, AF_BaseWidgetMixin)
 
     return frame
 end

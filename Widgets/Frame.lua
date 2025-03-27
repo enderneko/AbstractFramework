@@ -22,52 +22,66 @@ do
 end
 
 ---------------------------------------------------------------------
--- show / hide
+-- AF_BaseWidgetMixin
 ---------------------------------------------------------------------
----@class AF_BaseScriptHandlerMixin
-AF_BaseScriptHandlerMixin = {}
+---@class AF_BaseWidgetMixin
+AF_BaseWidgetMixin = {}
 
-function AF_BaseScriptHandlerMixin:SetOnShow(func)
+function AF_BaseWidgetMixin:SetOnShow(func)
     self:SetScript("OnShow", func)
 end
 
-function AF_BaseScriptHandlerMixin:SetOnHide(func)
+function AF_BaseWidgetMixin:SetOnHide(func)
     self:SetScript("OnHide", func)
 end
 
-function AF_BaseScriptHandlerMixin:SetOnEnter(func)
+function AF_BaseWidgetMixin:SetOnEnter(func)
     self:SetScript("OnEnter", func)
 end
 
-function AF_BaseScriptHandlerMixin:SetOnLeave(func)
+function AF_BaseWidgetMixin:SetOnLeave(func)
     self:SetScript("OnLeave", func)
 end
 
-function AF_BaseScriptHandlerMixin:SetOnMouseDown(func)
+function AF_BaseWidgetMixin:SetOnMouseDown(func)
     self:SetScript("OnMouseDown", func)
 end
 
-function AF_BaseScriptHandlerMixin:SetOnMouseUp(func)
+function AF_BaseWidgetMixin:SetOnMouseUp(func)
     self:SetScript("OnMouseUp", func)
 end
 
-function AF_BaseScriptHandlerMixin:SetOnMouseWheel(func)
+function AF_BaseWidgetMixin:SetOnMouseWheel(func)
     self:SetScript("OnMouseWheel", func)
 end
 
-function AF_BaseScriptHandlerMixin:SetOnLoad(func)
+function AF_BaseWidgetMixin:SetOnLoad(func)
     self:SetScript("OnLoad", func)
 end
 
-function AF_BaseScriptHandlerMixin:SetOnEnable(func)
+function AF_BaseWidgetMixin:SetOnEnable(func)
     if self:HasScript("OnEnable") then
         self:SetScript("OnEnable", func)
     end
 end
 
-function AF_BaseScriptHandlerMixin:SetOnDisable(func)
+function AF_BaseWidgetMixin:SetOnDisable(func)
     if self:HasScript("OnDisable") then
         self:SetScript("OnDisable", func)
+    end
+end
+
+function AF_BaseWidgetMixin:SetOnUpdate(func)
+    if self:HasScript("OnUpdate") then
+        self:SetScript("OnUpdate", func)
+    end
+end
+
+function AF_BaseWidgetMixin:Toggle()
+    if self:IsShown() then
+        self:Hide()
+    else
+        self:Show()
     end
 end
 
@@ -345,7 +359,7 @@ function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata,
 
     Mixin(f, AF_FrameMixin)
     Mixin(f, AF_HeaderedFrameMixin)
-    Mixin(f, AF_BaseScriptHandlerMixin)
+    Mixin(f, AF_BaseWidgetMixin)
 
     f:SetMovable(true)
 
@@ -386,7 +400,7 @@ function AF.CreateBorderedFrame(parent, name, width, height, color, borderColor)
 
     Mixin(f, AF_FrameMixin)
     Mixin(f, AF_BorderedFrameMixin)
-    Mixin(f, AF_BaseScriptHandlerMixin)
+    Mixin(f, AF_BaseWidgetMixin)
     AF.AddToPixelUpdater(f)
 
     return f
@@ -437,7 +451,7 @@ function AF.CreateTitledPane(parent, title, width, height, color)
     end
 
     AF.AddToPixelUpdater(pane)
-    Mixin(pane, AF_BaseScriptHandlerMixin)
+    Mixin(pane, AF_BaseWidgetMixin)
 
     return pane
 end
