@@ -176,12 +176,8 @@ function AF_ButtonMixin:SetOnClick(func)
     self:SetScript("OnClick", func)
 end
 
-function AF_ButtonMixin:HookOnEnter(func)
-    self:HookScript("OnEnter", func)
-end
-
-function AF_ButtonMixin:HookOnLeave(func)
-    self:HookScript("OnLeave", func)
+function AF_ButtonMixin:HookOnClick(func)
+    self:HookScript("OnClick", func)
 end
 
 ---@param tex string
@@ -452,6 +448,7 @@ end
 ---------------------------------------------------------------------
 -- close button
 ---------------------------------------------------------------------
+---@return AF_Button
 function AF.CreateCloseButton(parent, frameToHide, width, height, padding)
     width = width or 16
     height = height or 16
