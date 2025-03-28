@@ -10,8 +10,13 @@ local AF_HelpTipMixin = {}
 function AF_HelpTipMixin:OnShow()
     self:SetFrameStrata("TOOLTIP")
     self:SetToplevel(true)
-    C_Timer.After(0, function()
+    self.elapsed = 0
+    self:SetOnUpdate(function(_, elapsed)
         self:SetHeight(self.text:GetHeight() + 23)
+        self.elapsed = self.elapsed + elapsed
+        if self.elapsed >= 0.5 then
+            self:SetOnUpdate(nil)
+        end
     end)
 end
 
@@ -114,6 +119,7 @@ local function HelpTipBuilder()
     text:SetJustifyH("CENTER")
     text:SetJustifyV("TOP")
     text:SetSpacing(5)
+    text:SetWordWrap(true)
 
     return tip
 end
@@ -122,6 +128,7 @@ local function Release(_, tip)
     tip.widget = nil
     tip.callback = nil
     tip.nextTip = nil
+    tip.elapsed = nil
     AF.ClearPoints(tip)
     tip:Hide()
 end
@@ -162,6 +169,8 @@ local pos = {
 -- local info = {
 --     widget = (Frame),
 --     position = ("LEFT" | "RIGHT" | "TOP" | "BOTTOM"),
+--     x = (number),
+--     y = (number),
 --     text = (string),
 --     width = (number), -- default is 200
 --     glow = (boolean), -- show glow on widget, default is false
@@ -199,7 +208,7 @@ function AF.ShowHelpTip(info)
 
     -- position
     AF.ClearPoints(tip)
-    AF.SetPoint(tip, anchor, widget, position, x, y)
+    AF.SetPoint(tip, anchor, widget, position, info.x or x, info.y or y)
 
     -- arrow
     AF.SetSize(tip.arrow, w, h)
