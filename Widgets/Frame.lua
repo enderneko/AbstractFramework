@@ -475,7 +475,25 @@ end
 ---------------------------------------------------------------------
 -- titled pane
 ---------------------------------------------------------------------
+---@class AF_TitledPane:Frame,AF_BaseWidgetMixin
+local AF_TitledPaneMixin = {}
+
+function AF_TitledPaneMixin:SetTitle(title)
+    self.title:SetText(title)
+end
+
+function AF_TitledPaneMixin:UpdatePixels()
+    AF.ReSize(self)
+    AF.RePoint(self)
+    AF.ReSize(self.line)
+    AF.RePoint(self.line)
+    AF.ReSize(self.shadow)
+    AF.RePoint(self.shadow)
+    -- AF.RePoint(self.title)
+end
+
 ---@param color string color name defined in Color.lua
+---@return AF_TitledPane
 function AF.CreateTitledPane(parent, title, width, height, color)
     color = color or "accent"
 
@@ -491,6 +509,7 @@ function AF.CreateTitledPane(parent, title, width, height, color)
     AF.SetPoint(line, "TOPRIGHT", pane, 0, -17)
 
     local shadow = pane:CreateTexture()
+    pane.shadow = shadow
     AF.SetHeight(shadow, 1)
     shadow:SetColorTexture(0, 0, 0, 1)
     AF.SetPoint(shadow, "TOPLEFT", line, 1, -1)
@@ -502,22 +521,9 @@ function AF.CreateTitledPane(parent, title, width, height, color)
     text:SetJustifyH("LEFT")
     AF.SetPoint(text, "BOTTOMLEFT", line, "TOPLEFT", 0, 2)
 
-    function pane:SetTitle(t)
-        text:SetText(t)
-    end
-
-    function pane:UpdatePixels()
-        AF.ReSize(pane)
-        AF.RePoint(pane)
-        AF.ReSize(line)
-        AF.RePoint(line)
-        AF.ReSize(shadow)
-        AF.RePoint(shadow)
-        AF.RePoint(text)
-    end
-
-    AF.AddToPixelUpdater(pane)
+    Mixin(pane, AF_TitledPaneMixin)
     Mixin(pane, AF_BaseWidgetMixin)
+    AF.AddToPixelUpdater(pane)
 
     return pane
 end
