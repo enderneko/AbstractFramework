@@ -494,6 +494,16 @@ function AF_IconButtonMixin:HookOnClick(func)
     self:HookScript("OnClick", func)
 end
 
+function AF_IconButtonMixin:SetTexCoord(...)
+    self.icon:SetTexCoord(...)
+end
+
+function AF_IconButtonMixin:UpdatePixels()
+    AF.ReSize(self)
+    AF.RePoint(self)
+    AF.SetSize(self.icon, self._width - self.padding, self._height - self.padding)
+end
+
 ---@param parent Frame
 ---@param icon string
 ---@param width number
@@ -505,14 +515,15 @@ end
 ---@param noPushDownEffect? boolean
 ---@return AF_IconButton
 function AF.CreateIconButton(parent, icon, width, height, padding, color, hoverColor, filterMode, noPushDownEffect)
-    padding = padding or 0
 
     local b = CreateFrame("Button", nil, parent)
     AF.SetSize(b, width, height)
 
+    b.padding = (padding or 0) * 2
+
     b.icon = b:CreateTexture(nil, "ARTWORK")
     b.icon:SetPoint("CENTER")
-    AF.SetSize(b.icon, width - padding, height - padding)
+    AF.SetSize(b.icon, width - b.padding, height - b.padding)
     b.icon:SetTexture(icon, nil, nil, filterMode)
 
     b.color = type(color) == "string" and AF.GetColorTable(color) or (color or AF.GetColorTable("white"))
