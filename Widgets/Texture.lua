@@ -40,12 +40,11 @@ end
 ---------------------------------------------------------------------
 
 ---calculates texture coordinates with adjustments for aspect ratio and cropping
----@param targetWidth number
----@param targetHeight number
 ---@param crop? number cropping percentage
----@param originalAspectRatio? number optional texture aspect ratio (width/height), defaults to 1
+---@param targetAspectRatio? number target aspect ratio (targetWidth / targetHeight), defaults to 1
+---@param originalAspectRatio? number original texture aspect ratio (width/height), defaults to 1
 ---@return table coordinates {ULx, ULy, LLx, LLy, URx, URy, LRx, LRy}
-function AF.CalcTexCoordPreCrop(targetWidth, targetHeight, crop, originalAspectRatio)
+function AF.CalcTexCoordPreCrop(crop, targetAspectRatio, originalAspectRatio)
     crop = crop or 0
 
     -- apply cropping to initial texCoord
@@ -56,15 +55,15 @@ function AF.CalcTexCoordPreCrop(targetWidth, targetHeight, crop, originalAspectR
         1 - crop, 1 - crop   -- LRx, LRy
     }
 
-    local newAspectRatio = targetWidth / targetHeight
+    targetAspectRatio = targetAspectRatio or 1
     if originalAspectRatio then
-        newAspectRatio = newAspectRatio / originalAspectRatio
+        targetAspectRatio = targetAspectRatio / originalAspectRatio
     else
         -- in most cases, the original aspect ratio is 1
     end
 
-    local xRatio = newAspectRatio < 1 and newAspectRatio or 1
-    local yRatio = newAspectRatio > 1 and 1 / newAspectRatio or 1
+    local xRatio = targetAspectRatio < 1 and targetAspectRatio or 1
+    local yRatio = targetAspectRatio > 1 and 1 / targetAspectRatio or 1
 
     for i, coord in ipairs(texCoord) do
         local ratio = (i % 2 == 1) and xRatio or yRatio
