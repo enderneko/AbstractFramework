@@ -19,6 +19,7 @@ do
 
     local c = CreateFrame("Cooldown")
     AF.FrameSetCooldown = c.SetCooldown
+    AF.FrameSetCooldownDuration = c.SetCooldownDuration
 end
 
 ---------------------------------------------------------------------
@@ -189,9 +190,9 @@ end
 ---------------------------------------------------------------------
 function AF.SetFrameLevel(frame, level, relativeTo)
     if relativeTo then
-        frame:SetFrameLevel(relativeTo:GetFrameLevel() + level)
+        frame:SetFrameLevel(AF.Clamp(relativeTo:GetFrameLevel() + level, 0, 10000))
     else
-        frame:SetFrameLevel(frame:GetParent():GetFrameLevel() + level)
+        frame:SetFrameLevel(AF.Clamp(frame:GetParent():GetFrameLevel() + level, 0, 10000))
     end
 end
 
@@ -265,7 +266,7 @@ end
 ---------------------------------------------------------------------
 -- normal frame
 ---------------------------------------------------------------------
----@class AF_Frame:Frame
+---@class AF_Frame:Frame,AF_BaseWidgetMixin
 local AF_FrameMixin = {}
 
 function AF_FrameMixin:SetOnEnter(func)
@@ -375,6 +376,9 @@ function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata,
     header:EnableMouse(true)
     header:SetClampedToScreen(true)
     header:RegisterForDrag("LeftButton")
+    header:SetScript("OnMouseDown", function()
+        f:SetToplevel(true)
+    end)
 
     AF.SetPoint(header, "BOTTOMLEFT", f, "TOPLEFT", 0, -1)
     AF.SetPoint(header, "BOTTOMRIGHT", f, "TOPRIGHT", 0, -1)

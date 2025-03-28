@@ -502,7 +502,7 @@ function AF.CreateAura(parent, noPixelUpdates)
 
     -- pixels
     if not noPixelUpdates then
-        AF.AddToPixelUpdater(frame, Aura_UpdatePixels)
+        AF.AddToPixelUpdater(frame)
     end
 
     return frame

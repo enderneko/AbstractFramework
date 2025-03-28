@@ -4,7 +4,7 @@ local AF = _G.AbstractFramework
 ---------------------------------------------------------------------
 -- edit box
 ---------------------------------------------------------------------
----@class AF_EditBox:EditBox
+---@class AF_EditBox:EditBox,AF_BaseWidgetMixin
 local AF_EditBoxMixin = {}
 
 ---@param func function?

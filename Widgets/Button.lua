@@ -25,7 +25,7 @@ end
 -- button
 ---------------------------------------------------------------------
 
----@class AF_Button:Button
+---@class AF_Button:Button,AF_BaseWidgetMixin
 local AF_ButtonMixin = {}
 
 function AF_ButtonMixin:HandleMouseDownText()
@@ -469,7 +469,7 @@ end
 ---------------------------------------------------------------------
 -- icon button
 ---------------------------------------------------------------------
----@class AF_IconButton
+---@class AF_IconButton:Button,AF_BaseWidgetMixin
 local AF_IconButtonMixin = {}
 
 function AF_IconButtonMixin:HandleMouseDownTexture()
@@ -486,6 +486,14 @@ function AF_IconButtonMixin:EnablePushEffect(enabled)
     self._pushEffectEnabled = enabled
 end
 
+function AF_IconButtonMixin:SetOnClick(func)
+    self:SetScript("OnClick", func)
+end
+
+function AF_IconButtonMixin:HookOnClick(func)
+    self:HookScript("OnClick", func)
+end
+
 ---@param parent Frame
 ---@param icon string
 ---@param width number
@@ -495,6 +503,7 @@ end
 ---@param hoverColor? string|table
 ---@param filterMode? string
 ---@param noPushDownEffect? boolean
+---@return AF_IconButton
 function AF.CreateIconButton(parent, icon, width, height, padding, color, hoverColor, filterMode, noPushDownEffect)
     padding = padding or 0
 
@@ -533,7 +542,7 @@ end
 ---------------------------------------------------------------------
 -- check button
 ---------------------------------------------------------------------
----@class AF_CheckButton:CheckButton
+---@class AF_CheckButton:CheckButton,AF_BaseWidgetMixin
 local AF_CheckButtonMixin = {}
 
 function AF_CheckButtonMixin:SetText(text)
@@ -803,10 +812,11 @@ end
 ---------------------------------------------------------------------
 -- resize button
 ---------------------------------------------------------------------
+---@return Button|AF_BaseWidgetMixin
 function AF.CreateResizeButton(target, minWidth, minHeight, maxWidth, maxHeight)
     local b = CreateFrame("Button", nil, target)
     Mixin(b, PanelResizeButtonMixin)
-    Mixin(BNGetNumFOF, AF_BaseWidgetMixin)
+    Mixin(b, AF_BaseWidgetMixin)
 
     b:Init(target, minWidth, minHeight, maxWidth, maxHeight)
 
