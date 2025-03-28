@@ -25,8 +25,8 @@ function AF_ObjectPoolMixin:GetAllActives()
     return actives
 end
 
----@param creationFunc function
----@param resetterFunc function
+---@param creationFunc fun(pool:ObjectPool):UIObject
+---@param resetterFunc fun(pool:ObjectPool, widget:UIObject)
 ---@return ObjectPool pool
 function AF.CreateObjectPool(creationFunc, resetterFunc)
     local pool = CreateObjectPool(creationFunc, resetterFunc)

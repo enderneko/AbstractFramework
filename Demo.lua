@@ -11,7 +11,7 @@ function AF.ShowDemo()
     --                              headered frame                             --
     -----------------------------------------------------------------------------
     local demo = AF.CreateHeaderedFrame(AF.UIParent, "AF_DEMO", AF.GetIconString("AF", 16) .. AF.GetGradientText("AbstractFramework", "accent", "accent_alt") .. AF.WrapTextInColor(" Demo", "white"), 710, 500)
-    AF.SetPoint(demo, "BOTTOMLEFT", 500, 270)
+    AF.SetPoint(demo, "CENTER")
     demo:SetFrameLevel(100)
     demo:SetTitleJustify("LEFT")
 
@@ -113,14 +113,14 @@ function AF.ShowDemo()
     local eb1 = AF.CreateEditBox(demo, "Edit Box", 200, 20)
     AF.SetPoint(eb1, "TOPLEFT", cb3, "BOTTOMLEFT", 0, -10)
     eb1:SetOnTextChanged(function(text)
-        print("TextChanged:", text)
+        AF.Print("TextChanged:", text)
     end)
     eb1:SetText("Hello!")
 
     local eb2 = AF.CreateEditBox(demo, "Number Only", 200, 20, "number")
     AF.SetPoint(eb2, "TOPLEFT", eb1, "BOTTOMLEFT", 0, -10)
     eb2:SetConfirmButton(function(text)
-        print("ConfirmButtonClicked:", text)
+        AF.Print("ConfirmButtonClicked:", text)
     end)
 
     local eb3 = AF.CreateEditBox(demo, "Edit Box", 200, 20)
@@ -190,7 +190,7 @@ function AF.ShowDemo()
     AF.SetTooltips(gb3, "LEFT", -2, 0, "Item C")
 
     AF.CreateButtonGroup({gb1, gb2, gb3}, function(id)
-        print("selected", id)
+        AF.Print("selected", id)
     end)
 
 
@@ -264,10 +264,10 @@ function AF.ShowDemo()
     AF.SetPoint(sl2, "TOPLEFT", eb4, "TOPRIGHT", 10, -25)
     sl2:SetValue(1)
     sl2:SetOnValueChanged(function(value)
-        print("OnSliderValueChanged:", value)
+        AF.Print("OnSliderValueChanged:", value)
     end)
     sl2:SetAfterValueChanged(function(value)
-        print("AfterSliderValueChanged:", value)
+        AF.Print("AfterSliderValueChanged:", value)
     end)
 
     local cb5 = AF.CreateCheckButton(demo, nil, function(checked, self)
@@ -283,10 +283,10 @@ function AF.ShowDemo()
     sl3:UpdateWordWrap()
     sl3:SetValue(0) -- for percentage, set value * 100
     sl3:SetOnValueChanged(function(value)
-        print("VERTICAL_OnSliderValueChanged:", value) -- for percentage, get value / 100
+        AF.Print("VERTICAL_OnSliderValueChanged:", value) -- for percentage, get value / 100
     end)
     sl3:SetAfterValueChanged(function(value)
-        print("VERTICAL_AfterSliderValueChanged:", value) -- for percentage, get value / 100
+        AF.Print("VERTICAL_AfterSliderValueChanged:", value) -- for percentage, get value / 100
     end)
 
     local sl4 = AF.CreateSlider(tp1, "Font Size", 130, -5, 5, 1)
@@ -341,7 +341,7 @@ function AF.ShowDemo()
                     ["icon"] = icon,
                     ["iconBorderColor"] = "black",
                     ["onClick"] = function()
-                        print(string.format("Class: %s, SpellID: %d, SpellName: %s", class, spellID, name))
+                        AF.Print(string.format("Class: %s, SpellID: %d, SpellName: %s", class, spellID, name))
                     end
                 })
             end
@@ -354,25 +354,25 @@ function AF.ShowDemo()
             ["icon"] = fireballIcon,
             ["iconBorderColor"] = "black",
             ["onClick"] = function()
-                print(string.format("SpellID: %d, SpellName: %s", 133, fireballName))
+                AF.Print(string.format("SpellID: %d, SpellName: %s", 133, fireballName))
             end,
             ["children"] = {
                 {
                     ["text"] = "Rank 1",
                     ["onClick"] = function()
-                        print("Fireball Rank 1")
+                        AF.Print("Fireball Rank 1")
                     end
                 },
                 {
                     ["text"] = "Rank 2",
                     ["onClick"] = function()
-                        print("Fireball Rank 2")
+                        AF.Print("Fireball Rank 2")
                     end
                 },
                 {
                     ["text"] = "Rank 3",
                     ["onClick"] = function()
-                        print("Fireball Rank 3")
+                        AF.Print("Fireball Rank 3")
                     end
                 }
             }
@@ -406,7 +406,7 @@ function AF.ShowDemo()
             for _, v in ipairs(path) do
                 tinsert(paths, v.text)
             end
-            print("OnMenuSelection:", table.concat(paths, AF.WrapTextInColor(" > ", "gray")))
+            AF.Print("OnMenuSelection:", table.concat(paths, AF.WrapTextInColor(" > ", "gray")))
         end)
     end
 
@@ -419,7 +419,7 @@ function AF.ShowDemo()
     AF.SetTooltips(dd1, "TOPLEFT", 0, 2, "Normal Dropdown 1")
     dd1:SetLabel("Normal Dropdown 1")
     dd1:SetOnClick(function(value)
-        print("NormalDropdown1 Selected:", value)
+        AF.Print("NormalDropdown1 Selected:", value)
     end)
     local items = {}
     for i = 1, 7 do
@@ -433,7 +433,7 @@ function AF.ShowDemo()
     AF.SetTooltips(dd2, "TOPLEFT", 0, 2, "Normal Dropdown 2")
     dd2:SetLabel("Normal Dropdown 2")
     dd2:SetOnClick(function(value)
-        print("NormalDropdown2 Selected:", value)
+        AF.Print("NormalDropdown2 Selected:", value)
     end)
     local items = {}
     for i = 1, 20 do
@@ -526,9 +526,9 @@ function AF.ShowDemo()
     --                              color picker                               --
     -----------------------------------------------------------------------------
     local cp1 = AF.CreateColorPicker(demo, "Color Picker", true, function(r, g, b, a)
-        print("ColorPicker1_OnChange:", r, g, b, a)
+        AF.Print("ColorPicker1_OnChange:", r, g, b, a)
     end, function(r, g, b, a)
-        print("ColorPicker1_OnConfirm:", r, g, b, a)
+        AF.Print("ColorPicker1_OnConfirm:", r, g, b, a)
     end)
     AF.SetPoint(cp1, "TOPLEFT", slist1, "BOTTOMLEFT", 0, -10)
     cp1:SetColor(AF.GetColorRGB("pink", 0.7))
@@ -602,7 +602,7 @@ function AF.ShowDemo()
         AF.SetDialogPoint("TOPLEFT", 255, -170)
         AF.ResizeDialogButtonToFitText(70)
         AF.SetDialogOnConfirm(function()
-            print("Dialog Confirmed:", form.value1, form.value2)
+            AF.Print("Dialog Confirmed:", form.value1, form.value2)
         end)
     end)
 
@@ -827,9 +827,9 @@ function AF.ShowDemo()
     b15:SetScript("OnClick", function()
         for i = 1, 3 do
             AF.ShowConfirmPopup("Confirm " .. i, function()
-                print("Confirm " .. i, "yes")
+                AF.Print("Confirm " .. i, "yes")
             end, function()
-                print("Confirm " .. i, "no")
+                AF.Print("Confirm " .. i, "no")
             end)
         end
     end)
@@ -860,7 +860,7 @@ function AF.ShowDemo()
     end
     dw:SetMarksInfo(niceDays)
     dw:SetOnDateChanged(function(dt)
-        print(dt.year, dt.month, dt.day, dt.timestamp)
+        AF.Print(dt.year, dt.month, dt.day, dt.timestamp)
     end)
 
     -----------------------------------------------------------------------------
@@ -922,7 +922,7 @@ function AF.ShowDemo()
         tinsert(moverTestFrames, f)
         AF.SetPoint(f, point)
         f:SetLabel("Mover Test Frame " .. id .. "\n" .. point, "hotpink", nil, true)
-        AF.CreateMover(f, group, "Test Mover " .. id, function(p, x, y) print("MTF" .. id .. ":", p, x, y) end)
+        AF.CreateMover(f, group, "Test Mover " .. id, function(p, x, y) AF.Print("MTF" .. id .. ":", p, x, y) end)
     end
 
     -- group1
@@ -937,4 +937,56 @@ function AF.ShowDemo()
     CreateMoverTestFrame(7, "test2", "RIGHT")
     CreateMoverTestFrame(8, "test2", "BOTTOM")
     CreateMoverTestFrame(9, "test2", "BOTTOMRIGHT")
+
+
+    -----------------------------------------------------------------------------
+    --                                 helptip                                 --
+    -----------------------------------------------------------------------------
+    local htBtn = AF.CreateButton(demo, "HelpTip", "gold", nil, 20)
+    AF.SetPoint(htBtn, "TOPLEFT", undoBtn, "TOPRIGHT", 5, 0)
+    AF.SetPoint(htBtn, "RIGHT", cm)
+
+    local tips = {
+        {
+            widget = sw1,
+            position = "TOP",
+            text = "Switch\n(Group HelpTip 1/3)",
+            glow = true,
+            callback = function()
+                AF.Print("Switch!")
+            end
+        },
+        {
+            widget = b7,
+            position = "LEFT",
+            text = "Dialog\n(Group HelpTip 2/3)",
+            glow = true,
+            callback = function()
+                AF.Print("Dialog!")
+            end
+        },
+        {
+            widget = dd6,
+            position = "RIGHT",
+            text = "Dropdown\n(Group HelpTip 3/3)",
+            glow = true,
+            callback = function()
+                AF.Print("Dropdown!")
+            end
+        },
+    }
+
+    htBtn:SetOnClick(function()
+        AF.HideAllHelpTips()
+        AF.ShowHelpTip({
+            widget = cm,
+            position = "RIGHT",
+            text = "Cascading Menu\n(Single HelpTip)",
+            -- glow = true,
+            callback = function()
+                AF.Print("HelpTip viewed and closed")
+            end
+        })
+        AF.ShowHelpTipGroup(tips)
+    end)
 end

@@ -59,8 +59,8 @@ function AF.Debug(arg, ...)
     end
 end
 
-function AF.Print(msg)
-    print(GetPrefix(), msg)
+function AF.Print(...)
+    print(GetPrefix(), ...)
 end
 
 function AF.Printf(msg, ...)

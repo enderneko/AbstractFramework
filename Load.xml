@@ -69,6 +69,7 @@
     <Script file="Widgets\Popup.lua"/>
     <Script file="Widgets\Calendar.lua"/>
     <Script file="Widgets\Sheet.lua"/>
+    <Script file="Widgets\HelpTip.lua"/>
     <Include file="Widgets\AuraCooldown.xml"/>
     <Script file="Widgets\Aura.lua"/>
     <Script file="Widgets\Misc.lua"/>
