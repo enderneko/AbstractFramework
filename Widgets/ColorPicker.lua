@@ -238,7 +238,7 @@ local function CreateColorSliderHolder(onValueChanged)
     slider:SetThumbTexture(slider.thumb1)
 
     slider.thumb2 = slider:CreateTexture(nil, "ARTWORK")
-    slider.thumb2:SetTexture(AF.GetIcon("Thumb"))
+    slider.thumb2:SetTexture(AF.GetIcon("ArrowLeft2"))
     AF.SetSize(slider.thumb2, 16, 16)
     AF.SetPoint(slider.thumb2, "LEFT", slider.thumb1, "RIGHT", -5, 0)
 

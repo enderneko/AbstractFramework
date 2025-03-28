@@ -132,7 +132,7 @@ local function CreateCalendar()
     -- previous month
     local previous = AF.CreateButton(calendar, nil, "accent_hover", 35, 20)
     calendar.previous = previous
-    previous:SetTexture(AF.GetIcon("ArrowLeft"), {16, 16}, {"CENTER", 0, 0})
+    previous:SetTexture(AF.GetIcon("ArrowLeft1"), {16, 16}, {"CENTER", 0, 0})
     previous:SetScript("OnClick", function()
         calendar.date.month = calendar.date.month - 1
         if calendar.date.month == 0 then
@@ -148,7 +148,7 @@ local function CreateCalendar()
     -- next month
     local next = AF.CreateButton(calendar, nil, "accent_hover", 35, 20)
     calendar.next = next
-    next:SetTexture(AF.GetIcon("ArrowRight"), {16, 16}, {"CENTER", 0, 0})
+    next:SetTexture(AF.GetIcon("ArrowRight1"), {16, 16}, {"CENTER", 0, 0})
     next:SetScript("OnClick", function()
         calendar.date.month = calendar.date.month + 1
         if calendar.date.month == 13 then
