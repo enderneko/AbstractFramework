@@ -1,0 +1,45 @@
+{
+  "lists": [
+    {
+      "id": "8e8373eb-f6b9-4d4a-9bbb-5847fa668385",
+      "title": "BACKLOG",
+      "cards": [
+        {
+          "id": "d6173515-7d6a-4626-a704-615d747d4166",
+          "listId": "8e8373eb-f6b9-4d4a-9bbb-5847fa668385",
+          "title": "dialogs queue",
+          "description": "",
+          "labels": [],
+          "checkboxes": [],
+          "comments": []
+        },
+        {
+          "id": "1725c44d-1e1b-4c4c-a3aa-b0d7ee889dae",
+          "listId": "8e8373eb-f6b9-4d4a-9bbb-5847fa668385",
+          "title": "event squash",
+          "description": "",
+          "labels": [],
+          "checkboxes": [],
+          "comments": []
+        }
+      ]
+    },
+    {
+      "id": "7933a009-1cf2-4180-bebb-0279b9810c5f",
+      "title": "TODO",
+      "cards": []
+    },
+    {
+      "id": "9276eb48-ae95-4342-9462-fa9f0d38ab17",
+      "title": "DONE",
+      "cards": []
+    }
+  ],
+  "archive": {
+    "lists": [],
+    "cards": []
+  },
+  "settings": {
+    "labels": []
+  }
+}
