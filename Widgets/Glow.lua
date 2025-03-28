@@ -11,6 +11,7 @@ local AF = _G.AbstractFramework
 function AF.ShowNormalGlow(parent, size, color, autoHide)
     if not parent.normalGlow then
         parent.normalGlow = CreateFrame("Frame", nil, parent, "BackdropTemplate")
+        AF.SetFrameLevel(parent.normalGlow, -1)
 
         if autoHide then
             parent.normalGlow:SetScript("OnHide", function() parent.normalGlow:Hide() end)
@@ -49,6 +50,7 @@ function AF.ShowCalloutGlow(parent, blink, autoHide)
         parent.calloutGlow:SetBackdrop({edgeFile = AF.GetTexture("CalloutGlow"), edgeSize = 7})
         parent.calloutGlow:SetBorderBlendMode("ADD")
         AF.SetOutside(parent.calloutGlow, parent, 4)
+        AF.SetFrameLevel(parent.calloutGlow, -1)
 
         if autoHide then
             parent.calloutGlow:SetScript("OnHide", function() parent.calloutGlow:Hide() end)
