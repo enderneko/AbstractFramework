@@ -97,13 +97,13 @@ local function CreateDialog()
         dialog:SetScript("OnUpdate", function()
             if text:GetText() then
                 --! NOTE: text width must be set, and its x/y offset should be 0 (not sure), or WEIRD ISSUES would a appear.
-                text:SetWidth(Round(dialog:GetWidth()-14))
+                text:SetWidth(Round(dialog:GetWidth() - 14))
                 textHolder:SetHeight(Round(text:GetHeight()))
             end
             if dialog.content then
                 contentHolder:SetHeight(Round(dialog.content:GetHeight()))
             end
-            dialog:SetHeight(Round(textHolder:GetHeight()+contentHolder:GetHeight())+40)
+            dialog:SetHeight(Round(textHolder:GetHeight() + contentHolder:GetHeight()) + 40)
             dialog:SetScript("OnUpdate", nil)
         end)
     end)
@@ -125,12 +125,21 @@ local function CreateDialog()
 end
 
 -- show
+---@param parent Frame
+---@param text string
+---@param width? number default 200
+---@param yesText? string default YES
+---@param noText? string default NO
+---@param showMask? boolean
+---@param content? Frame
+---@param yesDisabled? boolean
+---@return AF_Dialog
 function AF.ShowDialog(parent, text, width, yesText, noText, showMask, content, yesDisabled)
     if not dialog then CreateDialog() end
 
     dialog:SetParent(parent)
     AF.SetFrameLevel(dialog, 50, parent)
-    AF.SetWidth(dialog, width)
+    AF.SetWidth(dialog, width or 200)
 
     dialog.text:SetText(text)
 
@@ -166,8 +175,8 @@ end
 -- resize yes/no
 function AF.ResizeDialogButtonToFitText(minWidth)
     dialog.minButtonWidth = minWidth or 0
-    local yesWidth = Round(dialog.yes.text:GetWidth())+10
-    local noWidth = Round(dialog.no.text:GetWidth())+10
+    local yesWidth = Round(dialog.yes.text:GetWidth()) + 10
+    local noWidth = Round(dialog.no.text:GetWidth()) + 10
     if minWidth then
         yesWidth = max(minWidth, yesWidth)
         noWidth = max(minWidth, noWidth)
@@ -259,10 +268,10 @@ local function CreateNotificationDialog()
         notificationDialog:SetScript("OnUpdate", function()
             if text:GetText() then
                 --! NOTE: text width must be set, and its x/y offset should be 0 (not sure), or WEIRD ISSUES would a appear.
-                text:SetWidth(Round(notificationDialog:GetWidth()-14))
+                text:SetWidth(Round(notificationDialog:GetWidth() - 14))
                 textHolder:SetHeight(Round(text:GetHeight()))
             end
-            notificationDialog:SetHeight(Round(textHolder:GetHeight())+40)
+            notificationDialog:SetHeight(Round(textHolder:GetHeight()) + 40)
             notificationDialog:SetScript("OnUpdate", nil)
         end)
     end)
@@ -280,18 +289,18 @@ local function CreateNotificationDialog()
 end
 
 -- show
----@param parent any
+---@param parent Frame
 ---@param text string
----@param width number
----@param showMask boolean
----@param countdown number
+---@param width? number default 200
+---@param showMask? boolean
+---@param countdown? number
 ---@return AF_NotificationDialog
 function AF.ShowNotificationDialog(parent, text, width, showMask, countdown)
     if not notificationDialog then CreateNotificationDialog() end
 
     notificationDialog:SetParent(parent)
     AF.SetFrameLevel(notificationDialog, 50, parent)
-    AF.SetWidth(notificationDialog, width)
+    AF.SetWidth(notificationDialog, width or 200)
 
     notificationDialog.text:SetText(text)
 
@@ -301,7 +310,7 @@ function AF.ShowNotificationDialog(parent, text, width, showMask, countdown)
 
     if countdown then
         notificationDialog.close:SetEnabled(false)
-        notificationDialog.close:SetText(_G.HELP_TIP_BUTTON_GOT_IT.." ("..countdown..")")
+        notificationDialog.close:SetText(_G.HELP_TIP_BUTTON_GOT_IT .. " (" .. countdown .. ")")
         notificationDialog.timer = C_Timer.NewTicker(1, function()
             notificationDialog.timer = nil
             countdown = countdown - 1
@@ -309,7 +318,7 @@ function AF.ShowNotificationDialog(parent, text, width, showMask, countdown)
                 notificationDialog.close:SetText(_G.HELP_TIP_BUTTON_GOT_IT)
                 notificationDialog.close:SetEnabled(true)
             else
-                notificationDialog.close:SetText(_G.HELP_TIP_BUTTON_GOT_IT.." ("..countdown..")")
+                notificationDialog.close:SetText(_G.HELP_TIP_BUTTON_GOT_IT .. " (" .. countdown .. ")")
             end
         end, countdown)
     else
