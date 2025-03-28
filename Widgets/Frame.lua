@@ -1071,6 +1071,53 @@ function AF.HideMask(parent)
 end
 
 ---------------------------------------------------------------------
+-- cooldown
+---------------------------------------------------------------------
+---@class AF_Cooldown:Cooldown
+local AF_CooldownMixin = {}
+
+function AF_CooldownMixin:Start(duration)
+    AF.FrameSetCooldownDuration(self, duration)
+end
+
+function AF_CooldownMixin:StartSince(start, duration)
+    AF.FrameSetCooldown(self, start, duration)
+end
+
+function AF_CooldownMixin:SetOnCooldownDone(func)
+    self:SetScript("OnCooldownDone", func)
+end
+
+---@param parent Frame
+---@param name? string
+---@param texture string
+---@param color? string default is white
+---@param reverse? boolean
+---@return AF_Cooldown
+function AF.CreateCooldown(parent, name, texture, color, reverse)
+    local cd = CreateFrame("Cooldown", name, parent)
+    cd:SetSwipeTexture(texture)
+    cd:SetSwipeColor(AF.GetColorRGB(color or "white"))
+    cd:SetDrawEdge(false)
+    cd:SetDrawSwipe(true)
+    cd:SetDrawBling(false)
+    cd:SetReverse(reverse)
+
+    -- disable omnicc
+    cd.noCooldownCount = true
+
+    -- prevent some dirty addons from adding cooldown text
+    cd.SetCooldown = nil
+    cd.SetCooldownDuration = nil
+
+    Mixin(cd, AF_CooldownMixin)
+
+    AF.AddToPixelUpdater(cd)
+
+    return cd
+end
+
+---------------------------------------------------------------------
 -- combat mask (+100 frame level)
 ---------------------------------------------------------------------
 local function CreateCombatMask(parent, tlX, tlY, brX, brY)
