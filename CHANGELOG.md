@@ -1,1 +1,27 @@
-Initial release
+[Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r1...973ae06df2d33c3aa74902be8914a887ab54e8fe)
+
+- Add AF_ButtonMixin.HookOnClick
+- Add AF_IconButtonMixin.SetTexCoord
+- Add AF.CreateCooldown
+- Add AF.GetAddOnMetadata
+- Add AF.Unpack8
+- Add some icons
+- Add some logos
+- AF_BaseWidgetMixin add hooks
+- Change tooltip lefttext color
+- Create .kanban
+- Implement HelpTip
+- Pool -> ObjectPool
+- Rename AF_BaseScriptHandlerMixin -> AF_BaseWidgetMixin
+- Set frame level of NormalGlow/CalloutGlow to -1
+- Update AF_TitledPaneMixin
+- Update AF.CalcTexCoordPreCrop
+- Update class inheritance
+- Update Color.lua
+- Update dialog
+- Update HelpTip
+- Update icons
+- Update Locales.lua
+- Update Locales.lua
+- Update Mover.lua
+- Update some functions
