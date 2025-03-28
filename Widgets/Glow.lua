@@ -5,11 +5,10 @@ local AF = _G.AbstractFramework
 -- normal glow
 ---------------------------------------------------------------------
 ---@param parent Frame
----@param size number
----@param color string
----@param alpha number
----@param autoHide boolean only available for the first call
-function AF.ShowNormalGlow(parent, size, color, alpha, autoHide)
+---@param size? number default is 5
+---@param color? string
+---@param autoHide? boolean only available for the first call
+function AF.ShowNormalGlow(parent, size, color, autoHide)
     if not parent.normalGlow then
         parent.normalGlow = CreateFrame("Frame", nil, parent, "BackdropTemplate")
 
@@ -18,9 +17,16 @@ function AF.ShowNormalGlow(parent, size, color, alpha, autoHide)
         end
     end
 
-    parent.normalGlow:SetBackdrop({edgeFile = AF.GetTexture("StaticGlow"), edgeSize = AF.ConvertPixelsForRegion(size or 5, parent)})
-    AF.SetOutside(parent.normalGlow, parent, size or 5)
-    parent.normalGlow:SetBackdropBorderColor(AF.GetColorRGB(color or "accent", alpha))
+    parent.normalGlow.size = size or parent.normalGlow.size or 5
+    parent.normalGlow.color = color or parent.normalGlow.color or "accent"
+
+    parent.normalGlow:SetBackdrop({edgeFile = AF.GetTexture("StaticGlow"), edgeSize = AF.ConvertPixelsForRegion(parent.normalGlow.size, parent)})
+    AF.SetOutside(parent.normalGlow, parent, parent.normalGlow.size)
+    if type(parent.normalGlow.color) == "string" then
+        parent.normalGlow:SetBackdropBorderColor(AF.GetColorRGB(parent.normalGlow.color))
+    elseif type(parent.normalGlow.color) == "table" then
+        parent.normalGlow:SetBackdropBorderColor(AF.UnpackColor(parent.normalGlow.color))
+    end
 
     parent.normalGlow:Show()
 end

@@ -38,7 +38,16 @@ end
 ---------------------------------------------------------------------
 -- calc texcoord
 ---------------------------------------------------------------------
-function AF.CalcTexCoordPreCrop(width, height, aspectRatio, crop)
+
+---calculates texture coordinates with adjustments for aspect ratio and cropping
+---@param targetWidth number
+---@param targetHeight number
+---@param crop? number cropping percentage
+---@param originalAspectRatio? number optional texture aspect ratio (width/height), defaults to 1
+---@return table coordinates {ULx, ULy, LLx, LLy, URx, URy, LRx, LRy}
+function AF.CalcTexCoordPreCrop(targetWidth, targetHeight, crop, originalAspectRatio)
+    crop = crop or 0
+
     -- apply cropping to initial texCoord
     local texCoord = {
         crop, crop,          -- ULx, ULy
@@ -47,8 +56,12 @@ function AF.CalcTexCoordPreCrop(width, height, aspectRatio, crop)
         1 - crop, 1 - crop   -- LRx, LRy
     }
 
-    local newAspectRatio = width / height
-    newAspectRatio = newAspectRatio / aspectRatio
+    local newAspectRatio = targetWidth / targetHeight
+    if originalAspectRatio then
+        newAspectRatio = newAspectRatio / originalAspectRatio
+    else
+        -- in most cases, the original aspect ratio is 1
+    end
 
     local xRatio = newAspectRatio < 1 and newAspectRatio or 1
     local yRatio = newAspectRatio > 1 and 1 / newAspectRatio or 1
@@ -61,12 +74,19 @@ function AF.CalcTexCoordPreCrop(width, height, aspectRatio, crop)
     return texCoord
 end
 
-function AF.CalcScale(baseOriginalWidth, baseOriginalHeight, baseNewWidth, baseNewHeight, crop)
-    local effectiveBaseWidth = baseOriginalWidth * (1 - 2 * crop)
-    local effectiveBaseHeight = baseOriginalHeight * (1 - 2 * crop)
+---ccalculates scaling factor to fit a texture to target size while preserving aspect ratio
+---@param originalWidth number
+---@param originalHeight number
+---@param targetWidth number
+---@param targetHeight number
+---@param crop number crop amount (0-0.5) from each edge
+---@return number scale that ensures texture fills at least one dimension
+function AF.CalcScale(originalWidth, originalHeight, targetWidth, targetHeight, crop)
+    local effectiveWidth = originalWidth * (1 - 2 * crop)
+    local effectiveHeight = originalHeight * (1 - 2 * crop)
 
-    local wScale = baseNewWidth / effectiveBaseWidth
-    local hScale = baseNewHeight / effectiveBaseHeight
+    local wScale = targetWidth / effectiveWidth
+    local hScale = targetHeight / effectiveHeight
 
     return math.max(wScale, hScale)
 end
@@ -74,6 +94,7 @@ end
 ---------------------------------------------------------------------
 -- gradient texture
 ---------------------------------------------------------------------
+---@param orientation string "HORIZONTAL" or "VERTICAL"
 ---@param color1 table|string
 ---@param color2 table|string
 ---@return Texture tex

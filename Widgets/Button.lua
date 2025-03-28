@@ -486,8 +486,15 @@ function AF_IconButtonMixin:EnablePushEffect(enabled)
     self._pushEffectEnabled = enabled
 end
 
+---@param parent Frame
+---@param icon string
+---@param width number
+---@param height number
+---@param padding? number default is 0
 ---@param color? string|table
 ---@param hoverColor? string|table
+---@param filterMode? string
+---@param noPushDownEffect? boolean
 function AF.CreateIconButton(parent, icon, width, height, padding, color, hoverColor, filterMode, noPushDownEffect)
     padding = padding or 0
 
