@@ -4,7 +4,7 @@ local AF = _G.AbstractFramework
 ---------------------------------------------------------------------
 -- base
 ---------------------------------------------------------------------
-local sharedEventHandler = CreateFrame("Frame", "BFI_EVENT_HANDLER")
+local sharedEventHandler = CreateFrame("Frame", "AF_EVENT_HANDLER")
 local _RegisterEvent = sharedEventHandler.RegisterEvent
 local _RegisterUnitEvent = sharedEventHandler.RegisterUnitEvent
 local _UnregisterEvent = sharedEventHandler.UnregisterEvent
@@ -15,7 +15,7 @@ local _UnregisterAllEvents = sharedEventHandler.UnregisterAllEvents
 -- CLEU
 ---------------------------------------------------------------------
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
-local cleuDispatcher = CreateFrame("Frame", "BFI_CLEU_HANDLER")
+local cleuDispatcher = CreateFrame("Frame", "AF_CLEU_HANDLER")
 cleuDispatcher.eventFuncs = {}
 cleuDispatcher:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 
