@@ -30,6 +30,10 @@ function AF.EscapeIcon(iconPath, size)
     return format("|T%s:%d|t", iconPath, size or 0)
 end
 
+function AF.EscapeAtlas(atlas, width, height)
+    return format("|A:%s:%d:%d|a", atlas, height or 0, width or 0)
+end
+
 function AF.EscapeRaidIcon(raidIconIndex)
     raidIconIndex = raidIconIndex - 1
     local left, right, top, bottom
