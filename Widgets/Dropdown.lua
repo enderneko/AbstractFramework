@@ -383,7 +383,7 @@ function AF_DropdownMixin:LoadItems()
         if #self.items == 0 then
             AF.SetWidth(self.list, 5)
         else
-            AF.SetListWidth(self.list, #self.items, self.width, 0, 2)
+            AF.SetListWidth(self.list, #self.items, self.width, 0, 1, 1)
         end
 
     else -- using scroll list

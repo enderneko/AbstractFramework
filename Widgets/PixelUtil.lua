@@ -78,55 +78,89 @@ function AF.SetHeight(region, height, minPixels)
     region:SetHeight(AF.GetNearestPixelSize(height, region:GetEffectiveScale(), minPixels))
 end
 
-function AF.SetListWidth(region, itemNum, itemWidth, itemSpacing, extraWidth)
+---@param region Frame
+---@param itemNum number
+---@param itemWidth number
+---@param itemSpacing number
+---@param leftPadding number|nil
+---@param rightPadding number|nil
+function AF.SetListWidth(region, itemNum, itemWidth, itemSpacing, leftPadding, rightPadding)
     -- clear conflicts
     region._size_grid = nil
     region._width = nil
     region._minwidth = nil
+
     -- add new
     region._size_list_h = true
     region._itemNumH = itemNum
     region._itemWidth = itemWidth
     region._itemSpacingX = itemSpacing
-    extraWidth = extraWidth or 0
-    region._extraWidth = extraWidth
+
+    leftPadding = leftPadding or 0
+    rightPadding = rightPadding or 0
+    region._leftPadding = leftPadding
+    region._rightPadding = rightPadding
 
     if itemNum == 0 then
         region:SetWidth(0.001)
     else
-        region:SetWidth(AF.GetNearestPixelSize(itemWidth, region:GetEffectiveScale())*itemNum
-            + AF.GetNearestPixelSize(itemSpacing, region:GetEffectiveScale())*(itemNum-1)
-            + AF.GetNearestPixelSize(extraWidth, region:GetEffectiveScale()))
+        region:SetWidth(AF.GetNearestPixelSize(itemWidth, region:GetEffectiveScale()) * itemNum
+            + AF.GetNearestPixelSize(itemSpacing, region:GetEffectiveScale()) * (itemNum - 1)
+            + AF.GetNearestPixelSize(leftPadding, region:GetEffectiveScale())
+            + AF.GetNearestPixelSize(rightPadding, region:GetEffectiveScale()))
     end
 end
 
-function AF.SetListHeight(region, itemNum, itemHeight, itemSpacing, extraHeight)
+---@param region Frame
+---@param itemNum number
+---@param itemHeight number
+---@param itemSpacing number
+---@param topPadding number|nil
+---@param bottomPadding number|nil
+function AF.SetListHeight(region, itemNum, itemHeight, itemSpacing, topPadding, bottomPadding)
     -- clear conflicts
     region._size_grid = nil
     region._height = nil
     region._minheight = nil
+
     -- add new
     region._size_list_v = true
     region._itemNumV = itemNum
     region._itemHeight = itemHeight
     region._itemSpacingY = itemSpacing
-    extraHeight = extraHeight or 0
-    region._extraHeight = extraHeight
+
+    topPadding = topPadding or 0
+    bottomPadding = bottomPadding or 0
+    region._topPadding = topPadding
+    region._bottomPadding = bottomPadding
 
     if itemNum == 0 then
         region:SetHeight(0.001)
     else
-        region:SetHeight(AF.GetNearestPixelSize(itemHeight, region:GetEffectiveScale())*itemNum
-            + AF.GetNearestPixelSize(itemSpacing, region:GetEffectiveScale())*(itemNum-1)
-            + AF.GetNearestPixelSize(extraHeight, region:GetEffectiveScale()))
+        region:SetHeight(AF.GetNearestPixelSize(itemHeight, region:GetEffectiveScale()) * itemNum
+            + AF.GetNearestPixelSize(itemSpacing, region:GetEffectiveScale()) * (itemNum - 1)
+            + AF.GetNearestPixelSize(topPadding, region:GetEffectiveScale())
+            + AF.GetNearestPixelSize(bottomPadding, region:GetEffectiveScale()))
     end
 end
 
-function AF.SetGridSize(region, gridWidth, gridHeight, gridSpacingX, gridSpacingY, columns, rows)
+---@param region Frame
+---@param gridWidth number
+---@param gridHeight number
+---@param gridSpacingX number
+---@param gridSpacingY number
+---@param columns number
+---@param rows number
+---@param topPadding number|nil
+---@param bottomPadding number|nil
+---@param leftPadding number|nil
+---@param rightPadding number|nil
+function AF.SetGridSize(region, gridWidth, gridHeight, gridSpacingX, gridSpacingY, columns, rows, topPadding, bottomPadding, leftPadding, rightPadding)
     -- clear conflicts
     region._size_list_h = nil
     region._size_list_v = nil
     -- region._size_normal = nil
+
     -- add new
     region._size_grid = true
     region._gridWidth = gridWidth
@@ -136,18 +170,31 @@ function AF.SetGridSize(region, gridWidth, gridHeight, gridSpacingX, gridSpacing
     region._rows = rows
     region._columns = columns
 
+    leftPadding = leftPadding or 0
+    rightPadding = rightPadding or 0
+    topPadding = topPadding or 0
+    bottomPadding = bottomPadding or 0
+    region._leftPadding = leftPadding
+    region._rightPadding = rightPadding
+    region._topPadding = topPadding
+    region._bottomPadding = bottomPadding
+
     if columns == 0 then
         region:SetWidth(0.001)
     else
-        region:SetWidth(AF.GetNearestPixelSize(gridWidth, region:GetEffectiveScale())*columns
-            + AF.GetNearestPixelSize(gridSpacingX, region:GetEffectiveScale())*(columns-1))
+        region:SetWidth(AF.GetNearestPixelSize(gridWidth, region:GetEffectiveScale()) * columns
+            + AF.GetNearestPixelSize(gridSpacingX, region:GetEffectiveScale()) * (columns - 1)
+            + AF.GetNearestPixelSize(leftPadding, region:GetEffectiveScale())
+            + AF.GetNearestPixelSize(rightPadding, region:GetEffectiveScale()))
     end
 
     if rows == 0 then
         region:SetHeight(0.001)
     else
-        region:SetHeight(AF.GetNearestPixelSize(gridHeight, region:GetEffectiveScale())*rows
-            + AF.GetNearestPixelSize(gridSpacingY, region:GetEffectiveScale())*(rows-1))
+        region:SetHeight(AF.GetNearestPixelSize(gridHeight, region:GetEffectiveScale()) * rows
+            + AF.GetNearestPixelSize(gridSpacingY, region:GetEffectiveScale()) * (rows - 1)
+            + AF.GetNearestPixelSize(topPadding, region:GetEffectiveScale())
+            + AF.GetNearestPixelSize(bottomPadding, region:GetEffectiveScale()))
     end
 end
 
@@ -260,7 +307,8 @@ end
 ---------------------------------------------------------------------
 function AF.ReSize(region)
     if region._size_grid then
-        AF.SetGridSize(region, region._gridWidth, region._gridHeight, region._gridSpacingX, region._gridSpacingY, region._columns, region._rows)
+        AF.SetGridSize(region, region._gridWidth, region._gridHeight, region._gridSpacingX, region._gridSpacingY, region._columns, region._rows,
+            region._topPadding, region._bottomPadding, region._leftPadding, region._rightPadding)
     else
         if region._width then
             AF.SetWidth(region, region._width, region._minwidth)
@@ -269,10 +317,10 @@ function AF.ReSize(region)
             AF.SetHeight(region, region._height, region._minheight)
         end
         if region._size_list_h then
-            AF.SetListWidth(region, region._itemNumH, region._itemWidth, region._itemSpacingX, region._extraWidth)
+            AF.SetListWidth(region, region._itemNumH, region._itemWidth, region._itemSpacingX, region._leftPadding, region._rightPadding)
         end
         if region._size_list_v then
-            AF.SetListHeight(region, region._itemNumV, region._itemHeight, region._itemSpacingY, region._extraHeight)
+            AF.SetListHeight(region, region._itemNumV, region._itemHeight, region._itemSpacingY, region._topPadding, region._bottomPadding)
         end
     end
 end

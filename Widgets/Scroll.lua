@@ -1,6 +1,9 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 
+local abs, max, select = abs, max, select
+local Round = AF.Round
+
 ---------------------------------------------------------------------
 -- scroll frame
 ---------------------------------------------------------------------
@@ -39,10 +42,10 @@ function AF_ScrollFrameMixin:ScrollToBottom()
     self.scrollFrame:SetVerticalScroll(self:GetVerticalScrollRange())
 end
 
-function AF_ScrollFrameMixin:SetContentHeight(height, num, spacing, extraHeight)
+function AF_ScrollFrameMixin:SetContentHeight(height, num, spacing, topPadding, bottomPadding)
     self:ResetScroll()
     if num and spacing then
-        AF.SetListHeight(self.scrollContent, num, height, spacing, extraHeight)
+        AF.SetListHeight(self.scrollContent, num, height, spacing, topPadding, bottomPadding)
     else
         AF.SetHeight(self.scrollContent, height)
     end
@@ -214,17 +217,23 @@ function AF_ScrollListMixin:UpdateSlots()
     for i = 1, self.slotNum do
         if not self.slots[i] then
             self.slots[i] = AF.CreateFrame(self.slotFrame)
+            AF.RemoveFromPixelUpdater(self.slots[i])
             AF.SetHeight(self.slots[i], self.slotHeight)
-            AF.SetPoint(self.slots[i], "RIGHT", -self.horizontalMargins, 0)
+            AF.SetPoint(self.slots[i], "RIGHT", -self.horizontalMargin, 0)
             if i == 1 then
-                AF.SetPoint(self.slots[i], "TOPLEFT", self.horizontalMargins, 0)
+                AF.SetPoint(self.slots[i], "TOPLEFT", self.horizontalMargin, 0)
             else
                 AF.SetPoint(self.slots[i], "TOPLEFT", self.slots[i-1], "BOTTOMLEFT", 0, -self.slotSpacing)
             end
         end
+
         self.slots[i]:Show()
+
         if self.slots[i].widget then
             self.slots[i].widget:Show()
+            if self.slots[i].widget.UpdatePixels then
+                self.slots[i].widget:UpdatePixels()
+            end
         end
     end
     -- hide unused slots
@@ -236,15 +245,19 @@ function AF_ScrollListMixin:UpdateSlots()
     end
 end
 
--- NOTE: for dropdowns only
 function AF_ScrollListMixin:SetSlotNum(newSlotNum)
     self.slotNum = newSlotNum
     if self.slotNum == 0 then
         AF.SetHeight(self, 5)
     else
-        AF.SetListHeight(self, self.slotNum, self.slotHeight, self.slotSpacing, self.verticalMargins*2)
+        AF.SetListHeight(self, self.slotNum, self.slotHeight, self.slotSpacing, self.verticalMargin, self.verticalMargin)
     end
     self:UpdateSlots()
+end
+
+function AF_ScrollListMixin:SetSlotHeight(newHeight)
+    self.slotHeight = newHeight
+    self:SetSlotNum(self.slotNum)
 end
 
 function AF_ScrollListMixin:SetWidgets(widgets)
@@ -253,13 +266,18 @@ function AF_ScrollListMixin:SetWidgets(widgets)
     self.widgetNum = #widgets
     self:SetScroll(1)
 
+    -- call UpdatePixels on show
+    for _, w in ipairs(self.widgets) do
+        AF.RemoveFromPixelUpdater(w)
+    end
+
     if self.widgetNum > self.slotNum then -- can scroll
         local p = self.slotNum / self.widgetNum
         self.scrollThumb:SetHeight(self.scrollBar:GetHeight() * p)
-        AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", -7, self.verticalMargins)
+        AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", -7, self.verticalMargin)
         self.scrollBar:Show()
     else
-        AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", 0, self.verticalMargins)
+        AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", 0, self.verticalMargin)
         self.scrollBar:Hide()
     end
 end
@@ -277,7 +295,7 @@ function AF_ScrollListMixin:Reset()
         s.widgetIndex = nil
     end
     -- resize / repoint
-    AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", 0, self.verticalMargins)
+    AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", 0, self.verticalMargin)
     self.scrollBar:Hide()
 end
 
@@ -313,6 +331,9 @@ function AF_ScrollListMixin:SetScroll(startIndex)
         else
             w:Show()
             w:SetAllPoints(self.slots[slotIndex])
+            if w.UpdatePixels then
+                w:UpdatePixels()
+            end
             w._slotIndex = slotIndex
             if w.Update then
                 -- NOTE: fix some widget issues, define them manually
@@ -366,14 +387,16 @@ function AF_ScrollListMixin:UpdatePixels()
     AF.RePoint(self)
     AF.ReBorder(self)
     AF.RePoint(self.slotFrame)
-    -- do it again, even if already invoked by AF.UpdatePixels
-    AF.RePoint(self.scrollBar)
+    self.scrollBar:UpdatePixels()
+
+    -- update slots and widgets
     for _, s in ipairs(self.slots) do
         s:UpdatePixels()
         if s.widget and s.widget.UpdatePixels then
             s.widget:UpdatePixels()
         end
     end
+
     -- update scorll thumb
     if self:CanScroll() and self.slots[1].widgetIndex then
         local offset = (self.slots[1].widgetIndex - 1) * ((self.scrollBar:GetHeight() - self.scrollThumb:GetHeight()) / self:GetScrollRange()) -- n * perHeight
@@ -381,33 +404,33 @@ function AF_ScrollListMixin:UpdatePixels()
     end
 end
 
----@param verticalMargins number top/bottom margin
----@param horizontalMargins number left/right margin
+---@param verticalMargin number top/bottom margin
+---@param horizontalMargin number left/right margin
 ---@param slotSpacing number spacing between widgets next to each other
 ---@return AF_ScrollList scrollList
-function AF.CreateScrollList(parent, name, verticalMargins, horizontalMargins, slotNum, slotHeight, slotSpacing, color, borderColor)
-    local scrollList = AF.CreateBorderedFrame(parent, name, width, nil, color, borderColor)
-    AF.SetListHeight(scrollList, slotNum, slotHeight, slotSpacing, verticalMargins*2)
+function AF.CreateScrollList(parent, name, verticalMargin, horizontalMargin, slotNum, slotHeight, slotSpacing, color, borderColor)
+    local scrollList = AF.CreateBorderedFrame(parent, name, nil, nil, color, borderColor)
+    AF.SetListHeight(scrollList, slotNum, slotHeight, slotSpacing, verticalMargin, verticalMargin)
 
     scrollList.slotNum = slotNum
     scrollList.slotHeight = slotHeight
     scrollList.slotSpacing = slotSpacing
-    scrollList.verticalMargins = verticalMargins
-    scrollList.horizontalMargins = horizontalMargins
+    scrollList.verticalMargin = verticalMargin
+    scrollList.horizontalMargin = horizontalMargin
 
     -- slotFrame
     local slotFrame = CreateFrame("Frame", nil, scrollList)
     scrollList.slotFrame = slotFrame
-    AF.SetPoint(slotFrame, "TOPLEFT", 0, -verticalMargins)
-    AF.SetPoint(slotFrame, "BOTTOMRIGHT", 0, verticalMargins)
+    AF.SetPoint(slotFrame, "TOPLEFT", 0, -verticalMargin)
+    AF.SetPoint(slotFrame, "BOTTOMRIGHT", 0, verticalMargin)
 
     -- scrollBar
     local scrollBar = AF.CreateBorderedFrame(scrollList, nil, 5, nil, color, borderColor)
     scrollList.scrollBar = scrollBar
-    AF.SetPoint(scrollBar, "TOPRIGHT", 0, -verticalMargins)
-    AF.SetPoint(scrollBar, "BOTTOMRIGHT", 0, verticalMargins)
+    AF.RemoveFromPixelUpdater(scrollBar)
+    AF.SetPoint(scrollBar, "TOPRIGHT", 0, -verticalMargin)
+    AF.SetPoint(scrollBar, "BOTTOMRIGHT", 0, verticalMargin)
     scrollBar:Hide()
-
 
     -- scrollBar thumb
     local scrollThumb = AF.CreateBorderedFrame(scrollBar, nil, 5, nil, AF.GetAccentColorTable(0.7))
