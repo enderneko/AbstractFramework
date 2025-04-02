@@ -52,6 +52,7 @@
     <Script file="Widgets\Font.lua"/>
     <Script file="Widgets\Animation.lua"/>
     <Script file="Widgets\Frame.lua"/>
+    <Script file="Widgets\Scroll.lua"/>
     <Script file="Widgets\Glow.lua"/>
     <Include file="Widgets\TooltipTemplate.xml"/>
     <Script file="Widgets\Tooltip.lua"/>
