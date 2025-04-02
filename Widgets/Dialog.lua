@@ -157,10 +157,7 @@ function AF.ShowDialog(parent, text, width, yesText, noText, showMask, content, 
         content:Show()
     end
 
-    if yesDisabled then
-        dialog.yes:SetEnabled(false)
-    end
-
+    dialog.yes:SetEnabled(not yesDisabled)
     dialog:Show()
 
     return dialog
@@ -190,6 +187,7 @@ function AF.CreateDialogContent(height)
     assert(height, "height is required")
     if not dialog then CreateDialog() end
     local f = AF.CreateFrame(dialog.contentHolder)
+    f:Hide()
     AF.SetHeight(f, height)
     f.dialog = dialog
     return f
