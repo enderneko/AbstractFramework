@@ -358,7 +358,7 @@ function AF.CreateSheet(parent, name, config, onSizeChanged)
     AF.SetPoint(header, "TOPLEFT")
     header:SetFrameLevel(sheet:GetFrameLevel() + 2)
 
-    local content = AF.CreateScrollList(sheet, nil, 20, 0, 0, config.rowNum, config.rowHeight, -1)
+    local content = AF.CreateScrollList(sheet, nil, 0, 0, config.rowNum, config.rowHeight, -1)
     sheet.content = content
     AF.SetPoint(content, "TOPLEFT", header, "BOTTOMLEFT", 0, 1)
     content:SetFrameLevel(sheet:GetFrameLevel() + 1)

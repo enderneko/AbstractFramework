@@ -202,8 +202,9 @@ function AF.CreateScrollFrame(parent, name, width, height, color, borderColor)
     return scrollParent
 end
 
+
 ---------------------------------------------------------------------
--- scroll list (filled with widgets)
+-- scroll list
 ---------------------------------------------------------------------
 ---@class AF_ScrollList:AF_BorderedFrame
 local AF_ScrollListMixin = {}
@@ -384,7 +385,7 @@ end
 ---@param horizontalMargins number left/right margin
 ---@param slotSpacing number spacing between widgets next to each other
 ---@return AF_ScrollList scrollList
-function AF.CreateScrollList(parent, name, width, verticalMargins, horizontalMargins, slotNum, slotHeight, slotSpacing, color, borderColor)
+function AF.CreateScrollList(parent, name, verticalMargins, horizontalMargins, slotNum, slotHeight, slotSpacing, color, borderColor)
     local scrollList = AF.CreateBorderedFrame(parent, name, width, nil, color, borderColor)
     AF.SetListHeight(scrollList, slotNum, slotHeight, slotSpacing, verticalMargins*2)
 

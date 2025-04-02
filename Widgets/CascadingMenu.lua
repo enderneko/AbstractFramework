@@ -10,7 +10,7 @@ local selection_path = {}
 local menus = {}
 
 local function CreateMenu(level)
-    local menu = AF.CreateScrollList(level > 1 and menus[level - 1] or AF.UIParent, "AFCascadingMenu" .. level, 10, 1, 1, 10, 18, 0, "widget", "accent")
+    local menu = AF.CreateScrollList(level > 1 and menus[level - 1] or AF.UIParent, "AFCascadingMenu" .. level, 1, 1, 10, 18, 0, "widget", "accent")
     menu:SetClampedToScreen(true)
     menu:EnableMouse(true)
     menu:Hide()

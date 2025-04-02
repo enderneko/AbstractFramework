@@ -300,7 +300,8 @@ function AF.ShowDemo()
     -----------------------------------------------------------------------------
     --                               scroll list                               --
     -----------------------------------------------------------------------------
-    local slist1 = AF.CreateScrollList(demo, nil, 150, 5, 5, 7, 20, 5)
+    local slist1 = AF.CreateScrollList(demo, nil, 5, 5, 7, 20, 5)
+    AF.SetWidth(slist1, 150)
     AF.SetPoint(slist1, "TOPLEFT", bf1, "TOPRIGHT", 10, 0)
     local widgets = {}
     for i = 1, 20 do

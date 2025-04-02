@@ -7,7 +7,7 @@ local list, horizontalList
 -- list
 ---------------------------------------------------------------------
 local function CreateListFrame()
-    list = AF.CreateScrollList(AF.UIParent, "AFDropdownList", 10, 1, 1, 10, 18, 0, "widget")
+    list = AF.CreateScrollList(AF.UIParent, "AFDropdownList", 1, 1, 10, 18, 0, "widget")
     list:SetClampedToScreen(true)
     list:Hide()
 
