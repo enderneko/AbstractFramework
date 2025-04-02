@@ -403,7 +403,6 @@ local function CreateColorPickerFrame()
     -- AF.ApplyDefaultBackdropWithColors(colorPickerFrame, nil, "accent")
     -- AF.ApplyDefaultBackdropWithColors(colorPickerFrame.header, "header", "accent")
     AF.SetPoint(colorPickerFrame, "CENTER")
-    AF.PixelPerfectPoint(colorPickerFrame)
 
     ---------------------------------------------
     -- color pane

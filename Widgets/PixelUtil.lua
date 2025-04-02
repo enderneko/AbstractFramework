@@ -378,13 +378,15 @@ function AF.UpdatePixelsForAddon(addon)
 end
 
 ---------------------------------------------------------------------
--- pixel perfect point
+-- snap to pixel
 ---------------------------------------------------------------------
-function AF.PixelPerfectPoint(region)
-    local left = Round(region:GetLeft())
-    local bottom = Round(region:GetBottom())
+function AF.SnapRegionToPixel(region)
+    if region:GetNumPoints() ~= 1 then return end
+    local point, relativeTo, relativePoint, offsetX, offsetY = region:GetPoint()
+    offsetX = AF.Round(offsetX)
+    offsetY = AF.Round(offsetY)
     AF.ClearPoints(region)
-    AF.SetPoint(region, "BOTTOMLEFT", left, bottom)
+    region:SetPoint(point, relativeTo, relativePoint, offsetX, offsetY)
 end
 
 ---------------------------------------------------------------------
