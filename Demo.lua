@@ -11,7 +11,7 @@ function AF.ShowDemo()
     --                              headered frame                             --
     -----------------------------------------------------------------------------
     local demo = AF.CreateHeaderedFrame(AF.UIParent, "AF_DEMO", AF.GetIconString("AF", 16) .. AF.GetGradientText("AbstractFramework", "accent", "accent_alt") .. AF.WrapTextInColor(" Demo", "white"), 710, 500)
-    AF.SetPoint(demo, "CENTER")
+    AF.SetPoint(demo, "LEFT", 100, 0)
     demo:SetFrameLevel(100)
     demo:SetTitleJustify("LEFT")
 
@@ -257,7 +257,7 @@ function AF.ShowDemo()
     -----------------------------------------------------------------------------
     local sl1 = AF.CreateSlider(tp1, "Scale", 130, 0.5, 2, 0.01)
     AF.SetPoint(sl1, "TOPLEFT", 5, -40)
-    AF.SetTooltips(sl1, "TOPLEFT", 0, 20, "Set scale of AF.UIParent", "If scale is too small, there can be some display issues")
+    AF.SetTooltips(sl1, "TOPLEFT", 0, 20, "Set scale of AF.UIParent", "If scale is too small, there can be some display issues", "It's highly recommended to do a UI reload after changing scale")
     sl1:SetValue(AF.GetScale())
     sl1:SetAfterValueChanged(function(value)
         AF.SetScale(value)

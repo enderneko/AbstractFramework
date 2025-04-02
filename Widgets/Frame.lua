@@ -203,22 +203,22 @@ function AF.ApplyDefaultBackdrop(frame, borderSize)
     if not frame.SetBackdrop then
         Mixin(frame, BackdropTemplateMixin)
     end
-    local n = AF.ConvertPixelsForRegion(borderSize or 1, frame)
-    AF.SetBackdrop(frame, {bgFile=AF.GetPlainTexture(), edgeFile=AF.GetPlainTexture(), edgeSize=n, insets={left=n, right=n, top=n, bottom=n}})
+    local n = borderSize or 1
+    AF.SetBackdrop(frame, {bgFile = AF.GetPlainTexture(), edgeFile = AF.GetPlainTexture(), edgeSize = n, insets = {left = n, right = n, top = n, bottom = n}})
 end
 
 function AF.ApplyDefaultBackdrop_NoBackground(frame, borderSize)
     if not frame.SetBackdrop then
         Mixin(frame, BackdropTemplateMixin)
     end
-    AF.SetBackdrop(frame, {edgeFile=AF.GetPlainTexture(), edgeSize=AF.ConvertPixelsForRegion(borderSize or 1, frame)})
+    AF.SetBackdrop(frame, {edgeFile = AF.GetPlainTexture(), edgeSize = borderSize or 1})
 end
 
 function AF.ApplyDefaultBackdrop_NoBorder(frame)
     if not frame.SetBackdrop then
         Mixin(frame, BackdropTemplateMixin)
     end
-    AF.SetBackdrop(frame, {bgFile=AF.GetPlainTexture()})
+    AF.SetBackdrop(frame, {bgFile = AF.GetPlainTexture()})
 end
 
 function AF.ApplyDefaultBackdropColors(frame)
