@@ -206,14 +206,15 @@ function AF_ButtonMixin:SetTexture(tex, size, point, isAtlas, bgColor, justifyH)
         AF.SetSize(self.texture, unpack(size))
 
         self.textureJustifyH = justifyH or "LEFT"
-        AF.ClearPoints(self.text)
-        if self.textureJustifyH == "RIGHT" then
-            AF.SetPoint(self.text, "LEFT", self.textPadding, 0)
-            AF.SetPoint(self.text, "RIGHT", self.texture, "LEFT", -2, 0)
-        else
-            AF.SetPoint(self.text, "LEFT", self.texture, "RIGHT", 2, 0)
-            AF.SetPoint(self.text, "RIGHT", -self.textPadding, 0)
-        end
+    end
+
+    AF.ClearPoints(self.text)
+    if self.textureJustifyH == "RIGHT" then
+        AF.SetPoint(self.text, "LEFT", self.textPadding, 0)
+        AF.SetPoint(self.text, "RIGHT", self.texture, "LEFT", -2, 0)
+    else
+        AF.SetPoint(self.text, "LEFT", self.texture, "RIGHT", 2, 0)
+        AF.SetPoint(self.text, "RIGHT", -self.textPadding, 0)
     end
 
     self.texture:Show()
