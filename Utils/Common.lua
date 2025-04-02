@@ -251,6 +251,7 @@ function AF.Contains(t, v)
     return false
 end
 
+-- insert into the first empty slot
 function AF.Insert(t, v)
     local i, done = 1
     repeat
