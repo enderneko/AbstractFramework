@@ -89,6 +89,9 @@ function AF.ShowDemo()
     AF.SetPoint(b6, "TOPLEFT", b5, "TOPRIGHT", 10, 0)
     b6:SetEnabled(false)
 
+    local iconBtn = AF.CreateIconButton(demo, AF.GetIcon("Info1"), 20, 20, 2, "gray")
+    AF.SetPoint(iconBtn, "TOPLEFT", b6, "TOPRIGHT", 10, 0)
+
 
     -----------------------------------------------------------------------------
     --                               check button                              --

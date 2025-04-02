@@ -498,6 +498,19 @@ function AF_IconButtonMixin:SetTexCoord(...)
     self.icon:SetTexCoord(...)
 end
 
+function AF_IconButtonMixin:SetIcon(icon, filterMode)
+    if filterMode then
+        self._filterMode = filterMode
+    end
+    self._iconPath = icon
+    self.icon:SetTexture(icon, nil, nil, self._filterMode)
+end
+
+function AF_IconButtonMixin:SetFilterMode(filterMode)
+    self._filterMode = filterMode
+    self.icon:SetTexture(self._iconPath, nil, nil, filterMode)
+end
+
 function AF_IconButtonMixin:UpdatePixels()
     AF.ReSize(self)
     AF.RePoint(self)
@@ -524,7 +537,10 @@ function AF.CreateIconButton(parent, icon, width, height, padding, color, hoverC
     b.icon = b:CreateTexture(nil, "ARTWORK")
     b.icon:SetPoint("CENTER")
     AF.SetSize(b.icon, width - b.padding, height - b.padding)
+
     b.icon:SetTexture(icon, nil, nil, filterMode)
+    b._icon = icon
+    b._filterMode = filterMode
 
     b.color = type(color) == "string" and AF.GetColorTable(color) or (color or AF.GetColorTable("white"))
     b.hoverColor = type(hoverColor) == "string" and AF.GetColorTable(hoverColor) or (hoverColor or AF.GetColorTable("white"))
