@@ -17,7 +17,6 @@ local _UnregisterAllEvents = sharedEventHandler.UnregisterAllEvents
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local cleuDispatcher = CreateFrame("Frame", "AF_CLEU_HANDLER")
 cleuDispatcher.eventFuncs = {}
-cleuDispatcher:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 
 local function DispatchCLEU(_, subevent, ...)
     if cleuDispatcher.eventFuncs[subevent] then
@@ -32,6 +31,10 @@ cleuDispatcher:SetScript("OnEvent", function()
 end)
 
 local function RegisterCLEU(obj, subevent, ...)
+    if not cleuDispatcher:IsEventRegistered("COMBAT_LOG_EVENT_UNFILTERED") then
+        cleuDispatcher:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+    end
+
     if not cleuDispatcher.eventFuncs[subevent] then
         cleuDispatcher.eventFuncs[subevent] = {}
     end
@@ -60,7 +63,14 @@ local function UnregisterCLEU(obj, subevent)
                 end
             end
         end
+    end
 
+    if AF.IsEmpty(cleuDispatcher.eventFuncs[subevent]) then
+        cleuDispatcher.eventFuncs[subevent] = nil
+    end
+
+    if AF.IsEmpty(cleuDispatcher.eventFuncs) and cleuDispatcher:IsEventRegistered("COMBAT_LOG_EVENT_UNFILTERED") then
+        cleuDispatcher:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     end
 end
 
