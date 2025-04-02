@@ -277,9 +277,10 @@ function AF.SetAccentColor(color, buttonNormalColor, buttonHoverColor)
     end
 end
 
+---@param addon? string
 ---@return string accentColorName registered addon folder name or "accent"
-function AF.GetAccentColorName()
-    local addon = GetAddon()
+function AF.GetAccentColorName(addon)
+    addon = addon or GetAddon()
     if addon and COLORS[addon] then
         return addon
     end

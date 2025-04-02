@@ -35,7 +35,7 @@ end
 local function GetPrefix()
     local addon, alias = AF.GetAddon()
     if addon then
-        return AF.WrapTextInColor("[" .. (type(alias) == "string" and alias or addon) .. "]", addon)
+        return AF.WrapTextInColor("[" .. (type(alias) == "string" and alias or addon) .. "]", AF.GetAccentColorName(addon))
     else
         return AF.WrapTextInColor("[AF]", "accent")
     end
