@@ -340,10 +340,10 @@ function AF_ScrollListMixin:SetWidgets(widgets)
         self.scrollBar:Show()
         local p = self.slotNum / self.widgetNum
         self.scrollThumb:SetHeight(self.scrollBar:GetHeight() * p)
-        AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", self.scrollBar, "BOTTOMLEFT", -self.horizontalMargin, self.verticalMargin)
+        AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", self.scrollBar, "BOTTOMLEFT", -self.horizontalMargin, 0)
     else
         self.scrollBar:Hide()
-        AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", 0, self.verticalMargin)
+        AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", -self.horizontalMargin, self.verticalMargin)
     end
 end
 
@@ -642,7 +642,7 @@ function AF_ScrollGridMixin:SetWidgets(widgets)
         self.scrollBar:Show()
         local p = self.slotRow / ceil(self.widgetNum / self.slotColumn)
         self.scrollThumb:SetHeight(self.scrollBar:GetHeight() * p)
-        AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", self.scrollBar, "BOTTOMLEFT", -self.horizontalMargin, self.verticalMargin)
+        AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", self.scrollBar, "BOTTOMLEFT", -self.horizontalMargin, 0)
     else
         self.scrollBar:Hide()
         AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", -self.horizontalMargin, self.verticalMargin)
