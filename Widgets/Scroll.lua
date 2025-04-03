@@ -3,6 +3,7 @@ local AF = _G.AbstractFramework
 
 local select, abs, max, ceil = select, abs, max, ceil
 local Round = AF.Round
+local ApproxZero = AF.ApproxZero
 local GetCursorPosition = GetCursorPosition
 
 ---------------------------------------------------------------------
@@ -204,6 +205,69 @@ function AF.CreateScrollFrame(parent, name, width, height, color, borderColor)
     AF.AddToPixelUpdater(scrollParent)
 
     return scrollParent
+end
+
+
+---------------------------------------------------------------------
+-- ScrollListGrid shared
+---------------------------------------------------------------------
+local function ScorllThumb_OnEnter(self)
+    self:SetBackdropColor(self.r, self.g, self.b, 0.9)
+end
+
+local function ScorllThumb_OnLeave(self)
+    self:SetBackdropColor(self.r, self.g, self.b, 0.7)
+end
+
+local function ScrollRoot_OnMouseWheel(self, delta)
+    if not self:CanScroll() then return end
+    if delta == 1 then -- scroll up
+        self:SetScroll(self:GetScroll() - self.step)
+    elseif delta == -1 then -- scroll down
+        self:SetScroll(self:GetScroll() + self.step)
+    end
+end
+
+local function ScrollRoot_OnMouseDown(self, button)
+    if button ~= "LeftButton" then return end
+
+    local scale = self:GetEffectiveScale()
+    local offsetY = select(5, self:GetPoint(1))
+    local mouseY = select(2, GetCursorPosition()) / scale -- https://warcraft.wiki.gg/wiki/API_GetCursorPosition
+
+    self:SetScript("OnUpdate", function(self)
+        local newMouseY = select(2, GetCursorPosition()) / scale
+        local mouseOffset = newMouseY - mouseY
+        if ApproxZero(mouseOffset) then return end
+
+        local newOffsetY = offsetY + mouseOffset
+
+        -- top ------------------------------
+        if newOffsetY >= 0 then
+            if self.root:GetScroll() ~= 1 then
+                self.root:SetScroll(1)
+            end
+
+        -- bottom ---------------------------
+        elseif (-newOffsetY) + self:GetHeight() >= self.root.scrollBar:GetHeight() then
+            if self.root:GetScroll() ~= self.root:GetScrollRange() + 1 then
+                self.root:SetScroll(self.root:GetScrollRange() + 1)
+            end
+
+        -- scroll ---------------------------
+        else
+            local threshold = (self.root.scrollBar:GetHeight() - self:GetHeight()) / self.root:GetScrollRange()
+            local targetIndex = Round(abs(newOffsetY) / threshold)
+            targetIndex = max(targetIndex, 1)
+            if targetIndex ~= self.root:GetScroll() then
+                self.root:SetScroll(targetIndex)
+            end
+        end
+    end)
+end
+
+local function ScrollRoot_OnMouseUp(self)
+    self:SetScript("OnUpdate", nil)
 end
 
 
@@ -442,17 +506,14 @@ function AF.CreateScrollList(parent, name, verticalMargin, horizontalMargin, slo
     -- scrollBar thumb
     local scrollThumb = AF.CreateBorderedFrame(scrollBar, nil, 5, nil, AF.GetAccentColorTable(0.7))
     scrollList.scrollThumb = scrollThumb
+    scrollThumb.root = scrollList
     scrollThumb.r, scrollThumb.g, scrollThumb.b = AF.GetAccentColorRGB()
     -- AF.SetPoint(scrollThumb, "TOP")
     scrollThumb:EnableMouse(true)
     scrollThumb:SetMovable(true)
     scrollThumb:SetHitRectInsets(-5, -5, 0, 0) -- Frame:SetHitRectInsets(left, right, top, bottom)
-    scrollThumb:SetScript("OnEnter", function()
-        scrollThumb:SetBackdropColor(scrollThumb.r, scrollThumb.g, scrollThumb.b, 0.9)
-    end)
-    scrollThumb:SetScript("OnLeave", function()
-        scrollThumb:SetBackdropColor(scrollThumb.r, scrollThumb.g, scrollThumb.b, 0.7)
-    end)
+    scrollThumb:SetScript("OnEnter", ScorllThumb_OnEnter)
+    scrollThumb:SetScript("OnLeave", ScorllThumb_OnLeave)
 
     -- slots
     scrollList.slots = {}
@@ -469,56 +530,12 @@ function AF.CreateScrollList(parent, name, verticalMargin, horizontalMargin, slo
 
     -- enable mouse wheel scroll
     scrollList:EnableMouseWheel(true)
-    scrollList:SetScript("OnMouseWheel", function(self, delta)
-        if scrollList.widgetNum == 0 then return end
-        if delta == 1 then -- scroll up
-            scrollList:SetScroll(scrollList:GetScroll() - scrollList.step)
-        elseif delta == -1 then -- scroll down
-            scrollList:SetScroll(scrollList:GetScroll() + scrollList.step)
-        end
-    end)
+    scrollList:SetScript("OnMouseWheel", ScrollRoot_OnMouseWheel)
     -----------------------------------------------------------------
 
     -- dragging and scrolling ---------------------------------------
-    scrollThumb:SetScript("OnMouseDown", function(self, button)
-        if button ~= "LeftButton" then return end
-
-        local scale = scrollThumb:GetEffectiveScale()
-        local offsetY = select(5, scrollThumb:GetPoint(1))
-        local mouseY = select(2, GetCursorPosition()) / scale -- https://warcraft.wiki.gg/wiki/API_GetCursorPosition
-
-        self:SetScript("OnUpdate", function(self)
-            local newMouseY = select(2, GetCursorPosition()) / scale
-            local mouseOffset = newMouseY - mouseY
-            local newOffsetY = offsetY + mouseOffset
-
-            -- top ------------------------------
-            if newOffsetY >= 0 then
-                if scrollList:GetScroll() ~= 1 then
-                    scrollList:SetScroll(1)
-                end
-
-            -- bottom ---------------------------
-            elseif (-newOffsetY) + scrollThumb:GetHeight() >= scrollBar:GetHeight() then
-                if scrollList:GetScroll() ~= scrollList:GetScrollRange() + 1 then
-                    scrollList:SetScroll(scrollList:GetScrollRange() + 1)
-                end
-
-            -- scroll ---------------------------
-            else
-                local threshold = (scrollBar:GetHeight() - scrollThumb:GetHeight()) / scrollList:GetScrollRange()
-                local targetIndex = Round(abs(newOffsetY) / threshold)
-                targetIndex = max(targetIndex, 1)
-                if targetIndex ~= scrollList:GetScroll() then
-                    scrollList:SetScroll(targetIndex)
-                end
-            end
-        end)
-    end)
-
-    scrollThumb:SetScript("OnMouseUp", function(self)
-        self:SetScript("OnUpdate", nil)
-    end)
+    scrollThumb:SetScript("OnMouseDown", ScrollRoot_OnMouseDown)
+    scrollThumb:SetScript("OnMouseUp", ScrollRoot_OnMouseUp)
     -----------------------------------------------------------------
 
     AF.AddToPixelUpdater(scrollList)
@@ -806,17 +823,14 @@ function AF.CreateScrollGrid(parent, name, verticalMargin, horizontalMargin, slo
     -- scrollBar thumb
     local scrollThumb = AF.CreateBorderedFrame(scrollBar, nil, 5, nil, AF.GetAccentColorTable(0.7))
     scrollGrid.scrollThumb = scrollThumb
+    scrollThumb.root = scrollGrid
     scrollThumb.r, scrollThumb.g, scrollThumb.b = AF.GetAccentColorRGB()
     -- AF.SetPoint(scrollThumb, "TOP")
     scrollThumb:EnableMouse(true)
     scrollThumb:SetMovable(true)
     scrollThumb:SetHitRectInsets(-5, -5, 0, 0) -- Frame:SetHitRectInsets(left, right, top, bottom)
-    scrollThumb:SetScript("OnEnter", function()
-        scrollThumb:SetBackdropColor(scrollThumb.r, scrollThumb.g, scrollThumb.b, 0.9)
-    end)
-    scrollThumb:SetScript("OnLeave", function()
-        scrollThumb:SetBackdropColor(scrollThumb.r, scrollThumb.g, scrollThumb.b, 0.7)
-    end)
+    scrollThumb:SetScript("OnEnter", ScorllThumb_OnEnter)
+    scrollThumb:SetScript("OnLeave", ScorllThumb_OnLeave)
 
     -- slots
     scrollGrid.slots = {}
@@ -833,56 +847,12 @@ function AF.CreateScrollGrid(parent, name, verticalMargin, horizontalMargin, slo
 
     -- enable mouse wheel scroll
     scrollGrid:EnableMouseWheel(true)
-    scrollGrid:SetScript("OnMouseWheel", function(self, delta)
-        if not scrollGrid:CanScroll() then return end
-        if delta == 1 then -- scroll up
-            scrollGrid:SetScroll(scrollGrid:GetScroll() - scrollGrid.step)
-        elseif delta == -1 then -- scroll down
-            scrollGrid:SetScroll(scrollGrid:GetScroll() + scrollGrid.step)
-        end
-    end)
+    scrollGrid:SetScript("OnMouseWheel", ScrollRoot_OnMouseWheel)
     -----------------------------------------------------------------
 
     -- dragging and scrolling ---------------------------------------
-    scrollThumb:SetScript("OnMouseDown", function(self, button)
-        if button ~= "LeftButton" then return end
-
-        local scale = scrollThumb:GetEffectiveScale()
-        local offsetY = select(5, scrollThumb:GetPoint(1))
-        local mouseY = select(2, GetCursorPosition()) / scale -- https://warcraft.wiki.gg/wiki/API_GetCursorPosition
-
-        self:SetScript("OnUpdate", function(self)
-            local newMouseY = select(2, GetCursorPosition()) / scale
-            local mouseOffset = newMouseY - mouseY
-            local newOffsetY = offsetY + mouseOffset
-
-            -- top ------------------------------
-            if newOffsetY >= 0 then
-                if scrollGrid:GetScroll() ~= 1 then
-                    scrollGrid:SetScroll(1)
-                end
-
-            -- bottom ---------------------------
-            elseif (-newOffsetY) + scrollThumb:GetHeight() >= scrollBar:GetHeight() then
-                if scrollGrid:GetScroll() ~= scrollGrid:GetScrollRange() + 1 then
-                    scrollGrid:SetScroll(scrollGrid:GetScrollRange() + 1)
-                end
-
-            -- scroll ---------------------------
-            else
-                local threshold = (scrollBar:GetHeight() - scrollThumb:GetHeight()) / scrollGrid:GetScrollRange()
-                local targetIndex = Round(abs(newOffsetY) / threshold)
-                targetIndex = max(targetIndex, 1)
-                if targetIndex ~= scrollGrid:GetScroll() then
-                    scrollGrid:SetScroll(targetIndex)
-                end
-            end
-        end)
-    end)
-
-    scrollThumb:SetScript("OnMouseUp", function(self)
-        self:SetScript("OnUpdate", nil)
-    end)
+    scrollThumb:SetScript("OnMouseDown", ScrollRoot_OnMouseDown)
+    scrollThumb:SetScript("OnMouseUp", ScrollRoot_OnMouseUp)
     -----------------------------------------------------------------
 
     AF.AddToPixelUpdater(scrollGrid)
