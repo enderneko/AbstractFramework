@@ -266,6 +266,11 @@ end
 ---@param steps number total steps to final size
 ---@param anchorPoint string TOPLEFT|TOPRIGHT|BOTTOMLEFT|BOTTOMRIGHT
 function AF.AnimatedResize(frame, targetWidth, targetHeight, frequency, steps, onStart, onFinish, onChange, anchorPoint)
+    if frame._animatedResizeTimer then
+        frame._animatedResizeTimer:Cancel()
+        frame._animatedResizeTimer = nil
+    end
+
     frequency = frequency or 0.015
     steps = steps or 7
 
@@ -299,9 +304,8 @@ function AF.AnimatedResize(frame, targetWidth, targetHeight, frequency, steps, o
     local diffW = (targetWidth - currentWidth) / steps
     local diffH = (targetHeight - currentHeight) / steps
 
-    local animationTimer
-    animationTimer = C_Timer.NewTicker(frequency, function()
-        if diffW ~= 0 then
+    frame._animatedResizeTimer = C_Timer.NewTicker(frequency, function()
+        if not AF.ApproxZero(diffW) then
             if diffW > 0 then
                 currentWidth = math.min(currentWidth + diffW, targetWidth)
             else
@@ -310,7 +314,7 @@ function AF.AnimatedResize(frame, targetWidth, targetHeight, frequency, steps, o
             AF.SetWidth(frame, currentWidth)
         end
 
-        if diffH ~= 0 then
+        if not AF.ApproxZero(diffH) then
             if diffH > 0 then
                 currentHeight = math.min(currentHeight + diffH, targetHeight)
             else
@@ -323,9 +327,11 @@ function AF.AnimatedResize(frame, targetWidth, targetHeight, frequency, steps, o
             onChange(currentWidth, currentHeight)
         end
 
-        if currentWidth == targetWidth and currentHeight == targetHeight then
-            animationTimer:Cancel()
-            animationTimer = nil
+        if AF.ApproxEqual(currentWidth, targetWidth) and AF.ApproxEqual(currentHeight, targetHeight) then
+            frame._animatedResizeTimer:Cancel()
+            frame._animatedResizeTimer = nil
+            if targetWidth then AF.SetWidth(frame, targetWidth) end
+            if targetHeight then AF.SetHeight(frame, targetHeight) end
             if onFinish then onFinish() end
         end
     end)
