@@ -109,7 +109,7 @@ function AF_EditBoxMixin:SetMode(mode)
     elseif mode == "number" then
         self:SetNumeric(true)
         self.GetValue = function(self)
-            return tonumber(self:GetText()) or 0
+            return tonumber(self:GetText()) -- or 0
         end
     elseif mode == "decimal" then
         self.GetValue = function(self)
@@ -120,7 +120,7 @@ function AF_EditBoxMixin:SetMode(mode)
                 text = string.sub(text, 1, firstDecimal) ..
                     string.gsub(string.sub(text, firstDecimal + 1), "%.", "")
             end
-            return tonumber(text) or 0
+            return tonumber(text) -- or 0
         end
     elseif mode == "trim" then
         self.GetValue = function(self)
@@ -231,7 +231,7 @@ function AF.CreateEditBox(parent, label, width, height, mode, font)
 
         if userChanged then
             if eb.notUserChangable then
-                eb:SetText(eb.value) -- restore
+                eb:SetText(eb.value or "") -- restore
                 return
             end
 
@@ -248,7 +248,7 @@ function AF.CreateEditBox(parent, label, width, height, mode, font)
     end)
 
     eb:SetScript("OnHide", function()
-        eb:SetText(eb.value) -- restore
+        eb:SetText(eb.value or "") -- restore
     end)
 
     AF.AddToPixelUpdater(eb)
