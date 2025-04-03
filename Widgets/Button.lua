@@ -1,6 +1,9 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 
+local PlaySoundFile = PlaySoundFile
+local PlaySound = PlaySound
+
 local function RegisterMouseDownUp(b)
     b:SetScript("OnMouseDown", function()
         if b._pushEffectEnabled then
@@ -296,6 +299,19 @@ function AF_ButtonMixin:UpdatePixels()
     end
 end
 
+---@param sound string|nil|"default" default is SOUNDKIT.U_CHAT_SCROLL_BUTTON
+function AF_ButtonMixin:SetClickSound(sound)
+    if sound == "default" then
+        self._customSound = nil
+        self._noSound = nil
+    elseif sound then
+        self._customSound = sound
+        self._noSound = nil
+    else
+        self._noSound = true
+    end
+end
+
 function AF_ButtonMixin:SilentClick()
     self._noSound = true
     self:Click()
@@ -374,18 +390,38 @@ function AF.CreateButton(parent, text, color, width, height, template, borderCol
 
         b:SetScript("PostClick", function(self, button, down)
             if self._noSound then return end
+            local play
             if b._isSecure then
                 if down == GetCVarBool("ActionButtonUseKeyDown") then
-                    PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
+                    play = true
                 end
             else
-                PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
+                play = true
+            end
+            if play then
+                if b._customSound then
+                    if strlower(b._customSound):find("^interface") then
+                        PlaySoundFile(b._customSound)
+                    else
+                        AF.PlaySound(b._customSound)
+                    end
+                else
+                    PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
+                end
             end
         end)
     else
         b:SetScript("PostClick", function()
             if self._noSound then return end
-            PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
+            if b._customSound then
+                if strlower(b._customSound):find("^interface") then
+                    PlaySoundFile(b._customSound)
+                else
+                    AF.PlaySound(b._customSound)
+                end
+            else
+                PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
+            end
         end)
     end
 
