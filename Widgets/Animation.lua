@@ -263,8 +263,15 @@ end
 ---------------------------------------------------------------------
 -- resize with animation
 ---------------------------------------------------------------------
----@param steps number total steps to final size
----@param anchorPoint string TOPLEFT|TOPRIGHT|BOTTOMLEFT|BOTTOMRIGHT
+---@param frame Frame
+---@param targetWidth? number
+---@param targetHeight? number
+---@param frequency? number default 0.015
+---@param onStart? function called when animation starts
+---@param onFinish? function called when animation ends
+---@param onChange? function called when size changes, with currentWidth and currentHeight as parameters
+---@param steps? number total steps to final size, default 7
+---@param anchorPoint? string TOPLEFT|TOPRIGHT|BOTTOMLEFT|BOTTOMRIGHT
 function AF.AnimatedResize(frame, targetWidth, targetHeight, frequency, steps, onStart, onFinish, onChange, anchorPoint)
     if frame._animatedResizeTimer then
         frame._animatedResizeTimer:Cancel()

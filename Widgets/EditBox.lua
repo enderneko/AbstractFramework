@@ -9,8 +9,8 @@ local AF_EditBoxMixin = {}
 
 ---@param func function?
 ---@param text string?
----@param position string? "right_inside"|"right_outside"|"bottom"|"bottomleft"|"bottomright"|nil, default "right_inside".
----@param width number? default is 30, but use editbox width if position is "bottom".
+---@param position string? "RIGHT_INSIDE"|"RIGHT_OUTSIDE"|"BOTTOM"|"BOTTOMLEFT"|"BOTTOMRIGHT"|nil, default "RIGHT_INSIDE".
+---@param width number? default is 30, but use editbox width if position is "BOTTOM".
 ---@param height number? default is 20.
 function AF_EditBoxMixin:SetConfirmButton(func, text, position, width, height)
     self.confirmBtn = self.confirmBtn or AF.CreateButton(self, text, "accent", width or 30, height or 20)
@@ -24,15 +24,15 @@ function AF_EditBoxMixin:SetConfirmButton(func, text, position, width, height)
     end
 
     AF.ClearPoints(self.confirmBtn)
-    position = position and strlower(position) or "right_inside"
-    if position == "bottom" then
+    position = position and strupper(position) or "RIGHT_INSIDE"
+    if position == "BOTTOM" then
         AF.SetPoint(self.confirmBtn, "TOPLEFT", self, "BOTTOMLEFT", 0, 1)
         AF.SetPoint(self.confirmBtn, "TOPRIGHT", self, "BOTTOMRIGHT", 0, 1)
-    elseif position == "bottomleft" then
+    elseif position == "BOTTOMLEFT" then
         AF.SetPoint(self.confirmBtn, "TOPLEFT", self, "BOTTOMLEFT", 0, 1)
-    elseif position == "bottomright" then
+    elseif position == "BOTTOMRIGHT" then
         AF.SetPoint(self.confirmBtn, "TOPRIGHT", self, "BOTTOMRIGHT", 0, 1)
-    elseif position == "right_outside" then
+    elseif position == "RIGHT_OUTSIDE" then
         AF.SetPoint(self.confirmBtn, "TOPLEFT", self, "TOPRIGHT", -1, 0)
     else
         AF.SetPoint(self.confirmBtn, "TOPRIGHT")
@@ -84,7 +84,7 @@ function AF_EditBoxMixin:GetBytes()
     return #value
 end
 
----@param mode string? "multiline"|"number"|"decimal"|"trim"|nil
+---@param mode string|nil "multiline"|"number"|"decimal"|"trim".
 function AF_EditBoxMixin:SetMode(mode)
     self:SetMultiLine(false)
     self:SetNumeric(false)
@@ -300,8 +300,8 @@ end
 
 ---@param func function?
 ---@param text string?
----@param position string? "right_inside"|"right_outside"|"bottom"|"bottomleft"|"bottomright"|nil, default "bottomleft".
----@param width number? default is 30, but use editbox width if position is "bottom".
+---@param position string? "RIGHT_INSIDE"|"RIGHT_OUTSIDE"|"BOTTOM"|"BOTTOMLEFT"|"BOTTOMRIGHT"|nil, default "BOTTOMLEFT".
+---@param width number? default is 30, but use editbox width if position is "BOTTOM".
 ---@param height number? default is 20.
 function AF_ScrollEditBoxMixin:SetConfirmButton(func, text, position, width, height)
     self.eb:SetConfirmButton(func, text, nil, width, height)
@@ -311,15 +311,15 @@ function AF_ScrollEditBoxMixin:SetConfirmButton(func, text, position, width, hei
     AF.SetFrameLevel(confirmBtn, 5, self.scrollFrame)
 
     AF.ClearPoints(confirmBtn)
-    position = position and strlower(position) or "bottomleft"
-    if position == "bottom" then
+    position = position and strupper(position) or "BOTTOMLEFT"
+    if position == "BOTTOM" then
         AF.SetPoint(confirmBtn, "TOPLEFT", self.scrollFrame, "BOTTOMLEFT", 0, 1)
         AF.SetPoint(confirmBtn, "TOPRIGHT", self.scrollFrame, "BOTTOMRIGHT", 0, 1)
-    elseif position == "bottomleft" then
+    elseif position == "BOTTOMLEFT" then
         AF.SetPoint(confirmBtn, "TOPLEFT", self.scrollFrame, "BOTTOMLEFT", 0, 1)
-    elseif position == "bottomright" then
+    elseif position == "BOTTOMRIGHT" then
         AF.SetPoint(confirmBtn, "TOPRIGHT", self.scrollFrame, "BOTTOMRIGHT", 0, 1)
-    elseif position == "right_outside" then
+    elseif position == "RIGHT_OUTSIDE" then
         AF.SetPoint(confirmBtn, "TOPLEFT", self.scrollFrame, "TOPRIGHT", -1, 0)
     else
         AF.SetPoint(confirmBtn, "TOPRIGHT", self.scrollFrame)

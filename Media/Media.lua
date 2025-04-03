@@ -100,7 +100,7 @@ end
 ---@return boolean willPlay
 ---@return number soundHandle
 function AF.PlaySound(sound, addon, channel)
-    return PlaySoundFile(AF.GetSound(sound, addon), channel)
+    return PlaySoundFile(AF.GetSound(sound, addon), channel or "Master")
 end
 
 ---------------------------------------------------------------------

@@ -93,7 +93,7 @@ end
 ---------------------------------------------------------------------
 -- gradient texture
 ---------------------------------------------------------------------
----@param orientation string "HORIZONTAL" or "VERTICAL"
+---@param orientation string "HORIZONTAL"|"VERTICAL".
 ---@param color1 table|string
 ---@param color2 table|string
 ---@return Texture tex

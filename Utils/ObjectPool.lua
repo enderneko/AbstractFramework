@@ -1,6 +1,7 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 
+local insert = table.insert
 local CreateObjectPool = CreateObjectPool
 
 ---@class ObjectPool
@@ -20,7 +21,7 @@ function AF_ObjectPoolMixin:GetAllActives()
     -- return self.activeObjects -- secure
     local actives = {}
     for obj in self:EnumerateActive() do
-        table.insert(actives, obj)
+        insert(actives, obj)
     end
     return actives
 end
