@@ -181,7 +181,7 @@ function AF.SetGridSize(region, gridWidth, gridHeight, gridSpacingX, gridSpacing
 
     if columns == 0 then
         region:SetWidth(0.001)
-    else
+    elseif gridWidth then
         region:SetWidth(AF.GetNearestPixelSize(gridWidth, region:GetEffectiveScale()) * columns
             + AF.GetNearestPixelSize(gridSpacingX, region:GetEffectiveScale()) * (columns - 1)
             + AF.GetNearestPixelSize(leftPadding, region:GetEffectiveScale())
@@ -190,7 +190,7 @@ function AF.SetGridSize(region, gridWidth, gridHeight, gridSpacingX, gridSpacing
 
     if rows == 0 then
         region:SetHeight(0.001)
-    else
+    elseif gridHeight then
         region:SetHeight(AF.GetNearestPixelSize(gridHeight, region:GetEffectiveScale()) * rows
             + AF.GetNearestPixelSize(gridSpacingY, region:GetEffectiveScale()) * (rows - 1)
             + AF.GetNearestPixelSize(topPadding, region:GetEffectiveScale())

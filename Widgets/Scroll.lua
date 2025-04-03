@@ -220,9 +220,9 @@ function AF_ScrollListMixin:UpdateSlots()
             self.slots[i] = AF.CreateFrame(self.slotFrame)
             AF.RemoveFromPixelUpdater(self.slots[i])
             AF.SetHeight(self.slots[i], self.slotHeight)
-            AF.SetPoint(self.slots[i], "RIGHT", -self.horizontalMargin, 0)
+            AF.SetPoint(self.slots[i], "RIGHT")
             if i == 1 then
-                AF.SetPoint(self.slots[i], "TOPLEFT", self.horizontalMargin, 0)
+                AF.SetPoint(self.slots[i], "TOPLEFT")
             else
                 AF.SetPoint(self.slots[i], "TOPLEFT", self.slots[i - 1], "BOTTOMLEFT", 0, -self.slotSpacing)
             end
@@ -273,13 +273,13 @@ function AF_ScrollListMixin:SetWidgets(widgets)
     end
 
     if self.widgetNum > self.slotNum then -- can scroll
+        self.scrollBar:Show()
         local p = self.slotNum / self.widgetNum
         self.scrollThumb:SetHeight(self.scrollBar:GetHeight() * p)
-        AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", -7, self.verticalMargin)
-        self.scrollBar:Show()
+        AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", self.scrollBar, "BOTTOMLEFT", -self.horizontalMargin, self.verticalMargin)
     else
-        AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", 0, self.verticalMargin)
         self.scrollBar:Hide()
+        AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", 0, self.verticalMargin)
     end
 end
 
@@ -428,8 +428,8 @@ function AF.CreateScrollList(parent, name, verticalMargin, horizontalMargin, slo
     -- slotFrame
     local slotFrame = CreateFrame("Frame", nil, scrollList)
     scrollList.slotFrame = slotFrame
-    AF.SetPoint(slotFrame, "TOPLEFT", 0, -verticalMargin)
-    AF.SetPoint(slotFrame, "BOTTOMRIGHT", 0, verticalMargin)
+    AF.SetPoint(slotFrame, "TOPLEFT", horizontalMargin, -verticalMargin)
+    AF.SetPoint(slotFrame, "BOTTOMRIGHT", -horizontalMargin, verticalMargin)
 
     -- scrollBar
     local scrollBar = AF.CreateBorderedFrame(scrollList, nil, 5, nil, color, borderColor)
@@ -534,19 +534,43 @@ end
 local AF_ScrollGridMixin = {}
 
 ---@private
+function AF_ScrollGridMixin:UpdateSlotPoint()
+    for i = 1, self.slotNum do
+        if i == 1 then
+            AF.SetPoint(self.slots[i], "TOPLEFT")
+        elseif i % self.slotColumn == 1 then
+            AF.SetPoint(self.slots[i], "TOPLEFT", self.slots[i - self.slotColumn], "BOTTOMLEFT", 0, -self.slotSpacing)
+        else
+            AF.SetPoint(self.slots[i], "TOPLEFT", self.slots[i - 1], "TOPRIGHT", self.slotSpacing, 0)
+        end
+    end
+end
+
+---@private
+function AF_ScrollGridMixin:UpdateSlotSize()
+    for i = 1, self.slotNum do
+        if self.slotWidth then
+            AF.SetWidth(self.slots[i], self.slotWidth)
+        else
+            local spacing = AF.ConvertPixelsForRegion(self.slotSpacing, self) * (self.slotColumn - 1)
+            self.slots[i]:SetWidth((self.slotFrame:GetWidth() - spacing) / self.slotColumn)
+        end
+
+        if self.slotHeight then
+            AF.SetHeight(self.slots[i], self.slotHeight)
+        else
+            local spacing = AF.ConvertPixelsForRegion(self.slotSpacing, self) * (self.slotRow - 1)
+            self.slots[i]:SetHeight((self.slotFrame:GetHeight() - spacing) / self.slotRow)
+        end
+    end
+end
+
+---@private
 function AF_ScrollGridMixin:UpdateSlots()
     for i = 1, self.slotNum do
         if not self.slots[i] then
             self.slots[i] = AF.CreateFrame(self.slotFrame)
             AF.RemoveFromPixelUpdater(self.slots[i])
-            AF.SetSize(self.slots[i], self.slotWidth, self.slotHeight)
-            if i == 1 then
-                AF.SetPoint(self.slots[i], "TOPLEFT")
-            elseif i % self.slotColumn == 1 then
-                AF.SetPoint(self.slots[i], "TOPLEFT", self.slots[i - self.slotColumn], "BOTTOMLEFT", 0, -self.slotSpacing)
-            else
-                AF.SetPoint(self.slots[i], "TOPLEFT", self.slots[i - 1], "TOPRIGHT", self.slotSpacing, 0)
-            end
         end
 
         self.slots[i]:Show()
@@ -558,6 +582,10 @@ function AF_ScrollGridMixin:UpdateSlots()
             end
         end
     end
+
+    -- update slot point and size
+    self:UpdateSlotPoint()
+    self:UpdateSlotSize()
 
     -- hide unused slots
     for i = self.slotNum + 1, #self.slots do
@@ -593,21 +621,25 @@ function AF_ScrollGridMixin:SetWidgets(widgets)
         AF.RemoveFromPixelUpdater(w)
     end
 
-    if self.widgetNum > self.slotNum then -- can scroll
+    if self:CanScroll() then
         self.scrollBar:Show()
         local p = self.slotRow / ceil(self.widgetNum / self.slotColumn)
         self.scrollThumb:SetHeight(self.scrollBar:GetHeight() * p)
-        AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", -7-self.horizontalMargin, self.verticalMargin)
+        AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", self.scrollBar, "BOTTOMLEFT", -self.horizontalMargin, self.verticalMargin)
     else
         self.scrollBar:Hide()
         AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", -self.horizontalMargin, self.verticalMargin)
     end
+
+    -- update slot size
+    self:UpdateSlotSize()
 end
 
 -- reset
 function AF_ScrollGridMixin:Reset()
     self.widgets = {}
     self.widgetNum = 0
+
     -- hide slot widgets
     for _, s in ipairs(self.slots) do
         if s.widget then
@@ -616,9 +648,13 @@ function AF_ScrollGridMixin:Reset()
         s.widget = nil
         s.widgetIndex = nil
     end
+
     -- resize / repoint
     AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", -self.horizontalMargin, self.verticalMargin)
     self.scrollBar:Hide()
+
+    -- update slot size
+    self:UpdateSlotSize()
 end
 
 ---@param startRow number
@@ -735,6 +771,10 @@ end
 
 ---@param verticalMargin number top/bottom margin
 ---@param horizontalMargin number left/right margin
+---@param slotColumn number
+---@param slotRow number
+---@param slotWidth number|nil if nil, auto calculate width
+---@param slotHeight number|nil if nil, auto calculate height
 ---@param slotSpacing number spacing between widgets next to each other
 ---@return AF_ScrollGrid scrollList
 function AF.CreateScrollGrid(parent, name, verticalMargin, horizontalMargin, slotColumn, slotRow, slotWidth, slotHeight, slotSpacing, color, borderColor)
