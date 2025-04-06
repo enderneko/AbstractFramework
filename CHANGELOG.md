@@ -1,27 +1,24 @@
-[Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r1...973ae06df2d33c3aa74902be8914a887ab54e8fe)
+[Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r2...b773a24c5cfa8ee09791772703bbf876e1ae2e75)
 
-- Add AF_ButtonMixin.HookOnClick
-- Add AF_IconButtonMixin.SetTexCoord
-- Add AF.CreateCooldown
-- Add AF.GetAddOnMetadata
-- Add AF.Unpack8
-- Add some icons
-- Add some logos
-- AF_BaseWidgetMixin add hooks
-- Change tooltip lefttext color
-- Create .kanban
-- Implement HelpTip
-- Pool -> ObjectPool
-- Rename AF_BaseScriptHandlerMixin -> AF_BaseWidgetMixin
-- Set frame level of NormalGlow/CalloutGlow to -1
-- Update AF_TitledPaneMixin
-- Update AF.CalcTexCoordPreCrop
-- Update class inheritance
-- Update Color.lua
-- Update dialog
-- Update HelpTip
-- Update icons
-- Update Locales.lua
-- Update Locales.lua
-- Update Mover.lua
-- Update some functions
+- Add AF_ButtonMixin.SetClickSound
+- Add AF.EscapeAtlas
+- Add SetIcon,SetFilterMode for AF_IconButtonMixin
+- AF_EditBox.GetValue can return nil now
+- AF.PixelPerfectPoint -> AF.SnapRegionToPixel
+- Extract duplicate code
+- Fix AF_Dialog
+- Fix AF.ApplyDefaultBackdrop
+- Fix button text position
+- Fix residual BFI
+- Fix slotFrame anchor for ScrollList
+- Implement AF_ScrollGrid auto slot sizing
+- Implement AF.CreateScrollGrid
+- No CLEU registration on startup
+- Remove "width" from AF.CreateScrollList
+- Separate Scroll frames
+- Trivial update
+- Update AF.AnimatedResize
+- Update AF.CreateSeparator
+- Update comment for AF.Insert
+- Update GetPrefix() for addon
+- Update pixel perfect for list/grid
