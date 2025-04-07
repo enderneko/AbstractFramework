@@ -1,24 +1,4 @@
-[Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r2...b773a24c5cfa8ee09791772703bbf876e1ae2e75)
+[Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r3...36c20de801c9965d62968218721e3e77f1b42b44)
 
-- Add AF_ButtonMixin.SetClickSound
-- Add AF.EscapeAtlas
-- Add SetIcon,SetFilterMode for AF_IconButtonMixin
-- AF_EditBox.GetValue can return nil now
-- AF.PixelPerfectPoint -> AF.SnapRegionToPixel
-- Extract duplicate code
-- Fix AF_Dialog
-- Fix AF.ApplyDefaultBackdrop
-- Fix button text position
-- Fix residual BFI
-- Fix slotFrame anchor for ScrollList
-- Implement AF_ScrollGrid auto slot sizing
-- Implement AF.CreateScrollGrid
-- No CLEU registration on startup
-- Remove "width" from AF.CreateScrollList
-- Separate Scroll frames
-- Trivial update
-- Update AF.AnimatedResize
-- Update AF.CreateSeparator
-- Update comment for AF.Insert
-- Update GetPrefix() for addon
-- Update pixel perfect for list/grid
+- Update AF.SetInside/SetOutside
+- Move base widget functions
