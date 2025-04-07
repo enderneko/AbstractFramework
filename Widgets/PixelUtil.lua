@@ -264,18 +264,30 @@ function AF.SetAllPoints(region, relativeTo)
     AF.SetInside(region, relativeTo, 0)
 end
 
-function AF.SetInside(region, relativeTo, offset)
+---@param region Frame
+---@param relativeTo Frame|nil if not provided, relativeTo = region:GetParent()
+---@param offsetX number if not provided, offsetX = 0
+---@param offsetY number|nil if not provided, offsetY = offsetX
+function AF.SetInside(region, relativeTo, offsetX, offsetY)
+    assert(offsetX, "SetInside: offsetX is nil")
     relativeTo = relativeTo or region:GetParent()
+    offsetY = offsetY or offsetX
     AF.ClearPoints(region)
-    AF.SetPoint(region, "TOPLEFT", relativeTo, "TOPLEFT", offset, -offset)
-    AF.SetPoint(region, "BOTTOMRIGHT", relativeTo, "BOTTOMRIGHT", -offset, offset)
+    AF.SetPoint(region, "TOPLEFT", relativeTo, "TOPLEFT", offsetX, -offsetY)
+    AF.SetPoint(region, "BOTTOMRIGHT", relativeTo, "BOTTOMRIGHT", -offsetX, offsetY)
 end
 
-function AF.SetOutside(region, relativeTo, offset)
+---@param region Frame
+---@param relativeTo Frame|nil if not provided, relativeTo = region:GetParent()
+---@param offsetX number if not provided, offsetX = 0
+---@param offsetY number|nil if not provided, offsetY = offsetX
+function AF.SetOutside(region, relativeTo, offsetX, offsetY)
+    assert(offsetX, "SetOutside: offsetX is nil")
     relativeTo = relativeTo or region:GetParent()
+    offsetY = offsetY or offsetX
     AF.ClearPoints(region)
-    AF.SetPoint(region, "TOPLEFT", relativeTo, "TOPLEFT", -offset, offset)
-    AF.SetPoint(region, "BOTTOMRIGHT", relativeTo, "BOTTOMRIGHT", offset, -offset)
+    AF.SetPoint(region, "TOPLEFT", relativeTo, "TOPLEFT", -offsetX, offsetY)
+    AF.SetPoint(region, "BOTTOMRIGHT", relativeTo, "BOTTOMRIGHT", offsetX, -offsetY)
 end
 
 function AF.ClearPoints(region)
