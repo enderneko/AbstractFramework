@@ -51,6 +51,7 @@
     <Script file="Widgets\Texture.lua"/>
     <Script file="Widgets\Font.lua"/>
     <Script file="Widgets\Animation.lua"/>
+    <Script file="Widgets\Base.lua"/>
     <Script file="Widgets\Frame.lua"/>
     <Script file="Widgets\Scroll.lua"/>
     <Script file="Widgets\Glow.lua"/>
