@@ -9,7 +9,7 @@ local LCG = AF.Libs.LCG
 ---@param width number
 ---@param height number
 function AF.ReCalcTexCoordForAura(aura, width, height)
-    aura.icon:SetTexCoord(unpack(AF.CalcTexCoordPreCrop(width, height, 1, 0.12)))
+    aura.icon:SetTexCoord(AF.Unpack8(AF.CalcTexCoordPreCrop(0.12, width / height)))
 end
 
 ---------------------------------------------------------------------
