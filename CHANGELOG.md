@@ -1,4 +1,5 @@
-[Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r3...36c20de801c9965d62968218721e3e77f1b42b44)
+[Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r4...fe97422a9f794e2f2e87e9888679122e6a61b80e)
 
-- Update AF.SetInside/SetOutside
-- Move base widget functions
+- Add AF.GetRealmName & AF.IsConnectedRealm
+- Add delayed invoke
+- Fix aura icon
