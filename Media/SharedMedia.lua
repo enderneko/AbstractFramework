@@ -2,12 +2,18 @@
 local AF = _G.AbstractFramework
 local LSM = AF.Libs.LSM
 
-local DEFAULT_BAR_TEXTURE = AF.GetPlainTexture()
-local DEFAULT_FONT = GameFontNormal:GetFont()
-
-LSM:Register("font", "Visitor", AF.GetFont("visitor"), 255)
+---------------------------------------------------------------------
+-- register media
+---------------------------------------------------------------------
+LSM:Register("font", "Visitor", AF.GetFont("Visitor"), 255)
 LSM:Register("font", "Emblem", AF.GetFont("Emblem"), 255)
 LSM:Register("font", "Expressway", AF.GetFont("Expressway"), 255)
+
+---------------------------------------------------------------------
+-- functions
+---------------------------------------------------------------------
+local DEFAULT_BAR_TEXTURE = AF.GetPlainTexture()
+local DEFAULT_FONT = GameFontNormal:GetFont()
 
 function AF.LSM_GetBarTexture(name)
     if LSM:IsValid("statusbar", name) then
