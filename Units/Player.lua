@@ -1,6 +1,19 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 
+local UnitName = UnitName
+local UnitClass = UnitClass
+local UnitLevel = UnitLevel
+local UnitGUID = UnitGUID
+local UnitFactionGroup = UnitFactionGroup
+local UnitRace = UnitRace
+local UnitSex = UnitSex
+local GetRealmName = GetRealmName
+local GetNormalizedRealmName = GetNormalizedRealmName
+local GetAutoCompleteRealms = GetAutoCompleteRealms
+local GetSpecialization = GetSpecialization
+local GetSpecializationInfo = GetSpecializationInfo
+
 ---------------------------------------------------------------------
 -- player info
 ---------------------------------------------------------------------
@@ -23,6 +36,10 @@ function playerInfoHandler:PLAYER_LOGIN()
     if AF.isRetail then
         playerInfoHandler:ACTIVE_TALENT_GROUP_CHANGED()
     end
+
+    -- connected realms
+    AF.connectedRealms = AF.TransposeTable(GetAutoCompleteRealms())
+    AF.connectedRealms[AF.player.normalizedRealm] = true
 end
 
 if AF.isRetail then

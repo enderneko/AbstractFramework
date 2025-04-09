@@ -330,3 +330,21 @@ function AF.ToShortName(fullName)
     local shortName = strsplit("-", fullName)
     return shortName
 end
+
+function AF.GetRealmName(fullName)
+    if not fullName then return "" end
+    local _, realmName = strsplit("-", fullName)
+    return realmName or GetNormalizedRealmName()
+end
+
+---@param name string realmName or fullName
+function AF.IsConnectedRealm(name)
+    if not name then return false end
+    -- realm
+    if name:find("-") then
+        name = AF.GetRealmName(name)
+    end
+    -- normalizedRealm
+    name = name:gsub(" ", ""):gsub("-", "")
+    return AF.connectedRealms[name] or false
+end

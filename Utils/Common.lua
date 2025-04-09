@@ -322,7 +322,7 @@ end
 
 -- transposes a table, swapping its keys and values
 ---@param t table the table to transpose
----@param value any the value to assign to the transposed keys
+---@param value? any the value to assign to the transposed keys
 ---@return table
 function AF.TransposeTable(t, value)
     local temp = {}
