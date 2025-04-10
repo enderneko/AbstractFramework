@@ -842,6 +842,9 @@ function AF_SwitchMixin:SetLabels(labels)
     end
 end
 
+---@param parent Frame
+---@param width number can not be nil
+---@param height number can not be nil
 ---@param labels table? {{["text"]=(string), ["value"]=(any), ["onClick"]=(function)}, ...}
 ---@return AF_Switch switch
 function AF.CreateSwitch(parent, width, height, labels)
