@@ -130,6 +130,14 @@ function AF.SetUIParentScale(scale)
 end
 
 ---------------------------------------------------------------------
+-- hidden parent
+---------------------------------------------------------------------
+AF.hiddenParent = CreateFrame("Frame", nil, UIParent)
+AF.hiddenParent:SetPoint("BOTTOMLEFT")
+AF.hiddenParent:SetSize(1, 1)
+AF.hiddenParent:Hide()
+
+---------------------------------------------------------------------
 -- slash command
 ---------------------------------------------------------------------
 _G["SLASH_ABSTRACTFRAMEWORK1"] = "/abstract"
