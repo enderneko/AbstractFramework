@@ -90,6 +90,7 @@ function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata,
     -- f:SetUserPlaced(not notUserPlaced)
     f:SetFrameStrata(frameStrata or "HIGH")
     f:SetFrameLevel(frameLevel or 1)
+    f:SetToplevel(true)
     f:SetClampedToScreen(true)
     f:SetClampRectInsets(0, 0, AF.ConvertPixelsForRegion(20, f), 0)
     AF.SetSize(f, width, height)
@@ -103,7 +104,7 @@ function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata,
     header:SetClampedToScreen(true)
     header:RegisterForDrag("LeftButton")
     header:SetScript("OnMouseDown", function()
-        f:SetToplevel(true)
+        f:Raise()
     end)
 
     AF.SetPoint(header, "BOTTOMLEFT", f, "TOPLEFT", 0, -1)
