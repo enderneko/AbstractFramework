@@ -219,6 +219,14 @@ function AF_TitledPaneMixin:UpdatePixels()
     -- AF.RePoint(self.title)
 end
 
+function AF_TitledPaneMixin:SetTips(...)
+    if not self.tips then
+        self.tips = AF.CreateIconButton(self, AF.GetIcon("Info1"), 16, 16, 0, "gray", "white", "NEAREST", true)
+        self.tips:SetPoint("BOTTOMRIGHT", self.line, "TOPRIGHT")
+    end
+    AF.SetTooltips(self.tips, "TOPRIGHT", 0, 0, ...)
+end
+
 ---@param color string color name defined in Color.lua
 ---@return AF_TitledPane
 function AF.CreateTitledPane(parent, title, width, height, color)

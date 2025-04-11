@@ -470,7 +470,8 @@ end
 ---@param r number
 ---@param g number
 ---@param b number
----@return string coloredText \"|caarrggbbtext|r\"
+---@param a number|nilDSS
+---@return string coloredText \"|cffrrggbbtext|r\"
 function AF.WrapTextInColorRGB(text, r, g, b)
     return AF.WrapTextInColorCode(text, AF.ConvertRGBToHEX(r, g, b, 1))
 end
