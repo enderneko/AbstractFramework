@@ -1,5 +1,6 @@
-[Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r4...fe97422a9f794e2f2e87e9888679122e6a61b80e)
+[Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r5...614d4527a5da493d981b37cfdd039e1e270f5e2f)
 
-- Add AF.GetRealmName & AF.IsConnectedRealm
-- Add delayed invoke
-- Fix aura icon
+- Add AF_TitledPaneMixin.SetTips
+- Add AF.hiddenParent
+- Fix button color
+- Fix frame level of headered frame
