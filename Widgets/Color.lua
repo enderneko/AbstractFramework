@@ -583,6 +583,8 @@ end
 function AF.GetButtonHoverColor(name)
     name = name or GetAddon() or "accent"
 
+    local baseName = name:gsub("_hover$", ""):gsub("_transparent$", "")
+
     if BUTTON_COLORS[name] then
         return BUTTON_COLORS[name]["hover"]
     elseif BUTTON_COLORS[baseName] then
@@ -592,8 +594,6 @@ function AF.GetButtonHoverColor(name)
     if name:find("^accent") then
         return COLORS["accent"]["hover"]
     end
-
-    local baseName = name:gsub("_hover$", ""):gsub("_transparent$", "")
 
     if COLORS[name] then
         if COLORS[name]["hover"] then

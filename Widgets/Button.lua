@@ -321,8 +321,8 @@ end
 ---@param parent Frame
 ---@param text string
 ---@param color? string|table if table, color[1] is normal color, color[2] is hover color
----@param width number
----@param height number
+---@param width? number
+---@param height? number
 ---@param template? string
 ---@param borderColor? string default is "black", set to "" to remove border
 ---@param backgroundColor? string default is "background", set to "" to remove background
