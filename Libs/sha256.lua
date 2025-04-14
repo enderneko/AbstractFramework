@@ -1,4 +1,4 @@
-local MAJOR_VERSION = "SHA256"
+local MAJOR_VERSION = "AF_SHA256"
 local MINOR_VERSION = 1
 if not LibStub then error(MAJOR_VERSION .. " requires LibStub.") end
 local lib, oldversion = LibStub:NewLibrary(MAJOR_VERSION, MINOR_VERSION)

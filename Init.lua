@@ -18,13 +18,19 @@ AF.Libs.Comm = LibStub("AceComm-3.0")
 AF.Libs.LibDataBroker = LibStub("LibDataBroker-1.1")
 AF.Libs.LibDBIcon = LibStub("LibDBIcon-1.0")
 
-AF.Libs.MD5 = LibStub("MD5")
----@type fun(str: string): string
+AF.Libs.MD5 = LibStub("AF_MD5")
+---@type fun(str:string):string
 AF.MD5 = AF.Libs.MD5.sumhexa
 
-AF.Libs.SHA256 = LibStub("SHA256")
----@type fun(str: string): string
+AF.Libs.SHA256 = LibStub("AF_SHA256")
+---@type fun(str:string):string
 AF.SHA256 = AF.Libs.SHA256.hash
+
+AF.Libs.BASE64 = LibStub("AF_BASE64")
+---@type fun(str:string, encoder:table?, usecaching:boolean?):string
+AF.EncodeBase64 = AF.Libs.BASE64.encode
+---@type fun(str:string, decoder:table?, usecaching:boolean?):string
+AF.DecodeBase64 = AF.Libs.BASE64.decode
 
 ---------------------------------------------------------------------
 -- game version

@@ -4,6 +4,7 @@
     <Script file="Libs\utf8.lua"/>
     <Script file="Libs\LibStub\LibStub.lua"/>
     <Script file="Libs\CallbackHandler-1.0\CallbackHandler-1.0.lua"/>
+    <Script file="Libs\base64.lua"/>
     <Script file="Libs\md5.lua"/>
     <Script file="Libs\sha256.lua"/>
     <Include file="Libs\TaintLess\TaintLess.xml"/>

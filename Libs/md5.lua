@@ -1,4 +1,4 @@
-local MAJOR_VERSION = "MD5"
+local MAJOR_VERSION = "AF_MD5"
 local MINOR_VERSION = 1
 if not LibStub then error(MAJOR_VERSION .. " requires LibStub.") end
 local md5, oldversion = LibStub:NewLibrary(MAJOR_VERSION, MINOR_VERSION)
