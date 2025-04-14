@@ -8,6 +8,7 @@ local AF = _G.AbstractFramework
 ---@param addon? string addonFolderName
 ---@return string iconPath
 function AF.GetIcon(icon, addon)
+    if not icon then return "" end
     if addon then
         return "Interface\\AddOns\\" .. addon .. "\\Media\\Icons\\" .. icon
     else
@@ -20,6 +21,7 @@ end
 ---@param addon? string addonFolderName
 ---@return string iconString "|T..:0|t" escape sequence
 function AF.GetIconString(icon, size, addon)
+    if not icon then return "" end
     return "|T" .. AF.GetIcon(icon, addon) .. ":" .. (size or 0) .. "|t"
 end
 
