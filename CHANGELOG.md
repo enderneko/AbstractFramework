@@ -1,6 +1,5 @@
-[Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r5...614d4527a5da493d981b37cfdd039e1e270f5e2f)
+[Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r6...cb25d4b0118578ec39f032b4de7248c2e4c0222d)
 
-- Add AF_TitledPaneMixin.SetTips
-- Add AF.hiddenParent
-- Fix button color
-- Fix frame level of headered frame
+
+- Update HelpTip
+- Add some icons
