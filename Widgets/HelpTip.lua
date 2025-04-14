@@ -8,16 +8,9 @@ local AF_HelpTipMixin = {}
 
 ---@private
 function AF_HelpTipMixin:OnShow()
-    self:SetFrameStrata("TOOLTIP")
-    self:SetToplevel(true)
     self.elapsed = 0
-    self:SetOnUpdate(function(_, elapsed)
-        self:SetHeight(self.text:GetHeight() + 23)
-        self.elapsed = self.elapsed + elapsed
-        if self.elapsed >= 0.5 then
-            self:SetOnUpdate(nil)
-        end
-    end)
+    self:SetFrameStrata("TOOLTIP")
+    self:Raise()
 end
 
 ---@private
@@ -47,6 +40,7 @@ end
 local function HelpTipBuilder()
     local tip = AF.CreateBorderedFrame(AF.UIParent, nil, nil, nil, "none", "gold")
     -- tip:SetFrameStrata("TOOLTIP")
+    -- tip:SetToplevel(true)
     tip:SetClampedToScreen(true)
     tip:SetIgnoreParentAlpha(true)
     tip:Hide()
@@ -65,8 +59,15 @@ local function HelpTipBuilder()
     local arrow = AF.CreateTexture(tip, AF.GetIcon("ArrowRight2"), "gold", "BORDER")
     tip.arrow = arrow
 
-    -- update size on show
+    -- update size & check widget visibility
     tip:SetOnShow(tip.OnShow)
+    tip.elapsed = 0
+    tip:SetOnUpdate(function(self, elapsed)
+        self:SetHeight(self.text:GetHeight() + 25)
+        if not self.widget or not self.widget:IsVisible() then
+            self:Hide()
+        end
+    end)
 
     -- close
     local close = AF.CreateIconButton(tip, AF.GetIcon("Close1"), 14, 14, 1, "gold")
@@ -114,8 +115,8 @@ local function HelpTipBuilder()
     -- text
     local text = AF.CreateFontString(tip)
     tip.text = text
-    AF.SetPoint(text, "TOPLEFT", 10, -10)
-    AF.SetPoint(text, "TOPRIGHT", -10, 10)
+    AF.SetPoint(text, "TOPLEFT", 12, -12)
+    AF.SetPoint(text, "TOPRIGHT", -12, 12)
     text:SetJustifyH("CENTER")
     text:SetJustifyV("TOP")
     text:SetSpacing(5)
@@ -125,12 +126,12 @@ local function HelpTipBuilder()
 end
 
 local function Release(_, tip)
+    AF.ClearPoints(tip)
+    tip:Hide()
     tip.widget = nil
     tip.callback = nil
     tip.nextTip = nil
-    tip.elapsed = nil
-    AF.ClearPoints(tip)
-    tip:Hide()
+    tip.elapsed = 0
 end
 
 pool = AF.CreateObjectPool(HelpTipBuilder, Release)
@@ -141,10 +142,7 @@ pool = AF.CreateObjectPool(HelpTipBuilder, Release)
 local function OnMouseDown(widget)
     local helpTip = widget._helptip
     if helpTip.widget == widget and helpTip:IsShown() then
-        helpTip:Hide()
-        if helpTip.callback then
-            helpTip.callback(widget)
-        end
+        helpTip:Close()
     end
 end
 
@@ -202,7 +200,7 @@ function AF.ShowHelpTip(info)
     -- tip
     local tip = pool:Acquire()
     HookOnMouseDown(widget, tip)
-    tip:SetParent(widget)
+    -- tip:SetParent(widget)
     AF.SetWidth(tip, width or 200)
     tip:SetText(text)
 
@@ -240,7 +238,16 @@ function AF.ShowHelpTip(info)
     -- callback
     tip.callback = callback
 
-    tip:Show()
+    if widget:IsVisible() then
+        tip:Show()
+    elseif not widget._helpTipHelper then
+        widget._helpTipHelper = CreateFrame("Frame", nil, widget)
+        widget._helpTipHelper:SetScript("OnShow", function(self)
+            if widget._helptip and widget._helptip.widget == widget then
+                widget._helptip:Show()
+            end
+        end)
+    end
 
     return tip
 end
