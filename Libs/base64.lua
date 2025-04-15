@@ -1,3 +1,15 @@
+-------------------------------------------------
+-- https://github.com/iskolbin/lbase64
+-- compatible with WoW Lua
+-- edit by enderneko
+-- 2025-04-15
+-------------------------------------------------
+local MAJOR_VERSION = "AF_BASE64"
+local MINOR_VERSION = 1
+if not LibStub then error(MAJOR_VERSION .. " requires LibStub.") end
+local lib, oldversion = LibStub:NewLibrary(MAJOR_VERSION, MINOR_VERSION)
+if not lib then return end
+
 ---------------------------------------------------------------------
 -- lua base64 - https://github.com/iskolbin/lbase64
 ---------------------------------------------------------------------
@@ -23,12 +35,6 @@
  See end of file for license information.
 
 --]]
-
-local MAJOR_VERSION = "AF_BASE64"
-local MINOR_VERSION = 1
-if not LibStub then error(MAJOR_VERSION .. " requires LibStub.") end
-local lib, oldversion = LibStub:NewLibrary(MAJOR_VERSION, MINOR_VERSION)
-if not lib then return end
 
 local extract = _G.bit32 and _G.bit32.extract -- Lua 5.2/Lua 5.3 in compatibility mode
 if not extract then

@@ -8,4 +8,5 @@ Libs/*
 !Libs/md5.lua
 !Libs/sha256.lua
 !Libs/base64.lua
+!Libs/json.lua
 !Libs/utf8.lua

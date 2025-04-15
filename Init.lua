@@ -32,6 +32,14 @@ AF.EncodeBase64 = AF.Libs.BASE64.encode
 ---@type fun(str:string, decoder:table?, usecaching:boolean?):string
 AF.DecodeBase64 = AF.Libs.BASE64.decode
 
+AF.Libs.JSON = LibStub("AF_JSON")
+---@type fun(obj:any, options:table?):string
+AF.EncodeJson = AF.Libs.JSON.encode_json
+---@type fun(obj:any, options:table?):string
+AF.EncodeHJson = AF.Libs.JSON.encode_hjson
+---@type fun(str:string, options:table?):any
+AF.DecodeJson = AF.Libs.JSON.decode
+
 ---------------------------------------------------------------------
 -- game version
 ---------------------------------------------------------------------
