@@ -405,14 +405,22 @@ function AF.Sort(t, ...)
 end
 
 ---------------------------------------------------------------------
--- time
+-- date & time
 ---------------------------------------------------------------------
 -- https://strftime.net
 -- https://warcraft.wiki.gg/wiki/API_date
+---@param sec number?
+---@param format string? default: "%Y/%m/%d %H:%M:%S"
 function AF.FormatTime(sec, format)
     format = format or "%Y/%m/%d %H:%M:%S"
     -- date() is equivalent to date("%c")
     return date("%Y/%m/%d %H:%M:%S", sec)
+end
+
+---@param sec number?
+---@return string YYYYMMDD
+function AF.GetDateString(sec)
+    return date("%Y%m%d", sec)
 end
 
 local SEC = gsub(_G.SPELL_DURATION_SEC, "%%%.%df", "%%s")
