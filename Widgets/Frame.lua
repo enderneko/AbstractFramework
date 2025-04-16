@@ -12,6 +12,7 @@ function AF.CreateFrame(parent, name, width, height, template)
     local f = CreateFrame("Frame", name, parent, template)
     AF.SetSize(f, width, height)
     Mixin(f, AF_FrameMixin)
+    Mixin(f, AF_BaseWidgetMixin)
     AF.AddToPixelUpdater(f)
     return f
 end
