@@ -26,6 +26,7 @@ local COLORS = {
     ["combat_mask"] = {["hex"] = "bf332b2b", ["t"] = {0.2, 0.17, 0.17, 0.75}},
     ["disabled"] = {["hex"] = "ff666666", ["t"] = {0.4, 0.4, 0.4, 1}},
     ["none"] = {["hex"] = "00000000", ["t"] = {0, 0, 0, 0}},
+    ["yellow_text"] = {["hex"] = "ffffd100", ["t"] = {1, 0.82, 0, 1}},
 
     -- sheet
     ["sheet_normal"] = {["t"] = {0.15, 0.15, 0.15, 0.9}}, -- row/column normal
@@ -142,16 +143,16 @@ local COLORS = {
     ["STAGGER_YELLOW"] = {["hex"] = "fffff9b7", ["t"] = {1, 0.98, 0.72}},
     ["STAGGER_RED"] = {["hex"] = "ffff6b6b", ["t"] = {1, 0.42, 0.42}},
 
-    -- quality https://warcraft.wiki.gg/wiki/Quality
-    ["Poor"] = {["hex"] = "ff9d9d9d", ["t"] = {0.62, 0.62, 0.62, 1}}, -- ITEM_QUALITY0_DESC
+    -- default quality colors https://warcraft.wiki.gg/wiki/Quality
+    ["Poor"] = {["hex"] = "ff9d9d9d", ["t"] = {0.615686297416687, 0.615686297416687, 0.615686297416687, 1}}, -- ITEM_QUALITY0_DESC
     ["Common"] = {["hex"] = "ffffffff", ["t"] = {1, 1, 1, 1}}, -- ITEM_QUALITY1_DESC
-    ["Uncommon"] = {["hex"] = "ff1eff00", ["t"] = {0.12, 1, 0, 1}}, -- ITEM_QUALITY2_DESC
-    ["Rare"] = {["hex"] = "ff0070dd", ["t"] = {0, 0.44, 0.87, 1}}, -- ITEM_QUALITY3_DESC
-    ["Epic"] = {["hex"] = "ffa335ee", ["t"] = {0.64, 0.21, 0.93, 1}}, -- ITEM_QUALITY4_DESC
-    ["Legendary"] = {["hex"] = "ffff8000", ["t"] = {1, 0.5, 0, 1}}, -- ITEM_QUALITY5_DESC
-    ["Artifact"] = {["hex"] = "ffe6cc80", ["t"] = {0.9, 0.8, 0.5, 1}}, -- ITEM_QUALITY6_DESC
-    ["Heirloom"] = {["hex"] = "ff00ccff", ["t"] = {0, 0.8, 1, 1}}, -- ITEM_QUALITY7_DESC
-    ["WoWToken"] = {["hex"] = "ff00ccff", ["t"] = {0, 0.8, 1, 1}}, -- ITEM_QUALITY8_DESC
+    ["Uncommon"] = {["hex"] = "ff1eff00", ["t"] = {0.1176470667123795, 1, 0, 1}}, -- ITEM_QUALITY2_DESC
+    ["Rare"] = {["hex"] = "ff0070dd", ["t"] = {0, 0.4392157196998596, 0.8666667342185974, 1}}, -- ITEM_QUALITY3_DESC
+    ["Epic"] = {["hex"] = "ffa335ee", ["t"] = {0.6392157077789307, 0.207843154668808, 0.9333333969116211, 1}}, -- ITEM_QUALITY4_DESC
+    ["Legendary"] = {["hex"] = "ffff8000", ["t"] = {1, 0.501960813999176, 0, 1}}, -- ITEM_QUALITY5_DESC
+    ["Artifact"] = {["hex"] = "ffe6cc80", ["t"] = {0.9019608497619629, 0.8000000715255737, 0.501960813999176, 1}}, -- ITEM_QUALITY6_DESC
+    ["Heirloom"] = {["hex"] = "ff00ccff", ["t"] = {0, 0.8000000715255737, 1, 1}}, -- ITEM_QUALITY7_DESC
+    ["WoWToken"] = {["hex"] = "ff00ccff", ["t"] = {0, 0.8000000715255737, 1, 1}}, -- ITEM_QUALITY8_DESC
 }
 
 ---@param color string
@@ -222,6 +223,16 @@ function AF.GetAuraTypeColor(auraType)
     else
         return AF.GetColorRGB("black")
     end
+end
+
+local GetItemQualityColor = C_Item.GetItemQualityColor
+---@param quality number
+---@return number r
+---@return number g
+---@return number b
+function AF.GetItemQualityColor(quality)
+    local r, g, b = GetItemQualityColor(quality)
+    return r, g, b
 end
 
 local ADDONS = AF.REGISTERED_ADDONS
@@ -476,6 +487,14 @@ end
 ---@return string coloredText \"|cffrrggbbtext|r\"
 function AF.WrapTextInColorRGB(text, r, g, b)
     return AF.WrapTextInColorCode(text, AF.ConvertRGBToHEX(r, g, b, 1))
+end
+
+---@param text string
+---@param quality number
+---@return string coloredText \"|cffaarrggbbtext|r\"
+function AF.WrapTextInQualityColor(text, quality)
+    local hex = select(4, GetItemQualityColor(quality))
+    return format("|c%s%s|r", hex, text)
 end
 
 ---comment

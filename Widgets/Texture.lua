@@ -36,9 +36,25 @@ function AF.CreateTexture(parent, texture, color, drawLayer, subLevel, wrapModeH
 end
 
 ---------------------------------------------------------------------
+-- default texcoord for blizzard icons
+---------------------------------------------------------------------
+---@return number left 0.08
+---@return number right 0.92
+---@return number top 0.08
+---@return number bottom 0.92
+function AF.GetDefaultTexCoord()
+    return 0.08, 0.92, 0.08, 0.92
+end
+
+--- 0.08, 0.92, 0.08, 0.92
+---@param tex Texture
+function AF.ApplyDefaultTexCoord(tex)
+    tex:SetTexCoord(AF.GetDefaultTexCoord())
+end
+
+---------------------------------------------------------------------
 -- calc texcoord
 ---------------------------------------------------------------------
-
 ---calculates texture coordinates with adjustments for aspect ratio and cropping
 ---@param crop? number cropping percentage
 ---@param targetAspectRatio? number target aspect ratio (targetWidth / targetHeight), defaults to 1
