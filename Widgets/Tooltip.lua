@@ -95,7 +95,137 @@ end
 ---------------------------------------------------------------------
 -- create
 ---------------------------------------------------------------------
-local function CreateTooltip(name, hasIcon)
+local GetItemIconByID = C_Item.GetItemIconByID
+local GetSpellTexture = C_Spell.GetSpellTexture
+local GetItemQualityByID = C_Item.GetItemQualityByID
+
+local function GameTooltip_OnHide(self)
+    self.waitingForData = false
+    GameTooltip_ClearMoney(self)
+    GameTooltip_ClearStatusBars(self)
+    GameTooltip_ClearProgressBars(self)
+    GameTooltip_ClearWidgetSet(self)
+    TooltipComparisonManager:Clear(self)
+
+    GameTooltip_HideBattlePetTooltip()
+
+    if self.ItemTooltip then
+        EmbeddedItemTooltip_Hide(self.ItemTooltip)
+    end
+    self:SetPadding(0, 0, 0, 0)
+
+    self:ClearHandlerInfo()
+
+    GameTooltip_ClearStatusBars(self)
+    GameTooltip_ClearStatusBarWatch(self)
+end
+
+---@class AF_Tooltip:GameTooltip
+local AF_TooltipMixin = {}
+
+function AF_TooltipMixin:UpdatePixels()
+    AF.ReBorder(self)
+    if self.icon then
+        AF.RePoint(self.iconBG)
+        AF.RePoint(self.icon)
+    end
+end
+
+function AF_TooltipMixin:OnHide()
+    AF.ClearPoints(self)
+    GameTooltip_OnHide(self)
+
+    -- reset border color
+    self:SetBackdropBorderColor(AF.GetColorRGB("accent"))
+
+    -- SetX with invalid data may or may not clear the tooltip's contents.
+    self:ClearLines()
+
+    if self.icon then
+        self.iconBG:Hide()
+        self.icon:Hide()
+    end
+end
+
+function AF_TooltipMixin:OnShow()
+    self:UpdatePixels()
+end
+
+function AF_TooltipMixin:SetItem(itemID, icon)
+    self:SetItemByID(itemID)
+
+    local quality = GetItemQualityByID(itemID)
+    if quality then
+        self:SetBackdropBorderColor(AF.GetItemQualityColor(quality))
+    end
+
+    if icon == true then
+        icon = GetItemIconByID(itemID)
+    end
+
+    if icon then
+        if not self.icon then
+            self:SetupIcon("TOPRIGHT", "TOPLEFT", -1, 0)
+        end
+        self.iconBG:Show()
+        self.icon:SetTexture(icon)
+        self.icon:Show()
+    else
+        self.iconBG:Hide()
+        self.icon:Hide()
+    end
+
+    self:Show()
+end
+
+function AF_TooltipMixin:SetSpell(spellID, icon)
+    self:SetSpellByID(spellID)
+
+    if icon == true then
+        icon = GetSpellTexture(spellID)
+    end
+
+    if icon then
+        if not self.icon then
+            self:SetupIcon("TOPRIGHT", "TOPLEFT", -1, 0)
+        end
+        self.iconBG:Show()
+        self.icon:SetTexture(icon)
+        self.icon:Show()
+    else
+        self.iconBG:Hide()
+        self.icon:Hide()
+    end
+
+    self:Show()
+end
+
+function AF_TooltipMixin:SetupIcon(point, relativePoint, x, y)
+    if not self.icon then
+        local iconBG = self:CreateTexture(nil, "BORDER")
+        self.iconBG = iconBG
+        iconBG:SetColorTexture(AF.GetColorRGB("accent"))
+        AF.SetSize(iconBG, 35, 35)
+        iconBG:Hide()
+
+        local icon = self:CreateTexture(nil, "ARTWORK")
+        self.icon = icon
+        AF.SetOnePixelInside(icon, iconBG)
+        AF.ApplyDefaultTexCoord(icon)
+        icon:Hide()
+
+        hooksecurefunc(self, "SetBackdropBorderColor", function(self, r, g, b)
+            self.iconBG:SetColorTexture(r, g, b)
+        end)
+    end
+
+    AF.ClearPoints(self.iconBG)
+    AF.SetPoint(self.iconBG, point, self, relativePoint, x, y)
+end
+
+---@return AF_Tooltip
+local function CreateTooltip(name)
+    ---@type AF_Tooltip
     local tooltip = CreateFrame("GameTooltip", name, AF.UIParent, "AFTooltipTemplate,BackdropTemplate")
     -- local tooltip = CreateFrame("GameTooltip", name, AF.UIParent, "SharedTooltipTemplate,BackdropTemplate")
     AF.ApplyDefaultBackdrop(tooltip)
@@ -103,29 +233,8 @@ local function CreateTooltip(name, hasIcon)
     tooltip:SetBackdropBorderColor(AF.GetColorRGB("accent"))
     tooltip:SetOwner(AF.UIParent, "ANCHOR_NONE")
 
-    if hasIcon then
-        local iconBG = tooltip:CreateTexture(nil, "BACKGROUND")
-        tooltip.iconBG = iconBG
-        AF.SetSize(iconBG, 35, 35)
-        AF.SetPoint(iconBG, "TOPRIGHT", tooltip, "TOPLEFT", -1, 0)
-        iconBG:SetColorTexture(AF.GetColorRGB("accent"))
-        iconBG:Hide()
-
-        local icon = tooltip:CreateTexture(nil, "ARTWORK")
-        tooltip.icon = icon
-        AF.SetPoint(icon, "TOPLEFT", iconBG, 1, -1)
-        AF.SetPoint(icon, "BOTTOMRIGHT", iconBG, -1, 1)
-        icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
-        icon:Hide()
-
-        hooksecurefunc(tooltip, "SetSpellByID", function(self, id, tex)
-            if tex then
-                iconBG:Show()
-                icon:SetTexture(tex)
-                icon:Show()
-            end
-        end)
-    end
+    Mixin(tooltip, AF_BaseWidgetMixin)
+    Mixin(tooltip, AF_TooltipMixin)
 
     if AF.isRetail then
         tooltip:RegisterEvent("TOOLTIP_DATA_UPDATE")
@@ -142,31 +251,14 @@ local function CreateTooltip(name, hasIcon)
     --     tooltip:SetBackdropBorderColor(_G[name.."TextLeft1"]:GetTextColor())
     -- end)
 
-    tooltip:SetScript("OnHide", function()
-        tooltip:SetPadding(0, 0, 0, 0)
-
-        -- reset border color
-        tooltip:SetBackdropBorderColor(AF.GetColorRGB("accent"))
-
-        -- SetX with invalid data may or may not clear the tooltip's contents.
-        tooltip:ClearLines()
-
-        if hasIcon then
-            tooltip.iconBG:Hide()
-            tooltip.icon:Hide()
-        end
-    end)
-
-    function tooltip:UpdatePixels()
-        AF.ReBorder(self)
-        if hasIcon then
-            AF.RePoint(self.iconBG)
-            AF.RePoint(self.icon)
-        end
-    end
+    tooltip:SetOnHide(tooltip.OnHide)
+    tooltip:SetOnShow(tooltip.OnShow)
 
     AF.AddToPixelUpdater(tooltip)
+
+    return tooltip
 end
 
-CreateTooltip("AFTooltip")
-CreateTooltip("AFSpellTooltip", true)
+AF.Tooltip = CreateTooltip("AFTooltip")
+AF.IconTooltip = CreateTooltip("AFIconTooltip")
+AF.IconTooltip:SetupIcon("TOPRIGHT", "TOPLEFT", -1, 0)
