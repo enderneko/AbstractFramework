@@ -26,9 +26,11 @@ local COLORS = {
     ["combat_mask"] = {["hex"] = "bf332b2b", ["t"] = {0.2, 0.17, 0.17, 0.75}},
     ["disabled"] = {["hex"] = "ff666666", ["t"] = {0.4, 0.4, 0.4, 1}},
     ["none"] = {["hex"] = "00000000", ["t"] = {0, 0, 0, 0}},
-    ["sheet_bg"] = {["t"] = {0.15, 0.15, 0.15, 0.9}},
-    ["sheet_bg2"] = {["t"] = {0.17, 0.17, 0.17, 0.9}},
-    ["sheet_row_highlight"] = {["t"] = {0.2, 0.2, 0.2, 0.9}},
+
+    -- sheet
+    ["sheet_normal"] = {["t"] = {0.15, 0.15, 0.15, 0.9}}, -- row/column normal
+    ["sheet_normal2"] = {["t"] = {0.17, 0.17, 0.17, 0.9}}, -- row/column normal
+    ["sheet_highlight"] = {["t"] = {0.2, 0.2, 0.2, 0.9}}, -- row/column highlight
     ["sheet_cell_highlight"] = {["t"] = {0.3, 0.3, 0.3, 0.9}},
 
     -- common
