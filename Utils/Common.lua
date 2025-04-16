@@ -130,6 +130,59 @@ function AF.FormatNumber(n)
 end
 
 ---------------------------------------------------------------------
+-- money
+---------------------------------------------------------------------
+local BreakUpLargeNumbers = BreakUpLargeNumbers
+local GOLD_SYMBOL, SILVER_SYMBOL, COPPER_SYMBOL
+local GOLD_ICON, SILVER_ICON, COPPER_ICON
+
+---@param style string? "icon"|"symbol"|"nosuffix", default is "icon".
+---@param goldOnly boolean?
+function AF.FormatMoney(copper, style, useCommas, goldOnly)
+    local gold = floor(copper / 10000)
+    local silver = floor(copper / 100 - gold * 100)
+    local copper = copper - gold * 10000 - silver * 100
+
+    if useCommas then
+        gold = BreakUpLargeNumbers(gold)
+    end
+
+    if style == "symbol" then
+        if not GOLD_SYMBOL then
+            GOLD_SYMBOL = AF.WrapTextInColor(_G.GOLD_AMOUNT_SYMBOL, "coin_gold")
+            SILVER_SYMBOL = AF.WrapTextInColor(_G.SILVER_AMOUNT_SYMBOL, "coin_silver")
+            COPPER_SYMBOL = AF.WrapTextInColor(_G.COPPER_AMOUNT_SYMBOL, "coin_copper")
+        end
+
+        if goldOnly then
+            return format("%s%s", gold, GOLD_SYMBOL)
+        else
+            return format("%s%s %d%s %d%s", gold, GOLD_SYMBOL, silver, SILVER_SYMBOL, copper, COPPER_SYMBOL)
+        end
+
+    elseif style == "nosuffix" then
+        if goldOnly then
+            return AF.WrapTextInColor(gold, "coin_gold")
+        else
+            return format("%s %s %s", AF.WrapTextInColor(gold, "coin_gold"), AF.WrapTextInColor(silver, "coin_silver"), AF.WrapTextInColor(copper, "coin_copper"))
+        end
+
+    else
+        if not GOLD_ICON then
+            GOLD_ICON = "|TInterface\\MoneyFrame\\UI-GoldIcon:0|t"
+            SILVER_ICON = "|TInterface\\MoneyFrame\\UI-SilverIcon:0|t"
+            COPPER_ICON = "|TInterface\\MoneyFrame\\UI-CopperIcon:0|t"
+        end
+
+        if goldOnly then
+            return format("%s%s", gold, GOLD_ICON)
+        else
+            return format("%s%s %d%s %d%s", gold, GOLD_ICON, silver, SILVER_ICON, copper, COPPER_ICON)
+        end
+    end
+end
+
+---------------------------------------------------------------------
 -- string
 ---------------------------------------------------------------------
 function AF.UpperFirst(str, lowerOthers)

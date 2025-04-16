@@ -44,6 +44,11 @@ local COLORS = {
     ["white"] = {["hex"] = "ffffffff", ["t"] = {1, 1, 1, 1}},
     ["black"] = {["hex"] = "ff000000", ["t"] = {0, 0, 0, 1}},
 
+    -- coin colors
+    ["coin_gold"] = {["hex"] = "ffffd300", ["t"] = {1, 0.827, 0, 1}},
+    ["coin_silver"] = {["hex"] = "ffb2b2b2", ["t"] = {0.7, 0.7, 0.7, 1}},
+    ["coin_copper"] = {["hex"] = "ffcc7f3f", ["t"] = {0.8, 0.5, 0.25, 1}},
+
     -- others
     ["darkgray"] = {["hex"] = "ff919191", ["t"] = {0.57, 0.57, 0.57, 1}},
     ["gray"] = {["hex"] = "ffb2b2b2", ["t"] = {0.7, 0.7, 0.7, 1}},
