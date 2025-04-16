@@ -213,10 +213,30 @@ function AF_DropdownMixin:SetIconBGColor(color)
 end
 
 -- update items ---------------------------------
+-- {
+--     {
+--         ["text"] = (string),
+--         ["value"] = (any),
+--         ["texture"] = (string),
+--         ["font"] = (string),
+--         ["icon"] = (string),
+--         ["disabled"] = (boolean),
+--         ["onClick"] = (function)
+--     },
+-- }
+
+---@param items table array of items (table|string|number)
 function AF_DropdownMixin:SetItems(items)
-    -- validate item.value
-    for _, item in ipairs(items) do
-        if not item.value then item.value = item.text end
+    -- validate items
+    for i, item in ipairs(items) do
+        if type(item) ~= "table" then
+            items[i] = {
+                text = item,
+                value = item,
+            }
+        else
+            if not item.value then item.value = item.text end
+        end
     end
     self.items = items
     self.reloadRequired = true
