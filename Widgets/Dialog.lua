@@ -108,6 +108,14 @@ local function CreateDialog()
         end)
     end)
 
+    function dialog:EnableYes(enabled)
+        dialog.yes:SetEnabled(enabled)
+    end
+
+    function dialog:EnableNo(enabled)
+        dialog.no:SetEnabled(enabled)
+    end
+
     -- update pixels
     function dialog:UpdatePixels()
         AF.ReSize(dialog)
