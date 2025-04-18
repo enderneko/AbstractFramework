@@ -70,7 +70,7 @@ local function HelpTipBuilder()
     end)
 
     -- close
-    local close = AF.CreateIconButton(tip, AF.GetIcon("Close1"), 14, 14, 1, "gold")
+    local close = AF.CreateIconButton(tip, AF.GetIcon("Close"), 14, 14, 1, "gold")
     tip.close = close
     AF.SetPoint(close, "TOPRIGHT")
 
@@ -95,7 +95,7 @@ local function HelpTipBuilder()
     end)
 
     -- timer
-    local timer = AF.CreateCooldown(tip, nil, AF.GetIcon("Circle2"), "gold", true)
+    local timer = AF.CreateCooldown(tip, nil, AF.GetIcon("Circle_Filled"), "gold", true)
     tip.timer = timer
     AF.SetPoint(timer, "RIGHT", close, "LEFT")
     AF.SetSize(timer, 10, 10)
