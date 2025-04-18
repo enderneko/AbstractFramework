@@ -280,6 +280,23 @@ function AF.GetKeys(t)
     return keys
 end
 
+---@param t table
+---@return number? maxKey
+---@return any? maxValue value of maxKey
+function AF.GetMaxKeyValue(t)
+    local maxKey = nil
+    for k in pairs(t) do
+        local kn = tonumber(k)
+        if not maxKey or (kn and kn > tonumber(maxKey)) then
+            maxKey = k
+        end
+    end
+
+    if maxKey then
+        return maxKey, t[maxKey]
+    end
+end
+
 ---@param ... table
 ---@return table newTbl
 function AF.Copy(...)
