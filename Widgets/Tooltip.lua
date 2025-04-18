@@ -1,6 +1,8 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 
+local SetOwner = CreateFrame("GameTooltip").SetOwner
+
 ---------------------------------------------------------------------
 -- show / hide
 ---------------------------------------------------------------------
@@ -17,44 +19,38 @@ local anchorOverride = {
 ---@param y number
 ---@param lines string[]
 function AF.ShowTooltips(widget, anchor, x, y, lines)
-    local tooltip = _G["AFTooltip"]
-
     if type(lines) ~= "table" or #lines == 0 then
-        tooltip:Hide()
+        AF.Tooltip:Hide()
         return
     end
 
-    tooltip:SetParent(widget)
-    AF.ReBorder(tooltip)
+    x = AF.ConvertPixelsForRegion(x, AF.Tooltip)
+    y = AF.ConvertPixelsForRegion(y, AF.Tooltip)
 
-    x = AF.ConvertPixelsForRegion(x, tooltip)
-    y = AF.ConvertPixelsForRegion(y, tooltip)
-
-    tooltip:ClearLines()
+    AF.Tooltip:ClearLines()
 
     if anchorOverride[anchor] then
-        tooltip:SetOwner(widget, "ANCHOR_NONE")
-        tooltip:SetPoint(anchorOverride[anchor], widget, anchor, x, y)
+        AF.Tooltip:SetOwner(widget, "ANCHOR_NONE")
+        AF.Tooltip:SetPoint(anchorOverride[anchor], widget, anchor, x, y)
     else
         if anchor and not strfind(anchor, "^ANCHOR_") then anchor = "ANCHOR_" .. anchor end
-        tooltip:SetOwner(widget, anchor or "ANCHOR_TOP", x or 0, y or 0)
+        AF.Tooltip:SetOwner(widget, anchor or "ANCHOR_TOP", x or 0, y or 0)
     end
 
     local r, g, b = AF.GetColorRGB("accent")
-    tooltip:AddLine(lines[1], r, g, b)
+    AF.Tooltip:AddLine(lines[1], r, g, b)
     for i = 2, #lines do
         if type(lines[i]) == "string" then
-            tooltip:AddLine(lines[i], 1, 1, 1, true)
+            AF.Tooltip:AddLine(lines[i], 1, 1, 1, true)
         elseif type(lines[i]) == "table" then
-            tooltip:AddDoubleLine(lines[i][1], lines[i][2], 1, 0.82, 0, 1, 1, 1)
+            AF.Tooltip:AddDoubleLine(lines[i][1], lines[i][2], 1, 0.82, 0, 1, 1, 1)
         end
     end
 
-    tooltip:SetFrameStrata("TOOLTIP")
-    tooltip:SetToplevel(true)
-    -- tooltip:SetCustomLineSpacing(5)
-    tooltip:SetCustomWordWrapMinWidth(300)
-    tooltip:Show()
+    AF.Tooltip:SetFrameStrata("TOOLTIP")
+    -- AF.Tooltip:SetCustomLineSpacing(5)
+    AF.Tooltip:SetCustomWordWrapMinWidth(300)
+    AF.Tooltip:Show()
 end
 
 ---@param widget Frame
@@ -79,7 +75,7 @@ function AF.SetTooltips(widget, anchor, x, y, ...)
             AF.ShowTooltips(widget, anchor, x, y, widget._tooltips)
         end)
         widget:HookScript("OnLeave", function()
-            _G["AFTooltip"]:Hide()
+            AF.Tooltip:Hide()
         end)
     end
 end
@@ -88,8 +84,11 @@ function AF.ClearTooltips(widget)
     widget._tooltips = nil
 end
 
+local tooltips = {}
 function AF.HideTooltips()
-    _G["AFTooltip"]:Hide()
+    for _, tooltip in pairs(tooltips) do
+        tooltip:Hide()
+    end
 end
 
 ---------------------------------------------------------------------
@@ -156,6 +155,13 @@ end
 
 ---@class AF_Tooltip:GameTooltip
 local AF_TooltipMixin = {}
+
+function AF_TooltipMixin:SetOwner(owner, ...)
+    self:Hide()
+    self:SetParent(owner) -- update scale
+    SetOwner(self, owner, ...)
+    AF.ReBorder(self)
+end
 
 function AF_TooltipMixin:UpdatePixels()
     AF.ReBorder(self)
@@ -274,10 +280,10 @@ local function CreateTooltip(name)
     ---@type AF_Tooltip
     local tooltip = CreateFrame("GameTooltip", name, AF.UIParent, "AFTooltipTemplate,BackdropTemplate")
     -- local tooltip = CreateFrame("GameTooltip", name, AF.UIParent, "SharedTooltipTemplate,BackdropTemplate")
+    tinsert(tooltips, tooltip)
     AF.ApplyDefaultBackdrop(tooltip)
     tooltip:SetBackdropColor(0.1, 0.1, 0.1, 0.9)
     tooltip:SetBackdropBorderColor(AF.GetColorRGB("accent"))
-    tooltip:SetOwner(AF.UIParent, "ANCHOR_NONE")
 
     AF.AddEventHandler(tooltip)
     Mixin(tooltip, AF_BaseWidgetMixin)
