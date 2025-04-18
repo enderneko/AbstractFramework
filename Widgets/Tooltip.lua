@@ -93,6 +93,40 @@ function AF.HideTooltips()
 end
 
 ---------------------------------------------------------------------
+-- event related functions
+---------------------------------------------------------------------
+local strupper = strupper
+
+local function IsRequiredModifierKeyDown(self)
+    if not self.requiredModifier then
+        return true
+    end
+
+    if self.requiredModifier == "ALT" then
+        return IsAltKeyDown()
+    elseif self.requiredModifier == "CTRL" then
+        return IsControlKeyDown()
+    elseif self.requiredModifier == "SHIFT" then
+        return IsShiftKeyDown()
+    -- elseif -- TODO:
+    --     return IsMetaKeyDown()
+    end
+end
+
+local function MODIFIER_STATE_CHANGED(self, event, key, down)
+    if not self.requiredModifier then return end
+    if not key:find(self.requiredModifier) then return end
+    self:SetAlpha(down)
+end
+
+local function TOOLTIP_DATA_UPDATE(self)
+    if self:IsVisible() then
+        -- Interface\FrameXML\GameTooltip.lua GameTooltipDataMixin:RefreshData()
+        self:RefreshData()
+    end
+end
+
+---------------------------------------------------------------------
 -- create
 ---------------------------------------------------------------------
 local GetItemIconByID = C_Item.GetItemIconByID
@@ -145,10 +179,20 @@ function AF_TooltipMixin:OnHide()
         self.iconBG:Hide()
         self.icon:Hide()
     end
+
+    self.requiredModifier = nil
+    self:UnregisterEvent("MODIFIER_STATE_CHANGED")
 end
 
 function AF_TooltipMixin:OnShow()
     self:UpdatePixels()
+end
+
+---@param modifier string "ALT"|"CTRL"|"SHIFT", only accepts single modifier key
+function AF_TooltipMixin:RequireModifier(modifier)
+    if AF.IsBlank(modifier) then return end
+    self.requiredModifier = strupper(modifier)
+    self:RegisterEvent("MODIFIER_STATE_CHANGED", MODIFIER_STATE_CHANGED)
 end
 
 function AF_TooltipMixin:SetItem(itemID, icon)
@@ -176,6 +220,7 @@ function AF_TooltipMixin:SetItem(itemID, icon)
     end
 
     self:Show()
+    self:SetAlpha(IsRequiredModifierKeyDown(self) and 1 or 0)
 end
 
 function AF_TooltipMixin:SetSpell(spellID, icon)
@@ -198,6 +243,7 @@ function AF_TooltipMixin:SetSpell(spellID, icon)
     end
 
     self:Show()
+    self:SetAlpha(IsRequiredModifierKeyDown(self) and 1 or 0)
 end
 
 function AF_TooltipMixin:SetupIcon(point, relativePoint, x, y)
@@ -233,17 +279,12 @@ local function CreateTooltip(name)
     tooltip:SetBackdropBorderColor(AF.GetColorRGB("accent"))
     tooltip:SetOwner(AF.UIParent, "ANCHOR_NONE")
 
+    AF.AddEventHandler(tooltip)
     Mixin(tooltip, AF_BaseWidgetMixin)
     Mixin(tooltip, AF_TooltipMixin)
 
     if AF.isRetail then
-        tooltip:RegisterEvent("TOOLTIP_DATA_UPDATE")
-        tooltip:SetScript("OnEvent", function()
-            if tooltip:IsVisible() then
-                -- Interface\FrameXML\GameTooltip.lua GameTooltipDataMixin:RefreshData()
-                tooltip:RefreshData()
-            end
-        end)
+        tooltip:RegisterEvent("TOOLTIP_DATA_UPDATE", TOOLTIP_DATA_UPDATE)
     end
 
     -- tooltip:SetScript("OnTooltipSetItem", function()
