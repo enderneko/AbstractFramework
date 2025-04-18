@@ -170,7 +170,7 @@ function AF_TooltipMixin:SetItem(itemID, icon)
         self.iconBG:Show()
         self.icon:SetTexture(icon)
         self.icon:Show()
-    else
+    elseif self.icon then
         self.iconBG:Hide()
         self.icon:Hide()
     end
@@ -260,5 +260,4 @@ local function CreateTooltip(name)
 end
 
 AF.Tooltip = CreateTooltip("AFTooltip")
-AF.IconTooltip = CreateTooltip("AFIconTooltip")
-AF.IconTooltip:SetupIcon("TOPRIGHT", "TOPLEFT", -1, 0)
+AF.Tooltip2 = CreateTooltip("AFTooltip2")
