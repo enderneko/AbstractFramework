@@ -535,12 +535,32 @@ function AF_IconButtonMixin:SetTexCoord(...)
     self.icon:SetTexCoord(...)
 end
 
+---@param icon string
+---@param filterMode string|nil "LINEAR"|"TRILINEAR"|"NEAREST". default is "LINEAR".
 function AF_IconButtonMixin:SetIcon(icon, filterMode)
     if filterMode then
         self._filterMode = filterMode
     end
     self._iconPath = icon
     self.icon:SetTexture(icon, nil, nil, self._filterMode)
+end
+
+---@param color string|table
+function AF_IconButtonMixin:SetColor(color)
+    assert(type(color) == "string" or (type(color) == "table" and (#color == 3 or #color == 4)), "color must be a string or a table with 3 or 4 elements")
+    self._color = type(color) == "string" and AF.GetColorTable(color) or color
+    if not self:IsMouseOver() then
+        self.icon:SetVertexColor(AF.UnpackColor(self._color))
+    end
+end
+
+---@param color string|table
+function AF_IconButtonMixin:SetHoverColor(color)
+    assert(type(color) == "string" or (type(color) == "table" and (#color == 3 or #color == 4)), "color must be a string or a table with 3 or 4 elements")
+    self._hoverColor = type(color) == "string" and AF.GetColorTable(color) or color
+    if self:IsMouseOver() then
+        self.icon:SetVertexColor(AF.UnpackColor(self._hoverColor))
+    end
 end
 
 function AF_IconButtonMixin:SetFilterMode(filterMode)
@@ -551,7 +571,7 @@ end
 function AF_IconButtonMixin:UpdatePixels()
     AF.ReSize(self)
     AF.RePoint(self)
-    AF.SetSize(self.icon, self._width - self.padding, self._height - self.padding)
+    AF.SetSize(self.icon, self._width - self._padding, self._height - self._padding)
 end
 
 ---@param parent Frame
@@ -569,25 +589,25 @@ function AF.CreateIconButton(parent, icon, width, height, padding, color, hoverC
     local b = CreateFrame("Button", nil, parent)
     AF.SetSize(b, width, height)
 
-    b.padding = (padding or 0) * 2
+    b._padding = (padding or 0) * 2
 
     b.icon = b:CreateTexture(nil, "ARTWORK")
     b.icon:SetPoint("CENTER")
-    AF.SetSize(b.icon, width - b.padding, height - b.padding)
+    AF.SetSize(b.icon, width - b._padding, height - b._padding)
 
     b.icon:SetTexture(icon, nil, nil, filterMode)
     b._icon = icon
     b._filterMode = filterMode
 
-    b.color = type(color) == "string" and AF.GetColorTable(color) or (color or AF.GetColorTable("white"))
-    b.hoverColor = type(hoverColor) == "string" and AF.GetColorTable(hoverColor) or (hoverColor or AF.GetColorTable("white"))
-    b.icon:SetVertexColor(AF.UnpackColor(b.color))
+    b._color = type(color) == "string" and AF.GetColorTable(color) or (color or AF.GetColorTable("white"))
+    b._hoverColor = type(hoverColor) == "string" and AF.GetColorTable(hoverColor) or (hoverColor or AF.GetColorTable("white"))
+    b.icon:SetVertexColor(AF.UnpackColor(b._color))
 
     b:SetScript("OnEnter", function()
-        b.icon:SetVertexColor(AF.UnpackColor(b.hoverColor))
+        b.icon:SetVertexColor(AF.UnpackColor(b._hoverColor))
     end)
     b:SetScript("OnLeave", function()
-        b.icon:SetVertexColor(AF.UnpackColor(b.color))
+        b.icon:SetVertexColor(AF.UnpackColor(b._color))
     end)
 
     Mixin(b, AF_IconButtonMixin)
