@@ -163,8 +163,9 @@ function AF.ShowDialog(parent, text, width, yesText, noText, showMask, content, 
     return dialog
 end
 
--- point
+-- use this after AF.ShowDialog to set the dialog position
 function AF.SetDialogPoint(...)
+    if not dialog then return end
     AF.ClearPoints(dialog)
     AF.SetPoint(dialog, ...)
 end
@@ -328,8 +329,9 @@ function AF.ShowNotificationDialog(parent, text, width, showMask, countdown)
     return notificationDialog
 end
 
--- point
+-- use this after AF.ShowNotificationDialog to set the dialog position
 function AF.SetNotificationDialogPoint(...)
+    if not notificationDialog then return end
     AF.ClearPoints(notificationDialog)
     AF.SetPoint(notificationDialog, ...)
 end
