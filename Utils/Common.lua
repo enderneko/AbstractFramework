@@ -493,6 +493,12 @@ function AF.GetDateString(sec)
     return date("%Y%m%d", sec)
 end
 
+function AF.IsToday(sec)
+    local today = date("%Y%m%d")
+    local dateStr = date("%Y%m%d", sec)
+    return today == dateStr
+end
+
 local SEC = gsub(_G.SPELL_DURATION_SEC, "%%%.%df", "%%s")
 local MIN = gsub(_G.SPELL_DURATION_MIN, "%%%.%df", "%%s")
 
