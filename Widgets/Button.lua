@@ -624,6 +624,43 @@ function AF.CreateIconButton(parent, icon, width, height, padding, color, hoverC
 end
 
 ---------------------------------------------------------------------
+-- tips button
+---------------------------------------------------------------------
+---@class AF_TipsButton:AF_IconButton
+local AF_TipsButtonMixin = {}
+
+local function TipsButton_OnEnter(self)
+    if not AF.IsEmpty(self.tips) then
+        AF.ShowTooltips(self, self.position, self.x, self.y, self.tips)
+    end
+end
+
+local function TipsButton_OnLeave(self)
+    AF.HideTooltips()
+end
+
+---@param ... string
+function AF_TipsButtonMixin:SetTips(...)
+    self.tips = {...}
+end
+
+function AF_TipsButtonMixin:SetTipsPosition(position, x, y)
+    self.position = position or "TOPRIGHT"
+    self.x = x or 0
+    self.y = y or 0
+end
+
+---@return AF_TipsButton
+function AF.CreateTipsButton(parent)
+    local tipsButton = AF.CreateIconButton(parent, AF.GetIcon("Info_Square"), 16, 16, 0, "gray", "white", "NEAREST", true)
+    Mixin(tipsButton, AF_TipsButtonMixin)
+    tipsButton:SetTipsPosition("TOPRIGHT", 0, 0)
+    tipsButton:HookOnEnter(TipsButton_OnEnter)
+    tipsButton:HookOnLeave(TipsButton_OnLeave)
+    return tipsButton
+end
+
+---------------------------------------------------------------------
 -- check button
 ---------------------------------------------------------------------
 ---@class AF_CheckButton:CheckButton,AF_BaseWidgetMixin

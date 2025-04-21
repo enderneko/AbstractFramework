@@ -222,10 +222,10 @@ end
 
 function AF_TitledPaneMixin:SetTips(...)
     if not self.tips then
-        self.tips = AF.CreateIconButton(self, AF.GetIcon("Info_Square"), 16, 16, 0, "gray", "white", "NEAREST", true)
+        self.tips = AF.CreateTipsButton(self)
         self.tips:SetPoint("BOTTOMRIGHT", self.line, "TOPRIGHT")
     end
-    AF.SetTooltips(self.tips, "TOPRIGHT", 0, 0, ...)
+    self.tips:SetTips(...)
 end
 
 ---@param color string color name defined in Color.lua
