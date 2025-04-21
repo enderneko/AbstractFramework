@@ -6,13 +6,22 @@ local deflateConfig = {level = 9}
 local LibSerialize = AF.Libs.LibSerialize
 local Comm = AF.Libs.Comm
 local GetChannelName = GetChannelName
+local JoinTemporaryChannel = JoinTemporaryChannel
+local LeaveChannelByName = LeaveChannelByName
+local InCombatLockdown = InCombatLockdown
 
+---------------------------------------------------------------------
+-- serialize
+---------------------------------------------------------------------
 local function Serialize(data)
     local serialized = LibSerialize:Serialize(data) -- serialize
     local compressed = LibDeflate:CompressDeflate(serialized, deflateConfig) -- compress
     return LibDeflate:EncodeForWoWAddonChannel(compressed) -- encode
 end
 
+---------------------------------------------------------------------
+-- deserialize
+---------------------------------------------------------------------
 local function Deserialize(encoded)
     local decoded = LibDeflate:DecodeForWoWAddonChannel(encoded) -- decode
     local decompressed = LibDeflate:DecompressDeflate(decoded) -- decompress
@@ -28,6 +37,9 @@ local function Deserialize(encoded)
     return data
 end
 
+---------------------------------------------------------------------
+-- register addon prefix
+---------------------------------------------------------------------
 ---@param prefix string max 16 characters
 ---@param callback fun(data: any?, sender: string, channel: string)
 function AF.RegisterComm(prefix, callback)
@@ -37,6 +49,9 @@ function AF.RegisterComm(prefix, callback)
     end)
 end
 
+---------------------------------------------------------------------
+-- send addon message (whisper)
+---------------------------------------------------------------------
 ---@param prefix string max 16 characters
 ---@param data any
 ---@param target string
@@ -48,6 +63,9 @@ function AF.SendCommMessage_Whisper(prefix, data, target, priority, callbackFn, 
     Comm:SendCommMessage(prefix, encoded, "WHISPER", target, priority, callbackFn, callbackArg)
 end
 
+---------------------------------------------------------------------
+-- send addon message (group)
+---------------------------------------------------------------------
 ---@param prefix string max 16 characters
 ---@param data any
 ---@param priority string "BULK", "NORMAL", "ALERT".
@@ -66,6 +84,9 @@ function AF.SendCommMessage_Group(prefix, data, priority, callbackFn, callbackAr
     Comm:SendCommMessage(prefix, encoded, channel, nil, priority, callbackFn, callbackArg)
 end
 
+---------------------------------------------------------------------
+-- send addon message (guild)
+---------------------------------------------------------------------
 ---@param prefix string max 16 characters
 ---@param data any
 ---@param isOfficer boolean if true, send to officer chat, otherwise guild chat
@@ -77,6 +98,9 @@ function AF.SendCommMessage_Guild(prefix, data, isOfficer, priority, callbackFn,
     Comm:SendCommMessage(prefix, encoded, isOfficer and "OFFICER" or "GUILD", nil, priority, callbackFn, callbackArg)
 end
 
+---------------------------------------------------------------------
+-- send addon message (channel)
+---------------------------------------------------------------------
 ---@param prefix string max 16 characters
 ---@param data any
 ---@param channelName string
@@ -91,4 +115,110 @@ function AF.SendCommMessage_Channel(prefix, data, channelName, priority, callbac
     else
         Comm:SendCommMessage(prefix, encoded, "CHANNEL", channelId, priority, callbackFn, callbackArg)
     end
+end
+
+---------------------------------------------------------------------
+-- join temporary channel
+---------------------------------------------------------------------
+local registeredChannels = {
+    -- [channelName] = id = (number)
+}
+AF.registeredChannels = registeredChannels
+
+-- join
+local function DoJoin(channelName)
+    local channelID = GetChannelName(channelName)
+    if channelID == 0 then
+        JoinTemporaryChannel(channelName)
+        C_Timer.After(1, function()
+            DoJoin(channelName) -- check if joined
+        end)
+    elseif registeredChannels[channelName] ~= channelID then
+        registeredChannels[channelName] = channelID
+        AF.Debug("Joined Temporary Channel: ", channelName, channelID)
+        AF.Fire("AF_JOIN_TEMP_CHANNEL", channelName, channelID)
+    end
+end
+
+-- will fire AF_JOIN_TEMP_CHANNEL(channelName, channelID) when the channel is joined
+---@param channelName string
+---@param joinNow boolean if true, join the channel immediately; otherwise, wait for PLAYER_ENTERING_WORLD event
+function AF.RegisterTemporaryChannel(channelName, joinNow)
+    assert(type(channelName) == "string", "channelName must be a string")
+    if not registeredChannels[channelName] or registeredChannels[channelName] == -1 then
+        registeredChannels[channelName] = 0
+    end
+    if joinNow then
+        DoJoin(channelName)
+    end
+end
+
+-- leave
+local function DoLeave(channelName)
+    local channelID = GetChannelName(channelName)
+    if channelID ~= 0 then
+        LeaveChannelByName(channelName)
+        C_Timer.After(1, function()
+            DoLeave(channelName) -- check if left
+        end)
+    else
+        registeredChannels[channelName] = nil
+        AF.Debug("Left Temporary Channel: ", channelName)
+        AF.Fire("AF_LEAVE_TEMP_CHANNEL", channelName)
+    end
+end
+
+-- will fire AF_LEAVE_TEMP_CHANNEL(channelName) when the channel is left
+---@param channelName string
+---@param leaveNow boolean if true, leave the channel immediately; otherwise, wait for PLAYER_ENTERING_WORLD event
+function AF.UnregisterChannel(channelName, leaveNow)
+    assert(type(channelName) == "string", "channelName must be a string")
+    registeredChannels[channelName] = -1
+    if leaveNow then
+        DoLeave(channelName)
+    end
+end
+
+local function CheckAllRegisteredChannels()
+    if InCombatLockdown() then return end
+    for name, id in pairs(registeredChannels) do
+        if id == -1 then
+            DoLeave(name)
+        else
+            DoJoin(name)
+        end
+    end
+end
+
+-- check all "registered" temp channels
+AF.CreateBasicEventHandler(AF.GetDelayedInvoker(9, CheckAllRegisteredChannels), "PLAYER_ENTERING_WORLD")
+
+---------------------------------------------------------------------
+-- block ChatConfigFrame widgets interaction
+---------------------------------------------------------------------
+local blockedChannels = {}
+
+hooksecurefunc("ChatConfig_CreateCheckboxes", function(frame, checkBoxTable, checkBoxTemplate, title)
+    local name = frame:GetName()
+    if name == "ChatConfigChannelSettingsLeft" then
+        for i = 1, #checkBoxTable do
+            local checkBox = _G[name .. "Checkbox" .. i]
+            if checkBoxTable[i].channelName and blockedChannels[checkBoxTable[i].channelName] then
+                AF.ShowMask(checkBox)
+                if not checkBox._dragHooked then
+                    checkBox._dragHooked = true
+                    checkBox.mask:RegisterForDrag("LeftButton")
+                    checkBox.mask:SetScript("OnDragStart", function()
+                        checkBox:GetScript("OnDragStart")(checkBox)
+                    end)
+                end
+            else
+                AF.HideMask(checkBox)
+            end
+        end
+    end
+end)
+
+function AF.BlockChatConfigFrameInteractionForChannel(channelName)
+    blockedChannels[channelName] = true
 end
