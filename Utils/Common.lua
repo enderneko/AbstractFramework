@@ -543,20 +543,45 @@ local LibDeflate = AF.Libs.LibDeflate
 local deflateConfig = {level = 9}
 local LibSerialize = AF.Libs.LibSerialize
 
-function AF.Serialize(data)
-    local serialized = LibSerialize:Serialize(data) -- serialize
-    local compressed = LibDeflate:CompressDeflate(serialized, deflateConfig) -- compress
-    return LibDeflate:EncodeForPrint(compressed) -- encode
+---@param data any
+---@param isForAddonChannel boolean?
+---@return string encoded
+function AF.Serialize(data, isForAddonChannel)
+    -- serialize
+    local serialized = LibSerialize:Serialize(data)
+
+    -- compress
+    local compressed = LibDeflate:CompressDeflate(serialized, deflateConfig)
+
+    -- encode
+    if isForAddonChannel then
+        return LibDeflate:EncodeForWoWAddonChannel(compressed)
+    else
+        return LibDeflate:EncodeForPrint(compressed)
+    end
 end
 
-function AF.Deserialize(encoded)
-    local decoded = LibDeflate:DecodeForPrint(encoded) -- decode
-    local decompressed = LibDeflate:DecompressDeflate(decoded) -- decompress
+---@param encoded string
+---@param isForAddonChannel boolean?
+---@return any data
+function AF.Deserialize(encoded, isForAddonChannel)
+    -- decode
+    local decoded
+    if isForAddonChannel then
+        decoded = LibDeflate:DecodeForWoWAddonChannel(encoded)
+    else
+        decoded = LibDeflate:DecodeForPrint(encoded)
+    end
+
+    -- decompress
+    local decompressed = LibDeflate:DecompressDeflate(decoded)
     if not decompressed then
         AF.Debug("Error decompressing")
         return
     end
-    local success, data = LibSerialize:Deserialize(decompressed) -- deserialize
+
+    -- deserialize
+    local success, data = LibSerialize:Deserialize(decompressed)
     if not success then
         AF.Debug("Error deserializing")
         return

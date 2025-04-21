@@ -1,9 +1,6 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 
-local LibDeflate = AF.Libs.LibDeflate
-local deflateConfig = {level = 9}
-local LibSerialize = AF.Libs.LibSerialize
 local Comm = AF.Libs.Comm
 local GetChannelName = GetChannelName
 local JoinTemporaryChannel = JoinTemporaryChannel
@@ -14,40 +11,13 @@ local IsInGroup = IsInGroup
 local IsInRaid = IsInRaid
 
 ---------------------------------------------------------------------
--- serialize
----------------------------------------------------------------------
-local function Serialize(data)
-    local serialized = LibSerialize:Serialize(data) -- serialize
-    local compressed = LibDeflate:CompressDeflate(serialized, deflateConfig) -- compress
-    return LibDeflate:EncodeForWoWAddonChannel(compressed) -- encode
-end
-
----------------------------------------------------------------------
--- deserialize
----------------------------------------------------------------------
-local function Deserialize(encoded)
-    local decoded = LibDeflate:DecodeForWoWAddonChannel(encoded) -- decode
-    local decompressed = LibDeflate:DecompressDeflate(decoded) -- decompress
-    if not decompressed then
-        AF.Debug("Error decompressing")
-        return
-    end
-    local success, data = LibSerialize:Deserialize(decompressed) -- deserialize
-    if not success then
-        AF.Debug("Error deserializing")
-        return
-    end
-    return data
-end
-
----------------------------------------------------------------------
 -- register addon prefix
 ---------------------------------------------------------------------
 ---@param prefix string max 16 characters
 ---@param callback fun(data: any?, sender: string, channel: string)
 function AF.RegisterComm(prefix, callback)
     Comm:RegisterComm(prefix, function(prefix, encoded, channel, sender)
-        local data = Deserialize(encoded)
+        local data = AF.Deserialize(encoded, true)
         callback(data, sender, channel)
     end)
 end
@@ -63,7 +33,7 @@ end
 ---@param callbackArg any? any data you want to pass to the callback function
 ---@param isSerializedData boolean if true, data is already serialized
 function AF.SendCommMessage_Whisper(prefix, data, target, priority, callbackFn, callbackArg, isSerializedData)
-    local encoded = isSerializedData and data or Serialize(data)
+    local encoded = isSerializedData and data or AF.Serialize(data, true)
     Comm:SendCommMessage(prefix, encoded, "WHISPER", target, priority, callbackFn, callbackArg)
 end
 
@@ -88,7 +58,7 @@ function AF.SendCommMessage_Group(prefix, data, priority, callbackFn, callbackAr
     if not channel then
         AF.Debug("SendCommMessage_Group, not in a group")
     else
-        local encoded = isSerializedData and data or Serialize(data)
+        local encoded = isSerializedData and data or AF.Serialize(data, true)
         Comm:SendCommMessage(prefix, encoded, channel, nil, priority, callbackFn, callbackArg)
     end
 end
@@ -107,7 +77,7 @@ function AF.SendCommMessage_Guild(prefix, data, isOfficer, priority, callbackFn,
     if not IsInGuild() then
         AF.Debug("SendCommMessage_Guild, not in a guild")
     else
-        local encoded = isSerializedData and data or Serialize(data)
+        local encoded = isSerializedData and data or AF.Serialize(data, true)
         Comm:SendCommMessage(prefix, encoded, isOfficer and "OFFICER" or "GUILD", nil, priority, callbackFn, callbackArg)
     end
 end
@@ -127,7 +97,7 @@ function AF.SendCommMessage_Channel(prefix, data, channelName, priority, callbac
     if channelId == 0 then
         AF.Debug("SendCommMessage_Channel, channel not found: " .. channelName)
     else
-        local encoded = isSerializedData and data or Serialize(data)
+        local encoded = isSerializedData and data or AF.Serialize(data, true)
         Comm:SendCommMessage(prefix, encoded, "CHANNEL", channelId, priority, callbackFn, callbackArg)
     end
 end
