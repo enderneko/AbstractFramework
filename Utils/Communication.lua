@@ -9,6 +9,9 @@ local GetChannelName = GetChannelName
 local JoinTemporaryChannel = JoinTemporaryChannel
 local LeaveChannelByName = LeaveChannelByName
 local InCombatLockdown = InCombatLockdown
+local IsInGuild = IsInGuild
+local IsInGroup = IsInGroup
+local IsInRaid = IsInRaid
 
 ---------------------------------------------------------------------
 -- serialize
@@ -58,8 +61,9 @@ end
 ---@param priority string "BULK", "NORMAL", "ALERT".
 ---@param callbackFn fun(callbackArg: any?, sentBytes: number, totalBytes: number)
 ---@param callbackArg any? any data you want to pass to the callback function
-function AF.SendCommMessage_Whisper(prefix, data, target, priority, callbackFn, callbackArg)
-    local encoded = Serialize(data)
+---@param isSerializedData boolean if true, data is already serialized
+function AF.SendCommMessage_Whisper(prefix, data, target, priority, callbackFn, callbackArg, isSerializedData)
+    local encoded = isSerializedData and data or Serialize(data)
     Comm:SendCommMessage(prefix, encoded, "WHISPER", target, priority, callbackFn, callbackArg)
 end
 
@@ -71,17 +75,22 @@ end
 ---@param priority string "BULK", "NORMAL", "ALERT".
 ---@param callbackFn fun(callbackArg: any?, sentBytes: number, totalBytes: number)
 ---@param callbackArg any? any data you want to pass to the callback function
-function AF.SendCommMessage_Group(prefix, data, priority, callbackFn, callbackArg)
-    local encoded = Serialize(data)
+---@param isSerializedData boolean if true, data is already serialized
+function AF.SendCommMessage_Group(prefix, data, priority, callbackFn, callbackArg, isSerializedData)
     local channel
     if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
         channel = "INSTANCE_CHAT"
     elseif IsInRaid() then
         channel = "RAID"
-    else
+    elseif IsInGroup(LE_PARTY_CATEGORY_HOME) then
         channel = "PARTY"
     end
-    Comm:SendCommMessage(prefix, encoded, channel, nil, priority, callbackFn, callbackArg)
+    if not channel then
+        AF.Debug("SendCommMessage_Group, not in a group")
+    else
+        local encoded = isSerializedData and data or Serialize(data)
+        Comm:SendCommMessage(prefix, encoded, channel, nil, priority, callbackFn, callbackArg)
+    end
 end
 
 ---------------------------------------------------------------------
@@ -93,9 +102,14 @@ end
 ---@param priority string "BULK", "NORMAL", "ALERT".
 ---@param callbackFn fun(callbackArg: any?, sentBytes: number, totalBytes: number)
 ---@param callbackArg any? any data you want to pass to the callback function
-function AF.SendCommMessage_Guild(prefix, data, isOfficer, priority, callbackFn, callbackArg)
-    local encoded = Serialize(data)
-    Comm:SendCommMessage(prefix, encoded, isOfficer and "OFFICER" or "GUILD", nil, priority, callbackFn, callbackArg)
+---@param isSerializedData boolean if true, data is already serialized
+function AF.SendCommMessage_Guild(prefix, data, isOfficer, priority, callbackFn, callbackArg, isSerializedData)
+    if not IsInGuild() then
+        AF.Debug("SendCommMessage_Guild, not in a guild")
+    else
+        local encoded = isSerializedData and data or Serialize(data)
+        Comm:SendCommMessage(prefix, encoded, isOfficer and "OFFICER" or "GUILD", nil, priority, callbackFn, callbackArg)
+    end
 end
 
 ---------------------------------------------------------------------
@@ -107,12 +121,13 @@ end
 ---@param priority string "BULK", "NORMAL", "ALERT".
 ---@param callbackFn fun(callbackArg: any?, sentBytes: number, totalBytes: number)
 ---@param callbackArg any? any data you want to pass to the callback function
-function AF.SendCommMessage_Channel(prefix, data, channelName, priority, callbackFn, callbackArg)
-    local encoded = Serialize(data)
+---@param isSerializedData boolean if true, data is already serialized
+function AF.SendCommMessage_Channel(prefix, data, channelName, priority, callbackFn, callbackArg, isSerializedData)
     local channelId = GetChannelName(channelName)
     if channelId == 0 then
-        AF.Debug("Channel not found: " .. channelName)
+        AF.Debug("SendCommMessage_Channel, channel not found: " .. channelName)
     else
+        local encoded = isSerializedData and data or Serialize(data)
         Comm:SendCommMessage(prefix, encoded, "CHANNEL", channelId, priority, callbackFn, callbackArg)
     end
 end
