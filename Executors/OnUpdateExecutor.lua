@@ -35,7 +35,7 @@ end
 function AF_OnUpdateExecutorMixin:RunImmediately(task)
     self:Clear()
     for _, t in ipairs(task) do
-        self.Run(t, 0, 0)
+        self:Run(t, 0, 0)
     end
 end
 
@@ -84,6 +84,7 @@ function AF_OnUpdateExecutorMixin:OnHide()
     self.status = STATUS_IDLE
 end
 
+-- NOTE: This executor is only suitable for non-asynchronous tasks
 ---@param taskHandler fun(executor: AF_OnUpdateExecutor, task: any, numRemainingTasks: number, numTotalTasks: number)
 ---@param onFinishedCallback? fun(executor: AF_OnUpdateExecutor)
 ---@return AF_OnUpdateExecutor executor
