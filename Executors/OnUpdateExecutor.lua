@@ -32,12 +32,12 @@ function AF_OnUpdateExecutorMixin:Execute()
     self:Show()
 end
 
-function AF_OnUpdateExecutorMixin:RunImmediately(task)
-    self:Clear()
-    for _, t in ipairs(task) do
-        self:Run(t, 0, 0)
-    end
-end
+-- function AF_OnUpdateExecutorMixin:RunImmediately(task)
+--     self:Clear()
+--     for _, t in ipairs(task) do
+--         self:Run(t, 0, 0)
+--     end
+-- end
 
 function AF_OnUpdateExecutorMixin:Clear()
     self:Hide()
@@ -57,15 +57,15 @@ function AF_OnUpdateExecutorMixin:OnUpdate()
         else
             self:Hide()
             -- all tasks finished
-            if self.Finished then
-                self:Finished()
+            if self.Finish then
+                self:Finish()
             end
         end
     end
 end
 
 ---@private
-function AF_OnUpdateExecutorMixin:OnEachTaskFinished()
+function AF_OnUpdateExecutorMixin:OnEachTaskFinish()
     self.status = STATUS_READY
 end
 
@@ -86,9 +86,9 @@ end
 
 -- NOTE: This executor is only suitable for non-asynchronous tasks
 ---@param taskHandler fun(executor: AF_OnUpdateExecutor, task: any, numRemainingTasks: number, numTotalTasks: number)
----@param onFinishedCallback? fun(executor: AF_OnUpdateExecutor)
+---@param onFinish? fun(executor: AF_OnUpdateExecutor)
 ---@return AF_OnUpdateExecutor executor
-function AF.BuildOnUpdateExecutor(taskHandler, onFinishedCallback)
+function AF.BuildOnUpdateExecutor(taskHandler, onFinish)
     local executor = CreateFrame("Frame")
     executor:Hide()
 
@@ -99,8 +99,8 @@ function AF.BuildOnUpdateExecutor(taskHandler, onFinishedCallback)
     executor.queue = AF.NewQueue()
 
     executor.Run = taskHandler
-    hooksecurefunc(executor, "Run", executor.OnEachTaskFinished)
-    executor.Finished = onFinishedCallback
+    hooksecurefunc(executor, "Run", executor.OnEachTaskFinish)
+    executor.Finish = onFinish
 
     executor:SetScript("OnUpdate", executor.OnUpdate)
     executor:SetScript("OnShow", executor.OnShow)

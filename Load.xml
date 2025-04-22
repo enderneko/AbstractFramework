@@ -21,12 +21,6 @@
     <Script file="Init.lua"/>
     <Script file="Locales.lua"/>
 
-    <!-- system -->
-    <Script file="System\Addon.lua"/>
-    <Script file="System\CallbackHandler.lua"/>
-    <Script file="System\EventHandler.lua"/>
-    <Script file="System\Communication.lua"/>
-
     <!-- utils -->
     <Script file="Utils\Math.lua"/>
     <Script file="Utils\Table.lua"/>
@@ -36,12 +30,19 @@
     <Script file="Utils\Serialization.lua"/>
     <Script file="Utils\Color.lua"/>
 
+    <!-- system -->
+    <Script file="System\Addon.lua"/>
+    <Script file="System\CallbackHandler.lua"/>
+    <Script file="System\EventHandler.lua"/>
+    <Script file="System\Communication.lua"/>
+
     <!-- data -->
     <Script file="Data\ObjectPool.lua"/>
     <Script file="Data\Queue.lua"/>
 
     <!-- Executors -->
     <Script file="Executors\OnUpdateExecutor.lua"/>
+    <Script file="Executors\ItemLoadExecutor.lua"/>
 
     <!-- units/player -->
     <Script file="Units\Player.lua"/>
