@@ -1,9 +1,14 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 
--- NOTE: override these before create calendar
-AF.FIRST_WEEKDAY = 1
-AF.WEEKDAY_NAMES = {"Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"}
+if LOCALE_zhCN then
+    AF.WEEKDAY_NAMES = {"一", "二", "三", "四", "五", "六", "日"}
+    AF.FIRST_WEEKDAY = 1
+else
+    AF.WEEKDAY_NAMES = {"Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"}
+    AF.FIRST_WEEKDAY = 7
+end
+
 if GetCVar("portal") == "US" then
     AF.RAID_LOCKOUT_RESET_DAY = 2
 elseif GetCVar("portal") == "EU" then
@@ -74,7 +79,8 @@ local function FillDays(year, month)
     if month == today.month and year == today.year then
         calendar.todayMark:SetParent(calendar.days[start + today.day - 1])
         AF.ClearPoints(calendar.todayMark)
-        AF.SetPoint(calendar.todayMark, "BOTTOM", 0, 3)
+        AF.SetPoint(calendar.todayMark, "BOTTOMLEFT", 1, 1)
+        AF.SetPoint(calendar.todayMark, "BOTTOMRIGHT", -1, 1)
         calendar.todayMark:Show()
     else
         calendar.todayMark:Hide()
@@ -233,7 +239,7 @@ local function CreateCalendar()
     -- "today" mark
     local todayMark = AF.CreateTexture(calendar, nil, "gray")
     calendar.todayMark = todayMark
-    AF.SetSize(todayMark, 17, 1)
+    AF.SetHeight(todayMark, 1)
 
     -- scripts
     calendar:SetScript("OnMouseWheel", function() end)
