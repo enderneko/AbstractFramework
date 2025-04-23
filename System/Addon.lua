@@ -32,6 +32,20 @@ function AF.GetAddOnMetadata(fieldName, addon)
     end
 end
 
+---@param addon string?
+---@return string? version
+---@return number? versionNum
+function AF.GetAddOnVersion(addon)
+    addon = addon or AF.GetAddon()
+    if addon then
+        local version = GetAddOnMetadata(addon, "Version")
+        if version then
+            local versionNum = tonumber(version:match("(%d+)$")) or tonumber(version:match("%d+"))
+            return version, versionNum
+        end
+    end
+end
+
 local function GetPrefix()
     local addon, alias = AF.GetAddon()
     if addon then
