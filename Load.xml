@@ -35,6 +35,7 @@
     <Script file="System\CallbackHandler.lua"/>
     <Script file="System\EventHandler.lua"/>
     <Script file="System\Communication.lua"/>
+    <Script file="System\Events.lua"/>
 
     <!-- data -->
     <Script file="Data\ObjectPool.lua"/>
