@@ -61,7 +61,7 @@ function AF.SendCommMessage_Group(prefix, data, priority, callbackFn, callbackAr
         channel = "PARTY"
     end
     if not channel then
-        AF.Debug("SendCommMessage_Group, not in a group")
+        AF.Debug(AF.GetColorStr("lightred") .. "SendCommMessage_Group, not in a group")
     else
         local encoded = isSerializedData and data or AF.Serialize(data, true)
         Comm:SendCommMessage(prefix, encoded, channel, nil, priority, callbackFn, callbackArg)
@@ -80,7 +80,7 @@ end
 ---@param isSerializedData boolean if true, data is already serialized
 function AF.SendCommMessage_Guild(prefix, data, isOfficer, priority, callbackFn, callbackArg, isSerializedData)
     if not IsInGuild() then
-        AF.Debug("SendCommMessage_Guild, not in a guild")
+        AF.Debug(AF.GetColorStr("lightred") .. "SendCommMessage_Guild, not in a guild")
     else
         local encoded = isSerializedData and data or AF.Serialize(data, true)
         Comm:SendCommMessage(prefix, encoded, isOfficer and "OFFICER" or "GUILD", nil, priority, callbackFn, callbackArg)
@@ -100,7 +100,7 @@ end
 function AF.SendCommMessage_Channel(prefix, data, channelName, priority, callbackFn, callbackArg, isSerializedData)
     local channelId = GetChannelName(channelName)
     if channelId == 0 then
-        AF.Debug("SendCommMessage_Channel, channel not found: " .. channelName)
+        AF.Debug(AF.GetColorStr("lightred") .. "SendCommMessage_Channel, channel not found: " .. channelName)
     else
         local encoded = isSerializedData and data or AF.Serialize(data, true)
         Comm:SendCommMessage(prefix, encoded, "CHANNEL", channelId, priority, callbackFn, callbackArg)
@@ -125,7 +125,6 @@ local function DoJoin(channelName)
         end)
     elseif registeredChannels[channelName] ~= channelID then
         registeredChannels[channelName] = channelID
-        AF.Debug("Joined Temporary Channel: ", channelName, channelID)
         AF.Fire("AF_JOIN_TEMP_CHANNEL", channelName, channelID)
     end
 end
@@ -153,7 +152,6 @@ local function DoLeave(channelName)
         end)
     else
         registeredChannels[channelName] = nil
-        AF.Debug("Left Temporary Channel: ", channelName)
         AF.Fire("AF_LEAVE_TEMP_CHANNEL", channelName)
     end
 end
