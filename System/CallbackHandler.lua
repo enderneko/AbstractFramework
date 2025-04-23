@@ -64,6 +64,8 @@ function AF.UnregisterAllCallbacks(event)
 end
 
 function AF.Fire(event, ...)
+    -- AF.Debug("Fire", event, ...)
+
     if callbacks.high[event] then
         for fn in pairs(callbacks.high[event]) do
                 fn(...)
