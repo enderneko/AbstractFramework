@@ -217,6 +217,18 @@ function AF.GetColorHex(color)
     return COLORS[color]["hex"]
 end
 
+---@param color string
+---@return string colorStr |caarrggbb
+function AF.GetColorStr(color)
+    local hex = AF.GetColorHex(color)
+
+    if #hex == 8 then
+        return "|c" .. hex
+    else
+        return "|cff" .. hex
+    end
+end
+
 ---@param auraType string
 ---@return number r
 ---@return number g
