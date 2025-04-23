@@ -160,12 +160,25 @@ end
 
 -- converts a table using a processor function
 ---@param t table the table to convert
----@param processor function the processor function to use, returns newKey, newValue
+---@param processor fun(key: any, value: any): (any, any) the processor function that takes a key and value and returns a new key and value
 function AF.ConvertTable(t, processor)
     local temp = {}
     for k, v in ipairs(t) do
         local newKey, newValue = processor(k, v)
         temp[newKey] = newValue
+    end
+    return temp
+end
+
+---@param t table
+---@param key any the key to look for in the sub-tables
+---@return table temp a new table containing the values of the specified key from each sub-table
+function AF.ExtractSubTableValues(t, key)
+    local temp = {}
+    for k, v in pairs(t) do
+        if type(v) == "table" and v[key] then
+            tinsert(temp, v[key])
+        end
     end
     return temp
 end
