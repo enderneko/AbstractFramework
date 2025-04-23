@@ -11,7 +11,7 @@ local IsInGroup = IsInGroup
 local IsInRaid = IsInRaid
 
 ---------------------------------------------------------------------
--- register addon prefix
+-- register/unregister addon prefix
 ---------------------------------------------------------------------
 ---@param prefix string max 16 characters
 ---@param callback fun(data: any?, sender: string, channel: string)
@@ -20,6 +20,11 @@ function AF.RegisterComm(prefix, callback)
         local data = AF.Deserialize(encoded, true)
         callback(data, sender, channel)
     end)
+end
+
+---@param prefix string
+function AF.UnregisterComm(prefix)
+    Comm:UnregisterComm(prefix)
 end
 
 ---------------------------------------------------------------------
