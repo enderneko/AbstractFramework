@@ -9,6 +9,7 @@ local InCombatLockdown = InCombatLockdown
 local IsInGuild = IsInGuild
 local IsInGroup = IsInGroup
 local IsInRaid = IsInRaid
+local ChatFrame_RemoveChannel = ChatFrame_RemoveChannel
 
 ---------------------------------------------------------------------
 -- register/unregister addon prefix
@@ -126,6 +127,12 @@ local function DoJoin(channelName)
     elseif registeredChannels[channelName] ~= channelID then
         registeredChannels[channelName] = channelID
         AF.Fire("AF_JOIN_TEMP_CHANNEL", channelName, channelID)
+        -- disable channel message
+        for i = 1, 10 do
+            if _G["ChatFrame" .. i] then
+                ChatFrame_RemoveChannel(_G["ChatFrame" .. i], channelName)
+            end
+        end
     end
 end
 
