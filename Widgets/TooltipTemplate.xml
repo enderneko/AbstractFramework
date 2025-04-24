@@ -55,5 +55,11 @@
                 <Texture name="$parentTexture30" inherits="TooltipTextureTemplate"/>
             </Layer>
         </Layers>
+        <Scripts>
+            <OnTooltipCleared>
+                GameTooltip_ClearMoney(self)
+                SharedTooltip_ClearInsertedFrames(self)
+            </OnTooltipCleared>
+        </Scripts>
     </GameTooltip>
 </Ui>

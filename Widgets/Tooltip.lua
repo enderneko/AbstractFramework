@@ -1,7 +1,10 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 
-local SetOwner = CreateFrame("GameTooltip").SetOwner
+local tt = CreateFrame("GameTooltip", nil, nil, "GameTooltipTemplate")
+local SetOwner = tt.SetOwner
+local SetItemByID = tt.SetItemByID
+local SetSpellByID = tt.SetSpellByID
 
 ---------------------------------------------------------------------
 -- show / hide
@@ -121,7 +124,12 @@ end
 local function TOOLTIP_DATA_UPDATE(self)
     if self:IsVisible() then
         -- Interface\FrameXML\GameTooltip.lua GameTooltipDataMixin:RefreshData()
-        self:RefreshData()
+        -- self:RefreshData()
+        if self.itemID then
+            self:SetItemByID(self.itemID)
+        elseif self.spellID then
+            self:SetSpellByID(self.spellID)
+        end
     end
 end
 
@@ -133,7 +141,10 @@ local GetSpellTexture = C_Spell.GetSpellTexture
 local GetItemQualityByID = C_Item.GetItemQualityByID
 
 local function GameTooltip_OnHide(self)
+    self.itemID = nil
+    self.spellID = nil
     self.waitingForData = false
+
     GameTooltip_ClearMoney(self)
     GameTooltip_ClearStatusBars(self)
     GameTooltip_ClearProgressBars(self)
@@ -201,56 +212,50 @@ function AF_TooltipMixin:RequireModifier(modifier)
     self:RegisterEvent("MODIFIER_STATE_CHANGED", MODIFIER_STATE_CHANGED)
 end
 
-function AF_TooltipMixin:SetItem(itemID, icon)
-    self:SetItemByID(itemID)
+function AF_TooltipMixin:SetItemByID(itemID)
+    self.itemID = itemID
+    self.spellID = nil
+
+    SetItemByID(self, itemID)
 
     local quality = GetItemQualityByID(itemID)
     if quality then
         self:SetBackdropBorderColor(AF.GetItemQualityColor(quality))
     end
 
-    if icon == true then
-        icon = GetItemIconByID(itemID)
-    end
-
+    local icon = GetItemIconByID(itemID)
     if icon then
         if not self.icon then
             self:SetupIcon("TOPRIGHT", "TOPLEFT", -1, 0)
         end
-        self.iconBG:Show()
         self.icon:SetTexture(icon)
-        self.icon:Show()
-    elseif self.icon then
-        self.iconBG:Hide()
-        self.icon:Hide()
     end
 
     self:Show()
     self:SetAlpha(IsRequiredModifierKeyDown(self) and 1 or 0)
 end
 
-function AF_TooltipMixin:SetSpell(spellID, icon)
-    self:SetSpellByID(spellID)
+AF_TooltipMixin.SetItem = AF_TooltipMixin.SetItemByID
 
-    if icon == true then
-        icon = GetSpellTexture(spellID)
-    end
+function AF_TooltipMixin:SetSpellByID(spellID)
+    self.spellID = spellID
+    self.itemID = nil
 
+    SetSpellByID(self, spellID)
+
+    local icon = GetSpellTexture(spellID)
     if icon then
         if not self.icon then
             self:SetupIcon("TOPRIGHT", "TOPLEFT", -1, 0)
         end
-        self.iconBG:Show()
         self.icon:SetTexture(icon)
-        self.icon:Show()
-    else
-        self.iconBG:Hide()
-        self.icon:Hide()
     end
 
     self:Show()
     self:SetAlpha(IsRequiredModifierKeyDown(self) and 1 or 0)
 end
+
+AF_TooltipMixin.SetSpell = AF_TooltipMixin.SetSpellByID
 
 function AF_TooltipMixin:SetupIcon(point, relativePoint, x, y)
     if not self.icon then
@@ -273,6 +278,21 @@ function AF_TooltipMixin:SetupIcon(point, relativePoint, x, y)
 
     AF.ClearPoints(self.iconBG)
     AF.SetPoint(self.iconBG, point, self, relativePoint, x, y)
+end
+
+function AF_TooltipMixin:ShowIcon()
+    if not self.icon then
+        self:SetupIcon("TOPRIGHT", "TOPLEFT", -1, 0)
+    end
+    self.iconBG:Show()
+    self.icon:Show()
+end
+
+function AF_TooltipMixin:HideIcon()
+    if self.icon then
+        self.iconBG:Hide()
+        self.icon:Hide()
+    end
 end
 
 ---@return AF_Tooltip
