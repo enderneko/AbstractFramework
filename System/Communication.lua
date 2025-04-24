@@ -193,15 +193,22 @@ AF.CreateBasicEventHandler(AF.GetDelayedInvoker(9, CheckAllRegisteredChannels), 
 ---------------------------------------------------------------------
 local blockedChannels = {}
 
+local tip = CHAT_CONFIG_CHANNEL_SETTINGS_TITLE_WITH_DRAG_INSTRUCTIONS
+tip = tip:gsub("（", "(")
+tip = tip:gsub("）", ")")
+tip = tip:match("%((.+)%)")
+
 hooksecurefunc("ChatConfig_CreateCheckboxes", function(frame, checkBoxTable, checkBoxTemplate, title)
     local name = frame:GetName()
     if name == "ChatConfigChannelSettingsLeft" then
         for i = 1, #checkBoxTable do
             local checkBox = _G[name .. "Checkbox" .. i]
             if checkBoxTable[i].channelName and blockedChannels[checkBoxTable[i].channelName] then
-                AF.ShowMask(checkBox)
+                AF.ShowMask(checkBox, AF.WrapTextInColor(tip, "firebrick"))
                 if not checkBox._dragHooked then
                     checkBox._dragHooked = true
+                    AF.ClearPoints(checkBox.mask.text)
+                    checkBox.mask.text:SetPoint("RIGHT", checkBox.CloseChannel, "LEFT", -5, 0)
                     checkBox.mask:RegisterForDrag("LeftButton")
                     checkBox.mask:SetScript("OnDragStart", function()
                         checkBox:GetScript("OnDragStart")(checkBox)
