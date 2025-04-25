@@ -58,7 +58,7 @@ end
 function AF.Debug(arg, ...)
     if AFConfig.debugMode then
         if type(arg) == "string" or type(arg) == "number" or type(arg) == "boolean" then
-            print(GetPrefix() .. AF.WrapTextInColor("[DEBUG]", "red"), arg, ...)
+            print(AF.WrapTextInColor("[DEBUG]", "red") .. GetPrefix(), arg, ...)
         elseif type(arg) == "table" then
             if IsAddOnLoaded("TableExplorer") then
                 texplore(arg) -- kinda bug

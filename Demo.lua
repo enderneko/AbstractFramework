@@ -10,9 +10,12 @@ function AF.ShowDemo()
     -----------------------------------------------------------------------------
     --                              headered frame                             --
     -----------------------------------------------------------------------------
-    local demo = AF.CreateHeaderedFrame(AF.UIParent, "AF_DEMO", AF.GetIconString("AF", 16) .. AF.GetGradientText("AbstractFramework", "accent", "accent_alt") .. AF.WrapTextInColor(" Demo", "white"), 710, 500)
-    AF.SetPoint(demo, "LEFT", 100, 0)
-    demo:SetFrameLevel(100)
+    local demo = AF.CreateHeaderedFrame(AF.UIParent, "AF_DEMO",
+        AF.GetIconString("AF", 16) .. AF.GetGradientText("AbstractFramework", "accent", "accent_alt")
+        .. " " .. AF.WrapTextInColor(AF.GetAddOnVersion(AF.name) .. " Demo", "white"), 710, 500)
+    -- AF.SetPoint(demo, "LEFT", 100, 0)
+    demo:SetPoint("CENTER")
+    demo:SetFrameLevel(500)
     demo:SetTitleJustify("LEFT")
 
     local moverTestFrames = {}
@@ -51,6 +54,16 @@ function AF.ShowDemo()
     -- fps
     local fps = AF.CreateFPSPane(demo.header, "RIGHT")
     AF.SetPoint(fps, "RIGHT", ns, "LEFT", -230, 0)
+
+    -----------------------------------------------------------------------------
+    --                                 github                                  --
+    -----------------------------------------------------------------------------
+    local github = AF.CreateEditBox(demo, nil, 350, 20)
+    AF.SetPoint(github, "TOPRIGHT", demo, "BOTTOMRIGHT")
+    github:SetBackdropBorderColor(AF.GetColorRGB("accent"))
+    github:SetText("https://github.com/enderneko/AbstractFramework")
+    github:SetNotUserChangable(true)
+    github:SetCursorPosition(0)
 
 
     -----------------------------------------------------------------------------
@@ -115,9 +128,10 @@ function AF.ShowDemo()
     -----------------------------------------------------------------------------
     local eb1 = AF.CreateEditBox(demo, "Edit Box", 200, 20)
     AF.SetPoint(eb1, "TOPLEFT", cb3, "BOTTOMLEFT", 0, -10)
-    eb1:SetText("https://github.com/enderneko/AbstractFramework")
-    eb1:SetNotUserChangable(true)
-    eb1:SetCursorPosition(0)
+    eb1:SetOnTextChanged(function(text)
+        AF.Print("TextChanged:", text)
+    end)
+    eb1:SetText("Hello!")
 
     local eb2 = AF.CreateEditBox(demo, "Number Only", 200, 20, "number")
     AF.SetPoint(eb2, "TOPLEFT", eb1, "BOTTOMLEFT", 0, -10)

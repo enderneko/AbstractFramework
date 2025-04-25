@@ -138,10 +138,10 @@ function AF_EditBoxMixin:SetNotUserChangable(notUserChangable)
 end
 
 ---@param parent Frame
----@param label string
----@param width number
----@param height number
----@param mode string? "multiline"|"number"|"trim"|nil
+---@param label? string
+---@param width? number
+---@param height? number
+---@param mode? string "multiline"|"number"|"trim"|nil
 ---@param font? string|Font
 ---@return AF_EditBox
 function AF.CreateEditBox(parent, label, width, height, mode, font)
