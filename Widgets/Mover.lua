@@ -178,6 +178,8 @@ local function CreateMoverDialog()
 
         moverGroups:SetItems(items)
         -- moverGroups:SetSelectedValue("all")
+
+        AF.UpdatePixelsForRegionAndChildren(moverDialog)
     end)
 
     -- OnHide

@@ -428,11 +428,29 @@ function AF.UpdatePixels()
     end
 end
 
+-- not ideal
 function AF.UpdatePixelsForAddon(addon)
     addon = addon or AF.GetAddon()
     if addon and addonComponents[addon] then
         for r in next, addonComponents[addon] do
             r:UpdatePixels()
+        end
+    end
+end
+
+-- some object types are not included in GetChildren(), such as Texture, FontString ...
+---@param region Frame
+function AF.UpdatePixelsForRegionAndChildren(region)
+    if region and not region:IsForbidden() and region.GetChildren then
+        -- print(region:GetObjectType())
+        if region.UpdatePixels then
+            region:UpdatePixels()
+        else
+            DefaultUpdatePixels(region)
+        end
+
+        for _, child in pairs({region:GetChildren()}) do
+            AF.UpdatePixelsForRegionAndChildren(child)
         end
     end
 end
