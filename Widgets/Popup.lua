@@ -122,6 +122,27 @@ local function OnPopupShow(p)
     else
         AF.PlaySound("pop")
     end
+
+    -- icon
+    if p.icon then
+        p.iconTex:SetTexture(p.icon)
+
+        if type(p.icon) == "number" then
+            AF.ApplyDefaultTexCoord(p.iconTex) -- for blizzard item/spell icons
+        else
+            AF.ClearTexCoord(p.iconTex)
+        end
+
+        if strmatch(p.icon, "^!") then
+            AF.Show(p.iconTex)
+        else
+            AF.Show(p.iconTex, p.iconBGTex)
+        end
+        AF.SetPoint(p.text, "LEFT", p._textLeftX + 7 + 32, p._textLeftY)
+    else
+        AF.Hide(p.iconTex, p.iconBGTex)
+        AF.SetPoint(p.text, "LEFT", p._textLeftX, p._textLeftY)
+    end
 end
 
 local function OnPopupHide(p)
@@ -195,6 +216,22 @@ local function CreateAnimation(p)
 end
 
 ---------------------------------------------------------------------
+-- icon
+---------------------------------------------------------------------
+local function CreateIcon(p)
+    local iconTex = AF.CreateTexture(p, nil, nil, "OVERLAY")
+    p.iconTex = iconTex
+    iconTex:Hide()
+    AF.SetSize(iconTex, 32, 32)
+    AF.SetPoint(iconTex, "LEFT", 7, 0)
+
+    local iconBGTex = AF.CreateTexture(p, nil, "black", "BORDER")
+    p.iconBGTex = iconBGTex
+    iconBGTex:Hide()
+    AF.SetOnePixelOutside(iconBGTex, iconTex)
+end
+
+---------------------------------------------------------------------
 -- notificationPool
 ---------------------------------------------------------------------
 local npCreationFn = function()
@@ -206,13 +243,18 @@ local npCreationFn = function()
     CreateAnimation(p)
     p:EnableMouse(true)
 
-    -- text ------------------------------------------------------------------ --
+    -- text ---------------------------------------------------------
     local text = AF.CreateFontString(p)
     p.text = text
+    p._textLeftX = 7
+    p._textLeftY = 0
     AF.SetPoint(p.text, "LEFT", 7, 0)
     AF.SetPoint(p.text, "RIGHT", -7, 0)
 
-    -- timerBar -------------------------------------------------------------- --
+    -- icon ---------------------------------------------------------
+    CreateIcon(p)
+
+    -- timerBar -----------------------------------------------------
     local timerBar = CreateFrame("StatusBar", nil, p)
     p.timerBar = timerBar
     timerBar:SetStatusBarTexture(AF.GetPlainTexture())
@@ -221,8 +263,9 @@ local npCreationFn = function()
     AF.SetPoint(timerBar, "BOTTOMRIGHT", -1, 1)
     AF.SetHeight(timerBar, 1)
 
-    -- OnMouseUp ------------------------------------------------------------- --
-    p:SetScript("OnMouseUp", function(self, button)
+    -- OnMouseUp ----------------------------------------------------
+    p:SetOnMouseUp(function(self, button)
+        if p.onClick then p:onClick(button) end
         if button ~= "RightButton" then return end
         if p.timer then
             p.timer:Cancel()
@@ -231,22 +274,22 @@ local npCreationFn = function()
         AddToHidingQueue(p)
     end)
 
-    -- OnHide --------------------------------------------------------------- --
-    p:SetScript("OnHide", function()
+    -- OnHide -------------------------------------------------------
+    p:SetOnHide(function()
         OnPopupHide(p)
         -- release
         notificationPool:Release(p)
     end)
 
-    -- SetTimeout ------------------------------------------------------------ --
+    -- SetTimeout ---------------------------------------------------
     function p:SetTimeout(timeout)
-        p:SetScript("OnShow", function()
+        p:SetOnShow(function()
             OnPopupShow(p)
             -- update height
-            p:SetScript("OnUpdate", function()
+            p:SetOnUpdate(function()
                 p.text:SetWidth(Round(p:GetWidth() - 14))
                 p:SetHeight(Round(p.text:GetHeight()) + 40)
-                p:SetScript("OnUpdate", nil)
+                p:SetOnUpdate(nil)
             end)
             -- timer bar
             p.timer = C_Timer.NewTimer(timeout, function()
@@ -287,19 +330,24 @@ local cpCreationFn = function()
     CreateAnimation(p)
     p:EnableMouse(true)
 
-    -- text ------------------------------------------------------------------ --
+    -- text ---------------------------------------------------------
     local text = AF.CreateFontString(p)
     p.text = text
+    p._textLeftX = 7
+    p._textLeftY = 5
     AF.SetPoint(p.text, "LEFT", 7, 5)
     AF.SetPoint(p.text, "RIGHT", -7, 5)
 
-    -- button ---------------------------------------------------------------- --
+    -- icon ---------------------------------------------------------
+    CreateIcon(p)
+
+    -- button -------------------------------------------------------
     -- local no = AF.CreateButton(p, nil, "red", 30, 15)
     local no = AF.CreateIconButton(p, AF.GetIcon("No"), 16, 16, 1, "gray", "white")
     p.no = no
     AF.SetPoint(no, "BOTTOMRIGHT")
     -- no:SetTexture(AF.GetIcon("Close"), {13, 13})
-    no:SetScript("OnClick", function()
+    no:SetOnClick(function()
         if p.onCancel then p.onCancel() end
         -- AF.Disable(p.yes, p.no)
         AddToHidingQueue(p)
@@ -310,7 +358,7 @@ local cpCreationFn = function()
     p.yes = yes
     AF.SetPoint(yes, "BOTTOMRIGHT", no, "BOTTOMLEFT", -2, 0)
     -- yes:SetTexture(AF.GetIcon("Tick"), {16, 16})
-    yes:SetScript("OnClick", function()
+    yes:SetOnClick(function()
         if p.onConfirm then p.onConfirm() end
         -- AF.Disable(p.yes, p.no)
         AddToHidingQueue(p)
@@ -319,13 +367,13 @@ local cpCreationFn = function()
     local ok = AF.CreateIconButton(p, AF.GetIcon("Yes"), 16, 16, 1, "gray", "white")
     p.ok = ok
     AF.SetPoint(ok, "BOTTOMRIGHT", -1, 0)
-    ok:SetScript("OnClick", function()
+    ok:SetOnClick(function()
         if p.onConfirm then p.onConfirm() end
         AddToHidingQueue(p)
     end)
 
-    -- OnShow ---------------------------------------------------------------- --
-    p:SetScript("OnShow", function()
+    -- OnShow -------------------------------------------------------
+    p:SetOnShow(function()
         OnPopupShow(p)
         -- AF.Enable(yes, no)
         if p.onCancel == false then
@@ -338,19 +386,25 @@ local cpCreationFn = function()
             p.ok:Hide()
         end
         -- update height
-        p:SetScript("OnUpdate", function()
+        p:SetOnUpdate(function()
             p.text:SetWidth(Round(p:GetWidth() - 14))
             p:SetHeight(Round(p.text:GetHeight()) + 50)
-            p:SetScript("OnUpdate", nil)
+            p:SetOnUpdate(nil)
         end)
     end)
 
-    -- OnHide --------------------------------------------------------------- --
-    p:SetScript("OnHide", function()
+    -- OnHide -------------------------------------------------------
+    p:SetOnHide(function()
         OnPopupHide(p)
         -- release
         confirmPool:Release(p)
     end)
+
+    -- OnClick ------------------------------------------------------
+    p:SetOnMouseUp(function(_, button)
+        if p.onClick then p:onClick(button) end
+    end)
+
 
     return p
 end
@@ -368,13 +422,18 @@ local ppCreationFn = function()
     CreateAnimation(p)
     p:EnableMouse(true)
 
-    -- text ------------------------------------------------------------------ --
+    -- text ---------------------------------------------------------
     local text = AF.CreateFontString(p)
     p.text = text
+    p._textLeftX = 7
+    p._textLeftY = 0
     AF.SetPoint(p.text, "LEFT", 7, 0)
     AF.SetPoint(p.text, "RIGHT", -7, 0)
 
-    -- progressBar ----------------------------------------------------------- --
+    -- icon ---------------------------------------------------------
+    CreateIcon(p)
+
+    -- progressBar --------------------------------------------------
     local bar = AF.CreateBlizzardStatusBar(p, nil, nil, 5, 5, "accent", nil, "percentage")
     p.bar = bar
     AF.SetPoint(bar, "BOTTOMLEFT")
@@ -385,11 +444,7 @@ local ppCreationFn = function()
     bar.progressText:SetFontObject("AF_FONT_SMALL")
 
     p.callback = function(value)
-        if p.isSmoothedBar then
             p.bar:SetSmoothedValue(value)
-        else
-            p.bar:SetBarValue(value)
-        end
         if value >= bar.maxValue then
             if p:IsShown() then
                 C_Timer.After(DEFAULT_PROGRESS_TIMEOUT, function()
@@ -399,14 +454,14 @@ local ppCreationFn = function()
         end
     end
 
-    -- OnShow ---------------------------------------------------------------- --
-    p:SetScript("OnShow", function()
+    -- OnShow -------------------------------------------------------
+    p:SetOnShow(function()
         OnPopupShow(p)
         -- update height
-        p:SetScript("OnUpdate", function()
+        p:SetOnUpdate(function()
             p.text:SetWidth(Round(p:GetWidth() - 14))
             p:SetHeight(Round(p.text:GetHeight()) + 40)
-            p:SetScript("OnUpdate", nil)
+            p:SetOnUpdate(nil)
         end)
         -- check if is done
         if bar:GetValue() >= bar.maxValue then
@@ -416,11 +471,16 @@ local ppCreationFn = function()
         end
     end)
 
-    -- OnHide --------------------------------------------------------------- --
-    p:SetScript("OnHide", function()
+    -- OnHide -------------------------------------------------------
+    p:SetOnHide(function()
         OnPopupHide(p)
         -- release
         progressPool:Release(p)
+    end)
+
+    -- OnClick ------------------------------------------------------
+    p:SetOnMouseUp(function(_, button)
+        if p.onClick then p:onClick(button) end
     end)
 
     return p
@@ -431,17 +491,23 @@ progressPool = CreateObjectPool(ppCreationFn)
 -- notification popup
 ---------------------------------------------------------------------
 ---@param text string
----@param sound? string
 ---@param timeout? number default 10 seconds
+---@param icon? string|number if starts with "!", will show a transparent icon bg instead of black
+---@param sound? string
+---@param onClick? fun(popup:AF_BorderedFrame, button:string)
 ---@param width? number default 220
 ---@param justify? string default "CENTER"
-function AF.ShowNotificationPopup(text, sound, timeout, width, justify)
+function AF.ShowNotificationPopup(text, timeout, icon, sound, onClick, width, justify)
     local p = notificationPool:Acquire()
     p.text:SetText(text)
     AF.SetWidth(p, width or DEFAULT_WIDTH)
     p:SetTimeout(timeout or DEFAULT_NOTIFICATION_TIMEOUT)
-    p.text:SetJustifyH("CENTER" or justify)
+    p.text:SetJustifyH(justify or "CENTER")
     -- AF.ApplyDefaultBackdropWithColors(p, color, borderColor)
+
+    p.icon = icon
+    p.sound = sound
+    p.onClick = onClick
 
     tinsert(popups, p)
     p.index = #popups
@@ -452,18 +518,24 @@ end
 -- confirm popup
 ---------------------------------------------------------------------
 ---@param text string
----@param sound? string
 ---@param onConfirm? function
 ---@param onCancel? function|false if false, the popup will show single ok button instead of yes/no
+---@param icon? string|number if starts with "!", will show a transparent icon bg instead of black
+---@param sound? string
+---@param onClick? fun(popup:AF_BorderedFrame, button:string)
 ---@param width? number default 220
 ---@param justify? string default "CENTER"
-function AF.ShowConfirmPopup(text, sound, onConfirm, onCancel, width, justify)
+function AF.ShowConfirmPopup(text, onConfirm, onCancel, icon, sound, onClick, width, justify)
     local p = confirmPool:Acquire()
     p.text:SetText(text)
+    AF.SetWidth(p, width or DEFAULT_WIDTH)
+    p.text:SetJustifyH(justify or "CENTER")
+
     p.onConfirm = onConfirm
     p.onCancel = onCancel
-    AF.SetWidth(p, width or DEFAULT_WIDTH)
-    p.text:SetJustifyH("CENTER" or justify)
+    p.icon = icon
+    p.sound = sound
+    p.onClick = onClick
 
     tinsert(popups, p)
     p.index = #popups
@@ -474,19 +546,23 @@ end
 -- progress popup
 ---------------------------------------------------------------------
 ---@param text string
----@param sound? string
 ---@param maxValue number
----@param isSmoothedBar? boolean
+---@param icon? string|number if starts with "!", will show a transparent icon bg instead of black
+---@param sound? string
+---@param onClick? fun(popup:AF_BorderedFrame, button:string)
 ---@param width? number default 220
 ---@param justify? string default "CENTER"
-function AF.ShowProgressPopup(text, sound, maxValue, isSmoothedBar, width, justify)
+function AF.ShowProgressPopup(text, maxValue, icon, sound, onClick, width, justify)
     local p = progressPool:Acquire()
     AF.SetWidth(p, width or DEFAULT_WIDTH)
     p.text:SetText(text)
-    p.text:SetJustifyH("CENTER" or justify)
-    p.bar:SetMinMaxValues(0, maxValue)
+    p.text:SetJustifyH(justify or "CENTER")
+    p.bar:SetMinMaxSmoothedValue(0, maxValue)
     p.bar:SetBarValue(0)
-    p.isSmoothedBar = isSmoothedBar
+
+    p.icon = icon
+    p.sound = sound
+    p.onClick = onClick
 
     tinsert(popups, p)
     p.index = #popups
