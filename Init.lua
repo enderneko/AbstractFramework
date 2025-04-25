@@ -118,6 +118,10 @@ function AF.UIParent:ADDON_LOADED(addon)
         AF.SetScale(AFConfig.scale)
         -- if type(AFConfig.uiScale) ~= "number" then AFConfig.uiScale = UIParent:GetScale() end
         -- UIParent:SetScale(AFConfig.uiScale)
+
+        -- popups
+        if type(AFConfig.popups) ~= "table" then AFConfig.popups = {} end
+        AF.SetupPopups(AFConfig.popups)
     end
 end
 

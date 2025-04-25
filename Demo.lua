@@ -804,8 +804,6 @@ function AF.ShowDemo()
     -----------------------------------------------------------------------------
     --                                  popups                                 --
     -----------------------------------------------------------------------------
-    AF.CreatePopupMover("general", "Popups")
-
     local bf5 = AF.CreateBorderedFrame(demo, nil, 370, 20)
     AF.SetPoint(bf5, "BOTTOMLEFT", b10, "BOTTOMRIGHT", 10, 0)
 
@@ -901,21 +899,21 @@ function AF.ShowDemo()
             end,
         },
         {
-            ["text"] = "General",
+            ["text"] = "Popups",
             ["onClick"] = function()
-                AF.ShowMovers("general")
+                AF.ShowMovers("Popups")
             end,
         },
         {
-            ["text"] = "Group 1",
+            ["text"] = "Test 1",
             ["onClick"] = function()
-                AF.ShowMovers("group1")
+                AF.ShowMovers("Test 1")
             end,
         },
         {
-            ["text"] = "Group 2",
+            ["text"] = "Test 2",
             ["onClick"] = function()
-                AF.ShowMovers("group2")
+                AF.ShowMovers("Test 2")
             end,
         },
     })
@@ -929,17 +927,17 @@ function AF.ShowDemo()
     end
 
     -- group1
-    CreateMoverTestFrame(1, "test1", "TOPLEFT")
-    CreateMoverTestFrame(2, "test1", "LEFT")
-    CreateMoverTestFrame(3, "test1", "BOTTOMLEFT")
-    CreateMoverTestFrame(4, "test1", "TOP")
-    CreateMoverTestFrame(5, "test1", "CENTER")
+    CreateMoverTestFrame(1, "Test 1", "TOPLEFT")
+    CreateMoverTestFrame(2, "Test 1", "LEFT")
+    CreateMoverTestFrame(3, "Test 1", "BOTTOMLEFT")
+    CreateMoverTestFrame(4, "Test 1", "TOP")
+    CreateMoverTestFrame(5, "Test 1", "CENTER")
 
     -- group2
-    CreateMoverTestFrame(6, "test2", "TOPRIGHT")
-    CreateMoverTestFrame(7, "test2", "RIGHT")
-    CreateMoverTestFrame(8, "test2", "BOTTOM")
-    CreateMoverTestFrame(9, "test2", "BOTTOMRIGHT")
+    CreateMoverTestFrame(6, "Test 2", "TOPRIGHT")
+    CreateMoverTestFrame(7, "Test 2", "RIGHT")
+    CreateMoverTestFrame(8, "Test 2", "BOTTOM")
+    CreateMoverTestFrame(9, "Test 2", "BOTTOMRIGHT")
 
 
     -----------------------------------------------------------------------------

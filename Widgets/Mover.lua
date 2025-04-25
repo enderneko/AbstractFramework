@@ -136,6 +136,7 @@ local function CreateMoverDialog()
 
     -- dropdown
     local moverGroups = AF.CreateDropdown(moverDialog, 20, 7)
+    moverDialog.moverGroups = moverGroups
     AF.SetPoint(moverGroups, "BOTTOMLEFT", 7, 7)
     AF.SetPoint(moverGroups, "RIGHT", undo, "LEFT", -7, 0)
     local items = {}
@@ -176,7 +177,7 @@ local function CreateMoverDialog()
         })
 
         moverGroups:SetItems(items)
-        moverGroups:SetSelectedValue("all")
+        -- moverGroups:SetSelectedValue("all")
     end)
 
     -- OnHide
@@ -755,6 +756,7 @@ function AF.ShowMovers(group)
     end
     moverParent:Show()
     moverDialog:Show()
+    moverDialog.moverGroups:SetSelectedValue(group or "all")
     if positionAdjustmentFrame then positionAdjustmentFrame:Hide() end
 end
 
