@@ -229,7 +229,12 @@ function AF_TitledPaneMixin:SetTips(...)
     self.tips:SetTips(...)
 end
 
----@param color string color name defined in Color.lua
+-- recommended position for first component is "TOPLEFT", 0, -25/-30
+---@param parent Frame
+---@param title string
+---@param width? number
+---@param height? number
+---@param color? string color name defined in Color.lua
 ---@return AF_TitledPane
 function AF.CreateTitledPane(parent, title, width, height, color)
     color = color or "accent"
