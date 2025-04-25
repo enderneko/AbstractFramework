@@ -45,4 +45,5 @@ if LOCALE_zhCN then
     L["%s ago"] = "%s前"
     L["%s from now"] = "%s后"
     L["just now"] = "刚刚"
+    L["Popups"] = "通知弹窗"
 end

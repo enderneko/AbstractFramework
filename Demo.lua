@@ -828,7 +828,7 @@ function AF.ShowDemo()
     AF.SetPoint(b14, "BOTTOMRIGHT")
     AF.SetTooltips(b14, "ANCHOR_TOPLEFT", 0, 2, "Progress Popup", "With progress bar", "Hide in 5 sec after completion")
     b14:SetScript("OnClick", function()
-        local callback = AF.ShowProgressPopup("In Progress...", 100, true)
+        local callback = AF.ShowProgressPopup("In Progress...", nil, 100, true)
         local v = 0
         C_Timer.NewTicker(2, function()
             v = v + 25
@@ -841,7 +841,7 @@ function AF.ShowDemo()
     AF.SetTooltips(b15, "ANCHOR_TOPLEFT", 0, 2, "Confirm Popup", "With \"Yes\" & \"No\" buttons", "Won't hide automatically")
     b15:SetScript("OnClick", function()
         for i = 1, 3 do
-            AF.ShowConfirmPopup("Confirm " .. i, function()
+            AF.ShowConfirmPopup("Confirm " .. i, nil, function()
                 AF.Print("Confirm " .. i, "yes")
             end, function()
                 AF.Print("Confirm " .. i, "no")
@@ -855,7 +855,7 @@ function AF.ShowDemo()
     b16:SetScript("OnClick", function()
         for i = 1, 3 do
             local timeout = random(2, 7)
-            AF.ShowNotificationPopup("Notification " .. AF.WrapTextInColor(timeout .. "sec", "gray"), timeout)
+            AF.ShowNotificationPopup("Notification " .. AF.WrapTextInColor(timeout .. "sec", "gray"), nil, timeout)
         end
     end)
 
