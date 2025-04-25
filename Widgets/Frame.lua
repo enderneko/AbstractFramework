@@ -85,6 +85,7 @@ function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata,
 
     f.notUserPlaced = notUserPlaced
 
+    AF.ShowNormalGlow(f, 2, "shadow")
     f:EnableMouse(true)
     -- f:SetIgnoreParentScale(true)
     -- f:SetResizable(false)
