@@ -26,6 +26,9 @@ function AF.GetDateString(sec)
 end
 
 function AF.IsToday(sec)
+    if type(sec) ~= "number" then
+        return false
+    end
     local today = date("%Y%m%d")
     local dateStr = date("%Y%m%d", sec)
     return today == dateStr
