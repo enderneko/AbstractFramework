@@ -52,6 +52,11 @@ function AF.ApplyDefaultTexCoord(tex)
     tex:SetTexCoord(AF.GetDefaultTexCoord())
 end
 
+---@param tex Texture
+function AF.ClearTexCoord(tex)
+    tex:SetTexCoord(0, 1, 0, 1)
+end
+
 ---------------------------------------------------------------------
 -- calc texcoord
 ---------------------------------------------------------------------
