@@ -223,7 +223,7 @@ local function CreateIcon(p)
     p.iconTex = iconTex
     iconTex:Hide()
     AF.SetSize(iconTex, 32, 32)
-    AF.SetPoint(iconTex, "LEFT", 7, 0)
+    AF.SetPoint(iconTex, "LEFT", 7, p._textLeftY)
 
     local iconBGTex = AF.CreateTexture(p, nil, "black", "BORDER")
     p.iconBGTex = iconBGTex
@@ -264,14 +264,16 @@ local npCreationFn = function()
     AF.SetHeight(timerBar, 1)
 
     -- OnMouseUp ----------------------------------------------------
-    p:SetOnMouseUp(function(self, button)
-        if p.onClick then p:onClick(button) end
-        if button ~= "RightButton" then return end
-        if p.timer then
-            p.timer:Cancel()
-            p.timer = nil
+    p:SetOnMouseUp(function(_, button)
+        if button == "LeftButton" then
+            if p.onClick then p:onClick(button, unpack(p.onClickArgs)) end
+        elseif button == "RightButton" then
+            if p.timer then
+                p.timer:Cancel()
+                p.timer = nil
+            end
+            AddToHidingQueue(p)
         end
-        AddToHidingQueue(p)
     end)
 
     -- OnHide -------------------------------------------------------
@@ -388,7 +390,7 @@ local cpCreationFn = function()
         -- update height
         p:SetOnUpdate(function()
             p.text:SetWidth(Round(p:GetWidth() - 14))
-            p:SetHeight(Round(p.text:GetHeight()) + 50)
+            p:SetHeight(Round(p.text:GetHeight()) + 45)
             p:SetOnUpdate(nil)
         end)
     end)
@@ -402,7 +404,7 @@ local cpCreationFn = function()
 
     -- OnClick ------------------------------------------------------
     p:SetOnMouseUp(function(_, button)
-        if p.onClick then p:onClick(button) end
+        if button == "LeftButton" and p.onClick then p:onClick(button, unpack(p.onClickArgs)) end
     end)
 
 
@@ -480,7 +482,7 @@ local ppCreationFn = function()
 
     -- OnClick ------------------------------------------------------
     p:SetOnMouseUp(function(_, button)
-        if p.onClick then p:onClick(button) end
+        if button == "LeftButton" and p.onClick then p:onClick(button, unpack(p.onClickArgs)) end
     end)
 
     return p
@@ -494,10 +496,11 @@ progressPool = CreateObjectPool(ppCreationFn)
 ---@param timeout? number default 10 seconds
 ---@param icon? string|number if starts with "!", will show a transparent icon bg instead of black
 ---@param sound? string
----@param onClick? fun(popup:AF_BorderedFrame, button:string)
 ---@param width? number default 220
 ---@param justify? string default "CENTER"
-function AF.ShowNotificationPopup(text, timeout, icon, sound, onClick, width, justify)
+---@param onClick? fun(popup:AF_BorderedFrame, button:string, ...:any)
+---@param ... any arguments to pass to the onClick function
+function AF.ShowNotificationPopup(text, timeout, icon, sound, width, justify, onClick, ...)
     local p = notificationPool:Acquire()
     p.text:SetText(text)
     AF.SetWidth(p, width or DEFAULT_WIDTH)
@@ -508,6 +511,7 @@ function AF.ShowNotificationPopup(text, timeout, icon, sound, onClick, width, ju
     p.icon = icon
     p.sound = sound
     p.onClick = onClick
+    p.onClickArgs = {...}
 
     tinsert(popups, p)
     p.index = #popups
@@ -522,10 +526,11 @@ end
 ---@param onCancel? function|false if false, the popup will show single ok button instead of yes/no
 ---@param icon? string|number if starts with "!", will show a transparent icon bg instead of black
 ---@param sound? string
----@param onClick? fun(popup:AF_BorderedFrame, button:string)
 ---@param width? number default 220
 ---@param justify? string default "CENTER"
-function AF.ShowConfirmPopup(text, onConfirm, onCancel, icon, sound, onClick, width, justify)
+---@param onClick? fun(popup:AF_BorderedFrame, button:string, ...:any)
+---@param ... any arguments to pass to the onClick function
+function AF.ShowConfirmPopup(text, onConfirm, onCancel, icon, sound, width, justify, onClick, ...)
     local p = confirmPool:Acquire()
     p.text:SetText(text)
     AF.SetWidth(p, width or DEFAULT_WIDTH)
@@ -536,6 +541,7 @@ function AF.ShowConfirmPopup(text, onConfirm, onCancel, icon, sound, onClick, wi
     p.icon = icon
     p.sound = sound
     p.onClick = onClick
+    p.onClickArgs = {...}
 
     tinsert(popups, p)
     p.index = #popups
@@ -549,10 +555,11 @@ end
 ---@param maxValue number
 ---@param icon? string|number if starts with "!", will show a transparent icon bg instead of black
 ---@param sound? string
----@param onClick? fun(popup:AF_BorderedFrame, button:string)
 ---@param width? number default 220
 ---@param justify? string default "CENTER"
-function AF.ShowProgressPopup(text, maxValue, icon, sound, onClick, width, justify)
+---@param onClick? fun(popup:AF_BorderedFrame, button:string, ...:any)
+---@param ... any arguments to pass to the onClick function
+function AF.ShowProgressPopup(text, maxValue, icon, sound, width, justify, onClick, ...)
     local p = progressPool:Acquire()
     AF.SetWidth(p, width or DEFAULT_WIDTH)
     p.text:SetText(text)
@@ -563,6 +570,7 @@ function AF.ShowProgressPopup(text, maxValue, icon, sound, onClick, width, justi
     p.icon = icon
     p.sound = sound
     p.onClick = onClick
+    p.onClickArgs = {...}
 
     tinsert(popups, p)
     p.index = #popups
