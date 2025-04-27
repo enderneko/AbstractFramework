@@ -244,7 +244,8 @@ end
 function AF.SetEnabled(isEnabled, ...)
     if isEnabled == nil then isEnabled = false end
 
-    for _, w in pairs({...}) do
+    for i = 1, select("#", ...) do
+        local w = select(i, ...)
         if w:IsObjectType("FontString") then
             if isEnabled then
                 w:SetTextColor(AF.GetColorRGB("white"))
@@ -273,6 +274,34 @@ end
 
 function AF.Disable(...)
     AF.SetEnabled(false, ...)
+end
+
+---------------------------------------------------------------------
+-- show / hide
+---------------------------------------------------------------------
+function AF.Show(...)
+    for i = 1, select("#", ...) do
+        local w = select(i, ...)
+        w:Show()
+    end
+end
+
+function AF.Hide(...)
+    for i = 1, select("#", ...) do
+        local w = select(i, ...)
+        w:Hide()
+    end
+end
+
+function AF.Toggle(...)
+    for i = 1, select("#", ...) do
+        local w = select(i, ...)
+        if w:IsShown() then
+            w:Hide()
+        else
+            w:Show()
+        end
+    end
 end
 
 ---------------------------------------------------------------------
