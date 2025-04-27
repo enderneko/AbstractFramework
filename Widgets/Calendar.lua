@@ -9,9 +9,9 @@ else
     AF.FIRST_WEEKDAY = 7
 end
 
-if GetCVar("portal") == "US" then
+if AF.portal == "US" then
     AF.RAID_LOCKOUT_RESET_DAY = 2
-elseif GetCVar("portal") == "EU" then
+elseif AF.portal == "EU" then
     AF.RAID_LOCKOUT_RESET_DAY = 3
 else
     AF.RAID_LOCKOUT_RESET_DAY = 4
