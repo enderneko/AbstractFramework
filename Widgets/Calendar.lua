@@ -348,9 +348,9 @@ function AF_CalendarButtonMixin:SetDate(d)
         self.date.day = dt.day
         self.date.timestamp = time(self.date)
     elseif type(d) == "table" then
-        self.date.year = d.year
-        self.date.month = d.month
-        self.date.day = d.day
+        self.date.year = tonumber(d.year)
+        self.date.month = tonumber(d.month)
+        self.date.day = tonumber(d.day)
         self.date.timestamp = time(self.date)
     end
     self:SetText(self.date.year .. "/" .. self.date.month .. "/" .. self.date.day)
