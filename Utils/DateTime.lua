@@ -16,13 +16,23 @@ local date, time = date, time
 function AF.FormatTime(sec, format)
     format = format or "%Y/%m/%d %H:%M:%S"
     -- date() is equivalent to date("%c")
-    return date("%Y/%m/%d %H:%M:%S", sec)
+    return date(format, sec)
 end
 
 ---@param sec number?
 ---@return string YYYYMMDD
 function AF.GetDateString(sec)
     return date("%Y%m%d", sec)
+end
+
+---@param dateStr string YYYYMMDD
+---@return number? seconds
+function AF.GetDateSeconds(dateStr)
+    if type(dateStr) ~= "string" then return end
+
+    local year, month, day = dateStr:match("(%d%d%d%d)(%d%d)(%d%d)")
+    if not (year and month and day) then return end
+    return time({year = year, month = month, day = day, hour = 0, min = 0, sec = 0})
 end
 
 function AF.IsToday(sec)
