@@ -11,7 +11,7 @@ local callbacks = {
 }
 
 ---@param event string
----@param callback function
+---@param callback fun(event:string, ...:any) function to call when event is fired
 ---@param priority string? "high"|"medium"|"low", default is "medium"
 ---@param tag string? for Unregister/Get
 function AF.RegisterCallback(event, callback, priority, tag)
@@ -64,23 +64,29 @@ function AF.UnregisterAllCallbacks(event)
 end
 
 function AF.Fire(event, ...)
-    AF.Debug(event, "->", ...)
+    if AFConfig.debugMode then
+        if select("#", ...) > 0 then
+            print(AF.WrapTextInColor("[EVENT_FIRED]", "hotpink"), event, "->", ...)
+        else
+            print(AF.WrapTextInColor("[EVENT_FIRED]", "hotpink"), event)
+        end
+    end
 
     if callbacks.high[event] then
         for fn in pairs(callbacks.high[event]) do
-                fn(...)
+                fn(event, ...)
             end
     end
 
     if callbacks.medium[event] then
         for fn in pairs(callbacks.medium[event]) do
-            fn(...)
+            fn(event, ...)
         end
     end
 
     if callbacks.low[event] then
         for fn in pairs(callbacks.low[event]) do
-            fn(...)
+            fn(event, ...)
         end
     end
 end
