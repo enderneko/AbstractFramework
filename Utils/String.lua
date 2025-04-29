@@ -9,10 +9,29 @@ local tinsert, tconcat = table.insert, table.concat
 -- string
 ---------------------------------------------------------------------
 function AF.UpperFirst(str, lowerOthers)
+    if AF.IsBlank(str) then return str end
+
     if lowerOthers then
         str = strlower(str)
     end
     return (str:gsub("^%l", strupper))
+end
+
+local function CapitalizeWord(space, firstChar, rest)
+    return space .. strupper(firstChar) .. rest
+end
+
+function AF.UpperEachWord(str, lowerOthers)
+    if AF.IsBlank(str) then return str end
+
+    if lowerOthers then
+        str = strlower(str)
+    end
+
+    -- %s matches whitespace
+    -- %w matches alphanumeric chars
+    -- %w* matches zero or more alphanumeric chars
+    return (str:gsub("(%s?)(%w)(%w*)", CapitalizeWord))
 end
 
 function AF.SplitString(sep, str)
