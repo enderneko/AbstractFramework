@@ -35,11 +35,14 @@ function AF.GetDateSeconds(dateStr)
     return time({year = year, month = month, day = day, hour = 0, min = 0, sec = 0})
 end
 
-function AF.IsToday(sec)
+---@param sec number
+---@param useServerTime boolean
+---@return boolean
+function AF.IsToday(sec, useServerTime)
     if type(sec) ~= "number" then
         return false
     end
-    local today = date("%Y%m%d")
+    local today = date("%Y%m%d", useServerTime and time() or GetServerTime())
     local dateStr = date("%Y%m%d", sec)
     return today == dateStr
 end
