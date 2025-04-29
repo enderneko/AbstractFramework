@@ -283,16 +283,16 @@ local npCreationFn = function()
         notificationPool:Release(p)
     end)
 
+    -- OnUpdate -----------------------------------------------------
+    p:SetOnUpdate(function()
+        -- update height
+        p:SetHeight(Round(p.text:GetStringHeight()) + 40)
+    end)
+
     -- SetTimeout ---------------------------------------------------
     function p:SetTimeout(timeout)
         p:SetOnShow(function()
             OnPopupShow(p)
-            -- update height
-            p:SetOnUpdate(function()
-                p.text:SetWidth(Round(p:GetWidth() - 14))
-                p:SetHeight(Round(p.text:GetHeight()) + 40)
-                p:SetOnUpdate(nil)
-            end)
             -- timer bar
             p.timer = C_Timer.NewTimer(timeout, function()
                 p.timer = nil
@@ -387,12 +387,6 @@ local cpCreationFn = function()
             p.no:Show()
             p.ok:Hide()
         end
-        -- update height
-        p:SetOnUpdate(function()
-            p.text:SetWidth(Round(p:GetWidth() - 14))
-            p:SetHeight(Round(p.text:GetHeight()) + 45)
-            p:SetOnUpdate(nil)
-        end)
     end)
 
     -- OnHide -------------------------------------------------------
@@ -400,6 +394,12 @@ local cpCreationFn = function()
         OnPopupHide(p)
         -- release
         confirmPool:Release(p)
+    end)
+
+    -- OnUpdate -----------------------------------------------------
+    p:SetOnUpdate(function()
+        -- update height
+        p:SetHeight(Round(p.text:GetStringHeight()) + 45)
     end)
 
     -- OnClick ------------------------------------------------------
@@ -459,12 +459,6 @@ local ppCreationFn = function()
     -- OnShow -------------------------------------------------------
     p:SetOnShow(function()
         OnPopupShow(p)
-        -- update height
-        p:SetOnUpdate(function()
-            p.text:SetWidth(Round(p:GetWidth() - 14))
-            p:SetHeight(Round(p.text:GetHeight()) + 40)
-            p:SetOnUpdate(nil)
-        end)
         -- check if is done
         if bar:GetValue() >= bar.maxValue then
             C_Timer.After(DEFAULT_PROGRESS_TIMEOUT, function()
@@ -478,6 +472,12 @@ local ppCreationFn = function()
         OnPopupHide(p)
         -- release
         progressPool:Release(p)
+    end)
+
+    -- OnUpdate -----------------------------------------------------
+    p:SetOnUpdate(function()
+        -- update height
+        p:SetHeight(Round(p.text:GetStringHeight()) + 40)
     end)
 
     -- OnClick ------------------------------------------------------
