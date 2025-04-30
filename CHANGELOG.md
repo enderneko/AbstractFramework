@@ -1,5 +1,48 @@
-[Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r6...cb25d4b0118578ec39f032b4de7248c2e4c0222d)
+[Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r7...f88e268e601959adb1e59957f337f15379ac9ce5)
 
-
-- Update HelpTip
+- Add AF_IconButtonMixin.SetColor
+- Add AF_TipsButton
+- Add AF.ClearTexCoord
+- Add AF.ExtractSubTableValues
+- Add AF.FormatMoney
+- Add AF.GetAddOnVersion
+- Add AF.GetColorStr
+- Add AF.GetDateSeconds
+- Add AF.GetDateString
+- Add AF.GetMaxKeyValue
+- Add AF.IsToday
+- Add AF.portal
+- Add AF.Show/Hide/Toggle
+- Add AF.UnregisterComm
+- Add AF.UpdatePixelsForRegionAndChildren
+- Add AF.UpperEachWord
+- Add channel functions
+- Add EnableYes/EnableNo for dialog
+- Add Events
+- Add lib AF_BASE64
+- Add lib AF_JSON
+- Add plain table support for AF_DropdownMixin.SetItems
+- Add shadows (glows)
 - Add some icons
+- Add some sounds
+- Fix missing AF_BaseWidgetMixin for AF_Frame
+- Implement ItemLoadExecutor
+- Prevent nil error on SetDialogPoint/SetNotificationDialogPoint
+- Rename AFIconTooltip -> Tooltip2
+- Rename icons
+- Reorganize Utils
+- Trivial update
+- Update AF_Tooltip
+- Update AF.Debug prints
+- Update AF.EscapeIcon and AF.GetIconString
+- Update AF.Serialize/Deserialize
+- Update calendar
+- Update CallbackHandler
+- Update color names
+- Update comm functions
+- Update debug print
+- Update demo
+- Update mover
+- Update popups
+- Update quality colors
+- Update zhCN
