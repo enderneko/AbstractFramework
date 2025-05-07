@@ -4,6 +4,11 @@ local AF = _G.AbstractFramework
 AF.AddEventHandler(AF)
 
 ---------------------------------------------------------------------
+-- login
+---------------------------------------------------------------------
+AF:RegisterEvent("PLAYER_LOGIN", AF.GetFireFunc("AF_PLAYER_LOGIN"))
+
+---------------------------------------------------------------------
 -- instance
 ---------------------------------------------------------------------
 local IsInInstance = IsInInstance
@@ -16,8 +21,15 @@ local wasInInstance = nil
 --     true if the player was in an instance before
 --     false if not
 
-AF:RegisterEvent("PLAYER_ENTERING_WORLD", function()
+AF:RegisterEvent("PLAYER_ENTERING_WORLD", function(_, _, isInitialLogin, isReloadingUi)
+    AF.Fire("AF_PLAYER_ENTERING_WORLD", isInitialLogin, isReloadingUi)
+
     local isIn, iType = IsInInstance()
+
+    if type(wasInInstance) == "boolean" and isIn ~= wasInInstance then
+        AF.Fire("AF_INSTANCE_CHANGE", iType)
+    end
+
     if isIn then
         AF.Fire("AF_INSTANCE_ENTER", iType, wasInInstance)
         wasInInstance = true
