@@ -158,6 +158,16 @@ function AF.TransposeTable(t, value)
     return temp
 end
 
+---@param t table
+---@return table temp a new table with the keys and values swapped
+function AF.SwapKeyValue(t)
+    local temp = {}
+    for k, v in pairs(t) do
+        temp[v] = k
+    end
+    return temp
+end
+
 -- converts a table using a processor function
 ---@param t table the table to convert
 ---@param processor fun(key: any, value: any): (any, any) the processor function that takes a key and value and returns a new key and value
