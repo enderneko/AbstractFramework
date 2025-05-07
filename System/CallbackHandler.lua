@@ -66,9 +66,9 @@ end
 function AF.Fire(event, ...)
     if AFConfig.debugMode then
         if select("#", ...) > 0 then
-            print(AF.WrapTextInColor("[EVENT_FIRED]", "hotpink"), event, "->", ...)
+            print(AF.WrapTextInColor("[EVENT]", "hotpink"), event, "->", ...)
         else
-            print(AF.WrapTextInColor("[EVENT_FIRED]", "hotpink"), event)
+            print(AF.WrapTextInColor("[EVENT]", "hotpink"), event)
         end
     end
 
