@@ -1,7 +1,7 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 
--- NOTE: for better performance, you might want to move these to your addon
+-- NOTE: it's highly recommended to use a unique prefix for every event
 
 local callbacks = {
     -- invoke priority
@@ -12,7 +12,7 @@ local callbacks = {
 
 ---@param event string
 ---@param callback fun(event:string, ...:any) function to call when event is fired
----@param priority string? "high"|"medium"|"low", default is "medium"
+---@param priority string? "high"|"medium"|"low", default is "medium".
 ---@param tag string? for Unregister/Get
 function AF.RegisterCallback(event, callback, priority, tag)
     assert(not priority or priority == "high" or priority == "medium" or priority == "low", "Priority must be high, medium, low or nil.")
@@ -92,9 +92,33 @@ function AF.Fire(event, ...)
 end
 
 function AF.GetFireFunc(event, ...)
-    local args = {...}
-    return function()
-        AF.Fire(event, unpack(args))
+    local a1, a2, a3 = ...
+    local numArgs = select("#", ...)
+    local args
+    if numArgs > 3 then
+        args = {...}
+    end
+
+    if numArgs == 0 then
+        return function()
+            AF.Fire(event)
+        end
+    elseif numArgs == 1 then
+        return function()
+            AF.Fire(event, a1)
+        end
+    elseif numArgs == 2 then
+        return function()
+            AF.Fire(event, a1, a2)
+        end
+    elseif numArgs == 3 then
+        return function()
+            AF.Fire(event, a1, a2, a3)
+        end
+    else
+        return function()
+            AF.Fire(event, unpack(args, 1, numArgs))
+        end
     end
 end
 

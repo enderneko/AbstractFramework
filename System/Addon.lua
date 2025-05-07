@@ -56,7 +56,7 @@ local function GetPrefix()
 end
 
 function AF.Debug(arg, ...)
-    if AFConfig.debugMode then
+    if AFConfig and AFConfig.debugMode then
         if type(arg) == "string" or type(arg) == "number" or type(arg) == "boolean" then
             print(AF.WrapTextInColor("[DEBUG]", "red") .. GetPrefix(), arg, ...)
         elseif type(arg) == "table" then
