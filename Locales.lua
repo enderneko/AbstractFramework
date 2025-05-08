@@ -27,6 +27,7 @@ if LOCALE_zhCN then
     L["About"] = "关于"
     L["Anchor Locked"] = "锚点已锁定"
     L["Author"] = "作者"
+    L["Authors"] = "作者"
     L["Close this dialog to exit Edit Mode"] = "关闭此窗口以退出编辑模式"
     L["Config"] = "设置"
     L["Export"] = "导出"
@@ -51,6 +52,7 @@ if LOCALE_zhCN then
     L["Tips"] = "提示"
     L["toggle Position Adjustment dialog"] = "打开/关闭微调窗口"
     L["Translator"] = "翻译"
+    L["Translators"] = "翻译"
     L["Undo"] = "撤消"
     L["Version"] = "版本"
 end
