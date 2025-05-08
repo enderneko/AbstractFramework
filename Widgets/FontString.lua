@@ -12,6 +12,16 @@ function AF_FontStringMixin:SetColor(color)
     AF.ColorFontString(self, color)
 end
 
+---@param text string
+function AF_FontStringMixin:AppendText(text)
+    local currentText = self:GetText()
+    if currentText and currentText ~= "" then
+        self:SetText(currentText .. text)
+    else
+        self:SetText(text)
+    end
+end
+
 ---@param color string color name defined in Color.lua
 ---@param font string color name defined in Font.lua
 ---@return AF_FontString fs
