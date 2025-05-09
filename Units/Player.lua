@@ -18,6 +18,7 @@ local GetSpecializationInfo = GetSpecializationInfo
 -- player info
 ---------------------------------------------------------------------
 AF.player = {}
+AF.player.localizedClass, AF.player.class, AF.player.classID = UnitClass("player")
 
 --* AF_PLAYER_DATA_UPDATE
 -- payload: isLogin boolean, if true, this is the first time the player data is loaded
@@ -25,7 +26,6 @@ AF.player = {}
 local function PLAYER_LOGIN()
     AF.player.name = UnitName("player")
     AF.player.fullName = AF.UnitFullName("player")
-    AF.player.localizedClass, AF.player.class, AF.player.classID = UnitClass("player")
     AF.player.level = UnitLevel("player")
     AF.player.guid = UnitGUID("player")
     AF.player.realm = GetRealmName()
