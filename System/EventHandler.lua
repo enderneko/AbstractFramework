@@ -16,12 +16,13 @@ local _UnregisterAllEvents = sharedEventHandler.UnregisterAllEvents
 ---------------------------------------------------------------------
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local cleuDispatcher = CreateFrame("Frame", "AF_CLEU_HANDLER")
-cleuDispatcher.eventFuncs = {}
+cleuDispatcher.eventCallbacks = {}
 
-local function DispatchCLEU(_, subevent, ...)
-    if cleuDispatcher.eventFuncs[subevent] then
-        for fn, obj in pairs(cleuDispatcher.eventFuncs[subevent]) do
-            fn(obj, subevent, ...)
+local function DispatchCLEU(timestamp, subevent, ...)
+    local callbacks = cleuDispatcher.eventCallbacks[subevent]
+    if callbacks then
+        for obj, fn in pairs(callbacks) do
+            fn(obj, timestamp, subevent, ...)
         end
     end
 end
@@ -30,46 +31,43 @@ cleuDispatcher:SetScript("OnEvent", function()
     DispatchCLEU(CombatLogGetCurrentEventInfo())
 end)
 
-local function RegisterCLEU(obj, subevent, ...)
+--! NOTE: obj can only have one callback for each subevent
+local function RegisterCLEU(obj, subevent, callback)
     if not cleuDispatcher:IsEventRegistered("COMBAT_LOG_EVENT_UNFILTERED") then
         cleuDispatcher:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     end
 
-    if not cleuDispatcher.eventFuncs[subevent] then
-        cleuDispatcher.eventFuncs[subevent] = {}
+    if not cleuDispatcher.eventCallbacks[subevent] then
+        cleuDispatcher.eventCallbacks[subevent] = {}
     end
 
-    for i = 1, select("#", ...) do
-        local fn = select(i, ...)
-        cleuDispatcher.eventFuncs[subevent][fn] = obj
-    end
+    cleuDispatcher.eventCallbacks[subevent][obj] = callback
 end
 
 local function UnregisterCLEU(obj, subevent)
-    if not cleuDispatcher.eventFuncs[subevent] then return end
+    if not cleuDispatcher.eventCallbacks[subevent] then return end
 
-    if subevent then
-        for f, o in pairs(cleuDispatcher.eventFuncs[subevent]) do
-            if obj == o then
-                cleuDispatcher.eventFuncs[subevent][f] = nil
-            end
-        end
-    else
-        --! NOT IDEAL
-        for _, sub in pairs(cleuDispatcher.eventFuncs) do
-            for f, o in pairs(sub) do
-                if obj == o then
-                    sub[f] = nil
-                end
-            end
+    cleuDispatcher.eventCallbacks[subevent][obj] = nil
+
+    if AF.IsEmpty(cleuDispatcher.eventCallbacks[subevent]) then
+        cleuDispatcher.eventCallbacks[subevent] = nil
+    end
+
+    if AF.IsEmpty(cleuDispatcher.eventCallbacks) and cleuDispatcher:IsEventRegistered("COMBAT_LOG_EVENT_UNFILTERED") then
+        cleuDispatcher:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+    end
+end
+
+local function UnregisterAllCLEU(obj)
+    for subevent, objTable in pairs(cleuDispatcher.eventCallbacks) do
+        objTable[obj] = nil
+
+        if AF.IsEmpty(objTable) then
+            cleuDispatcher.eventCallbacks[subevent] = nil
         end
     end
 
-    if AF.IsEmpty(cleuDispatcher.eventFuncs[subevent]) then
-        cleuDispatcher.eventFuncs[subevent] = nil
-    end
-
-    if AF.IsEmpty(cleuDispatcher.eventFuncs) and cleuDispatcher:IsEventRegistered("COMBAT_LOG_EVENT_UNFILTERED") then
+    if AF.IsEmpty(cleuDispatcher.eventCallbacks) and cleuDispatcher:IsEventRegistered("COMBAT_LOG_EVENT_UNFILTERED") then
         cleuDispatcher:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
     end
 end
@@ -79,22 +77,22 @@ end
 -- register / unregister events
 ---------------------------------------------------------------------
 local function RegisterEvent(self, event, ...)
-    if not self._eventHandler.eventFuncs[event] then self._eventHandler.eventFuncs[event] = {} end
+    if not self._eventHandler.eventCallbacks[event] then self._eventHandler.eventCallbacks[event] = {} end
 
     for i = 1, select("#", ...) do
         local fn = select(i, ...)
-        self._eventHandler.eventFuncs[event][fn] = true
+        self._eventHandler.eventCallbacks[event][fn] = true
     end
 
     _RegisterEvent(self._eventHandler, event)
 end
 
 local function RegisterUnitEvent(self, event, unit, ...)
-    if not self._eventHandler.eventFuncs[event] then self._eventHandler.eventFuncs[event] = {} end
+    if not self._eventHandler.eventCallbacks[event] then self._eventHandler.eventCallbacks[event] = {} end
 
     for i = 1, select("#", ...) do
         local fn = select(i, ...)
-        self._eventHandler.eventFuncs[event][fn] = true
+        self._eventHandler.eventCallbacks[event][fn] = true
     end
 
     if type(unit) == "table" then
@@ -105,28 +103,28 @@ local function RegisterUnitEvent(self, event, unit, ...)
 end
 
 local function UnregisterEvent(self, event, ...)
-    if not self._eventHandler.eventFuncs[event] then return end
+    if not self._eventHandler.eventCallbacks[event] then return end
 
     if select("#", ...) == 0 then
-        self._eventHandler.eventFuncs[event] = nil
+        self._eventHandler.eventCallbacks[event] = nil
         _UnregisterEvent(self._eventHandler, event)
         return
     end
 
     for i = 1, select("#", ...) do
         local fn = select(i, ...)
-        self._eventHandler.eventFuncs[event][fn] = nil
+        self._eventHandler.eventCallbacks[event][fn] = nil
     end
 
     -- check if isEmpty
-    if AF.IsEmpty(self._eventHandler.eventFuncs[event]) then
-        self._eventHandler.eventFuncs[event] = nil
+    if AF.IsEmpty(self._eventHandler.eventCallbacks[event]) then
+        self._eventHandler.eventCallbacks[event] = nil
         _UnregisterEvent(self._eventHandler, event)
     end
 end
 
 local function UnregisterAllEvents(self)
-    wipe(self._eventHandler.eventFuncs)
+    wipe(self._eventHandler.eventCallbacks)
     _UnregisterAllEvents(self._eventHandler)
 end
 
@@ -135,8 +133,8 @@ end
 -- process events
 ---------------------------------------------------------------------
 local function HandleEvent(eventHandler, event, ...)
-    if eventHandler.eventFuncs[event] then -- wipe on hide
-        for fn in pairs(eventHandler.eventFuncs[event]) do
+    if eventHandler.eventCallbacks[event] then -- wipe on hide
+        for fn in pairs(eventHandler.eventCallbacks[event]) do
             fn(eventHandler.owner, event, ...)
         end
     end
@@ -232,10 +230,11 @@ end
 function AF.AddEventHandler(obj)
     obj.RegisterCLEU = RegisterCLEU
     obj.UnregisterCLEU = UnregisterCLEU
+    obj.UnregisterAllCLEU = UnregisterAllCLEU
 
     obj._eventHandler = CreateFrame("Frame")
     obj._eventHandler.owner = obj
-    obj._eventHandler.eventFuncs = {}
+    obj._eventHandler.eventCallbacks = {}
 
     -- if squashEvents then
     --     obj._eventHandler.squashedEvents = {}
