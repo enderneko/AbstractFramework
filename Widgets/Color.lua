@@ -232,15 +232,16 @@ function AF.GetColorStr(color)
 end
 
 ---@param auraType string
+---@param alpha? number
 ---@return number r
 ---@return number g
 ---@return number b
-function AF.GetAuraTypeColor(auraType)
+function AF.GetAuraTypeColor(auraType, alpha)
     auraType = auraType and "aura_" .. strlower(auraType)
     if COLORS[auraType] then
-        return AF.GetColorRGB(auraType)
+        return AF.GetColorRGB(auraType, alpha)
     else
-        return AF.GetColorRGB("black")
+        return AF.GetColorRGB("black", alpha)
     end
 end
 
