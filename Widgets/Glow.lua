@@ -44,13 +44,14 @@ end
 ---@param parent Frame
 ---@param blink boolean only available for the first call
 ---@param autoHide boolean only available for the first call
-function AF.ShowCalloutGlow(parent, blink, autoHide)
+---@param relativeFrameLevel number? default is -1, only available for the first call
+function AF.ShowCalloutGlow(parent, blink, autoHide, relativeFrameLevel)
     if not parent.calloutGlow then
         parent.calloutGlow = CreateFrame("Frame", nil, parent, "BackdropTemplate")
         parent.calloutGlow:SetBackdrop({edgeFile = AF.GetTexture("CalloutGlow"), edgeSize = 7})
         parent.calloutGlow:SetBorderBlendMode("ADD")
         AF.SetOutside(parent.calloutGlow, parent, 4)
-        AF.SetFrameLevel(parent.calloutGlow, -1)
+        AF.SetFrameLevel(parent.calloutGlow, relativeFrameLevel or -1)
 
         if autoHide then
             parent.calloutGlow:SetScript("OnHide", function() parent.calloutGlow:Hide() end)
