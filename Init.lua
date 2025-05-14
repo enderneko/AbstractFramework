@@ -40,6 +40,12 @@ AF.EncodeHJson = AF.Libs.JSON.encode_hjson
 ---@type fun(str:string, options:table?):any
 AF.DecodeJson = AF.Libs.JSON.decode
 
+AF.Libs.QRCODE = LibStub("AF_QRCODE")
+---@type fun(parent:Frame, str:string, size:number?, padding:number?):Frame
+AF.GetQRCodeFrame = AF.Libs.QRCODE.GetQRCodeFrame
+---@type fun(str:string, white_pixel:string?, black_pixel:string?):string
+AF.GetQRCodeString = AF.Libs.QRCODE.GetQRCodeString
+
 ---------------------------------------------------------------------
 -- game version
 ---------------------------------------------------------------------

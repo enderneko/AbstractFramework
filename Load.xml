@@ -8,6 +8,7 @@
     <Script file="Libs\json.lua"/>
     <Script file="Libs\md5.lua"/>
     <Script file="Libs\sha256.lua"/>
+    <Script file="Libs\qrcode.lua"/>
     <Include file="Libs\TaintLess\TaintLess.xml"/>
     <Include file="Libs\LibSharedMedia-3.0\lib.xml"/>
     <Include file="Libs\LibCustomGlow-1.0\LibCustomGlow-1.0.xml"/>
