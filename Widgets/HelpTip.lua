@@ -11,6 +11,10 @@ function AF_HelpTipMixin:OnShow()
     self.elapsed = 0
     self:SetFrameStrata("TOOLTIP")
     self:Raise()
+    if self.calloutGlow then
+        self.calloutGlow:SetParent(self.widget)
+        AF.SetFrameLevel(self.calloutGlow, 1)
+    end
 end
 
 ---@private
@@ -128,6 +132,7 @@ end
 local function Release(_, tip)
     AF.ClearPoints(tip)
     tip:Hide()
+    AF.HideCalloutGlow(tip)
     tip.widget = nil
     tip.callback = nil
     tip.nextTip = nil
