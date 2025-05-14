@@ -6,6 +6,8 @@ local Round = AF.Round
 local ApproxZero = AF.ApproxZero
 local GetCursorPosition = GetCursorPosition
 
+local MIN_SCROLL_THUMB_HEIGHT = 20
+
 ---------------------------------------------------------------------
 -- scroll frame
 ---------------------------------------------------------------------
@@ -137,7 +139,7 @@ function AF.CreateScrollFrame(parent, name, width, height, color, borderColor)
         local p = scrollFrame:GetHeight() / scrollContent:GetHeight()
         p = tonumber(string.format("%.3f", p))
         if p < 1 then -- can scroll
-            scrollThumb:SetHeight(scrollBar:GetHeight()*p)
+            scrollThumb:SetHeight(max(scrollBar:GetHeight() * p, MIN_SCROLL_THUMB_HEIGHT))
             -- space for scrollBar
             AF.SetPoint(scrollFrame, "BOTTOMRIGHT", -7, 0)
             scrollBar:Show()
@@ -339,7 +341,7 @@ function AF_ScrollListMixin:SetWidgets(widgets)
     if self.widgetNum > self.slotNum then -- can scroll
         self.scrollBar:Show()
         local p = self.slotNum / self.widgetNum
-        self.scrollThumb:SetHeight(self.scrollBar:GetHeight() * p)
+        self.scrollThumb:SetHeight(max(self.scrollBar:GetHeight() * p, MIN_SCROLL_THUMB_HEIGHT))
         AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", self.scrollBar, "BOTTOMLEFT", -self.horizontalMargin, 0)
     else
         self.scrollBar:Hide()
@@ -641,7 +643,7 @@ function AF_ScrollGridMixin:SetWidgets(widgets)
     if self:CanScroll() then
         self.scrollBar:Show()
         local p = self.slotRow / ceil(self.widgetNum / self.slotColumn)
-        self.scrollThumb:SetHeight(self.scrollBar:GetHeight() * p)
+        self.scrollThumb:SetHeight(max(self.scrollBar:GetHeight() * p, MIN_SCROLL_THUMB_HEIGHT))
         AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", self.scrollBar, "BOTTOMLEFT", -self.horizontalMargin, 0)
     else
         self.scrollBar:Hide()
