@@ -308,11 +308,9 @@ end
 -- frame level relative to parent
 ---------------------------------------------------------------------
 function AF.SetFrameLevel(frame, level, relativeTo)
-    if relativeTo then
-        frame:SetFrameLevel(AF.Clamp(relativeTo:GetFrameLevel() + level, 0, 10000))
-    else
-        frame:SetFrameLevel(AF.Clamp(frame:GetParent():GetFrameLevel() + level, 0, 10000))
-    end
+    relativeTo = relativeTo or frame:GetParent()
+    frame:SetFrameStrata(relativeTo:GetFrameStrata())
+    frame:SetFrameLevel(AF.Clamp(relativeTo:GetFrameLevel() + level, 0, 10000))
 end
 
 ---------------------------------------------------------------------
