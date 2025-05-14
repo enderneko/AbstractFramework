@@ -202,6 +202,7 @@ function AF_TooltipMixin:OnHide()
 end
 
 function AF_TooltipMixin:OnShow()
+    self:SetFrameStrata("TOOLTIP")
     self:UpdatePixels()
 end
 
