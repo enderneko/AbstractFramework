@@ -345,7 +345,7 @@ local cpCreationFn = function()
 
     -- button -------------------------------------------------------
     -- local no = AF.CreateButton(p, nil, "red", 30, 15)
-    local no = AF.CreateIconButton(p, AF.GetIcon("No"), 16, 16, 1, "gray", "white")
+    local no = AF.CreateIconButton(p, AF.GetIcon("Fluent_Color_No"), 16, 16, 1, "gray", "white")
     p.no = no
     AF.SetPoint(no, "BOTTOMRIGHT")
     -- no:SetTexture(AF.GetIcon("Close"), {13, 13})
@@ -356,7 +356,7 @@ local cpCreationFn = function()
     end)
 
     -- local yes = AF.CreateButton(p, nil, "green", 30, 15)
-    local yes = AF.CreateIconButton(p, AF.GetIcon("Yes"), 16, 16, 1, "gray", "white")
+    local yes = AF.CreateIconButton(p, AF.GetIcon("Fluent_Color_Yes"), 16, 16, 1, "gray", "white")
     p.yes = yes
     AF.SetPoint(yes, "BOTTOMRIGHT", no, "BOTTOMLEFT", -2, 0)
     -- yes:SetTexture(AF.GetIcon("Tick"), {16, 16})
@@ -366,7 +366,7 @@ local cpCreationFn = function()
         AddToHidingQueue(p)
     end)
 
-    local ok = AF.CreateIconButton(p, AF.GetIcon("Yes"), 16, 16, 1, "gray", "white")
+    local ok = AF.CreateIconButton(p, AF.GetIcon("Fluent_Color_Yes"), 16, 16, 1, "gray", "white")
     p.ok = ok
     AF.SetPoint(ok, "BOTTOMRIGHT", -1, 0)
     ok:SetOnClick(function()
