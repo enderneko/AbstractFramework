@@ -1,10 +1,14 @@
-[Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r8...53b3f600ace009672afdd77b098d34c94b5a1465)
+[Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r9...c1c4a64d93aa52e39eb9c51fc063bc29991420de)
 
-- Add AF.SwapKeyValue
-- Add AF_FontStringMixin.AppendText
-- Add AF_PLAYER_ENTERING_WORLD, AF_PLAYER_LOGIN
-- Update Locales
-- Update unit functions
-- Update player data
-- Update range check
-- Change callback debug prefix to "EVENT"
+
+- Add "alpha" arg for AF.GetAuraTypeColor
+- Add lib AF_QRCODE
+- Add MIN_SCROLL_THUMB_HEIGHT
+- Add some icons
+- AF.GetDebuffType no longer returns "None"
+- Fix glow for HelpTips
+- Fix tooltip frame strata
+- Make class info in AF.player always available
+- Update AF.SetFrameLevel
+- Update AF.ShowCalloutGlow
+- Update cleuDispatcher
