@@ -81,12 +81,13 @@ function AF.Printf(msg, ...)
     AF.Print(msg:format(...))
 end
 
+local PRINT_STACK_PATTERN = "\n%[Interface/AddOns/([^/]+)/([^:]+)]:(%d+): in function"
 function AF.PrintStack()
     local stack = {}
-    for addon in strmatch(debugstack(2), PATTERN) do
-        tinsert(stack, addon)
+    for addon, file, line in strmatch(debugstack(2), PRINT_STACK_PATTERN) do
+        tinsert(stack, AF.WrapTextInColor(addon, "gray") .. ": " .. file .. " (" .. line .. ")")
     end
-    print(AF.WrapTextInColor("[AF] ", "accent") .. tconcat(stack, "\n-> "))
+    print(AF.WrapTextInColor("[CALL_STACK] ", "green") .. tconcat(stack, "\n-> "))
 end
 
 function AF.RegisterAddon(addonFolderName, alias)
