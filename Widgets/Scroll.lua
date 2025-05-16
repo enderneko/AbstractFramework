@@ -506,10 +506,10 @@ function AF.CreateScrollList(parent, name, verticalMargin, horizontalMargin, slo
     scrollBar:Hide()
 
     -- scrollBar thumb
-    local scrollThumb = AF.CreateBorderedFrame(scrollBar, nil, 5, nil, AF.GetAccentColorTable(0.7))
+    local scrollThumb = AF.CreateBorderedFrame(scrollBar, nil, 5, nil, AF.GetAddonAccentColorTable(nil, 0.7))
     scrollList.scrollThumb = scrollThumb
     scrollThumb.root = scrollList
-    scrollThumb.r, scrollThumb.g, scrollThumb.b = AF.GetAccentColorRGB()
+    scrollThumb.r, scrollThumb.g, scrollThumb.b = AF.GetAddonAccentColorRGB()
     -- AF.SetPoint(scrollThumb, "TOP")
     scrollThumb:EnableMouse(true)
     scrollThumb:SetMovable(true)
@@ -823,10 +823,10 @@ function AF.CreateScrollGrid(parent, name, verticalMargin, horizontalMargin, slo
     scrollBar:Hide()
 
     -- scrollBar thumb
-    local scrollThumb = AF.CreateBorderedFrame(scrollBar, nil, 5, nil, AF.GetAccentColorTable(0.7))
+    local scrollThumb = AF.CreateBorderedFrame(scrollBar, nil, 5, nil, AF.GetAddonAccentColorTable(nil, 0.7))
     scrollGrid.scrollThumb = scrollThumb
     scrollThumb.root = scrollGrid
-    scrollThumb.r, scrollThumb.g, scrollThumb.b = AF.GetAccentColorRGB()
+    scrollThumb.r, scrollThumb.g, scrollThumb.b = AF.GetAddonAccentColorRGB()
     -- AF.SetPoint(scrollThumb, "TOP")
     scrollThumb:EnableMouse(true)
     scrollThumb:SetMovable(true)

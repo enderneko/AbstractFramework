@@ -12,10 +12,16 @@ local UnitInPartyIsAI = UnitInPartyIsAI
 local UnitClassBase = UnitClassBase
 local UnitGUID = UnitGUID
 
+local ACCENT_COLOR = {["hex"] = "ffff6600", ["t"] = {1, 0.4, 0, 1}, ["normal"] = {1, 0.4, 0, 0.3}, ["hover"] = {1, 0.4, 0, 0.6}}
+local ACCENT_COLOR_ALT = {["hex"] = "ffff0066", ["t"] = {1, 0, 0.4, 1}, ["normal"] = {1, 0, 0.4, 0.3}, ["hover"] = {1, 0, 0.4, 0.6}}
+
 local COLORS = {
     -- accent
-    ["accent"] = {["hex"] = "ffff6600", ["t"] = {1, 0.4, 0, 1}, ["normal"] = {1, 0.4, 0, 0.3}, ["hover"] = {1, 0.4, 0, 0.6}},
-    ["accent_alt"] = {["hex"] = "ffff0066", ["t"] = {1, 0, 0.4, 1}, ["normal"] = {1, 0, 0.4, 0.3}, ["hover"] = {1, 0, 0.4, 0.6}},
+    ["accent"] = AF.Copy(ACCENT_COLOR),
+
+    -- default accent
+    ["blazing_tangerine"] = AF.Copy(ACCENT_COLOR), -- 炽热橘
+    ["vivid_raspberry"] = AF.Copy(ACCENT_COLOR_ALT), -- 炫莓粉
 
     -- for regions
     ["background"] = {["hex"] = "d91a1a1a", ["t"] = {0.1, 0.1, 0.1, 0.85}},
@@ -276,12 +282,75 @@ local function BuildColorTable(color)
     end
 end
 
+AF.RegisterCallback("AF_LOADED", function()
+    if type(AFConfig.customAccentColor) == "table" then
+        COLORS["accent"] = AFConfig.customAccentColor
+    end
+end, "high")
+
 ---@param color string|table colorName, colorHex, colorTable
 ---@param buttonNormalColor? string|table
 ---@param buttonHoverColor? string|table
 function AF.SetAccentColor(color, buttonNormalColor, buttonHoverColor)
-    local addon = GetAddon()
-    assert(addon, "no registered addon found")
+    local t = BuildColorTable(color)
+
+    -- normal
+    local normal
+    if buttonNormalColor then
+        normal = BuildColorTable(buttonNormalColor)["t"]
+    else
+        normal = AF.Copy(t["t"])
+        normal[4] = 0.3
+    end
+
+    -- hover
+    local hover
+    if buttonHoverColor then
+        hover = BuildColorTable(buttonHoverColor)["t"]
+    else
+        hover = AF.Copy(t["t"])
+        hover[4] = 0.6
+    end
+
+    COLORS["accent"] = {["hex"] = t["hex"], ["t"] = t["t"], ["normal"] = normal, ["hover"] = hover}
+    AFConfig.customAccentColor = COLORS["accent"]
+end
+
+function AF.ResetAccentColor()
+    COLORS["accent"] = AF.Copy(ACCENT_COLOR)
+    AFConfig.customAccentColor = nil
+end
+
+---@param alpha? number
+---@param saturation? number
+---@return number r
+---@return number g
+---@return number b
+---@return number a
+function AF.GetAccentColorRGB(alpha, saturation)
+    return AF.GetColorRGB("accent", alpha, saturation)
+end
+
+---@param alpha? number
+---@param saturation? number
+---@return table
+function AF.GetAccentColorTable(alpha, saturation)
+    return AF.GetColorTable("accent", alpha, saturation)
+end
+
+---@param alpha? number
+---@param saturation? number
+---@return string
+function AF.GetAccentColorHex(alpha, saturation)
+    return AF.GetColorHex("accent", alpha, saturation)
+end
+
+---@param color string|table colorName, colorHex, colorTable
+---@param buttonNormalColor? string|table
+---@param buttonHoverColor? string|table
+function AF.SetAddonAccentColor(addon, color, buttonNormalColor, buttonHoverColor)
+    addon = addon or GetAddon()
+    assert(type(addon) == "string", "no registered addon found")
 
     local t = BuildColorTable(color)
 
@@ -312,7 +381,7 @@ end
 
 ---@param addon? string
 ---@return string accentColorName registered addon folder name or "accent"
-function AF.GetAccentColorName(addon)
+function AF.GetAddonAccentColorName(addon)
     addon = addon or GetAddon()
     if addon and COLORS[addon] then
         return addon
@@ -323,8 +392,8 @@ end
 ---@param alpha? number
 ---@param saturation? number
 ---@return table
-function AF.GetAccentColorTable(alpha, saturation)
-    return AF.GetColorTable(AF.GetAccentColorName(), alpha, saturation)
+function AF.GetAddonAccentColorTable(addon, alpha, saturation)
+    return AF.GetColorTable(AF.GetAddonAccentColorName(addon), alpha, saturation)
 end
 
 ---@param alpha? number
@@ -333,15 +402,15 @@ end
 ---@return number g
 ---@return number b
 ---@return number a
-function AF.GetAccentColorRGB(alpha, saturation)
-    return AF.GetColorRGB(AF.GetAccentColorName(), alpha, saturation)
+function AF.GetAddonAccentColorRGB(addon, alpha, saturation)
+    return AF.GetColorRGB(AF.GetAddonAccentColorName(addon), alpha, saturation)
 end
 
 ---@param alpha? number
 ---@param saturation? number
 ---@return string
-function AF.GetAccentColorHex(alpha, saturation)
-    return AF.GetColorHex(AF.GetAccentColorName(), alpha, saturation)
+function AF.GetAddonAccentColorHex(addon, alpha, saturation)
+    return AF.GetColorHex(AF.GetAddonAccentColorName(addon), alpha, saturation)
 end
 
 ---@param class string capitalized class name

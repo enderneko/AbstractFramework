@@ -114,14 +114,14 @@ function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata,
     AF.SetHeight(header, 20)
     AF.ApplyDefaultBackdropWithColors(header, "header")
 
-    header.text = AF.CreateFontString(header, title, AF.GetAccentColorName(), "AF_FONT_TITLE")
+    header.text = AF.CreateFontString(header, title, AF.GetAddonAccentColorName(), "AF_FONT_TITLE")
     header.text:SetPoint("CENTER")
 
     header.closeBtn = AF.CreateCloseButton(header, f, 20, 20)
     header.closeBtn:SetPoint("TOPRIGHT")
     AF.RemoveFromPixelUpdater(header.closeBtn)
 
-    local r, g, b = AF.GetAccentColorRGB()
+    local r, g, b = AF.GetAddonAccentColorRGB()
     header.tex = header:CreateTexture(nil, "ARTWORK")
     header.tex:SetAllPoints(header)
     header.tex:SetColorTexture(r, g, b, 0.025)

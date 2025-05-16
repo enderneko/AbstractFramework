@@ -11,7 +11,7 @@ function AF.ShowDemo()
     --                              headered frame                             --
     -----------------------------------------------------------------------------
     local demo = AF.CreateHeaderedFrame(AF.UIParent, "AF_DEMO",
-        AF.GetIconString("AF", 16) .. AF.GetGradientText("AbstractFramework", "accent", "accent_alt")
+        AF.GetIconString("AF", 16) .. AF.GetGradientText("AbstractFramework", "blazing_tangerine", "vivid_raspberry")
         .. " " .. AF.WrapTextInColor(AF.GetAddOnVersion(AF.name) .. " Demo", "white"), 710, 500)
     -- AF.SetPoint(demo, "LEFT", 100, 0)
     demo:SetPoint("CENTER")
