@@ -327,5 +327,7 @@ local function CreateTooltip(name)
     return tooltip
 end
 
-AF.Tooltip = CreateTooltip("AFTooltip")
-AF.Tooltip2 = CreateTooltip("AFTooltip2")
+AF.RegisterCallback("AF_LOADED", function()
+    AF.Tooltip = CreateTooltip("AFTooltip")
+    AF.Tooltip2 = CreateTooltip("AFTooltip2")
+end, "high")

@@ -43,6 +43,12 @@ local function CreateListFrame()
     hooksecurefunc(list, "Show", function()
         list:UpdatePixels()
         horizontalList:Hide()
+
+        highlight:SetBackdropBorderColor(AF.GetAddonAccentColorRGB(list.dropdown.addon))
+        local scrollThumb = list.scrollThumb
+        scrollThumb.r, scrollThumb.g, scrollThumb.b = AF.GetAddonAccentColorRGB(list.dropdown.addon)
+        scrollThumb:SetBackdropColor(scrollThumb.r, scrollThumb.g, scrollThumb.b, 0.7)
+
         if list.dropdown.selected then
             highlight:UpdatePixels()
             if list.dropdown.selected > list.slotNum then
@@ -96,6 +102,9 @@ local function CreateHorizontalList()
     hooksecurefunc(horizontalList, "Show", function()
         list:Hide()
         horizontalList:UpdatePixels()
+
+        highlight:SetBackdropBorderColor(AF.GetAddonAccentColorRGB(horizontalList.dropdown.addon))
+
         for _, b in pairs(horizontalList.buttons) do
             b:UpdatePixels()
         end
@@ -328,6 +337,12 @@ function AF_DropdownMixin:LoadItems()
         tinsert(self.buttons, b)
         b:SetEnabled(not item.disabled)
 
+        if self.addon then
+            b:SetColor(self.addon .. "_transparent")
+        else
+            b:SetColor("accent_transparent")
+        end
+
         -- icon
         if item.icon then
             b:SetTexture(item.icon, {16, 16}, {"LEFT", 1, 0}, nil, self.iconBGColor)
@@ -437,7 +452,7 @@ function AF_DropdownMixin:SetEnabled(enabled)
     end
 end
 
----@param maxSlots number max shown items
+---@param maxSlots number max shown items, not available for mini horizontal dropdown
 ---@return AF_Dropdown
 function AF.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHorizontal, justify, textureAlpha)
     if not list then CreateListFrame() end
@@ -448,6 +463,8 @@ function AF.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
 
     local dropdown = AF.CreateBorderedFrame(parent, nil, width, 20, "widget")
     dropdown:EnableMouse(true)
+
+    dropdown.addon = AF.GetAddon()
 
     dropdown.enabled = true
     dropdown.width = width
@@ -484,6 +501,10 @@ function AF.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
         AF.SetPoint(dropdown.text, "LEFT", 5, 0)
         AF.SetPoint(dropdown.text, "RIGHT", dropdown.button, "LEFT", -5, 0)
         dropdown.text:SetJustifyH(justify or "LEFT")
+    end
+
+    if dropdown.addon then
+        dropdown.button:SetColor(dropdown.addon .. "_hover")
     end
 
     -- iconBG
