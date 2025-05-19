@@ -68,8 +68,8 @@ local function HelpTipBuilder()
     tip.elapsed = 0
     tip:SetOnUpdate(function(self, elapsed)
         self:SetHeight(self.text:GetHeight() + 25)
-        if not self.widget or not self.widget:IsVisible() then
-            self:Hide()
+        if pool:IsActive(self) and (not self.widget or not self.widget:IsVisible()) then
+            pool:Release(self)
         end
     end)
 
@@ -80,10 +80,12 @@ local function HelpTipBuilder()
 
     close:HookOnMouseDown(function()
         if tip.closeHoldDuration == 0 then return end
-        if tip.timer:IsPaused() then
+        if tip.timer:IsShown() and tip.timer:IsPaused() then
             tip.timer:Resume()
         else
+            tip.timer:Show()
             tip.timer:SetCooldownDuration(tip.closeHoldDuration)
+            tip.timer:Resume() --! or the 3rd time, the timer will not start, why?
         end
     end)
 
@@ -103,6 +105,7 @@ local function HelpTipBuilder()
     tip.timer = timer
     AF.SetPoint(timer, "RIGHT", close, "LEFT")
     AF.SetSize(timer, 10, 10)
+    timer:Hide()
     timer:SetOnCooldownDone(function()
         tip:Close()
     end)
@@ -132,6 +135,7 @@ end
 local function Release(_, tip)
     AF.ClearPoints(tip)
     tip:Hide()
+    tip.timer:Hide()
     AF.HideCalloutGlow(tip)
     tip.widget = nil
     tip.callback = nil
