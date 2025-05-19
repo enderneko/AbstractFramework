@@ -54,13 +54,21 @@ local function FillDays(year, month)
             b:SetEnabled(true)
             b:SetText(day)
 
+            b.addon = calendar.parent.addon
+            if b.addon then
+                b:SetColor(b.addon .. "_hover")
+            else
+                b:SetColor("accent_hover")
+            end
+
             -- date highlights
             local str = string.format("%04d%02d%02d", calendar.date.year, calendar.date.month, day)
-            if calendar.info[str] then
-                b.tooltips = calendar.info[str].tooltips
-                b.mark:SetColor(calendar.info[str].color)
+            if calendar.marks[str] then
+                b.tooltips = calendar.marks[str].tooltips
+                b.mark:SetColor(calendar.marks[str].color)
                 b.mark:Show()
             else
+                b.tooltips = nil
                 b.mark:Hide()
             end
 
@@ -194,6 +202,7 @@ local function CreateCalendar()
         -- highlight raid lockout reset day
         if weekday == AF.RAID_LOCKOUT_RESET_DAY then
             headers[i].text:SetColor("accent")
+            headers[0] = headers[i] -- save for re-color
         end
 
         if i == 1 then
@@ -281,7 +290,7 @@ local function CreateCalendar()
     end
 end
 
-local function ShowCalendar(parent, date, info, position, onDateChanged)
+local function ShowCalendar(parent, date, marks, position, onDateChanged)
     if not calendar then CreateCalendar() end
     if calendar:IsShown() and calendar:GetParent() == parent then
         calendar:Hide()
@@ -290,7 +299,29 @@ local function ShowCalendar(parent, date, info, position, onDateChanged)
 
     calendar.parent = parent
     calendar.onDateChanged = onDateChanged
-    calendar.info = info
+    calendar.marks = marks
+
+    -- accent color system
+    if parent.addon then
+        calendar:SetBackdropBorderColor(AF.GetAddonAccentColorRGB(parent.addon))
+        calendar.headers[0].text:SetColor(parent.addon)
+        calendar.previous:SetColor(parent.addon .. "_hover")
+        calendar.next:SetColor(parent.addon .. "_hover")
+        calendar.year.button:SetColor(parent.addon .. "_hover")
+        calendar.year.addon = parent.addon
+        calendar.month.button:SetColor(parent.addon .. "_hover")
+        calendar.month.addon = parent.addon
+    else
+        calendar:SetBackdropBorderColor(AF.GetAccentColorRGB())
+        calendar.headers[0].text:SetColor("accent")
+        calendar.previous:SetColor("accent_hover")
+        calendar.next:SetColor("accent_hover")
+        calendar.year.button:SetColor("accent_hover")
+        calendar.year.addon = nil
+        calendar.month.button:SetColor("accent_hover")
+        calendar.month.addon = nil
+    end
+    calendar.month.reloadRequired = true
 
     calendar:SetDate(date)
     calendar:SetParent(parent)
@@ -357,10 +388,25 @@ function AF_CalendarButtonMixin:SetDate(d)
     self:SetText(self.date.year .. "/" .. self.date.month .. "/" .. self.date.day)
 end
 
-function AF_CalendarButtonMixin:SetMarksInfo(info)
-    self.info = info
+---@param marks table
+-- {
+--     ["YYYYMMDD"] = {
+--         ["tooltips"] = {string...},
+--         ["color"] = colorName(string|table),
+--     },
+-- }
+function AF_CalendarButtonMixin:SetMarks(marks)
+    self.marks = marks
     if calendar and calendar:IsShown() and calendar.parent == self then
-        calendar.info = self.info
+        calendar.marks = self.marks
+        FillDays(self.date.year, self.date.month)
+    end
+end
+
+function AF_CalendarButtonMixin:ClearMarks()
+    self.marks = nil
+    if calendar and calendar:IsShown() and calendar.parent == self then
+        calendar.marks = nil
         FillDays(self.date.year, self.date.month)
     end
 end
@@ -376,8 +422,13 @@ function AF.CreateCalendarButton(parent, width, calendarPosition)
     local button = AF.CreateButton(parent, "", "accent", width or 110, 20)
     button:SetTexture(AF.GetIcon("Calendar"), {16, 16}, {"LEFT", 2, 0})
 
+    button.addon = AF.GetAddon()
+    if button.addon then
+        button:SetColor(button.addon)
+    end
+
     button.date = {} -- save show date info
-    button.info = { -- store dates with extra info
+    button.marks = { -- store dates with extra marks
         -- ["20240214"] = {
         --     ["tooltips"] = {strings},
         --     ["color"] = (string), -- in Color.lua
@@ -387,8 +438,9 @@ function AF.CreateCalendarButton(parent, width, calendarPosition)
     Mixin(button, AF_CalendarButtonMixin)
     button:SetDate(time())
 
-    button:SetScript("OnClick", function()
-        ShowCalendar(button, button.date, button.info, calendarPosition, button.onDateChanged)
+    button:SetOnClick(function()
+        ShowCalendar(button, button.date, button.marks, calendarPosition, button.onDateChanged)
+        button:SetMarks(button.marks)
     end)
 
     AF.RegisterForCloseDropdown(button)

@@ -873,7 +873,7 @@ function AF.ShowDemo()
             niceDays[str] = {color = colors[random(1, 4)], tooltips = {"Nice Day", str}}
         end
     end
-    dw:SetMarksInfo(niceDays)
+    dw:SetMarks(niceDays)
     dw:SetOnDateChanged(function(dt)
         AF.Print(dt.year, dt.month, dt.day, dt.timestamp)
     end)

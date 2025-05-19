@@ -7,6 +7,7 @@ local AF = _G.AbstractFramework
 ---@class AF_Texture:Texture
 local AF_TextureMixin = {}
 
+---@param color table|string
 function AF_TextureMixin:SetColor(color)
     if type(color) == "string" then color = AF.GetColorTable(color) end
     color = color or {1, 1, 1, 1}
