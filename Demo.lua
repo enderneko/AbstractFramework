@@ -862,7 +862,7 @@ function AF.ShowDemo()
     -----------------------------------------------------------------------------
     --                                 calendar                                --
     -----------------------------------------------------------------------------
-    local dw = AF.CreateCalendarButton(demo, time(), 150, "TOPLEFT")
+    local dw = AF.CreateCalendarButton(demo, 150, "TOPLEFT")
     AF.SetPoint(dw, "TOPLEFT", b9, "BOTTOMLEFT", 0, -7)
     local niceDays = {}
     local colors = {"firebrick", "hotpink", "chartreuse", "vividblue"}

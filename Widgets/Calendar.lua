@@ -334,6 +334,7 @@ end
 ---@class AF_CalendarButton:AF_Button
 local AF_CalendarButtonMixin = {}
 
+---@param d string|number|table "YYYYMMDD", a epoch unix timestamp in seconds, or a "*t" table
 function AF_CalendarButtonMixin:SetDate(d)
     if type(d) == "string" then
         local _y, _m, _d = d:match("(%d%d%d%d)(%d%d)(%d%d)")
@@ -368,11 +369,10 @@ function AF_CalendarButtonMixin:SetOnDateChanged(onDateChanged)
     self.onDateChanged = onDateChanged
 end
 
----@param date? string|number|table "YYYYMMDD", a epoch unix timestamp in seconds, or a "*t" table
 ---@param width? number default is 110
 ---@param calendarPosition? string "BOTTOMLEFT", "BOTTOMRIGHT", "TOPLEFT", "TOPRIGHT".
 ---@return AF_CalendarButton
-function AF.CreateCalendarButton(parent, date, width, calendarPosition)
+function AF.CreateCalendarButton(parent, width, calendarPosition)
     local button = AF.CreateButton(parent, "", "accent", width or 110, 20)
     button:SetTexture(AF.GetIcon("Calendar"), {16, 16}, {"LEFT", 2, 0})
 
@@ -385,7 +385,7 @@ function AF.CreateCalendarButton(parent, date, width, calendarPosition)
     }
 
     Mixin(button, AF_CalendarButtonMixin)
-    button:SetDate(date or time())
+    button:SetDate(time())
 
     button:SetScript("OnClick", function()
         ShowCalendar(button, button.date, button.info, calendarPosition, button.onDateChanged)
