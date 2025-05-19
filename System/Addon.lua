@@ -92,4 +92,5 @@ end
 
 function AF.RegisterAddon(addonFolderName, alias)
     AF.REGISTERED_ADDONS[addonFolderName] = alias or true
+    AF.SetAddonAccentColor(addonFolderName, "accent") -- setup with default accent color
 end
