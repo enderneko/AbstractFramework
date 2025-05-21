@@ -20,11 +20,6 @@ end
 ---------------------------------------------------------------------
 -- titled frame
 ---------------------------------------------------------------------
-local function HeaderedFrame_SetTitleBackgroundColor(self, color)
-    if type(color) == "string" then color = AF.GetColorTable(color) end
-    color = color or AF.GetColorTable("accent")
-end
-
 ---@class AF_HeaderedFrame:AF_Frame
 local AF_HeaderedFrameMixin = {}
 
@@ -85,7 +80,6 @@ function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata,
 
     f.notUserPlaced = notUserPlaced
 
-    AF.ShowNormalGlow(f, 2, "shadow")
     f:EnableMouse(true)
     -- f:SetIgnoreParentScale(true)
     -- f:SetResizable(false)
@@ -94,7 +88,7 @@ function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata,
     f:SetFrameLevel(frameLevel or 1)
     f:SetToplevel(true)
     f:SetClampedToScreen(true)
-    f:SetClampRectInsets(0, 0, AF.ConvertPixelsForRegion(20, f), 0)
+    f:SetClampRectInsets(0, 0, AF.ConvertPixelsForRegion(19, f), 0)
     AF.SetSize(f, width, height)
     f:SetPoint("CENTER")
     AF.ApplyDefaultBackdropWithColors(f)
@@ -108,6 +102,11 @@ function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata,
     header:SetScript("OnMouseDown", function()
         f:Raise()
     end)
+
+    AF.ShowNormalGlow(f, "shadow", 2)
+    AF.ClearPoints(f.normalGlow)
+    AF.SetPoint(f.normalGlow, "TOPLEFT", header, -2, 2)
+    AF.SetPoint(f.normalGlow, "BOTTOMRIGHT", f, 2, -2)
 
     AF.SetPoint(header, "BOTTOMLEFT", f, "TOPLEFT", 0, -1)
     AF.SetPoint(header, "BOTTOMRIGHT", f, "TOPRIGHT", 0, -1)
@@ -123,7 +122,7 @@ function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata,
 
     local r, g, b = AF.GetAddonAccentColorRGB()
     header.tex = header:CreateTexture(nil, "ARTWORK")
-    header.tex:SetAllPoints(header)
+    AF.SetOnePixelInside(header.tex, header)
     header.tex:SetColorTexture(r, g, b, 0.025)
 
     -- header.tex = AF.CreateGradientTexture(header, "Horizontal", {r, g, b, 0.25})

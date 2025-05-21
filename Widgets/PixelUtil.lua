@@ -290,6 +290,25 @@ function AF.SetOutside(region, relativeTo, offsetX, offsetY)
     AF.SetPoint(region, "BOTTOMRIGHT", relativeTo, "BOTTOMRIGHT", offsetX, -offsetY)
 end
 
+---@param region Frame
+---@param relativeTo Frame|nil default is region:GetParent()
+---@param left? number
+---@param right? number
+---@param top? number
+---@param bottom? number
+-- if left/right/top/bottom is not provided, it will be set to 0
+-- positive values expand outward, negative values contract inward
+function AF.SetOutsets(region, relativeTo, left, right, top, bottom)
+    left = left or 0
+    right = right or 0
+    top = top or 0
+    bottom = bottom or 0
+    relativeTo = relativeTo or region:GetParent()
+    AF.ClearPoints(region)
+    AF.SetPoint(region, "TOPLEFT", relativeTo, "TOPLEFT", -left, top)
+    AF.SetPoint(region, "BOTTOMRIGHT", relativeTo, "BOTTOMRIGHT", right, -bottom)
+end
+
 function AF.ClearPoints(region)
     region:ClearAllPoints()
     if region._points then wipe(region._points) end
@@ -305,9 +324,9 @@ function AF.SetBackdrop(region, backdropInfo)
     end
 
     if backdropInfo.insets then
-        region._inset_size = backdropInfo.insets.left
-        for k in pairs(backdropInfo.insets) do
-            backdropInfo.insets[k] = AF.ConvertPixelsForRegion(region._inset_size, region)
+        region._insets = AF.Copy(backdropInfo.insets)
+        for k, v in pairs(backdropInfo.insets) do
+            backdropInfo.insets[k] = AF.ConvertPixelsForRegion(v, region)
         end
     end
 
@@ -358,28 +377,21 @@ function AF.ReBorder(region)
     local backdropInfo = region:GetBackdrop()
     if not backdropInfo then return end
 
-    if not (region._edge_size or region._inset_size) then return end
+    if not (region._edge_size or region._insets) then return end
 
     local r, g, b, a = region:GetBackdropColor()
     local br, bg, bb, ba = region:GetBackdropBorderColor()
 
-    -- local n = AF.GetOnePixelForRegion(region)
-    -- if backdropInfo.edgeSize then
-        if region._edge_size then
-            backdropInfo.edgeSize = AF.ConvertPixelsForRegion(region._edge_size, region)
-        -- else
-        --     backdropInfo.edgeSize = n
+    if region._edge_size then
+        backdropInfo.edgeSize = AF.ConvertPixelsForRegion(region._edge_size, region)
+    end
+
+    if region._insets then
+        backdropInfo.insets = {}
+        for k, v in pairs(region._insets) do
+            backdropInfo.insets[k] = AF.ConvertPixelsForRegion(v, region)
         end
-    -- end
-    -- if backdropInfo.insets then
-        if region._inset_size then
-            local n = AF.ConvertPixelsForRegion(region._inset_size, region)
-            backdropInfo.insets.left = n
-            backdropInfo.insets.right = n
-            backdropInfo.insets.top = n
-            backdropInfo.insets.bottom = n
-        end
-    -- end
+    end
 
     region:SetBackdrop(backdropInfo)
     region:SetBackdropColor(r, g, b, a)
