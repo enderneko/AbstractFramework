@@ -238,7 +238,7 @@ local npCreationFn = function()
     local p = AF.CreateBorderedFrame(parent)
     p:Hide()
 
-    AF.ShowNormalGlow(p, 2, "shadow")
+    AF.ShowNormalGlow(p, "shadow", 2)
 
     CreateAnimation(p)
     p:EnableMouse(true)
@@ -327,7 +327,7 @@ local cpCreationFn = function()
     local p = AF.CreateBorderedFrame(parent)
     p:Hide()
 
-    AF.ShowNormalGlow(p, 2, "shadow")
+    AF.ShowNormalGlow(p, "shadow", 2)
 
     CreateAnimation(p)
     p:EnableMouse(true)
@@ -419,7 +419,7 @@ local ppCreationFn = function()
     local p = AF.CreateBorderedFrame(parent)
     p:Hide()
 
-    AF.ShowNormalGlow(p, 2, "shadow")
+    AF.ShowNormalGlow(p, "shadow", 2)
 
     CreateAnimation(p)
     p:EnableMouse(true)

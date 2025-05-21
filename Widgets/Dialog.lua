@@ -11,7 +11,7 @@ local function CreateDialog()
     dialog = AF.CreateBorderedFrame(AF.UIParent, "AF_Dialog", 200, 100, nil, "accent")
     dialog:Hide() -- for first OnShow
 
-    AF.ShowNormalGlow(dialog, 2, "shadow")
+    AF.ShowNormalGlow(dialog, "shadow", 2)
     dialog:EnableMouse(true)
     dialog:SetClampedToScreen(true)
 
@@ -93,7 +93,7 @@ local function CreateDialog()
         end
 
         -- reset shadow
-        AF.ShowNormalGlow(dialog, 2, "shadow")
+        AF.ShowNormalGlow(dialog, "shadow", 2)
     end)
 
     -- OnShow
@@ -228,7 +228,7 @@ local function CreateNotificationDialog()
     notificationDialog = AF.CreateBorderedFrame(AF.UIParent, "AF_NotificationDialog", 200, 100, nil, "accent")
     notificationDialog:Hide() -- for first OnShow
 
-    AF.ShowNormalGlow(notificationDialog, 2, "shadow")
+    AF.ShowNormalGlow(notificationDialog, "shadow", 2)
     notificationDialog:EnableMouse(true)
     notificationDialog:SetClampedToScreen(true)
 
@@ -275,7 +275,7 @@ local function CreateNotificationDialog()
         end
 
         -- reset shadow
-        AF.ShowNormalGlow(notificationDialog, 2, "shadow")
+        AF.ShowNormalGlow(notificationDialog, "shadow", 2)
     end)
 
     -- OnShow

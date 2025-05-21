@@ -632,7 +632,7 @@ function AF.ShowDemo()
     b9:SetScript("OnClick", function()
         local text = AF.WrapTextInColor("NOTICE", "orange") .. "\n" .. "One day, when what has happened behind the scene could be told, developers and gamers will have a whole new level understanding of how much damage a jerk can make."
         local dialog = AF.ShowNotificationDialog(demo, text, 200, true, 3)
-        AF.ShowNormalGlow(dialog, 3, "accent")
+        AF.ShowNormalGlow(dialog, "accent", 3)
         AF.SetNotificationDialogPoint("TOPLEFT", 255, -120)
     end)
 

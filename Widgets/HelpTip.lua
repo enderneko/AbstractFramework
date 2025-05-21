@@ -52,7 +52,7 @@ local function HelpTipBuilder()
     Mixin(tip, AF_HelpTipMixin)
 
     -- glow
-    AF.ShowNormalGlow(tip, 3, "#dbb800")
+    AF.ShowNormalGlow(tip, "#dbb800", 3)
 
     -- bg
     local bg = AF.CreateGradientTexture(tip, "VERTICAL", "#010000", "#3a2f00", nil, "BACKGROUND")
