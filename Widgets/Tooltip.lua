@@ -40,14 +40,9 @@ function AF.ShowTooltips(widget, anchor, x, y, lines)
         AF.Tooltip:SetOwner(widget, anchor or "ANCHOR_TOP", x or 0, y or 0)
     end
 
-    local r, g, b
-    if widget.addon then
-        r, g, b = AF.GetAddonAccentColorRGB(widget.addon)
-    else
-        r, g, b = AF.GetColorRGB("accent")
-    end
+    local r, g, b = AF.GetColorRGB(widget.accentColor or "accent")
 
-    AF.Tooltip.addon = widget.addon -- for iconBG color
+    AF.Tooltip.accentColor = widget.accentColor -- for iconBG color
     AF.Tooltip:SetBackdropBorderColor(r, g, b)
 
     AF.Tooltip:AddLine(lines[1], r, g, b)
@@ -286,11 +281,7 @@ function AF_TooltipMixin:SetupIcon(point, relativePoint, x, y)
         end)
     end
 
-    if self.addon then
-        self.iconBG:SetColorTexture(AF.GetAddonAccentColorRGB(self.addon))
-    else
-        self.iconBG:SetColorTexture(AF.GetColorRGB("accent"))
-    end
+    self.iconBG:SetColorTexture(AF.GetColorRGB(self.accentColor or "accent"))
 
     AF.ClearPoints(self.iconBG)
     AF.SetPoint(self.iconBG, point, self, relativePoint, x, y)

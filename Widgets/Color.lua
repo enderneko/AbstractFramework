@@ -552,9 +552,16 @@ end
 -- coloring
 ---------------------------------------------------------------------
 ---@param fs FontString
----@param color string
+---@param color string|table
 function AF.ColorFontString(fs, color)
-    local r, g, b, a = AF.GetColorRGB(color)
+    local r, g, b, a
+    if type(color) == "string" then
+        r, g, b, a = AF.GetColorRGB(color)
+    elseif type(color) == "table" then
+        r, g, b, a = AF.UnpackColor(color)
+    else
+        r, g, b, a = 1, 1, 1, 1
+    end
     fs:SetTextColor(r, g, b, a)
 end
 

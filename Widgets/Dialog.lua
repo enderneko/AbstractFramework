@@ -109,6 +109,12 @@ local function CreateDialog()
             end
             dialog:SetHeight(Round(textHolder:GetHeight() + contentHolder:GetHeight()) + 40)
             dialog:SetScript("OnUpdate", nil)
+
+            -- accent color system
+            local r, g, b = AF.GetColorRGB(dialog.accentColor)
+            dialog:SetBackdropBorderColor(r, g, b)
+            dialog.yes:SetBackdropBorderColor(r, g, b)
+            dialog.no:SetBackdropBorderColor(r, g, b)
         end)
     end)
 
@@ -148,6 +154,8 @@ end
 ---@return AF_Dialog
 function AF.ShowDialog(parent, text, width, yesText, noText, showMask, content, yesDisabled)
     if not dialog then CreateDialog() end
+
+    dialog.accentColor = AF.GetAddonAccentColorName()
 
     dialog:SetParent(parent)
     AF.SetFrameLevel(dialog, 50, parent)
@@ -288,6 +296,10 @@ local function CreateNotificationDialog()
             end
             notificationDialog:SetHeight(Round(textHolder:GetHeight()) + 40)
             notificationDialog:SetScript("OnUpdate", nil)
+
+            -- accent color system
+            notificationDialog:SetBackdropBorderColor(AF.GetColorRGB(notificationDialog.accentColor, 1))
+            notificationDialog.close:SetColor(notificationDialog.accentColor)
         end)
     end)
 
@@ -312,6 +324,8 @@ end
 ---@return AF_NotificationDialog
 function AF.ShowNotificationDialog(parent, text, width, showMask, countdown)
     if not notificationDialog then CreateNotificationDialog() end
+
+    notificationDialog.accentColor = AF.GetAddonAccentColorName()
 
     notificationDialog:SetParent(parent)
     AF.SetFrameLevel(notificationDialog, 50, parent)

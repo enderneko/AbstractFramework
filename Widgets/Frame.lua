@@ -34,6 +34,16 @@ function AF_HeaderedFrameMixin:SetTitleJustify(justify)
     end
 end
 
+---@param color string|table
+function AF_HeaderedFrameMixin:SetTitleColor(color)
+    self.header.text:SetColor(color)
+end
+
+---@param text string
+function AF_HeaderedFrameMixin:SetTitle(text)
+    self.header.text:SetText(text)
+end
+
 ---@param color string|table color name / table
 function AF_HeaderedFrameMixin:SetTitleBackgroundColor(color)
     if type(color) == "string" then color = AF.GetColorTable(color) end
@@ -177,7 +187,7 @@ local AF_BorderedFrameMixin = {}
 
 function AF_BorderedFrameMixin:SetLabel(label, fontColor, font, isInside)
     if not self.label then
-        self.label = AF.CreateFontString(self, label, fontColor or "accent", font)
+        self.label = AF.CreateFontString(self, label, fontColor or self.accentColor, font)
         self.label:SetJustifyH("LEFT")
     else
         self.label:SetText(label)
@@ -198,6 +208,8 @@ function AF.CreateBorderedFrame(parent, name, width, height, color, borderColor)
     local f = CreateFrame("Frame", name, parent, "BackdropTemplate")
     AF.ApplyDefaultBackdropWithColors(f, color, borderColor)
     AF.SetSize(f, width, height)
+
+    f.accentColor = AF.GetAddonAccentColorName()
 
     Mixin(f, AF_FrameMixin)
     Mixin(f, AF_BorderedFrameMixin)
@@ -243,7 +255,7 @@ end
 ---@param color? string color name defined in Color.lua
 ---@return AF_TitledPane
 function AF.CreateTitledPane(parent, title, width, height, color)
-    color = color or "accent"
+    color = color or AF.GetAddonAccentColorName()
 
     local pane = CreateFrame("Frame", nil, parent, "BackdropTemplate")
     AF.SetSize(pane, width, height)
@@ -264,7 +276,7 @@ function AF.CreateTitledPane(parent, title, width, height, color)
     AF.SetPoint(shadow, "TOPRIGHT", line, 1, -1)
 
     -- title
-    local text = AF.CreateFontString(pane, title, "accent")
+    local text = AF.CreateFontString(pane, title, color)
     pane.title = text
     text:SetJustifyH("LEFT")
     AF.SetPoint(text, "BOTTOMLEFT", line, "TOPLEFT", 0, 2)

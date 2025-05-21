@@ -150,6 +150,8 @@ end
 
 ---@param color string|table if table, color[1] is normal color, color[2] is hover color
 function AF_ButtonMixin:SetColor(color)
+    if not color then return end
+
     -- keep color & hoverColor ------------------
     if type(color) == "table" then
         assert(#color == 2, "color table must have 2 elements")
@@ -378,6 +380,7 @@ function AF.CreateButton(parent, text, color, width, height, template, borderCol
     end
 
     -- color ------------------------------------
+    b.accentColor = AF.GetAddonAccentColorName() -- just for Tooltips ...
     b:SetColor(color)
 
     -- click sound ------------------------------
@@ -691,6 +694,8 @@ function AF.CreateCheckButton(parent, label, onClick)
     local cb = CreateFrame("CheckButton", nil, parent, "BackdropTemplate")
     AF.SetSize(cb, 14, 14)
 
+    cb.accentColor = AF.GetAddonAccentColorName()
+
     cb.onClick = onClick
     cb:SetScript("OnClick", function(self)
         PlaySound(self:GetChecked() and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
@@ -711,13 +716,13 @@ function AF.CreateCheckButton(parent, label, onClick)
 
     local checkedTexture = cb:CreateTexture(nil, "ARTWORK")
     cb.checkedTexture = checkedTexture
-    checkedTexture:SetColorTexture(AF.GetColorRGB("accent", 0.7))
+    checkedTexture:SetColorTexture(AF.GetColorRGB(cb.accentColor, 0.7))
     AF.SetPoint(checkedTexture, "TOPLEFT", 1, -1)
     AF.SetPoint(checkedTexture, "BOTTOMRIGHT", -1, 1)
 
     local highlightTexture = cb:CreateTexture(nil, "ARTWORK")
     cb.highlightTexture = highlightTexture
-    highlightTexture:SetColorTexture(AF.GetColorRGB("accent", 0.1))
+    highlightTexture:SetColorTexture(AF.GetColorRGB(cb.accentColor, 0.1))
     AF.SetPoint(highlightTexture, "TOPLEFT", 1, -1)
     AF.SetPoint(highlightTexture, "BOTTOMRIGHT", -1, 1)
 
@@ -727,7 +732,7 @@ function AF.CreateCheckButton(parent, label, onClick)
 
     cb:SetScript("OnEnable", function()
         cb.label:SetTextColor(1, 1, 1)
-        checkedTexture:SetColorTexture(AF.GetColorRGB("accent", 0.7))
+        checkedTexture:SetColorTexture(AF.GetColorRGB(cb.accentColor, 0.7))
         cb:SetBackdropBorderColor(0, 0, 0, 1)
     end)
 
@@ -801,7 +806,7 @@ function AF_SwitchMixin:SetLabels(labels)
         buttons[i].value = labels[i].value or labels[i].text
         buttons[i].isSelected = false
 
-        buttons[i].highlight = AF.CreateTexture(buttons[i], nil, AF.GetColorTable("accent", 0.7))
+        buttons[i].highlight = AF.CreateTexture(buttons[i], nil, AF.GetColorTable(switch.accentColor, 0.7))
         AF.SetPoint(buttons[i].highlight, "BOTTOMLEFT", 1, 1)
         AF.SetPoint(buttons[i].highlight, "BOTTOMRIGHT", -1, 1)
         AF.SetHeight(buttons[i].highlight, 1)
@@ -907,7 +912,9 @@ end
 function AF.CreateSwitch(parent, width, height, labels)
     local switch = AF.CreateBorderedFrame(parent, nil, width, height, "widget")
 
-    switch.highlight = AF.CreateTexture(switch, nil, AF.GetColorTable("accent", 0.07))
+    switch.accentColor = AF.GetAddonAccentColorName()
+
+    switch.highlight = AF.CreateTexture(switch, nil, AF.GetColorTable(switch.accentColor, 0.07))
     AF.SetPoint(switch.highlight, "TOPLEFT", 1, -1)
     AF.SetPoint(switch.highlight, "BOTTOMRIGHT", -1, 1)
     switch.highlight:Hide()

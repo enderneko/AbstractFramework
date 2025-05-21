@@ -44,10 +44,10 @@ local function CreateListFrame()
         list:UpdatePixels()
         horizontalList:Hide()
 
-        highlight:SetBackdropBorderColor(AF.GetAddonAccentColorRGB(list.dropdown.addon))
         local scrollThumb = list.scrollThumb
-        scrollThumb.r, scrollThumb.g, scrollThumb.b = AF.GetAddonAccentColorRGB(list.dropdown.addon)
+        scrollThumb.r, scrollThumb.g, scrollThumb.b = AF.GetColorRGB(list.dropdown.accentColor)
         scrollThumb:SetBackdropColor(scrollThumb.r, scrollThumb.g, scrollThumb.b, 0.7)
+        highlight:SetBackdropBorderColor(scrollThumb.r, scrollThumb.g, scrollThumb.b)
 
         if list.dropdown.selected then
             highlight:UpdatePixels()
@@ -103,7 +103,7 @@ local function CreateHorizontalList()
         list:Hide()
         horizontalList:UpdatePixels()
 
-        highlight:SetBackdropBorderColor(AF.GetAddonAccentColorRGB(horizontalList.dropdown.addon))
+        highlight:SetBackdropBorderColor(AF.GetColorRGB(horizontalList.dropdown.accentColor))
 
         for _, b in pairs(horizontalList.buttons) do
             b:UpdatePixels()
@@ -336,12 +336,7 @@ function AF_DropdownMixin:LoadItems()
 
         tinsert(self.buttons, b)
         b:SetEnabled(not item.disabled)
-
-        if self.addon then
-            b:SetColor(self.addon .. "_transparent")
-        else
-            b:SetColor("accent_transparent")
-        end
+        b:SetColor(self.accentColor .. "_transparent")
 
         -- icon
         if item.icon then
@@ -464,7 +459,7 @@ function AF.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
     local dropdown = AF.CreateBorderedFrame(parent, nil, width, 20, "widget")
     dropdown:EnableMouse(true)
 
-    dropdown.addon = AF.GetAddon()
+    dropdown.accentColor = AF.GetAddonAccentColorName()
 
     dropdown.enabled = true
     dropdown.width = width
@@ -503,9 +498,7 @@ function AF.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
         dropdown.text:SetJustifyH(justify or "LEFT")
     end
 
-    if dropdown.addon then
-        dropdown.button:SetColor(dropdown.addon .. "_hover")
-    end
+    dropdown.button:SetColor(dropdown.accentColor .. "_hover")
 
     -- iconBG
     dropdown.iconBG = AF.CreateTexture(isMini and dropdown.button or dropdown, nil, nil, "ARTWORK", -2)

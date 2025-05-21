@@ -7,7 +7,7 @@ local AF = _G.AbstractFramework
 ---@class AF_FontString:FontString
 local AF_FontStringMixin = {}
 
----@param color string
+---@param color string|table
 function AF_FontStringMixin:SetColor(color)
     AF.ColorFontString(self, color)
 end
