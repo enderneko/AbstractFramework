@@ -34,6 +34,13 @@ function AF_HeaderedFrameMixin:SetTitleJustify(justify)
     end
 end
 
+---@param color string|table color name / table
+function AF_HeaderedFrameMixin:SetTitleBackgroundColor(color)
+    if type(color) == "string" then color = AF.GetColorTable(color) end
+    color = color or AF.GetColorTable("accent")
+    self.header.tex:SetColorTexture(AF.UnpackColor(color))
+end
+
 function AF_HeaderedFrameMixin:SetTitle(title)
     self.header.text:SetText(title)
 end
