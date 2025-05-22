@@ -63,12 +63,33 @@ function AF.UnregisterAllCallbacks(event)
     end
 end
 
+AF.DEBUG_EVENTS = {
+    AF_SCALE_CHANGED = "blazing_tangerine",
+    AF_LOADED = "blazing_tangerine",
+    AF_PLAYER_DATA_UPDATE = "lightblue",
+    AF_INSTANCE_ENTER = "sand",
+    AF_INSTANCE_LEAVE = "sand",
+    AF_INSTANCE_STATE_CHANGE = false,
+    AF_PLAYER_LOGIN = "gray",
+    AF_PLAYER_ENTERING_WORLD = "gray",
+    AF_COMBAT_ENTER = false,
+    AF_COMBAT_LEAVE = false,
+    AF_JOIN_TEMP_CHANNEL = "classicrose",
+    AF_LEAVE_TEMP_CHANNEL = "classicrose",
+}
+
 function AF.Fire(event, ...)
     if AFConfig.debugMode then
-        if select("#", ...) > 0 then
-            print(AF.WrapTextInColor("[EVENT]", "hotpink"), event, "->", ...)
-        else
-            print(AF.WrapTextInColor("[EVENT]", "hotpink"), event)
+        local e = event
+        if AF.DEBUG_EVENTS[event] then
+            e = AF.WrapTextInColor(event, AF.DEBUG_EVENTS[event])
+        end
+        if AF.DEBUG_EVENTS[event] ~= false then
+            if select("#", ...) > 0 then
+                print(AF.WrapTextInColor("[EVENT]", "hotpink"), e, AF.GetColorStr("gray") .. ":", ...)
+            else
+                print(AF.WrapTextInColor("[EVENT]", "hotpink"), e)
+            end
         end
     end
 
