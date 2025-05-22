@@ -77,6 +77,7 @@ local COLORS = {
     ["lime"] = {["hex"] = "ff2ed573", ["t"] = {0.18, 0.84, 0.45, 1}},
     ["brightgreen"] = {["hex"] = "ff66ff00", ["t"] = {0.4, 1, 0, 1}},
     ["chartreuse"] = {["hex"] = "ff80ff00", ["t"] = {0.502, 1, 0, 1}},
+    ["lightblue"] = {["hex"] = "ffadd8e6", ["t"] = {0.68, 0.85, 0.9, 1}},
     ["skyblue"] = {["hex"] = "ff00ccff", ["t"] = {0, 0.8, 1, 1}},
     ["vividblue"] = {["hex"] = "ff1e90ff", ["t"] = {0.12, 0.56, 1, 1}},
     ["softblue"] = {["hex"] = "ff5352ed", ["t"] = {0.33, 0.32, 0.93, 1}},
