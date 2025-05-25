@@ -45,18 +45,18 @@ local function UpdateLines()
     local centerY = math.floor((height - 1) / 2)
 
     -- v center
-    CreateLine("v0", "red", 0.75, 0, 0, 1, height, 1)
+    CreateLine("c_v", "red", 0.75, 0, 0, 1, height, 1)
 
     -- h center
-    CreateLine("h0", "red", 0.75, 0, 0, width, 1, 1)
+    CreateLine("c_h", "red", 0.75, 0, 0, width, 1, 1)
 
     -- vleft
     local n = 0
     local offset = 0
     repeat
-        n = n - 1
+        n = n + 1
         offset = offset - 25
-        CreateLine("v" .. n, "gray", 0.35, offset, 0, 1, height)
+        CreateLine("l_" .. n, "gray", 0.35, offset, 0, 1, height)
     until offset < -halfWidth
 
     -- vright
@@ -65,16 +65,16 @@ local function UpdateLines()
     repeat
         n = n + 1
         offset = offset + 25
-        CreateLine("v" .. n, "gray", 0.35, offset, 0, 1, height)
+        CreateLine("r_" .. n, "gray", 0.35, offset, 0, 1, height)
     until offset > halfWidth
 
     -- hbottom
     n = 0
     offset = 0
     repeat
-        n = n - 1
+        n = n + 1
         offset = offset - 25
-        CreateLine("h" .. n, "gray", 0.35, 0, offset, width, 1)
+        CreateLine("b_" .. n, "gray", 0.35, 0, offset, width, 1)
     until offset < -halfHeight
 
     -- htop
@@ -83,22 +83,21 @@ local function UpdateLines()
     repeat
         n = n + 1
         offset = offset + 25
-        CreateLine("h" .. n, "gray", 0.35, 0, offset, width, 1)
+        CreateLine("t_" .. n, "gray", 0.35, 0, offset, width, 1)
     until offset > halfHeight
 end
 
 local function CreateAlignmentGrid()
     alignmentGrid = CreateFrame("Frame", "AFAlignmentGrid", moverParent)
     alignmentGrid:SetFrameStrata("BACKGROUND")
-    -- alignmentGrid:SetBackdrop({bgFile=AF.GetPlainTexture()})
-    -- alignmentGrid:SetBackdropColor(AF.GetColorRGB("disabled", 0)) -- for user customization?
+    AF.ApplyDefaultBackdrop_NoBorder(alignmentGrid)
+    alignmentGrid:SetBackdropColor(AF.GetColorRGB("gray", 0.15))
     alignmentGrid:SetAllPoints()
-    -- alignmentGrid:SetIgnoreParentScale(true)
-    alignmentGrid:SetScale(AF.GetPixelFactor())
 
     -- DISPLAY_SIZE_CHANGED
     alignmentGrid:RegisterEvent("DISPLAY_SIZE_CHANGED")
     alignmentGrid:SetScript("OnEvent", UpdateLines)
+    AF.RegisterCallback("AF_SCALE_CHANGED", UpdateLines)
 
     UpdateLines()
 end

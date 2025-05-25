@@ -151,6 +151,7 @@ function AF.SetScale(scale)
     AF.scale = scale
     AF.UIParent:SetScale(scale)
     UpdatePixels()
+    AF.Fire("AF_SCALE_CHANGED", scale)
 end
 
 function AF.GetScale()
