@@ -349,11 +349,11 @@ end
 ---@param frame Frame
 ---@param color string|table color name defined in Color.lua or color table
 ---@param borderColor string|table color name defined in Color.lua or color table
-function AF.ApplyDefaultBackdropWithColors(frame, color, borderColor)
+function AF.ApplyDefaultBackdropWithColors(frame, color, borderColor, borderSize)
     color = color or "background"
     borderColor = borderColor or "border"
 
-    AF.ApplyDefaultBackdrop(frame)
+    AF.ApplyDefaultBackdrop(frame, borderSize)
     if type(color) == "string" then
         frame:SetBackdropColor(AF.GetColorRGB(color))
     else
