@@ -1,14 +1,16 @@
-[Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r9...c1c4a64d93aa52e39eb9c51fc063bc29991420de)
+[Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r10...da1a4a59a2e1a4b0780e5a57444c989aeb8b2007)
 
-
-- Add "alpha" arg for AF.GetAuraTypeColor
-- Add lib AF_QRCODE
-- Add MIN_SCROLL_THUMB_HEIGHT
-- Add some icons
-- AF.GetDebuffType no longer returns "None"
-- Fix glow for HelpTips
-- Fix tooltip frame strata
-- Make class info in AF.player always available
-- Update AF.SetFrameLevel
-- Update AF.ShowCalloutGlow
-- Update cleuDispatcher
+- Add "borderSize" for AF.ApplyDefaultBackdropWithColors
+- Add AF_HeaderedFrameMixin.SetTitleBackgroundColor
+- Add AF_PIXEL_UPDATE_START/END events
+- Add AF.SetBackdropBorderSize
+- Add AF.SetOutsets
+- Fix AFAlignmentGrid scale
+- Fix HelpTip timer
+- Remove "date" from AF.CreateCalendarButton
+- Update accent color system
+- Update AF_* events
+- Update AF.PrintStack
+- Update AF.ShowNormalGlow
+- Update color
+- Update mover system
