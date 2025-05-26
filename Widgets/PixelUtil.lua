@@ -333,6 +333,28 @@ function AF.SetBackdrop(region, backdropInfo)
     region:SetBackdrop(backdropInfo)
 end
 
+function AF.SetBackdropBorderSize(region, borderSize)
+    if not region.GetBackdrop then return end
+    local backdropInfo = region:GetBackdrop()
+    if not backdropInfo then return end
+
+    -- preserve color
+    local r, g, b, a = region:GetBackdropColor()
+    local br, bg, bb, ba = region:GetBackdropBorderColor()
+
+    if borderSize then
+        region._edge_size = borderSize
+        backdropInfo.edgeSize = AF.ConvertPixelsForRegion(borderSize, region)
+    else
+        region._edge_size = nil
+        backdropInfo.edgeSize = nil
+    end
+
+    region:SetBackdrop(backdropInfo)
+    region:SetBackdropColor(r, g, b, a)
+    region:SetBackdropBorderColor(br, bg, bb, ba)
+end
+
 ---------------------------------------------------------------------
 -- re-set
 ---------------------------------------------------------------------
