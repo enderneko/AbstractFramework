@@ -59,8 +59,6 @@ function AF.SetWidth(region, width, minPixels)
     region._size_grid = nil
     region._size_list_h = nil
     -- add new
-    minPixels = minPixels or 0.001
-    -- region._size_normal = true
     region._width = width
     region._minwidth = minPixels
     region:SetWidth(AF.GetNearestPixelSize(width, region:GetEffectiveScale(), minPixels))
@@ -71,8 +69,6 @@ function AF.SetHeight(region, height, minPixels)
     region._size_grid = nil
     region._size_list_v = nil
     -- add new
-    minPixels = minPixels or 0.001
-    -- region._size_normal = true
     region._height = height
     region._minheight = minPixels
     region:SetHeight(AF.GetNearestPixelSize(height, region:GetEffectiveScale(), minPixels))
@@ -159,7 +155,6 @@ function AF.SetGridSize(region, gridWidth, gridHeight, gridSpacingX, gridSpacing
     -- clear conflicts
     region._size_list_h = nil
     region._size_list_v = nil
-    -- region._size_normal = nil
 
     -- add new
     region._size_grid = true
@@ -457,9 +452,13 @@ function AF.RemoveFromPixelUpdater(r)
 end
 
 function AF.UpdatePixels()
+    local start = GetTimePreciseSec()
+    AF.Fire("AF_PIXEL_UPDATE_START")
     for r in next, components do
         r:UpdatePixels()
     end
+    AF.Fire("AF_PIXEL_UPDATE_END")
+    AF.Debug(AF.WrapTextInColor("Pixel update took %.3f seconds", "yellow"):format(GetTimePreciseSec() - start))
 end
 
 -- not ideal

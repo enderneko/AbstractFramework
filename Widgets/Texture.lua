@@ -18,7 +18,14 @@ function AF_TextureMixin:SetColor(color)
     end
 end
 
----@param color table|string
+---@param parent Frame
+---@param texture? string
+---@param color? table|string
+---@param drawLayer? string default "ARTWORK"
+---@param subLevel? number
+---@param wrapModeHorizontal? string
+---@param wrapModeVertical? string
+---@param filterMode? string
 ---@return AF_TextureMixin tex
 function AF.CreateTexture(parent, texture, color, drawLayer, subLevel, wrapModeHorizontal, wrapModeVertical, filterMode)
     local tex = parent:CreateTexture(nil, drawLayer or "ARTWORK", nil, subLevel)
