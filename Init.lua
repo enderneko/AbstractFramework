@@ -105,6 +105,7 @@ AF.UIParent:RegisterEvent("FIRST_FRAME_RENDERED")
 function AF.UIParent:FIRST_FRAME_RENDERED()
     AF.UIParent:UnregisterEvent("FIRST_FRAME_RENDERED")
     AF.UIParent:RegisterEvent("UI_SCALE_CHANGED")
+    AF.SetupPopups(AFConfig.popups)
 end
 
 function AF.UIParent:UI_SCALE_CHANGED()
@@ -132,16 +133,12 @@ function AF.UIParent:ADDON_LOADED(addon)
 
         --! AF_LOADED
         AF.Fire("AF_LOADED", AF.version, AF.versionNum)
+        AF.InitMoverParent()
 
         -- setup popups
         if type(AFConfig.popups) ~= "table" then AFConfig.popups = {} end
-        AF.SetupPopups(AFConfig.popups)
     end
 end
-
--- function AF.SetIgnoreParentScale(ignore)
---     AF.UIParent:SetIgnoreParentScale(ignore)
--- end
 
 --! scale should NOT be TOO SMALL
 --! or it will result in abnormal display of borders
@@ -160,9 +157,6 @@ end
 
 function AF.SetUIParentScale(scale)
     UIParent:SetScale(scale)
-    -- if not AF.UIParent:IsIgnoringParentScale() then
-    --     UpdatePixels()
-    -- end
 end
 
 ---------------------------------------------------------------------

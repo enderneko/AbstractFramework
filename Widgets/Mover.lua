@@ -9,7 +9,7 @@ local movers = {}
 
 local moverParent, moverDialog, alignmentGrid, positionEditorFrame
 local anchorLockedText
-local AnchorPositionEditorFrame, UpdateAndSave, UpdatePositionEditorFrame
+local CreatePositionEditorFrame, AnchorPositionEditorFrame, UpdateAndSave, UpdatePositionEditorFrame
 local isAnchorLocked = false
 local modified = {}
 
@@ -91,7 +91,7 @@ local function CreateAlignmentGrid()
     alignmentGrid = CreateFrame("Frame", "AFAlignmentGrid", moverParent)
     alignmentGrid:SetFrameStrata("BACKGROUND")
     AF.ApplyDefaultBackdrop_NoBorder(alignmentGrid)
-    alignmentGrid:SetBackdropColor(AF.GetColorRGB("gray", 0.15))
+    alignmentGrid:SetBackdropColor(AF.GetColorRGB("gray", 0.2))
     alignmentGrid:SetAllPoints()
 
     -- DISPLAY_SIZE_CHANGED
@@ -103,8 +103,9 @@ local function CreateAlignmentGrid()
 end
 
 local function CreateMoverDialog()
-    moverDialog = AF.CreateHeaderedFrame(moverParent, "AFMoverDialog", _G.HUD_EDIT_MODE_MENU, 300, 180, "FULLSCREEN_DIALOG", nil, true)
+    moverDialog = AF.CreateHeaderedFrame(moverParent, "AFMoverDialog", "AF " .. _G.HUD_EDIT_MODE_MENU, 300, 180, "FULLSCREEN_DIALOG", nil, true)
     moverDialog:SetFrameStrata("FULLSCREEN_DIALOG")
+    moverDialog:Hide()
 
     anchorLockedText = AF.CreateFontString(moverDialog, L["Anchor Locked"], "accent", "AF_FONT_OUTLINE")
     anchorLockedText:Hide()
@@ -178,7 +179,9 @@ local function CreateMoverDialog()
         moverGroups:SetItems(items)
         -- moverGroups:SetSelectedValue("all")
 
+        -- update pixels
         AF.UpdatePixelsForRegionAndChildren(moverDialog)
+        AF.UpdatePixelsForRegionAndChildren(positionEditorFrame)
     end)
 
     -- OnHide
@@ -187,7 +190,9 @@ local function CreateMoverDialog()
     end)
 end
 
-local function CreateMoverParent()
+function AF.InitMoverParent()
+    if moverParent then return end
+
     moverParent = CreateFrame("Frame", "AFMoverParent", AF.UIParent)
     moverParent:SetFrameStrata("FULLSCREEN")
     moverParent:SetFrameLevel(MOVER_PARENT_FRAME_LEVEL)
@@ -200,8 +205,12 @@ local function CreateMoverParent()
         AF.HideMovers()
     end)
 
-    CreateMoverDialog()
-    CreateAlignmentGrid()
+    moverParent:SetScript("OnShow", function()
+        moverParent:SetScript("OnShow", nil)
+        CreateMoverDialog()
+        CreatePositionEditorFrame()
+        CreateAlignmentGrid()
+    end)
 end
 
 ---------------------------------------------------------------------
@@ -288,7 +297,7 @@ end
 ---------------------------------------------------------------------
 -- position editor frame
 ---------------------------------------------------------------------
-local function CreatePositionEditorFrame()
+CreatePositionEditorFrame = function()
     positionEditorFrame = AF.CreateBorderedFrame(moverParent, "AFPositionEditorFrame", nil, nil, nil, "accent")
     positionEditorFrame:SetFrameLevel(FINE_TUNING_FRAME_LEVEL)
     positionEditorFrame:EnableMouse(true)
@@ -499,8 +508,6 @@ AnchorPositionEditorFrame = function(owner)
 end
 
 local function TogglePositionAdjustmentFrame(owner)
-    if not positionEditorFrame then CreatePositionEditorFrame() end
-
     if positionEditorFrame:IsShown() then
         positionEditorFrame:Hide()
         positionEditorFrame.owner = nil
@@ -606,10 +613,10 @@ function AF.CreateMover(owner, group, text, save)
     -- or
     -- its parent must SetAllPoints(AF.UIParent)
 
-    if not moverParent then CreateMoverParent() end
-
-    local mover = AF.CreateBorderedFrame(moverParent, nil, nil, nil, nil, "accent")
+    local mover = AF.CreateBorderedFrame(moverParent)
     mover:SetBackdropColor(AF.GetColorRGB("background", 0.8))
+    mover.accentColor = AF.GetAddonAccentColorName()
+    mover:SetBackdropBorderColor(AF.GetColorRGB(mover.accentColor))
 
     owner.mover = mover
     mover.owner = owner
@@ -623,7 +630,7 @@ function AF.CreateMover(owner, group, text, save)
     mover:EnableMouse(true)
     mover:Hide()
 
-    mover.text = AF.CreateFontString(mover, text, nil, "AF_FONT_OUTLINE", "OVERLAY")
+    mover.text = AF.CreateFontString(mover, text, mover.accentColor, "AF_FONT_OUTLINE", "OVERLAY")
     mover.text:SetPoint("CENTER")
     mover.text:SetText(text)
 
@@ -726,7 +733,7 @@ function AF.CreateMover(owner, group, text, save)
                     m:SetFrameLevel(MOVER_ON_TOP_FRAME_LEVEL)
                     AF.FrameFadeIn(m, 0.25)
                 elseif m:IsShown() then
-                    m.text:SetColor("accent")
+                    m.text:SetColor(m.accentColor)
                     m:SetFrameLevel(MOVER_PARENT_FRAME_LEVEL)
                     AF.FrameFadeOut(m, 0.25, nil, 0.5)
                 end
@@ -740,7 +747,7 @@ function AF.CreateMover(owner, group, text, save)
         for _, g in pairs(movers) do
             for _, m in pairs(g) do
                 if m:IsShown() then
-                    m.text:SetColor("accent")
+                    m.text:SetColor(m.accentColor)
                     m:SetFrameLevel(MOVER_PARENT_FRAME_LEVEL)
                     AF.FrameFadeIn(m, 0.25)
                 end
@@ -767,7 +774,6 @@ end
 ---------------------------------------------------------------------
 function AF.ShowMovers(group)
     if InCombatLockdown() then return end
-    if not moverParent then CreateMoverParent() end
 
     for g, gt in pairs(movers) do
         local show
