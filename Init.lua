@@ -5,6 +5,7 @@ AF.name = "AbstractFramework"
 
 -- no operation
 AF.noop = function() end
+AF.noop_true = function() return true end
 
 ---------------------------------------------------------------------
 -- libs
