@@ -17,7 +17,8 @@ local ChatFrame_RemoveChannel = ChatFrame_RemoveChannel
 ---@param prefix string max 16 characters
 ---@param callback fun(data: any?, sender: string, channel: string)
 function AF.RegisterComm(prefix, callback)
-    Comm:RegisterComm(prefix, function(prefix, encoded, channel, sender)
+    local _self = AF.GetAddon() or "AF_COMM_SELF"
+    Comm.RegisterComm(_self, prefix, function(prefix, encoded, channel, sender)
         local data = AF.Deserialize(encoded, true)
         callback(data, sender, channel)
     end)
@@ -25,7 +26,8 @@ end
 
 ---@param prefix string
 function AF.UnregisterComm(prefix)
-    Comm:UnregisterComm(prefix)
+    local _self = AF.GetAddon() or "AF_COMM_SELF"
+    Comm.UnregisterComm(_self, prefix)
 end
 
 ---------------------------------------------------------------------
