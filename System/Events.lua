@@ -18,8 +18,8 @@ local IsDelveComplete = C_PartyInfo.IsDelveComplete
 local wasInInstance = nil
 
 --* AF_INSTANCE_STATE_CHANGE / AF_INSTANCE_ENTER / AF_INSTANCE_LEAVE
--- payload: instanceInfo, wasInInstance
--- wasInInstance:
+-- payload: instanceInfo
+-- instanceInfo.wasInInstance:
 --     nil if first time after login
 --     true if the player was in an instance before
 --     false if not
@@ -27,16 +27,17 @@ local wasInInstance = nil
 local instanceInfo = {}
 setmetatable(instanceInfo, {
     __tostring = function(t)
-        return "{InstanceInfo}"
+        return AF.WrapTextInColor(t.name or _G.UNKNOWN, t.isIn and "green" or "red") .. "||" ..  (t.instanceType or "none")
     end
 })
 
-local function CheckInstanceStatus()
+local function CheckInstanceStatus(_, event)
     local isIn, iType = IsInInstance()
 
     local name, instanceType, difficultyID, difficultyName, maxPlayers, dynamicDifficulty, isDynamic, instanceID, instanceGroupSize, LfgDungeonID = GetInstanceInfo()
 
-    if IsDelveInProgress() or IsDelveComplete() then
+    -- if IsDelveInProgress() or IsDelveComplete() then
+    if difficultyID == 208 then -- https://warcraft.wiki.gg/wiki/DifficultyID
         isIn = true
         iType = "delve"
     else
@@ -44,6 +45,7 @@ local function CheckInstanceStatus()
     end
 
     instanceInfo.isIn = isIn
+    instanceInfo.wasIn = wasInInstance
     instanceInfo.name = name
     instanceInfo.instanceType = iType
     instanceInfo.difficultyID = difficultyID
@@ -56,16 +58,16 @@ local function CheckInstanceStatus()
     instanceInfo.LfgDungeonID = LfgDungeonID
 
     if isIn ~= wasInInstance then
-        AF.Fire("AF_INSTANCE_STATE_CHANGE", instanceInfo, wasInInstance)
+        AF.Fire("AF_INSTANCE_STATE_CHANGE", instanceInfo)
     end
 
-    if isIn then
-        AF.Fire("AF_INSTANCE_ENTER", instanceInfo, wasInInstance)
-        wasInInstance = true
-    else
-        AF.Fire("AF_INSTANCE_LEAVE", instanceInfo, wasInInstance)
-        wasInInstance = false
+    if isIn and not wasInInstance then
+        AF.Fire("AF_INSTANCE_ENTER", instanceInfo)
+    elseif not isIn and wasInInstance then
+        AF.Fire("AF_INSTANCE_LEAVE", instanceInfo)
     end
+
+    wasInInstance = isIn
 end
 AF:RegisterEvent("SCENARIO_UPDATE", AF.GetDelayedInvoker(1, CheckInstanceStatus))
 
