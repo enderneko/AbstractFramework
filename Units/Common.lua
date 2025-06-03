@@ -12,13 +12,18 @@ local UnitInParty = UnitInParty
 local UnitInPartyIsAI = UnitInPartyIsAI or AF.noop
 local UnitPlayerOrPetInParty = UnitPlayerOrPetInParty
 local UnitPlayerOrPetInRaid = UnitPlayerOrPetInRaid
+local UnitIsPlayer = UnitIsPlayer
 local UnitInPartyIsAI = UnitInPartyIsAI
 local UnitClassBase = UnitClassBase
 local UnitName = UnitName
 local GetUnitName = GetUnitName
 local GetNormalizedRealmName = GetNormalizedRealmName
 local UnitLevel = UnitLevel
+local UnitEffectiveLevel = UnitEffectiveLevel
 local IsLevelAtEffectiveMaxLevel = IsLevelAtEffectiveMaxLevel
+local UnitClassification = UnitClassification
+local UnitExists = UnitExists
+local UnitPlayerControlled = UnitPlayerControlled
 
 ---------------------------------------------------------------------
 -- group
@@ -45,7 +50,7 @@ function AF.GetUnitsInSubGroup(group)
         -- name, rank, subgroup, level, class, fileName, zone, online, isDead, role, isML, combatRole = GetRaidRosterInfo(raidIndex)
         local name, _, subgroup = GetRaidRosterInfo(i)
         if subgroup == group then
-            tinsert(units, "raid"..i)
+            tinsert(units, "raid" .. i)
         end
     end
     return units
@@ -221,20 +226,20 @@ function AF.GetTargetUnitInfo()
 
     if IsInRaid() then
         for i = 1, GetNumGroupMembers() do
-            if UnitIsUnit("target", "raid"..i) then
-                return "raid"..i, UnitName("raid"..i), UnitClassBase("raid"..i)
+            if UnitIsUnit("target", "raid" .. i) then
+                return "raid" .. i, UnitName("raid" .. i), UnitClassBase("raid" .. i)
             end
-            if UnitIsUnit("target", "raidpet"..i) then
-                return "raidpet"..i, UnitName("raidpet"..i)
+            if UnitIsUnit("target", "raidpet" .. i) then
+                return "raidpet" .. i, UnitName("raidpet" .. i)
             end
         end
     elseif IsInGroup() then
-        for i = 1, GetNumGroupMembers()-1 do
-            if UnitIsUnit("target", "party"..i) then
-                return "party"..i, UnitName("party"..i), UnitClassBase("party"..i)
+        for i = 1, GetNumGroupMembers() - 1 do
+            if UnitIsUnit("target", "party" .. i) then
+                return "party" .. i, UnitName("party" .. i), UnitClassBase("party" .. i)
             end
-            if UnitIsUnit("target", "partypet"..i) then
-                return "partypet"..i, UnitName("partypet"..i)
+            if UnitIsUnit("target", "partypet" .. i) then
+                return "partypet" .. i, UnitName("partypet" .. i)
             end
         end
     end
@@ -362,7 +367,7 @@ function AF.ToFullName(shortName, server)
     if not string.find(fullName, "-") then
         server = server or GetNormalizedRealmName()
         if server then
-            fullName = fullName.."-"..server
+            fullName = fullName .. "-" .. server
         end
     end
     return fullName
@@ -393,7 +398,84 @@ end
 function AF.IsMaxLevel()
     -- local maxLevel = GetMaxLevelForLatestExpansion() --? GetMaxPlayerLevel()
     local playerLevel = UnitLevel("player")
-    local isMaxLevel =  IsLevelAtEffectiveMaxLevel(playerLevel)
+    local isMaxLevel = IsLevelAtEffectiveMaxLevel(playerLevel)
     -- local isTrialMaxLevel =  (IsRestrictedAccount() or IsTrialAccount() or IsVeteranTrialAccount()) and (playerLevel == 20)
     return isMaxLevel -- or isTrialMaxLevel
+end
+
+---------------------------------------------------------------------
+-- npc
+---------------------------------------------------------------------
+local GetUnitTooltipData = C_TooltipInfo.GetUnit
+local GetCVarBool = C_CVar.GetCVarBool
+local UNIT_LEVEL_TEMPLATE = UNIT_LEVEL_TEMPLATE
+local PVP = PVP
+
+local npc_subtitle_cache = {}
+local npc_faction_cache = {}
+
+function AF.GetNPCSubtitle(unit)
+    if not UnitExists(unit) or UnitIsPlayer(unit) or UnitPlayerControlled(unit) then
+        return nil
+    end
+
+    local guid = UnitGUID(unit)
+    local subtitle = npc_subtitle_cache[guid]
+    local line = GetCVarBool("colorblindMode") and 3 or 2
+
+    if not subtitle then
+        texplore(npc_subtitle_cache)
+        local data = GetUnitTooltipData(unit)
+        if data then
+            if #data.lines >= line then
+                if data.guid ~= guid then
+                    return nil
+                end
+
+                local text = data.lines[line].leftText or ""
+                if text:match(UNIT_LEVEL_TEMPLATE) then
+                    subtitle = ""
+                else
+                    subtitle = text
+                end
+
+                npc_subtitle_cache[guid] = subtitle
+            end
+        end
+    end
+
+    if subtitle == "" then
+        return nil
+    else
+        return subtitle
+    end
+end
+
+
+function AF.GetNPCFaction(unit)
+    if not UnitExists(unit) or UnitIsPlayer(unit) or UnitPlayerControlled(unit) then
+        return nil
+    end
+
+    local guid = UnitGUID(unit)
+    local faction = npc_faction_cache[guid]
+
+    if not faction then
+        local data = GetUnitTooltipData(unit)
+        if data then
+            for i = 2, #data.lines do
+                local text = data.lines[i].leftText or ""
+                if text:match(UNIT_LEVEL_TEMPLATE) then
+                    text = data.lines[i + 1] and data.lines[i + 1].leftText
+                    if not AF.IsBlank(text) and text ~= PVP then
+                        faction = text
+                        npc_faction_cache[guid] = faction
+                    end
+                    break
+                end
+            end
+        end
+    end
+
+    return faction
 end
