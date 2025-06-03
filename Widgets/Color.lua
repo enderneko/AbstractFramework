@@ -11,6 +11,13 @@ local UnitIsPlayer = UnitIsPlayer
 local UnitInPartyIsAI = UnitInPartyIsAI
 local UnitClassBase = UnitClassBase
 local UnitGUID = UnitGUID
+local UnitEffectiveLevel = UnitEffectiveLevel
+local UnitIsWildBattlePet = UnitIsWildBattlePet
+local UnitIsBattlePetCompanion = UnitIsBattlePetCompanion
+local GetRelativeDifficultyColor = GetRelativeDifficultyColor
+local GetCreatureDifficultyColor = GetCreatureDifficultyColor
+local QuestDifficultyColors = QuestDifficultyColors
+local GetPetTeamAverageLevel = C_PetJournal and C_PetJournal.GetPetTeamAverageLevel
 
 local ACCENT_COLOR = {["hex"] = "ffff6600", ["t"] = {1, 0.4, 0, 1}, ["normal"] = {1, 0.4, 0, 0.3}, ["hover"] = {1, 0.4, 0, 0.6}}
 local ACCENT_COLOR_ALT = {["hex"] = "ffff0066", ["t"] = {1, 0, 0.4, 1}, ["normal"] = {1, 0, 0.4, 0.3}, ["hover"] = {1, 0, 0.4, 0.6}}
@@ -440,7 +447,6 @@ end
 ---@return number r
 ---@return number g
 ---@return number b
----@return number a
 function AF.GetUnitClassColor(unit)
     local class
     if UnitIsPlayer(unit) or UnitInPartyIsAI(unit) then -- player
@@ -461,7 +467,6 @@ end
 ---@return number r
 ---@return number g
 ---@return number b
----@return number a
 function AF.GetReactionColor(unit, alpha, saturation)
     --! reaction to player, MUST use UnitReaction(unit, "player")
     --! NOT UnitReaction("player", unit)
@@ -473,6 +478,40 @@ function AF.GetReactionColor(unit, alpha, saturation)
     else
         return AF.GetColorRGB("FRIENDLY", alpha, saturation)
     end
+end
+
+-- if unit is player or AI party member, return class color.
+-- if unit is non-player, return reaction color.
+---@param unit string unitId
+---@return number r
+---@return number g
+---@return number b
+function AF.GetUnitColor(unit)
+    if UnitIsPlayer(unit) or UnitInPartyIsAI(unit) then -- player
+        local class = UnitClassBase(unit)
+        return AF.GetClassColor(class)
+    else
+        return AF.GetReactionColor(unit)
+    end
+end
+
+---@param unit string unitId
+---@return number r
+---@return number g
+---@return number b
+function AF.GetLevelColor(unit)
+    if AF.isRetail and (UnitIsWildBattlePet(unit) or UnitIsBattlePetCompanion(unit)) then
+        local teamLevel = GetPetTeamAverageLevel()
+        local level = UnitBattlePetLevel(unit)
+        if teamLevel ~= level then
+            color = GetRelativeDifficultyColor(teamLevel, level)
+        else
+            color = QuestDifficultyColors.difficult
+        end
+    else
+        color = GetCreatureDifficultyColor(UnitEffectiveLevel(unit))
+    end
+    return color.r, color.g, color.b
 end
 
 ---@param power string capitalized power token
