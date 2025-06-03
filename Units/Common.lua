@@ -326,8 +326,13 @@ end
 -- name
 ---------------------------------------------------------------------
 
+---@param unit string
+---@return string fullName
 function AF.UnitFullName(unit)
-    if not unit or not UnitIsPlayer(unit) then return end
+    if not unit then return end
+    if not UnitIsPlayer(unit) then
+        return UnitName(unit)
+    end
 
     local name = GetUnitName(unit, true)
 
