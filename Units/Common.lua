@@ -25,6 +25,9 @@ local IsLevelAtEffectiveMaxLevel = IsLevelAtEffectiveMaxLevel
 local UnitClassification = UnitClassification
 local UnitExists = UnitExists
 local UnitPlayerControlled = UnitPlayerControlled
+local UnitCreatureType = UnitCreatureType
+local GetUnitTooltipData = C_TooltipInfo.GetUnit
+local GetCVarBool = C_CVar.GetCVarBool
 
 ---------------------------------------------------------------------
 -- group
@@ -336,11 +339,14 @@ end
 ---@return string fullName
 function AF.UnitFullName(unit)
     if not unit then return end
+
+    local name
     if not UnitIsPlayer(unit) then
-        return UnitName(unit)
+        name = UnitName(unit)
+        return name
     end
 
-    local name = GetUnitName(unit, true)
+    name = GetUnitName(unit, true)
 
     --? name might be nil in some cases?
     if name and not string.find(name, "-") then
@@ -407,12 +413,11 @@ end
 ---------------------------------------------------------------------
 -- npc
 ---------------------------------------------------------------------
-local GetUnitTooltipData = C_TooltipInfo.GetUnit
-local GetCVarBool = C_CVar.GetCVarBool
 local LEVEL = _G.LEVEL
 local PVP = _G.PVP
 local FACTION_HORDE = _G.FACTION_HORDE
 local FACTION_ALLIANCE = _G.FACTION_ALLIANCE
+local CORPSE = _G.CORPSE
 
 local npc_subtitle_cache = {}
 local npc_faction_cache = {}
@@ -422,14 +427,14 @@ local function UpdateNPCCache(unit)
         return
     end
 
-    local guid = UnitGUID(unit)
+    local name = UnitName(unit)
 
-    if npc_subtitle_cache[guid] ~= nil and npc_faction_cache[guid] ~= nil then
-        return guid
+    if npc_subtitle_cache[name] ~= nil and npc_faction_cache[name] ~= nil then
+        return name
     end
 
     local data = GetUnitTooltipData(unit)
-    if not data or data.guid ~= guid then
+    if not data then
         return
     end
 
@@ -438,43 +443,49 @@ local function UpdateNPCCache(unit)
 
     -- subtitle
     local line = GetCVarBool("colorblindMode") and 3 or 2
-    if not npc_subtitle_cache[guid] and numLines >= line then
+    if not npc_subtitle_cache[name] and numLines >= line then
         text = data.lines[line].leftText or ""
         if strfind(text, LEVEL) then
-            npc_subtitle_cache[guid] = false
+            npc_subtitle_cache[name] = false
         else
-            npc_subtitle_cache[guid] = text
+            npc_subtitle_cache[name] = text
             line = line + 1
         end
     end
 
     -- faction
-    if npc_faction_cache[guid] == nil then
+    if npc_faction_cache[name] == nil then
         for i = line, numLines do
             text = data.lines[i].leftText or ""
             if strfind(text, LEVEL) then
-                text = data.lines[i + 1] and data.lines[i + 1].leftText
-                if not AF.IsBlank(text) and text ~= PVP and text ~= FACTION_HORDE and text ~= FACTION_ALLIANCE then
-                    npc_faction_cache[guid] = text
+                text = (data.lines[i + 1] and not data.lines[i + 1].id) and data.lines[i + 1].leftText
+                if not AF.IsBlank(text)
+                    and text ~= PVP and text ~= FACTION_HORDE and text ~= FACTION_ALLIANCE
+                    and text ~= CORPSE
+                    and text ~= UnitCreatureType(unit) then
+
+                    npc_faction_cache[name] = text
                 else
-                    npc_faction_cache[guid] = false
+                    npc_faction_cache[name] = false
                 end
                 break
             end
         end
     end
 
-    return guid
+    return name
 end
 
+---@param unit string
+---@return string|nil
 function AF.GetNPCSubtitle(unit)
-    local guid = UpdateNPCCache(unit)
+    local name = UpdateNPCCache(unit)
 
-    if not guid then
+    if not name then
         return nil
     end
 
-    local subtitle = npc_subtitle_cache[guid]
+    local subtitle = npc_subtitle_cache[name]
 
     if subtitle then
         return subtitle
@@ -483,14 +494,16 @@ function AF.GetNPCSubtitle(unit)
     end
 end
 
+---@param unit string
+---@return string|nil
 function AF.GetNPCFaction(unit)
-    local guid = UpdateNPCCache(unit)
+    local name = UpdateNPCCache(unit)
 
-    if not guid then
+    if not name then
         return nil
     end
 
-    local faction = npc_faction_cache[guid]
+    local faction = npc_faction_cache[name]
 
     if faction then
         return faction
