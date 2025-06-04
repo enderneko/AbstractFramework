@@ -28,6 +28,9 @@ local UnitPlayerControlled = UnitPlayerControlled
 local UnitCreatureType = UnitCreatureType
 local GetUnitTooltipData = C_TooltipInfo.GetUnit
 local GetCVarBool = C_CVar.GetCVarBool
+local UnitIsWildBattlePet = UnitIsWildBattlePet
+local UnitIsBattlePetCompanion = UnitIsBattlePetCompanion
+local UnitBattlePetLevel = UnitBattlePetLevel
 
 ---------------------------------------------------------------------
 -- group
@@ -408,6 +411,21 @@ function AF.IsMaxLevel()
     local isMaxLevel = IsLevelAtEffectiveMaxLevel(playerLevel)
     -- local isTrialMaxLevel =  (IsRestrictedAccount() or IsTrialAccount() or IsVeteranTrialAccount()) and (playerLevel == 20)
     return isMaxLevel -- or isTrialMaxLevel
+end
+
+function AF.GetLevelText(unit)
+    if UnitIsWildBattlePet(unit) or UnitIsBattlePetCompanion(unit) then
+        return UnitBattlePetLevel(unit)
+    else
+        local level = UnitEffectiveLevel(unit)
+        local plus = strfind(UnitClassification(unit), "elite$") and "+" or ""
+
+        if level > 0 then
+            return level .. plus
+        else
+            return "??"
+        end
+    end
 end
 
 ---------------------------------------------------------------------
