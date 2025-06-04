@@ -2,6 +2,7 @@
 local AF = _G.AbstractFramework
 
 local strfind = strfind
+local strlower = strlower
 local bitband = bit.band
 local GetNumGroupMembers = GetNumGroupMembers
 local GetRaidRosterInfo = GetRaidRosterInfo
@@ -408,74 +409,92 @@ end
 ---------------------------------------------------------------------
 local GetUnitTooltipData = C_TooltipInfo.GetUnit
 local GetCVarBool = C_CVar.GetCVarBool
-local UNIT_LEVEL_TEMPLATE = UNIT_LEVEL_TEMPLATE
-local PVP = PVP
+local LEVEL = _G.LEVEL
+local PVP = _G.PVP
+local FACTION_HORDE = _G.FACTION_HORDE
+local FACTION_ALLIANCE = _G.FACTION_ALLIANCE
 
 local npc_subtitle_cache = {}
 local npc_faction_cache = {}
 
-function AF.GetNPCSubtitle(unit)
+local function UpdateNPCCache(unit)
     if not UnitExists(unit) or UnitIsPlayer(unit) or UnitPlayerControlled(unit) then
-        return nil
+        return
     end
 
     local guid = UnitGUID(unit)
-    local subtitle = npc_subtitle_cache[guid]
+
+    if npc_subtitle_cache[guid] ~= nil and npc_faction_cache[guid] ~= nil then
+        return guid
+    end
+
+    local data = GetUnitTooltipData(unit)
+    if not data or data.guid ~= guid then
+        return
+    end
+
+    local numLines = #data.lines
+    local text
+
+    -- subtitle
     local line = GetCVarBool("colorblindMode") and 3 or 2
+    if not npc_subtitle_cache[guid] and numLines >= line then
+        text = data.lines[line].leftText or ""
+        if strfind(text, LEVEL) then
+            npc_subtitle_cache[guid] = false
+        else
+            npc_subtitle_cache[guid] = text
+            line = line + 1
+        end
+    end
 
-    if not subtitle then
-        texplore(npc_subtitle_cache)
-        local data = GetUnitTooltipData(unit)
-        if data then
-            if #data.lines >= line then
-                if data.guid ~= guid then
-                    return nil
-                end
-
-                local text = data.lines[line].leftText or ""
-                if text:match(UNIT_LEVEL_TEMPLATE) then
-                    subtitle = ""
+    -- faction
+    if npc_faction_cache[guid] == nil then
+        for i = line, numLines do
+            text = data.lines[i].leftText or ""
+            if strfind(text, LEVEL) then
+                text = data.lines[i + 1] and data.lines[i + 1].leftText
+                if not AF.IsBlank(text) and text ~= PVP and text ~= FACTION_HORDE and text ~= FACTION_ALLIANCE then
+                    npc_faction_cache[guid] = text
                 else
-                    subtitle = text
+                    npc_faction_cache[guid] = false
                 end
-
-                npc_subtitle_cache[guid] = subtitle
+                break
             end
         end
     end
 
-    if subtitle == "" then
+    return guid
+end
+
+function AF.GetNPCSubtitle(unit)
+    local guid = UpdateNPCCache(unit)
+
+    if not guid then
         return nil
-    else
+    end
+
+    local subtitle = npc_subtitle_cache[guid]
+
+    if subtitle then
         return subtitle
+    else
+        return nil
     end
 end
 
-
 function AF.GetNPCFaction(unit)
-    if not UnitExists(unit) or UnitIsPlayer(unit) or UnitPlayerControlled(unit) then
+    local guid = UpdateNPCCache(unit)
+
+    if not guid then
         return nil
     end
 
-    local guid = UnitGUID(unit)
     local faction = npc_faction_cache[guid]
 
-    if not faction then
-        local data = GetUnitTooltipData(unit)
-        if data then
-            for i = 2, #data.lines do
-                local text = data.lines[i].leftText or ""
-                if text:match(UNIT_LEVEL_TEMPLATE) then
-                    text = data.lines[i + 1] and data.lines[i + 1].leftText
-                    if not AF.IsBlank(text) and text ~= PVP then
-                        faction = text
-                        npc_faction_cache[guid] = faction
-                    end
-                    break
-                end
-            end
-        end
+    if faction then
+        return faction
+    else
+        return nil
     end
-
-    return faction
 end
