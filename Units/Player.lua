@@ -15,6 +15,16 @@ local GetSpecialization = GetSpecialization
 local GetSpecializationInfo = GetSpecializationInfo
 
 ---------------------------------------------------------------------
+-- UnitClassBase --! fix wrong class for AI
+---------------------------------------------------------------------
+---@param unit string
+---@return string classFileName
+---@return string classID
+function AF.UnitClassBase(unit)
+    return select(2, UnitClass(unit))
+end
+
+---------------------------------------------------------------------
 -- player info
 ---------------------------------------------------------------------
 AF.player = {}

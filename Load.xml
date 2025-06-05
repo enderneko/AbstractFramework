@@ -53,13 +53,6 @@
     <Script file="Media\Media.lua"/>
     <Script file="Media\SharedMedia.lua"/>
 
-    <!-- spells -->
-    <Script file="Spells\Common.lua"/>
-    <Script file="Spells\Bleeds.lua"/>
-    <Script file="Spells\CrowdControls.lua"/>
-    <Script file="Spells\Dispellables_Retail.lua"/>
-    <Script file="Spells\Interrupts.lua"/>
-
     <!-- widgets -->
     <Script file="Widgets\PixelUtil.lua"/>
     <Script file="Widgets\Color.lua"/>
@@ -96,6 +89,13 @@
     <Script file="Units\Common.lua"/>
     <Script file="Units\Class.lua"/>
     <Script file="Units\RangeCheck.lua"/>
+
+    <!-- spells -->
+    <Script file="Spells\Common.lua"/>
+    <Script file="Spells\Bleeds.lua"/>
+    <Script file="Spells\CrowdControls.lua"/>
+    <Script file="Spells\Dispellables_Retail.lua"/>
+    <Script file="Spells\Interrupts.lua"/>
 
     <!-- demo -->
     <Script file="Demo.lua"/>

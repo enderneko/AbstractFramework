@@ -10,12 +10,12 @@ local IsInRaid = IsInRaid
 local IsInGroup = IsInGroup
 local UnitIsUnit = UnitIsUnit
 local UnitInParty = UnitInParty
+local UnitClassBase = AF.UnitClassBase
 local UnitInPartyIsAI = UnitInPartyIsAI or AF.noop
 local UnitPlayerOrPetInParty = UnitPlayerOrPetInParty
 local UnitPlayerOrPetInRaid = UnitPlayerOrPetInRaid
 local UnitIsPlayer = UnitIsPlayer
 local UnitInPartyIsAI = UnitInPartyIsAI
-local UnitClassBase = UnitClassBase
 local UnitName = UnitName
 local GetUnitName = GetUnitName
 local GetNormalizedRealmName = GetNormalizedRealmName
@@ -223,6 +223,7 @@ end
 ---@return string? bestUnitID
 ---@return string? unitName
 ---@return string? classFileName
+---@return string? classID
 function AF.GetTargetUnitInfo()
     if UnitIsUnit("target", "player") then
         return "player", UnitName("player"), UnitClassBase("player")
@@ -478,8 +479,8 @@ local function UpdateNPCCache(unit)
             if strfind(text, LEVEL) then
                 text = (data.lines[i + 1] and not data.lines[i + 1].id) and data.lines[i + 1].leftText
                 if not AF.IsBlank(text)
-                    and text ~= PVP and text ~= FACTION_HORDE and text ~= FACTION_ALLIANCE
-                    and text ~= CORPSE
+                    and text ~= PVP and text ~= FACTION_HORDE and text ~= FACTION_ALLIANCE and text ~= CORPSE
+                    and not AF.GetClassID(text)
                     and text ~= UnitCreatureType(unit) then
 
                     npc_faction_cache[name] = text

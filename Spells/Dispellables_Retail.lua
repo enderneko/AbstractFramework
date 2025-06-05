@@ -1,6 +1,8 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 
+local UnitClassBase = UnitClassBase
+
 local dispellable = {}
 
 function AF.CanDispel(debuffType)
