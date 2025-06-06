@@ -85,6 +85,9 @@
     <Script file="Widgets\Misc.lua"/>
     <Script file="Widgets\DataBroker.lua"/>
 
+    <!-- media/glyphs -->
+    <Script file="Media\Glyphs.lua"/>
+
     <!-- units -->
     <Script file="Units\Common.lua"/>
     <Script file="Units\Class.lua"/>
