@@ -265,6 +265,9 @@ local GetItemQualityColor = C_Item.GetItemQualityColor
 ---@return number g
 ---@return number b
 function AF.GetItemQualityColor(quality)
+    if not quality then
+        return 0, 0, 0
+    end
     local r, g, b = GetItemQualityColor(quality)
     return r, g, b
 end
