@@ -6,20 +6,39 @@ local AF = _G.AbstractFramework
 ---------------------------------------------------------------------
 do
     local f = CreateFrame("Frame")
-    AF.FrameSetSize = f.SetSize
-    AF.FrameSetHeight = f.SetHeight
-    AF.FrameSetWidth = f.SetWidth
-    AF.FrameGetSize = f.GetSize
-    AF.FrameGetHeight = f.GetHeight
-    AF.FrameGetWidth = f.GetWidth
-    AF.FrameSetPoint = f.SetPoint
-    AF.FrameSetFrameLevel = f.SetFrameLevel
+    -- AF.FrameSetSize = f.SetSize
+    -- AF.FrameSetHeight = f.SetHeight
+    -- AF.FrameSetWidth = f.SetWidth
+    -- AF.FrameGetSize = f.GetSize
+    -- AF.FrameGetHeight = f.GetHeight
+    -- AF.FrameGetWidth = f.GetWidth
+    -- AF.FrameSetPoint = f.SetPoint
+    -- AF.FrameSetFrameLevel = f.SetFrameLevel
     AF.FrameShow = f.Show
     AF.FrameHide = f.Hide
 
     local c = CreateFrame("Cooldown")
     AF.FrameSetCooldown = c.SetCooldown
     AF.FrameSetCooldownDuration = c.SetCooldownDuration
+
+    local t = f:CreateTexture()
+    AF.TextureShow = t.Show
+    AF.TextureHide = t.Hide
+end
+
+---------------------------------------------------------------------
+-- OnEnter/OnLeave
+---------------------------------------------------------------------
+function AF.InvokeOnEnter(region)
+    if region.HasScript and region:HasScript("OnEnter") then
+        region:GetScript("OnEnter")(region)
+    end
+end
+
+function AF.InvokeOnLeave(region)
+    if region.HasScript and region:HasScript("OnLeave") then
+        region:GetScript("OnLeave")(region)
+    end
 end
 
 ---------------------------------------------------------------------
