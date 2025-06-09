@@ -5,9 +5,14 @@ local LSM = AF.Libs.LSM
 ---------------------------------------------------------------------
 -- register media
 ---------------------------------------------------------------------
+-- fonts
 LSM:Register("font", "Visitor", AF.GetFont("Visitor"), 255)
 LSM:Register("font", "Emblem", AF.GetFont("Emblem"), 255)
 LSM:Register("font", "Expressway", AF.GetFont("Expressway"), 255)
+
+-- statusbar
+LSM:Register("statusbar", "AF Plain", AF.GetPlainTexture())
+LSM:Register("statusbar", "AF 1", AF.GetTexture("StatusBar1"))
 
 ---------------------------------------------------------------------
 -- functions
