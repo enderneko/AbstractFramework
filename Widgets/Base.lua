@@ -348,6 +348,7 @@ function AF.ApplyDefaultBackdrop_NoBackground(frame, borderSize)
         Mixin(frame, BackdropTemplateMixin)
     end
     AF.SetBackdrop(frame, {edgeFile = AF.GetPlainTexture(), edgeSize = borderSize or 1})
+    frame:SetBackdropBorderColor(AF.GetColorRGB("border"))
 end
 
 function AF.ApplyDefaultBackdrop_NoBorder(frame)
@@ -355,6 +356,7 @@ function AF.ApplyDefaultBackdrop_NoBorder(frame)
         Mixin(frame, BackdropTemplateMixin)
     end
     AF.SetBackdrop(frame, {bgFile = AF.GetPlainTexture()})
+    frame:SetBackdropColor(AF.GetColorRGB("background"))
 end
 
 function AF.ApplyDefaultBackdropColors(frame)
