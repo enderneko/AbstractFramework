@@ -57,26 +57,64 @@ function AF.GetStringSize(text, fontFile, fontSize, fontFlag, fontShadow)
 end
 
 ---------------------------------------------------------------------
--- FitStringWidth
+-- truncation
 ---------------------------------------------------------------------
 local utf8len, utf8sub = string.utf8len, string.utf8sub
-function AF.TruncateString(fs, text, alignment)
+
+---@param fs FontString
+---@param alignment string? "left" | "right" | nil
+---@param width number? if not provided, will use parent's width - 2
+---@param showEllipsis boolean? whether to show ellipsis "..."
+---@param text string? if not provided, will use fs:GetText()
+function AF.TruncateFontStringByWidth(fs, width, alignment, showEllipsis, text)
+    text = text or fs:GetText()
+    if AF.IsBlank(text) then
+        fs:SetText("")
+        return
+    end
+
+    alignment = alignment or "left"
+    if not width then
+        width = fs:GetParent():GetWidth() - 2
+    end
+
     fs:SetText(text)
     fs:SetWordWrap(false)
 
-    if fs:IsTruncated() then
-        for i = 1, utf8len(text) do
-            if strlower(alignment) == "right" then
-                fs:SetText("..." .. utf8sub(text, i))
+    if fs:IsTruncated() or fs:GetWidth() > width then
+        for i = 2, utf8len(text) do
+            if showEllipsis then
+                if strlower(alignment) == "right" then
+                    fs:SetFormattedText("%s%s", "...", utf8sub(text, i))
+                else
+                    fs:SetFormattedText("%s%s", utf8sub(text, 1, -1 * i), "...")
+                end
             else
-                fs:SetText(utf8sub(text, i) .. "...")
+                if strlower(alignment) == "right" then
+                    fs:SetText(utf8sub(text, i))
+                else
+                    fs:SetText(utf8sub(text, 1, -1 * i))
+                end
             end
 
-            if not fs:IsTruncated() then
+            if not fs:IsTruncated() and fs:GetWidth() <= width then
                 break
             end
         end
     end
+end
+
+---@param fs FontString
+---@param enChars number number of English characters
+---@param nonEnChars number number of non-English characters
+---@param text string? if not provided, will use fs:GetText(). if text contains only English characters, it will be truncated by enChars, otherwise by nonEnChars.
+function AF.TruncateFontStringByLength(fs, enChars, nonEnChars, text)
+    text = text or fs:GetText()
+    if AF.IsBlank(text) then
+        fs:SetText("")
+        return
+    end
+    fs:SetText(AF.TruncateStringByLength(text, enChars, nonEnChars))
 end
 
 ---------------------------------------------------------------------
