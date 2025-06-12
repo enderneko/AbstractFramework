@@ -3,6 +3,7 @@ local AF = _G.AbstractFramework
 
 local tonumber = tonumber
 local format, gsub, strlower, strupper, strsplit, strtrim = string.format, string.gsub, string.lower, string.upper, string.split, string.trim
+local utf8len, len, utf8sub = string.utf8len, string.len, string.utf8sub
 local tinsert, tconcat = table.insert, table.concat
 
 ---------------------------------------------------------------------
@@ -176,4 +177,32 @@ function AF.FormatMoney(copper, style, useCommas, goldOnly)
             return format("%s%s %d%s %d%s", gold, GOLD_ICON, silver, SILVER_ICON, copper, COPPER_ICON)
         end
     end
+end
+
+---------------------------------------------------------------------
+-- truncation
+---------------------------------------------------------------------
+
+---@param s string if s contains only English characters, it will be truncated by enChars, otherwise by nonEnChars.
+---@param enChars number number of English characters
+---@param nonEnChars number number of non-English characters
+---@return string
+function AF.TruncateStringByLength(s, enChars, nonEnChars)
+    if AF.IsBlank(s) then return s end
+
+    local len1 = len(s)
+    local len2 = utf8len(s)
+    local ret = s
+
+    if len1 ~= len2 then
+        if nonEnChars and nonEnChars > 0 and len2 > nonEnChars then
+            ret = utf8sub(s, 1, nonEnChars)
+        end
+    else
+        if enChars and enChars > 0 and len1 > enChars then
+            ret =  utf8sub(s, 1, enChars)
+        end
+    end
+
+    return ret
 end
