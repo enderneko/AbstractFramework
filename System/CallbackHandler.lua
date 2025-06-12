@@ -76,6 +76,8 @@ AF.DEBUG_EVENTS = {
     AF_PLAYER_ENTERING_WORLD = "gray",
     AF_COMBAT_ENTER = false,
     AF_COMBAT_LEAVE = false,
+    AF_GROUP_UPDATE = false,
+    AF_GROUP_TYPE_CHANGED = "lightblue",
     AF_JOIN_TEMP_CHANNEL = "classicrose",
     AF_LEAVE_TEMP_CHANNEL = "classicrose",
 }

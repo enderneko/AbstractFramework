@@ -104,3 +104,26 @@ end
 --* AF_COMBAT_ENTER / AF_COMBAT_LEAVE
 AF:RegisterEvent("PLAYER_REGEN_DISABLED", AF.GetFireFunc("AF_COMBAT_ENTER"))
 AF:RegisterEvent("PLAYER_REGEN_ENABLED", AF.GetFireFunc("AF_COMBAT_LEAVE"))
+
+---------------------------------------------------------------------
+-- group
+---------------------------------------------------------------------
+--* AF_GROUP_UPDATE / AF_GROUP_TYPE_CHANGED
+local groupType, lastGroupType, groupSize
+local function AF_GROUP_UPDATE()
+    if IsInRaid() then
+        groupType = "raid"
+    elseif IsInGroup() then
+        groupType = "party"
+    else
+        groupType = "solo"
+    end
+    groupSize = GetNumGroupMembers()
+    AF.Fire("AF_GROUP_UPDATE", groupType, groupSize)
+
+    if groupType ~= lastGroupType then
+        AF.Fire("AF_GROUP_TYPE_CHANGED", groupType, lastGroupType)
+    end
+    lastGroupType = groupType
+end
+AF:RegisterEvent("GROUP_ROSTER_UPDATE", AF.GetDelayedInvoker(1, AF_GROUP_UPDATE))
