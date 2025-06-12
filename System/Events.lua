@@ -110,7 +110,11 @@ AF:RegisterEvent("PLAYER_REGEN_ENABLED", AF.GetFireFunc("AF_COMBAT_LEAVE"))
 ---------------------------------------------------------------------
 --* AF_GROUP_UPDATE / AF_GROUP_TYPE_CHANGED
 local groupType, lastGroupType, groupSize
-local function AF_GROUP_UPDATE()
+local function AF_GROUP_UPDATE(_, event)
+    if event == "PLAYER_ENTERING_WORLD" then
+        AF:UnregisterEvent("PLAYER_ENTERING_WORLD", AF_GROUP_UPDATE)
+    end
+
     if IsInRaid() then
         groupType = "raid"
     elseif IsInGroup() then
@@ -127,3 +131,4 @@ local function AF_GROUP_UPDATE()
     lastGroupType = groupType
 end
 AF:RegisterEvent("GROUP_ROSTER_UPDATE", AF.GetDelayedInvoker(1, AF_GROUP_UPDATE))
+AF:RegisterEvent("PLAYER_ENTERING_WORLD", AF_GROUP_UPDATE)
