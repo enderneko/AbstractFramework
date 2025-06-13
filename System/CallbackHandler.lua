@@ -73,10 +73,11 @@ AF.DEBUG_EVENTS = {
     AF_INSTANCE_LEAVE = "sand",
     AF_INSTANCE_STATE_CHANGE = "sand",
     AF_PLAYER_LOGIN = "gray",
-    AF_PLAYER_ENTERING_WORLD = "gray",
+    AF_PLAYER_ENTERING_WORLD_DELAYED = "gray",
     AF_COMBAT_ENTER = false,
     AF_COMBAT_LEAVE = false,
     AF_GROUP_UPDATE = false,
+    AF_GROUP_SIZE_CHANGED = false,
     AF_GROUP_TYPE_CHANGED = "lightblue",
     AF_JOIN_TEMP_CHANNEL = "classicrose",
     AF_LEAVE_TEMP_CHANNEL = "classicrose",
@@ -98,19 +99,19 @@ function AF.Fire(event, ...)
     end
 
     if callbacks.high[event] then
-        for fn in pairs(callbacks.high[event]) do
-                fn(event, ...)
-            end
+        for fn in next, callbacks.high[event] do
+            fn(event, ...)
+        end
     end
 
     if callbacks.medium[event] then
-        for fn in pairs(callbacks.medium[event]) do
+        for fn in next, callbacks.medium[event] do
             fn(event, ...)
         end
     end
 
     if callbacks.low[event] then
-        for fn in pairs(callbacks.low[event]) do
+        for fn in next, callbacks.low[event] do
             fn(event, ...)
         end
     end

@@ -31,7 +31,7 @@ setmetatable(instanceInfo, {
     end
 })
 
-local function CheckInstanceStatus(_, event)
+local function CheckInstanceStatus()
     local isIn, iType = IsInInstance()
 
     local name, instanceType, difficultyID, difficultyName, maxPlayers, dynamicDifficulty, isDynamic, instanceID, instanceGroupSize, LfgDungeonID = GetInstanceInfo()
@@ -72,10 +72,10 @@ end
 AF:RegisterEvent("SCENARIO_UPDATE", AF.GetDelayedInvoker(1, CheckInstanceStatus))
 
 local function AF_PLAYER_ENTERING_WORLD(_, _, isInitialLogin, isReloadingUi)
-    AF.Fire("AF_PLAYER_ENTERING_WORLD", isInitialLogin, isReloadingUi)
-    AF.DelayedInvoke(0.5, CheckInstanceStatus)
+    AF.Fire("AF_PLAYER_ENTERING_WORLD_DELAYED", isInitialLogin, isReloadingUi)
+    CheckInstanceStatus()
 end
-AF:RegisterEvent("PLAYER_ENTERING_WORLD", AF_PLAYER_ENTERING_WORLD)
+AF:RegisterEvent("PLAYER_ENTERING_WORLD", AF.GetDelayedInvoker(0.5, AF_PLAYER_ENTERING_WORLD))
 
 function AF.IsInInstance()
     return instanceInfo.isIn
@@ -108,8 +108,11 @@ AF:RegisterEvent("PLAYER_REGEN_ENABLED", AF.GetFireFunc("AF_COMBAT_LEAVE"))
 ---------------------------------------------------------------------
 -- group
 ---------------------------------------------------------------------
---* AF_GROUP_UPDATE / AF_GROUP_TYPE_CHANGED
-local groupType, lastGroupType, groupSize
+local GetNumGroupMembers = GetNumGroupMembers
+
+--* AF_GROUP_UPDATE / AF_GROUP_SIZE_CHANGED / AF_GROUP_TYPE_CHANGED
+local groupType, lastGroupType, groupSize, lastGroupSize
+
 local function AF_GROUP_UPDATE(_, event)
     if event == "PLAYER_ENTERING_WORLD" then
         AF:UnregisterEvent("PLAYER_ENTERING_WORLD", AF_GROUP_UPDATE)
@@ -122,13 +125,23 @@ local function AF_GROUP_UPDATE(_, event)
     else
         groupType = "solo"
     end
-    groupSize = GetNumGroupMembers()
-    AF.Fire("AF_GROUP_UPDATE", groupType, groupSize)
 
+    groupSize = GetNumGroupMembers()
+
+    -- group size changed
+    if groupSize ~= lastGroupSize then
+        AF.Fire("AF_GROUP_SIZE_CHANGED", groupSize, lastGroupSize)
+    end
+
+    -- group type changed
     if groupType ~= lastGroupType then
         AF.Fire("AF_GROUP_TYPE_CHANGED", groupType, lastGroupType)
     end
+
+    AF.Fire("AF_GROUP_UPDATE", groupType, groupSize)
+
     lastGroupType = groupType
+    lastGroupSize = groupSize
 end
 AF:RegisterEvent("GROUP_ROSTER_UPDATE", AF.GetDelayedInvoker(1, AF_GROUP_UPDATE))
 AF:RegisterEvent("PLAYER_ENTERING_WORLD", AF_GROUP_UPDATE)
