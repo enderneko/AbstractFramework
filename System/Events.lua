@@ -114,8 +114,8 @@ local GetNumGroupMembers = GetNumGroupMembers
 local groupType, lastGroupType, groupSize, lastGroupSize
 
 local function AF_GROUP_UPDATE(_, event)
-    if event == "PLAYER_ENTERING_WORLD" then
-        AF:UnregisterEvent("PLAYER_ENTERING_WORLD", AF_GROUP_UPDATE)
+    if event == "PLAYER_LOGIN" then
+        AF:UnregisterEvent("PLAYER_LOGIN", AF_GROUP_UPDATE)
     end
 
     if IsInRaid() then
@@ -144,4 +144,4 @@ local function AF_GROUP_UPDATE(_, event)
     lastGroupSize = groupSize
 end
 AF:RegisterEvent("GROUP_ROSTER_UPDATE", AF.GetDelayedInvoker(1, AF_GROUP_UPDATE))
-AF:RegisterEvent("PLAYER_ENTERING_WORLD", AF_GROUP_UPDATE)
+AF:RegisterEvent("PLAYER_LOGIN", AF_GROUP_UPDATE)

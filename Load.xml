@@ -92,6 +92,7 @@
     <Script file="Units\Common.lua"/>
     <Script file="Units\Class.lua"/>
     <Script file="Units\RangeCheck.lua"/>
+    <Script file="Units\ItemLevel.lua"/>
 
     <!-- spells -->
     <Script file="Spells\Common.lua"/>

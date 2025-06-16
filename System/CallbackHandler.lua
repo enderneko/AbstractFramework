@@ -81,6 +81,7 @@ AF.DEBUG_EVENTS = {
     AF_GROUP_TYPE_CHANGED = "lightblue",
     AF_JOIN_TEMP_CHANNEL = "classicrose",
     AF_LEAVE_TEMP_CHANNEL = "classicrose",
+    AF_UNIT_ITEM_LEVEL_UPDATE = false,
 }
 
 function AF.Fire(event, ...)
