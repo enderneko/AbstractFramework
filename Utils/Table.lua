@@ -103,12 +103,23 @@ end
 function AF.Merge(t, ...)
     for i = 1, select("#", ...) do
         local _t = select(i, ...)
-        for k, v in pairs(_t) do
+        for k, v in next, _t do
             if type(v) == "table" then
                 t[k] = AF.Copy(v)
             else
                 t[k] = v
             end
+        end
+    end
+end
+
+---@param t table
+---@param ... table
+function AF.InsertAll(t, ...)
+    for i = 1, select("#", ...) do
+        local _t = select(i, ...)
+        for _, v in next, _t do
+            tinsert(t, v)
         end
     end
 end
