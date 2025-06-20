@@ -164,6 +164,8 @@ frame:SetScript("OnEvent", function(self, event, addon, containsBindings)
     end
 end)
 
+---@param addon string
+---@param func fun(addon:string, containsBindings:boolean) function to call when the addon is loaded
 function AF.RegisterAddonLoaded(addon, func)
     if not addonCallbacks[addon] then addonCallbacks[addon] = {} end
     tinsert(addonCallbacks[addon], func)

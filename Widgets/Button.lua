@@ -375,7 +375,7 @@ function AF.CreateButton(parent, text, color, width, height, template, borderCol
         else
             AF.SetOnePixelInside(bg, b)
         end
-        bg:SetColorTexture(AF.GetColorRGB(backgroundColor or "background"))
+        bg:SetColorTexture(AF.GetColorRGB(backgroundColor or "background", 1))
         -- bg:SetDrawLayer("BACKGROUND", -8)
     end
 
