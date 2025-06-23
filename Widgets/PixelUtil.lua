@@ -427,21 +427,26 @@ AF.DefaultUpdatePixels = DefaultUpdatePixels
 
 local components = {}
 AF.PIXEL_PERFECT_COMPONENTS = components
+local componentsCount = 0
+
 local addonComponents = {}
 AF.PIXEL_PERFECT_ADDON_COMPONENTS = addonComponents
 
+---@param r Region
 ---@param fn function
-function AF.AddToPixelUpdater(comp, fn)
-    comp.UpdatePixels = fn or comp.UpdatePixels or DefaultUpdatePixels
-    components[comp] = comp:GetName() or true
+function AF.AddToPixelUpdater(r, fn)
+    r.UpdatePixels = fn or r.UpdatePixels or DefaultUpdatePixels
+    components[r] = r:GetName() or true
+    componentsCount = componentsCount + 1
     -- addon
     local addon = AF.GetAddon()
     if addon then
         if not addonComponents[addon] then addonComponents[addon] = {} end
-        addonComponents[addon][comp] = comp:GetName() or true
+        addonComponents[addon][r] = r:GetName() or true
     end
 end
 
+---@param r Region
 function AF.RemoveFromPixelUpdater(r)
     components[r] = nil
     -- addon
@@ -452,6 +457,7 @@ function AF.RemoveFromPixelUpdater(r)
 end
 
 function AF.UpdatePixels()
+    -- TODO: if componentsCount > 10000 then popup
     local start = GetTimePreciseSec()
     AF.Fire("AF_PIXEL_UPDATE_START")
     for r in next, components do
@@ -466,6 +472,34 @@ function AF.UpdatePixelsForAddon(addon)
     addon = addon or AF.GetAddon()
     if addon and addonComponents[addon] then
         for r in next, addonComponents[addon] do
+            r:UpdatePixels()
+        end
+    end
+end
+
+local customComponents = {}
+AF.PIXEL_PERFECT_CUSTOM_COMPONENTS = customComponents
+
+---@param group string
+---@param r Region
+---@param fn function|nil
+function AF.AddToCustomPixelUpdater(group, r, fn)
+    if not customComponents[group] then
+        customComponents[group] = {}
+    end
+    r.UpdatePixels = fn or r.UpdatePixels or DefaultUpdatePixels
+    customComponents[group][r] = r:GetName() or true
+end
+
+function AF.RemoveFromCustomPixelUpdater(group, r)
+    if customComponents[group] then
+        customComponents[group][r] = nil
+    end
+end
+
+function AF.UpdatePixelsForCustomGroup(group)
+    if customComponents[group] then
+        for r in next, customComponents[group] do
             r:UpdatePixels()
         end
     end
