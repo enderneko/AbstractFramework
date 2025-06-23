@@ -64,9 +64,10 @@ function AF.UnregisterAllCallbacks(event)
 end
 
 AF.DEBUG_EVENTS = {
+    AF_PIXEL_UPDATE = "blazing_tangerine",
     AF_SCALE_CHANGED = "blazing_tangerine",
-    AF_PIXEL_UPDATE_START = false,
-    AF_PIXEL_UPDATE_END = false,
+    -- AF_PIXEL_UPDATE_START = false,
+    -- AF_PIXEL_UPDATE_END = false,
     AF_LOADED = "blazing_tangerine",
     AF_PLAYER_DATA_UPDATE = "lightblue",
     AF_INSTANCE_ENTER = "sand",

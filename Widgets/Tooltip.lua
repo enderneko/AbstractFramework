@@ -328,7 +328,7 @@ local function CreateTooltip(name)
     tooltip:SetOnHide(tooltip.OnHide)
     tooltip:SetOnShow(tooltip.OnShow)
 
-    AF.AddToPixelUpdater(tooltip)
+    AF.AddToPixelUpdater_OnShow(tooltip)
 
     return tooltip
 end

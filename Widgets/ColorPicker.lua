@@ -125,7 +125,7 @@ function AF.CreateColorPicker(parent, label, alphaEnabled, onChange, onConfirm)
         -- cp.mask:Show()
     end)
 
-    AF.AddToPixelUpdater(cp)
+    AF.AddToPixelUpdater_OnShow(cp)
 
     return cp
 end
@@ -211,6 +211,8 @@ local function CreateColorPane()
     AF.SetPoint(pane.alpha, "TOPLEFT", pane.solid, "TOPRIGHT")
     AF.SetPoint(pane.alpha, "BOTTOMRIGHT", -1, 1)
 
+    AF.RemoveFromPixelUpdater(pane)
+
     function pane:SetColor(r, g, b, a)
         pane.solid:SetColorTexture(r, g, b)
         pane.alpha:SetColorTexture(r, g, b, a)
@@ -262,8 +264,11 @@ end
 -------------------------------------------------
 local function CreateEB(label, width, height, isNumeric, group)
     local eb = AF.CreateEditBox(colorPickerFrame, nil, width, height, isNumeric and "number" or "trim")
+    AF.RemoveFromPixelUpdater(eb)
+
     eb.label2 = AF.CreateFontString(eb, label)
     AF.SetPoint(eb.label2, "BOTTOMLEFT", eb, "TOPLEFT", 0, 2)
+    AF.RemoveFromPixelUpdater(eb.label2)
 
     eb:SetScript("OnEditFocusGained", function()
         eb:HighlightText()
@@ -341,6 +346,7 @@ end
 -------------------------------------------------
 local function CreateColorGrid(color)
     local grid = AF.CreateButton(colorPickerFrame, nil, nil, 14, 14)
+    AF.RemoveFromPixelUpdater(grid)
 
     if type(color) == "table" then
         AF.SetTooltips(grid, "ANCHOR_TOPLEFT", 0, 2, "|c"..AF.GetColorHex(color[1])..color[2])
@@ -420,6 +426,7 @@ local function CreateColorPickerFrame()
     ---------------------------------------------
     local saturationBrightnessPaneBG = AF.CreateBorderedFrame(colorPickerFrame, nil, 132, 132)
     AF.SetPoint(saturationBrightnessPaneBG, "TOPLEFT", currentPane, "BOTTOMLEFT", 0, -7)
+    AF.RemoveFromPixelUpdater(saturationBrightnessPaneBG)
 
     saturationBrightnessPane = CreateFrame("Frame", nil, saturationBrightnessPaneBG)
     AF.SetOnePixelInside(saturationBrightnessPane, saturationBrightnessPaneBG)
@@ -430,6 +437,7 @@ local function CreateColorPickerFrame()
     -- add brightness
     local brightness = AF.CreateGradientTexture(saturationBrightnessPane, "VERTICAL", AF.GetColorTable("black", 1), AF.GetColorTable("black", 0), nil, nil, 1)
     brightness:SetAllPoints(saturationBrightnessPane)
+    AF.RemoveFromPixelUpdater(brightness)
 
     ---------------------------------------------
     -- hue slider
@@ -632,15 +640,18 @@ local function CreateColorPickerFrame()
     ---------------------------------------------
     confirmBtn = AF.CreateButton(colorPickerFrame, _G.OKAY, "green", 102, 20)
     AF.SetPoint(confirmBtn, "TOPLEFT", h_EB, "BOTTOMLEFT", 0, -7)
+    AF.RemoveFromPixelUpdater(confirmBtn)
 
     cancelBtn = AF.CreateButton(colorPickerFrame, _G.CANCEL, "red", 102, 20)
     AF.SetPoint(cancelBtn, "TOPLEFT", confirmBtn, "TOPRIGHT", 7, 0)
+    AF.RemoveFromPixelUpdater(cancelBtn)
 
     ---------------------------------------------
     -- color grids
     ---------------------------------------------
     local sep = AF.CreateSeparator(colorPickerFrame, 269, 1, AF.GetColorTable("disabled", 0.25), true)
     AF.SetPoint(sep, "TOPLEFT", originalPane, "TOPRIGHT", 7, -7)
+    AF.RemoveFromPixelUpdater(sep)
 
     local grids = {}
 
@@ -695,7 +706,13 @@ local function CreateColorPickerFrame()
 
         AF.RePoint(saturationBrightnessPane)
 
-        -- brightness slider
+        -- panes
+        currentPane:UpdatePixels()
+        originalPane:UpdatePixels()
+        saturationBrightnessPaneBG:UpdatePixels()
+        AF.RePoint(saturationBrightnessPane)
+
+        -- sliders
         hueSliderHolder:UpdatePixels()
         alphaSliderHolder:UpdatePixels()
 
@@ -706,9 +723,36 @@ local function CreateColorPickerFrame()
 
         -- picker
         AF.ReSize(picker)
+
+        -- eb
+        rEB:UpdatePixels()
+        rEB.label2:UpdatePixels()
+        gEB:UpdatePixels()
+        gEB.label2:UpdatePixels()
+        bEB:UpdatePixels()
+        bEB.label2:UpdatePixels()
+        aEB:UpdatePixels()
+        aEB.label2:UpdatePixels()
+        h_EB:UpdatePixels()
+        h_EB.label2:UpdatePixels()
+        s_EB:UpdatePixels()
+        s_EB.label2:UpdatePixels()
+        b_EB:UpdatePixels()
+        b_EB.label2:UpdatePixels()
+        hexEB:UpdatePixels()
+        hexEB.label2:UpdatePixels()
+
+        -- button
+        confirmBtn:UpdatePixels()
+        cancelBtn:UpdatePixels()
+
+        -- grid
+        for _, g in next, grids do
+            g:UpdatePixels()
+        end
     end
 
-    AF.AddToPixelUpdater(colorPickerFrame)
+    AF.AddToPixelUpdater_Auto(colorPickerFrame)
 end
 
 -------------------------------------------------

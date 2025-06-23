@@ -297,7 +297,7 @@ function AF.CreateSlider(parent, text, width, low, high, step, isPercentage, sho
     slider:SetScript("OnDisable", slider.OnDisable)
 
     slider:SetValue(low)
-    AF.AddToPixelUpdater(slider)
+    AF.AddToPixelUpdater_OnShow(slider)
 
     return slider
 end
@@ -434,7 +434,7 @@ function AF.CreateVerticalSlider(parent, text, height, low, high, step, isPercen
     end)
     -----------------------------------------------------------------
 
-    AF.AddToPixelUpdater(slider, VerticalSlider_UpdatePixels)
+    AF.AddToPixelUpdater_OnShow(slider, nil, VerticalSlider_UpdatePixels)
 
     return slider
 end

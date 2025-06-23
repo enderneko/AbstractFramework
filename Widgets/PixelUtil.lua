@@ -416,109 +416,336 @@ function AF.ReBorder(region)
 end
 
 ---------------------------------------------------------------------
--- pixel updater
+-- default pixel updater
 ---------------------------------------------------------------------
-local function DefaultUpdatePixels(self)
-    AF.ReSize(self)
-    AF.RePoint(self)
-    AF.ReBorder(self)
+local function DefaultUpdatePixels(f)
+    AF.ReSize(f)
+    AF.RePoint(f)
+    AF.ReBorder(f)
 end
-AF.DefaultUpdatePixels = DefaultUpdatePixels
 
-local components = {}
-AF.PIXEL_PERFECT_COMPONENTS = components
-local componentsCount = 0
+local function DefaultUpdatePixels_FontString(fs)
+    -- TODO: ReFont
+    AF.RePoint(fs)
+end
 
-local addonComponents = {}
-AF.PIXEL_PERFECT_ADDON_COMPONENTS = addonComponents
+local function DefaultUpdatePixels_Texture(t)
+    AF.ReSize(t)
+    AF.RePoint(t)
+end
 
----@param r Region
----@param fn function
-function AF.AddToPixelUpdater(r, fn)
-    r.UpdatePixels = fn or r.UpdatePixels or DefaultUpdatePixels
-    components[r] = r:GetName() or true
-    componentsCount = componentsCount + 1
-    -- addon
-    local addon = AF.GetAddon()
-    if addon then
-        if not addonComponents[addon] then addonComponents[addon] = {} end
-        addonComponents[addon][r] = r:GetName() or true
+local function GetDefaultUpdatePixelsForRegion(region)
+    if region:GetObjectType() == "FontString" then
+        return DefaultUpdatePixels_FontString
+    elseif region:GetObjectType() == "Texture" then
+        return DefaultUpdatePixels_Texture
+    else
+        return DefaultUpdatePixels
     end
 end
 
----@param r Region
-function AF.RemoveFromPixelUpdater(r)
-    components[r] = nil
-    -- addon
-    local addon = AF.GetAddon()
-    if addon and addonComponents[addon] then
-        addonComponents[addon][r] = nil
-    end
+---@param frame Frame
+function AF.DefaultUpdatePixels(frame)
+    DefaultUpdatePixels(frame)
 end
 
-function AF.UpdatePixels()
-    -- TODO: if componentsCount > 10000 then popup
-    local start = GetTimePreciseSec()
-    AF.Fire("AF_PIXEL_UPDATE_START")
-    for r in next, components do
+---------------------------------------------------------------------
+-- pixel updater (addon)
+---------------------------------------------------------------------
+--! not ideal, as AF.GetAddon() may not always return the correct addon
+-- local addonComponents = {}
+-- AF.PIXEL_PERFECT_ADDON_COMPONENTS = addonComponents
+
+-- local function AddAddonComponent(addon, r)
+--     if not addon then return end
+--     if not addonComponents[addon] then addonComponents[addon] = {} end
+--     addonComponents[addon][r] = r:GetName() or true
+-- end
+
+-- local function RemoveAddonComponent(addon, r)
+--     if not addon then return end
+--     if addonComponents[addon] then
+--         addonComponents[addon][r] = nil
+--     end
+--     if AF.IsEmpty(addonComponents[addon]) then
+--         addonComponents[addon] = nil
+--     end
+-- end
+
+-- function AF.UpdatePixels_Addon(addon)
+--     addon = addon or AF.GetAddon()
+--     if addon and addonComponents[addon] then
+--         for r in next, addonComponents[addon] do
+--             r:UpdatePixels()
+--         end
+--     end
+-- end
+
+function AF.AddToPixelUpdater() end
+
+---------------------------------------------------------------------
+-- combat safe pixel updater
+---------------------------------------------------------------------
+local InCombatLockdown = InCombatLockdown
+local queue = AF.NewQueue()
+
+local function UpdatePixelsForCombatSafeOnlyRegions()
+    local n = 0
+    while not InCombatLockdown() and not queue:isEmpty() do
+        local r = queue:pop()
         r:UpdatePixels()
+        n = n + 1
     end
-    AF.Fire("AF_PIXEL_UPDATE_END")
-    AF.Debug(AF.WrapTextInColor("Pixel update took %.3f seconds", "yellow"):format(GetTimePreciseSec() - start))
+    AF.Debug(AF.GetColorStr("yellow") .. "Updated pixels for combat safe only regions: ", n)
+end
+AF.CreateBasicEventHandler(UpdatePixelsForCombatSafeOnlyRegions, "PLAYER_REGEN_ENABLED")
+
+---------------------------------------------------------------------
+-- pixel updater (auto)
+---------------------------------------------------------------------
+local components = {}
+AF.PIXEL_PERFECT_AUTO_COMPONENTS = components
+
+-- Best used for always-visible or key UI widgets. Applying it broadly might overwhelm the client and cause freezes.
+-- Only one PixelUpdater can be assigned per region; assigning a new one replaces the old.
+---@param r Region
+---@param fn function|nil if not provided, will use r.UpdatePixels or DefaultUpdatePixels
+---@param combatSafeOnly boolean|nil if true, will update pixels when out of combat
+function AF.AddToPixelUpdater_Auto(r, fn, combatSafeOnly)
+    AF.RemoveFromPixelUpdater(r)
+
+    r.UpdatePixels = fn or r.UpdatePixels or GetDefaultUpdatePixelsForRegion(r)
+    r._pixelUpdateCombatSafeOnly = combatSafeOnly
+    r._pixelUpdateType = "auto"
+
+    local addon = AF.GetAddon()
+    -- AddAddonComponent(addon, r)
+
+    components[r] = r:GetName() or addon or true
 end
 
--- not ideal
-function AF.UpdatePixelsForAddon(addon)
-    addon = addon or AF.GetAddon()
-    if addon and addonComponents[addon] then
-        for r in next, addonComponents[addon] do
+local function RemoveFromPixelUpdater_Auto(r)
+    components[r] = nil
+end
+
+function AF.UpdatePixels_Auto()
+    -- TODO: if componentsCount > 10000 then popup
+    local n = 0
+    local start = GetTimePreciseSec()
+    -- AF.Fire("AF_PIXEL_UPDATE_START")
+    for r in next, components do
+        if r._pixelUpdateCombatSafeOnly and InCombatLockdown() then
+            queue:push(r)
+        else
             r:UpdatePixels()
+            n = n + 1
         end
     end
+    -- AF.Fire("AF_PIXEL_UPDATE_END")
+    AF.Debug(AF.WrapTextInColor("Automatically updated pixels for %d regions, took %.3f seconds", "yellow"):format(n, GetTimePreciseSec() - start))
 end
 
-local customComponents = {}
-AF.PIXEL_PERFECT_CUSTOM_COMPONENTS = customComponents
+---------------------------------------------------------------------
+-- pixel updater (onshow)
+---------------------------------------------------------------------
+local onShowComponents = {
+    -- [target] = {
+    --     [region] = name/true,
+    -- }, ...
+}
+AF.PIXEL_PERFECT_ONSHOW_COMPONENTS = onShowComponents
 
+local onShowHooks = {
+    -- [target] = hookFn,
+}
+
+local lastOnShows = {
+    -- [target] = lastOnShowTime,
+}
+
+local lastPixelUpdateTime
+AF.CreateBasicEventHandler(function()
+    AF.RegisterCallback("AF_PIXEL_UPDATE", function()
+        lastPixelUpdateTime = GetTime()
+    end)
+end, "FIRST_FRAME_RENDERED")
+
+local function ReHookOnShow(region, scriptType)
+    if scriptType == "OnShow" then
+        region:HookScript("OnShow", onShowHooks[region])
+    end
+end
+
+-- This function hooks target's OnShow/OnHide to track the frame visibility.
+-- Only one PixelUpdater can be assigned per region; assigning a new one replaces the old.
+---@param r Region
+---@param target Frame|nil invoke r:UpdatePixels() when target is shown, if not provided, will use r
+---@param fn function|nil if not provided, will use r.UpdatePixels or DefaultUpdatePixels
+---@param combatSafeOnly boolean|nil if true, will update pixels when out of combat
+function AF.AddToPixelUpdater_OnShow(r, target, fn, combatSafeOnly)
+    AF.RemoveFromPixelUpdater(r)
+
+    r.UpdatePixels = fn or r.UpdatePixels or GetDefaultUpdatePixelsForRegion(r)
+    r._pixelUpdateCombatSafeOnly = combatSafeOnly
+    r._pixelUpdateType = "onshow"
+
+    local addon = AF.GetAddon()
+    -- AddAddonComponent(addon, r)
+
+    if target then
+        if not onShowComponents[target] then onShowComponents[target] = {} end
+        onShowComponents[target][r] = r:GetName() or addon or true
+        r._pixelUpdateOnShowTarget = target
+    else
+        target = r
+        onShowComponents[target] = r:GetName() or addon or true
+        r._pixelUpdateOnShowTarget = "self"
+    end
+
+    if not onShowHooks[target] then
+        onShowHooks[target] = function(self)
+            if not lastPixelUpdateTime or (lastOnShows[self] == lastPixelUpdateTime) then
+                return -- prevent rapid updates
+            end
+            lastOnShows[self] = lastPixelUpdateTime
+
+            local components = onShowComponents[self]
+            if type(components) == "table" then
+                for region in next, components do
+                    if region._pixelUpdateCombatSafeOnly and InCombatLockdown() then
+                        queue:push(region)
+                    else
+                        region:UpdatePixels()
+                    end
+                end
+            elseif components then
+                if self._pixelUpdateCombatSafeOnly and InCombatLockdown() then
+                    queue:push(self)
+                else
+                    self:UpdatePixels()
+                end
+            end
+        end
+        target:HookScript("OnShow", onShowHooks[target])
+        hooksecurefunc(target, "SetScript", ReHookOnShow)
+    end
+end
+
+local function RemoveFromPixelUpdater_OnShow(r)
+    if not r._pixelUpdateOnShowTarget then return end
+
+    if r._pixelUpdateOnShowTarget ~= "self" then
+        local target = r._pixelUpdateOnShowTarget
+        if onShowComponents[target] then
+            onShowComponents[target][r] = nil
+        end
+        if AF.IsEmpty(onShowComponents[target]) then
+            onShowComponents[target] = nil
+        end
+    else
+        onShowComponents[r] = nil
+    end
+end
+
+---------------------------------------------------------------------
+-- pixel updater (customgroup)
+---------------------------------------------------------------------
+local customGroupComponents = {}
+AF.PIXEL_PERFECT_CUSTOMGROUP_COMPONENTS = customGroupComponents
+
+-- Only one PixelUpdater can be assigned per region; assigning a new one replaces the old.
 ---@param group string
 ---@param r Region
----@param fn function|nil
-function AF.AddToCustomPixelUpdater(group, r, fn)
-    if not customComponents[group] then
-        customComponents[group] = {}
+---@param fn function|nil if not provided, will use r.UpdatePixels or DefaultUpdatePixels
+---@param combatSafeOnly boolean|nil if true, will update pixels when out of combat
+function AF.AddToPixelUpdater_CustomGroup(group, r, fn, combatSafeOnly)
+    AF.RemoveFromPixelUpdater(r)
+
+    r.UpdatePixels = fn or r.UpdatePixels or GetDefaultUpdatePixelsForRegion(r)
+    r._pixelUpdateCombatSafeOnly = combatSafeOnly
+    r._pixelUpdateType = "customgroup"
+    r._pixelUpdateGroup = group
+
+    if not customGroupComponents[group] then
+        customGroupComponents[group] = {}
     end
-    r.UpdatePixels = fn or r.UpdatePixels or DefaultUpdatePixels
-    customComponents[group][r] = r:GetName() or true
+
+    local addon = AF.GetAddon()
+    -- AddAddonComponent(addon, r)
+    customGroupComponents[group][r] = r:GetName() or addon or true
 end
 
-function AF.RemoveFromCustomPixelUpdater(group, r)
-    if customComponents[group] then
-        customComponents[group][r] = nil
+local function RemoveFromPixelUpdater_CustomGroup(r)
+    local group = r._pixelUpdateGroup
+    if not group then return end
+
+    if customGroupComponents[group] then
+        customGroupComponents[group][r] = nil
+    end
+    if AF.IsEmpty(customGroupComponents[group]) then
+        customGroupComponents[group] = nil
     end
 end
 
-function AF.UpdatePixelsForCustomGroup(group)
-    if customComponents[group] then
-        for r in next, customComponents[group] do
-            r:UpdatePixels()
+---@param group string
+function AF.UpdatePixels_CustomGroup(group)
+    if group and customGroupComponents[group] then
+        for r in next, customGroupComponents[group] do
+            if r._pixelUpdateCombatSafeOnly and InCombatLockdown() then
+                queue:push(r)
+            else
+                r:UpdatePixels()
+            end
         end
     end
 end
 
--- some object types are not included in GetChildren(), such as Texture, FontString ...
+---------------------------------------------------------------------
+-- remove from pixel updater
+---------------------------------------------------------------------
+---@param r Region
+function AF.RemoveFromPixelUpdater(r)
+    if r._pixelUpdateType == "auto" then
+        RemoveFromPixelUpdater_Auto(r)
+    elseif r._pixelUpdateType == "onshow" then
+        RemoveFromPixelUpdater_OnShow(r)
+    elseif r._pixelUpdateType == "customgroup" then
+        RemoveFromPixelUpdater_CustomGroup(r)
+    end
+
+    r._pixelUpdateCombatSafeOnly = nil
+    r._pixelUpdateType = nil
+    r._pixelUpdateGroup = nil
+    r._pixelUpdateOnShowTarget = nil
+
+    -- RemoveAddonComponent(AF.GetAddon(), r)
+end
+
+---------------------------------------------------------------------
+-- UpdatePixelsForRegionAndChildren (not recommended)
+---------------------------------------------------------------------
 ---@param region Frame
 function AF.UpdatePixelsForRegionAndChildren(region)
-    if region and not region:IsForbidden() and region.GetChildren then
-        -- print(region:GetObjectType())
-        if region.UpdatePixels then
-            region:UpdatePixels()
-        else
-            DefaultUpdatePixels(region)
-        end
+    if not region or region:IsForbidden() then return end
 
-        for _, child in pairs({region:GetChildren()}) do
-            AF.UpdatePixelsForRegionAndChildren(child)
+    -- FontString or Texture
+    for _, subRegion in pairs({region:GetRegions()}) do
+        if subRegion.UpdatePixels then
+            subRegion:UpdatePixels()
+        else
+            DefaultUpdatePixels(subRegion)
         end
+    end
+
+    -- Frame
+    if region.UpdatePixels then
+        region:UpdatePixels()
+    else
+        DefaultUpdatePixels(region)
+    end
+
+    for _, child in pairs({region:GetChildren()}) do
+        AF.UpdatePixelsForRegionAndChildren(child)
     end
 end
 

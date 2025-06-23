@@ -72,7 +72,7 @@ function AF.CreateBlizzardStatusBar(parent, minValue, maxValue, width, height, c
     bar:SetMinMaxValues(minValue, maxValue)
     bar:SetValue(minValue)
 
-    AF.AddToPixelUpdater(bar)
+    AF.AddToPixelUpdater_OnShow(bar)
 
     return bar
 end
@@ -293,7 +293,7 @@ function AF.CreateSimpleStatusBar(parent, name, noBackdrop)
     bar:SnapTextureToEdge(noBackdrop)
 
     -- pixel perfect
-    AF.AddToPixelUpdater(bar, bar.DefaultUpdatePixels)
+    AF.AddToPixelUpdater_Auto(bar, bar.DefaultUpdatePixels)
 
     return bar
 end

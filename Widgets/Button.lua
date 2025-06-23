@@ -429,7 +429,7 @@ function AF.CreateButton(parent, text, color, width, height, template, borderCol
     end
 
     -- pixel updater ----------------------------
-    AF.AddToPixelUpdater(b)
+    AF.AddToPixelUpdater_OnShow(b)
 
     return b
 end
@@ -621,7 +621,7 @@ function AF.CreateIconButton(parent, icon, width, height, padding, color, hoverC
     b.HandleMouseDownText = AF.noop
     b.HandleMouseUpText = AF.noop
 
-    AF.AddToPixelUpdater(b)
+    AF.AddToPixelUpdater_OnShow(b)
 
     return b
 end
@@ -742,7 +742,7 @@ function AF.CreateCheckButton(parent, label, onClick)
         cb:SetBackdropBorderColor(0, 0, 0, 0.7)
     end)
 
-    AF.AddToPixelUpdater(cb)
+    AF.AddToPixelUpdater_OnShow(cb)
 
     return cb
 end
@@ -935,7 +935,7 @@ function AF.CreateSwitch(parent, width, height, labels)
 
     switch:SetLabels(labels)
 
-    AF.AddToPixelUpdater(switch)
+    AF.AddToPixelUpdater_OnShow(switch)
 
     return switch
 end

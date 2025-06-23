@@ -95,9 +95,9 @@ local function CreateAlignmentGrid()
     alignmentGrid:SetAllPoints()
 
     -- DISPLAY_SIZE_CHANGED
-    alignmentGrid:RegisterEvent("DISPLAY_SIZE_CHANGED")
-    alignmentGrid:SetScript("OnEvent", UpdateLines)
-    AF.RegisterCallback("AF_SCALE_CHANGED", UpdateLines)
+    -- alignmentGrid:RegisterEvent("DISPLAY_SIZE_CHANGED")
+    -- alignmentGrid:SetScript("OnEvent", UpdateLines)
+    AF.RegisterCallback("AF_PIXEL_UPDATE", UpdateLines)
 
     UpdateLines()
 end

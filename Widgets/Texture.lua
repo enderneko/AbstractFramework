@@ -38,7 +38,7 @@ function AF.CreateTexture(parent, texture, color, drawLayer, subLevel, wrapModeH
 
     tex:SetColor(color)
 
-    AF.AddToPixelUpdater(tex)
+    AF.AddToPixelUpdater_OnShow(tex)
 
     return tex
 end
@@ -137,7 +137,7 @@ function AF.CreateGradientTexture(parent, orientation, color1, color2, texture, 
     tex:SetTexture(texture)
     tex:SetGradient(orientation, CreateColor(unpack(color1)), CreateColor(unpack(color2)))
 
-    AF.AddToPixelUpdater(tex)
+    AF.AddToPixelUpdater_OnShow(tex)
 
     return tex
 end
@@ -195,7 +195,7 @@ function AF.CreateSeparator(parent, size, thickness, color, isVertical, noShadow
         end)
     end
 
-    AF.AddToPixelUpdater(separator, Separator_UpdatePixels)
+    AF.AddToPixelUpdater_OnShow(separator, nil, Separator_UpdatePixels)
 
     return separator
 end

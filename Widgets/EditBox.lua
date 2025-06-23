@@ -253,7 +253,7 @@ function AF.CreateEditBox(parent, label, width, height, mode, font)
         eb:SetText(eb.value or "") -- restore
     end)
 
-    AF.AddToPixelUpdater(eb)
+    AF.AddToPixelUpdater_OnShow(eb)
 
     return eb
 end

@@ -86,12 +86,8 @@ end)
 
 -- update pixels
 local function UpdatePixels()
-    if InCombatLockdown() then
-        AF.UIParent:RegisterEvent("PLAYER_REGEN_ENABLED")
-        return
-    end
-    AF.UIParent:UnregisterEvent("PLAYER_REGEN_ENABLED")
-    AF.UpdatePixels()
+    AF.UpdatePixels_Auto()
+    AF.Fire("AF_PIXEL_UPDATE")
 end
 
 local timer
@@ -148,8 +144,8 @@ function AF.SetScale(scale)
     AFConfig.scale = scale
     AF.scale = scale
     AF.UIParent:SetScale(scale)
-    UpdatePixels()
     AF.Fire("AF_SCALE_CHANGED", scale)
+    UpdatePixels()
 end
 
 function AF.GetScale()

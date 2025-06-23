@@ -32,7 +32,7 @@ function AF.CreateFontString(parent, text, color, font, layer)
     if color then AF.ColorFontString(fs, color) end
     fs:SetText(text)
 
-    AF.AddToPixelUpdater(fs)
+    AF.AddToPixelUpdater_OnShow(fs)
 
     return fs
 end
@@ -212,16 +212,58 @@ local AF_ScrollingTextMixin = {}
 function AF_ScrollingTextMixin:SetText(str, color)
     self.text:SetText(color and AF.WrapTextInColor(str, color) or str)
     if self:IsVisible() then
-        self:GetScript("OnShow")()
+        self:ShowUp()
     end
+end
+
+---@private
+function AF_ScrollingTextMixin.ShowUp(self)
+    self.fadeIn:Play()
+    self:SetHorizontalScroll(0)
+    self.scroll = 0
+    self.sTime, self.eTime, self.elapsedTime = 0, 0, 0
+
+    self:SetScript("OnUpdate", function()
+        -- NOTE: self:GetWidth() is valid on next OnUpdate
+        if self:GetWidth() ~= 0 then
+            self:SetScript("OnUpdate", nil)
+
+            if self.text:GetStringWidth() <= self:GetWidth() then
+                self:SetScript("OnUpdate", nil)
+            else
+                self.scrollRange = self.text:GetStringWidth() - self:GetWidth()
+                -- NOTE: FPS significantly affects OnUpdate frequency
+                -- 60FPS  -> 0.0166667 (1/60)
+                -- 90FPS  -> 0.0111111 (1/90)
+                -- 120FPS -> 0.0083333 (1/120)
+                self:SetScript("OnUpdate", function(self, elapsed)
+                    self.sTime = self.sTime + elapsed
+                    if self.eTime >= self.endDelay then
+                        self.fadeOutIn:Play()
+                    elseif self.sTime >= self.startDelay then
+                        if self.scroll >= self.scrollRange then -- scroll at max
+                            self.eTime = self.eTime + elapsed
+                        else
+                            self.elapsedTime = self.elapsedTime + elapsed
+                            if self.elapsedTime >= self.frequency then -- scroll
+                                self.elapsedTime = 0
+                                self.scroll = self.scroll + self.step
+                                self:SetHorizontalScroll(self.scroll)
+                            end
+                        end
+                    end
+                end)
+            end
+        end
+    end)
 end
 
 function AF_ScrollingTextMixin:UpdatePixels()
     AF.ReSize(self)
     AF.RePoint(self)
-    if self:IsVisible() then
-        self:GetScript("OnShow")()
-    end
+    -- if self:IsVisible() then
+    --     self:ShowUp()
+    -- end
 end
 
 ---@param parent Frame
@@ -231,17 +273,17 @@ end
 ---@param endDelay number
 ---@return AF_ScrollingText scroller
 function AF.CreateScrollingText(parent, frequency, step, startDelay, endDelay)
-    -- vars -------------------------------------
-    frequency = frequency or 0.02
-    step = step or 1
-    startDelay = startDelay or 2
-    endDelay = endDelay or 2
-    local scroll, scrollRange = 0, 0
-    local sTime, eTime, elapsedTime = 0, 0, 0
-    ---------------------------------------------
-
     local holder = CreateFrame("ScrollFrame", nil, parent)
     AF.SetHeight(holder, 20)
+
+    -- vars -------------------------------------
+    holder.frequency = frequency or 0.02
+    holder.step = step or 1
+    holder.startDelay = startDelay or 2
+    holder.endDelay = endDelay or 2
+    holder.scroll, holder.scrollRange = 0, 0
+    holder.sTime, holder.eTime, holder.elapsedTime = 0, 0, 0
+    ---------------------------------------------
 
     local content = CreateFrame("Frame", nil, holder)
     content:SetSize(20, 20)
@@ -254,6 +296,7 @@ function AF.CreateScrollingText(parent, frequency, step, startDelay, endDelay)
 
     -- fade in ----------------------------------
     local fadeIn = text:CreateAnimationGroup()
+    holder.fadeIn = fadeIn
     fadeIn._in = fadeIn:CreateAnimation("Alpha")
     fadeIn._in:SetFromAlpha(0)
     fadeIn._in:SetToAlpha(1)
@@ -262,6 +305,7 @@ function AF.CreateScrollingText(parent, frequency, step, startDelay, endDelay)
 
     -- fade out then in -------------------------
     local fadeOutIn = text:CreateAnimationGroup()
+    holder.fadeOutIn = fadeOutIn
 
     fadeOutIn._out = fadeOutIn:CreateAnimation("Alpha")
     fadeOutIn._out:SetFromAlpha(1)
@@ -278,59 +322,19 @@ function AF.CreateScrollingText(parent, frequency, step, startDelay, endDelay)
 
     fadeOutIn._out:SetScript("OnFinished", function()
         holder:SetHorizontalScroll(0)
-        scroll = 0
+        holder.scroll = 0
     end)
 
     fadeOutIn:SetScript("OnFinished", function()
-        sTime, eTime, elapsedTime = 0, 0, 0
+        holder.sTime, holder.eTime, holder.elapsedTime = 0, 0, 0
     end)
     ---------------------------------------------
 
     -- init holder
-    holder:SetScript("OnShow", function()
-        fadeIn:Play()
-        holder:SetHorizontalScroll(0)
-        scroll = 0
-        sTime, eTime, elapsedTime = 0, 0, 0
-
-        holder:SetScript("OnUpdate", function()
-            -- NOTE: holder:GetWidth() is valid on next OnUpdate
-            if holder:GetWidth() ~= 0 then
-                holder:SetScript("OnUpdate", nil)
-
-                if text:GetStringWidth() <= holder:GetWidth() then
-                    holder:SetScript("OnUpdate", nil)
-                else
-                    scrollRange = text:GetStringWidth() - holder:GetWidth()
-                    -- NOTE: FPS significantly affects OnUpdate frequency
-                    -- 60FPS  -> 0.0166667 (1/60)
-                    -- 90FPS  -> 0.0111111 (1/90)
-                    -- 120FPS -> 0.0083333 (1/120)
-                    holder:SetScript("OnUpdate", function(self, elapsed)
-                        sTime = sTime + elapsed
-                        if eTime >= endDelay then
-                            fadeOutIn:Play()
-                        elseif sTime >= startDelay then
-                            if scroll >= scrollRange then -- scroll at max
-                                eTime = eTime + elapsed
-                            else
-                                elapsedTime = elapsedTime + elapsed
-                                if elapsedTime >= frequency then -- scroll
-                                    elapsedTime = 0
-                                    scroll = scroll + step
-                                    holder:SetHorizontalScroll(scroll)
-                                end
-                            end
-                        end
-                    end)
-                end
-            end
-        end)
-    end)
-
     Mixin(holder, AF_ScrollingTextMixin)
+    holder:SetScript("OnShow", holder.ShowUp)
 
-    AF.AddToPixelUpdater(holder)
+    AF.AddToPixelUpdater_OnShow(holder)
 
     return holder
 end

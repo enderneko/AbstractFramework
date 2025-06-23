@@ -13,7 +13,7 @@ function AF.CreateFrame(parent, name, width, height, template)
     AF.SetSize(f, width, height)
     Mixin(f, AF_FrameMixin)
     Mixin(f, AF_BaseWidgetMixin)
-    AF.AddToPixelUpdater(f)
+    AF.AddToPixelUpdater_OnShow(f)
     return f
 end
 
@@ -174,7 +174,7 @@ function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata,
 
     f:SetMovable(true)
 
-    AF.AddToPixelUpdater(f)
+    AF.AddToPixelUpdater_OnShow(f)
 
     return f
 end
@@ -214,7 +214,7 @@ function AF.CreateBorderedFrame(parent, name, width, height, color, borderColor)
     Mixin(f, AF_FrameMixin)
     Mixin(f, AF_BorderedFrameMixin)
     Mixin(f, AF_BaseWidgetMixin)
-    AF.AddToPixelUpdater(f)
+    AF.AddToPixelUpdater_OnShow(f)
 
     return f
 end
@@ -283,7 +283,7 @@ function AF.CreateTitledPane(parent, title, width, height, color)
 
     Mixin(pane, AF_TitledPaneMixin)
     Mixin(pane, AF_BaseWidgetMixin)
-    AF.AddToPixelUpdater(pane)
+    AF.AddToPixelUpdater_OnShow(pane)
 
     return pane
 end
@@ -378,7 +378,7 @@ function AF.CreateCooldown(parent, name, texture, color, reverse)
 
     Mixin(cd, AF_CooldownMixin)
 
-    AF.AddToPixelUpdater(cd)
+    AF.AddToPixelUpdater_OnShow(cd)
 
     return cd
 end
@@ -418,7 +418,7 @@ end
 -- show mask
 local protectedFrames = {}
 -- while in combat, overlay a non-click-through mask to protect the frame.
--- do not use SetScript OnShow/OnHide scripts after this function.
+-- this function hooks OnShow/OnHide to track the frame visibility.
 function AF.ApplyCombatProtectionToFrame(frame, tlX, tlY, brX, brY)
     if not frame.combatMask then
         CreateCombatMask(frame, tlX, tlY, brX, brY)
@@ -447,7 +447,7 @@ end
 
 local protectedWidgets = {}
 -- while in combat, protect the widget by SetEnabled(false).
--- do not use SetScript OnShow/OnHide scripts after this function.
+-- this function hooks OnShow/OnHide to track the frame visibility.
 -- NOT SUGGESTED on widgets that are enabled/disabled by other events.
 function AF.ApplyCombatProtectionToWidget(widget)
     if InCombatLockdown() then

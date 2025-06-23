@@ -36,7 +36,7 @@ local function CreateParent()
         AF.ReSize(parent)
     end
 
-    AF.AddToPixelUpdater(parent)
+    AF.AddToPixelUpdater_Auto(parent)
 end
 
 ---------------------------------------------------------------------

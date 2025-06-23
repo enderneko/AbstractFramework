@@ -85,7 +85,7 @@ function AF_ScrollFrameMixin:Reset()
 end
 
 function AF_ScrollFrameMixin:UpdatePixels()
-    -- scrollBar / scrollThumb / children already AddToPixelUpdater
+    -- scrollBar / scrollThumb / children already AddToPixelUpdater_OnShow
     --! scrollParent's UpdatePixels is Overrided here
     AF.ReSize(self)
     AF.RePoint(self)
@@ -221,7 +221,7 @@ function AF.CreateScrollFrame(parent, name, width, height, color, borderColor)
         end
     end)
 
-    AF.AddToPixelUpdater(scrollParent)
+    AF.AddToPixelUpdater_OnShow(scrollParent)
 
     return scrollParent
 end
@@ -551,7 +551,7 @@ function AF.CreateScrollList(parent, name, verticalMargin, horizontalMargin, slo
     scrollThumb:SetScript("OnMouseUp", ScrollRoot_OnMouseUp)
     -----------------------------------------------------------------
 
-    AF.AddToPixelUpdater(scrollList)
+    AF.AddToPixelUpdater_OnShow(scrollList)
 
     return scrollList
 end
@@ -870,7 +870,7 @@ function AF.CreateScrollGrid(parent, name, verticalMargin, horizontalMargin, slo
     scrollThumb:SetScript("OnMouseUp", ScrollRoot_OnMouseUp)
     -----------------------------------------------------------------
 
-    AF.AddToPixelUpdater(scrollGrid)
+    AF.AddToPixelUpdater_OnShow(scrollGrid)
 
     return scrollGrid
 end
