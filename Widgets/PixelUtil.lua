@@ -504,7 +504,9 @@ AF.CreateBasicEventHandler(UpdatePixelsForCombatSafeOnlyRegions, "PLAYER_REGEN_E
 -- pixel updater (auto)
 ---------------------------------------------------------------------
 local components = {}
+--@debug@
 AF.PIXEL_PERFECT_AUTO_COMPONENTS = components
+--@end-debug@
 
 -- Best used for always-visible or key UI widgets. Applying it broadly might overwhelm the client and cause freezes.
 -- Only one PixelUpdater can be assigned per region; assigning a new one replaces the old.
@@ -553,7 +555,9 @@ local onShowComponents = {
     --     [region] = name/true,
     -- }, ...
 }
+--@debug@
 AF.PIXEL_PERFECT_ONSHOW_COMPONENTS = onShowComponents
+--@end-debug@
 
 local onShowHooks = {
     -- [target] = hookFn,
@@ -564,11 +568,9 @@ local lastOnShows = {
 }
 
 local lastPixelUpdateTime
-AF.CreateBasicEventHandler(function()
-    AF.RegisterCallback("AF_PIXEL_UPDATE", function()
-        lastPixelUpdateTime = GetTime()
-    end)
-end, "FIRST_FRAME_RENDERED")
+AF.RegisterCallback("AF_PIXEL_UPDATE", function()
+    lastPixelUpdateTime = GetTime()
+end)
 
 local function ReHookOnShow(region, scriptType)
     if scriptType == "OnShow" then
@@ -651,7 +653,9 @@ end
 -- pixel updater (customgroup)
 ---------------------------------------------------------------------
 local customGroupComponents = {}
+--@debug@
 AF.PIXEL_PERFECT_CUSTOMGROUP_COMPONENTS = customGroupComponents
+--@end-debug@
 
 -- Only one PixelUpdater can be assigned per region; assigning a new one replaces the old.
 ---@param group string
@@ -685,6 +689,12 @@ local function RemoveFromPixelUpdater_CustomGroup(r)
     if AF.IsEmpty(customGroupComponents[group]) then
         customGroupComponents[group] = nil
     end
+end
+
+---@param group string
+---@return table|nil
+function AF.GetPixelUpdaterCustomGroup(group)
+    return group and customGroupComponents[group]
 end
 
 ---@param group string

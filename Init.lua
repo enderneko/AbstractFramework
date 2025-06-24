@@ -124,7 +124,7 @@ function AF.UIParent:ADDON_LOADED(addon)
 
         -- scale
         if type(AFConfig.scale) ~= "number" then AFConfig.scale = 1 end
-        AF.SetScale(AFConfig.scale)
+        AF.SetScale(AFConfig.scale, true)
         -- if type(AFConfig.uiScale) ~= "number" then AFConfig.uiScale = UIParent:GetScale() end
         -- UIParent:SetScale(AFConfig.uiScale)
 
@@ -140,12 +140,15 @@ end
 --! scale should NOT be TOO SMALL
 --! or it will result in abnormal display of borders
 --! since AF has changed SetSnapToPixelGrid / SetTexelSnappingBias
-function AF.SetScale(scale)
+function AF.SetScale(scale, skipPixelsUpdate)
     AFConfig.scale = scale
     AF.scale = scale
     AF.UIParent:SetScale(scale)
     AF.Fire("AF_SCALE_CHANGED", scale)
-    UpdatePixels()
+    if not skipPixelsUpdate then
+        if timer then timer:Cancel() end
+        UpdatePixels()
+    end
 end
 
 function AF.GetScale()
