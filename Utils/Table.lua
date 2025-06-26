@@ -171,6 +171,24 @@ function AF.RemoveElementsByKeys(tbl, ...)
     end
 end
 
+function AF.MoveElementToEnd(t, index)
+    if not index or index < 1 or index > #t then
+        return
+    end
+
+    local element = tremove(t, index)
+    tinsert(t, element)
+end
+
+function AF.MoveElementToIndex(t, fromIndex, toIndex)
+    if not fromIndex or not toIndex or fromIndex < 1 or fromIndex > #t or toIndex < 1 or toIndex > #t then
+        return
+    end
+
+    local element = tremove(t, fromIndex)
+    tinsert(t, toIndex, element)
+end
+
 -- transposes a table, swapping its keys and values
 ---@param t table the table to transpose
 ---@param value? any the value to assign to the transposed keys
