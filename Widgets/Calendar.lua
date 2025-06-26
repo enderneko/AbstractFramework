@@ -214,6 +214,9 @@ local function CreateCalendar()
     for i = 1, 42 do
         days[i] = AF.CreateButton(calendar, "", "accent_hover", 27, 20)
 
+        AF.ClearPoints(days[i].text)
+        days[i].text:SetPoint("CENTER")
+
         -- mark
         days[i].mark = AF.CreateTexture(days[i], AF.GetIcon("Mark"))
         AF.SetSize(days[i].mark, 8, 8)
