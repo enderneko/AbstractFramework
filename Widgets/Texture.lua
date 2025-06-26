@@ -12,9 +12,9 @@ function AF_TextureMixin:SetColor(color)
     if type(color) == "string" then color = AF.GetColorTable(color) end
     color = color or {1, 1, 1, 1}
     if self._hasTexture then
-        self:SetVertexColor(unpack(color))
+        self:SetVertexColor(AF.UnpackColor(color))
     else
-        self:SetColorTexture(unpack(color))
+        self:SetColorTexture(AF.UnpackColor(color))
     end
 end
 
@@ -198,4 +198,63 @@ function AF.CreateSeparator(parent, size, thickness, color, isVertical, noShadow
     AF.AddToPixelUpdater_OnShow(separator, nil, Separator_UpdatePixels)
 
     return separator
+end
+
+---------------------------------------------------------------------
+-- icon with background
+---------------------------------------------------------------------
+---@class AF_Icon:Frame,AF_BaseWidgetMixin
+local AF_IconMixin = {}
+
+---@param color string|table
+function AF_IconMixin:SetBackgroundColor(color)
+    if type(color) == "string" then color = AF.GetColorTable(color) end
+    color = color or {0, 0, 0, 1}
+    self.bg:SetColorTexture(AF.UnpackColor(color))
+end
+
+---@param icon string texture path or atlas
+---@param isAtlas boolean
+function AF_IconMixin:SetIcon(icon, isAtlas)
+    if isAtlas then
+        self.icon:SetAtlas(icon)
+    else
+        self.icon:SetTexture(icon)
+    end
+end
+
+function AF_IconMixin:SetIconTexCoord(left, right, top, bottom)
+    self.icon:SetTexCoord(left, right, top, bottom)
+end
+
+function AF_IconMixin:UpdatePixels()
+    AF.ReSize(self)
+    AF.RePoint(self)
+    AF.RePoint(self.icon)
+end
+
+---@param parent Frame
+---@param icon string|nil texture path or atlas
+---@param size number
+---@param bgColor string|table|nil background color, defaults to "black"
+---@return AF_Icon
+function AF.CreateIcon(parent, icon, size, bgColor)
+    local frame = CreateFrame("Frame", nil, parent)
+    AF.SetSize(frame, size, size)
+
+    Mixin(frame, AF_IconMixin)
+    Mixin(frame, AF_BaseWidgetMixin)
+
+    frame.icon = frame:CreateTexture(nil, "ARTWORK")
+    AF.ApplyDefaultTexCoord(frame.icon)
+    AF.SetOnePixelInside(frame.icon, frame)
+    frame:SetIcon(icon or AF.GetIcon("QuestionMark"))
+
+    frame.bg = frame:CreateTexture(nil, "BORDER")
+    frame.bg:SetAllPoints(frame)
+    frame:SetBackgroundColor(bgColor)
+
+    AF.AddToPixelUpdater_OnShow(frame)
+
+    return frame
 end
