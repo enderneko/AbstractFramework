@@ -84,6 +84,7 @@
     <Script file="Widgets\Aura.lua"/>
     <Script file="Widgets\Misc.lua"/>
     <Script file="Widgets\DataBroker.lua"/>
+    <Script file="Widgets\DragSorter.lua"/>
 
     <!-- media/glyphs -->
     <Script file="Media\Glyphs.lua"/>

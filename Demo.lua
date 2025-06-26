@@ -12,7 +12,7 @@ function AF.ShowDemo()
     -----------------------------------------------------------------------------
     local demo = AF.CreateHeaderedFrame(AF.UIParent, "AF_DEMO",
         AF.GetIconString("AF", 16) .. AF.GetGradientText("AbstractFramework", "blazing_tangerine", "vivid_raspberry")
-        .. " " .. AF.WrapTextInColor(AF.GetAddOnVersion(AF.name) .. " Demo", "white"), 710, 500)
+        .. " " .. AF.WrapTextInColor(AF.GetAddOnVersion(AF.name) .. " Demo", "white"), 710, 520)
     -- AF.SetPoint(demo, "LEFT", 100, 0)
     demo:SetPoint("CENTER")
     demo:SetFrameLevel(500)
@@ -1003,5 +1003,63 @@ function AF.ShowDemo()
             end
         })
         AF.ShowHelpTipGroup(tips)
+    end)
+
+    -----------------------------------------------------------------------------
+    --                               drag sorter                               --
+    -----------------------------------------------------------------------------
+    local dsbf = AF.CreateBorderedFrame(demo, nil, nil, 20)
+    AF.SetPoint(dsbf, "TOPLEFT", mbf, "BOTTOMLEFT", 0, -10)
+    AF.SetPoint(dsbf, "RIGHT", demo, -10, 0)
+
+    dsbf.text = AF.CreateFontString(dsbf, "DragSorter", "accent")
+    AF.SetPoint(dsbf.text, "LEFT", dsbf, 10, 0)
+
+    local ds = AF.CreateDragSorter(demo, nil, nil, 90)
+    AF.SetPoint(ds, "TOPLEFT", dsbf, 85, 0)
+
+    local widgets = {}
+    local config = {"Tank", "Healer", "Damager"}
+
+    for i = 1, 3 do
+        local b = AF.CreateButton(ds, config[i], "accent_hover")
+        tinsert(widgets, b)
+
+        b.cb = AF.CreateCheckButton(b, nil, function(checked)
+            b:SetEnabled(checked)
+
+            if checked then
+                config[b.index] = b.value
+                local firstNoneIndex = AF.IndexOf(config, "None")
+                if firstNoneIndex and firstNoneIndex < b.index then
+                    AF.MoveElementToIndex(config, b.index, AF.IndexOf(config, "None"))
+                end
+                b:InvokeOnEnter()
+            else
+                config[b.index] = "None"
+                AF.MoveElementToEnd(config, b.index)
+                b:InvokeOnLeave()
+            end
+
+            ds:Refresh()
+        end)
+        AF.SetPoint(b.cb, "LEFT", b, 5, 0)
+
+        AF.SetPoint(b.text, "LEFT", b.cb, "RIGHT", 5, 0)
+        b.text:SetJustifyH("LEFT")
+
+        b.cb:SetChecked(true)
+        b.cb:HookOnEnter(function() if b:IsEnabled() then b:InvokeOnEnter() end end)
+        b.cb:HookOnLeave(b:GetOnLeave())
+
+        b.value = config[i]
+        b.tipText = config[i]
+        b.tipIcon = AF.GetIcon("Role_" .. config[i]:upper())
+    end
+
+    ds:SetWidgets(widgets)
+    ds:SetConfigTable(config)
+    ds:SetCallback(function(config)
+        AF.Print("DragSorter.callback: " .. AF.TableToString(config, ", "))
     end)
 end
