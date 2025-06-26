@@ -47,6 +47,7 @@ end
 ---@class AF_BaseWidgetMixin
 AF_BaseWidgetMixin = {}
 
+-- OnShow
 function AF_BaseWidgetMixin:SetOnShow(func)
     self:SetScript("OnShow", func)
 end
@@ -61,6 +62,7 @@ function AF_BaseWidgetMixin:GetOnShow()
     end
 end
 
+-- OnHide
 function AF_BaseWidgetMixin:SetOnHide(func)
     self:SetScript("OnHide", func)
 end
@@ -75,6 +77,7 @@ function AF_BaseWidgetMixin:GetOnHide()
     end
 end
 
+-- OnEnter
 function AF_BaseWidgetMixin:SetOnEnter(func)
     self:SetScript("OnEnter", func)
 end
@@ -89,6 +92,11 @@ function AF_BaseWidgetMixin:GetOnEnter()
     end
 end
 
+function AF_BaseWidgetMixin:InvokeOnEnter()
+    self:GetScript("OnEnter")(self)
+end
+
+-- OnLeave
 function AF_BaseWidgetMixin:SetOnLeave(func)
     self:SetScript("OnLeave", func)
 end
@@ -103,6 +111,11 @@ function AF_BaseWidgetMixin:GetOnLeave()
     end
 end
 
+function AF_BaseWidgetMixin:InvokeOnLeave()
+    self:GetScript("OnLeave")(self)
+end
+
+-- OnClick
 function AF_BaseWidgetMixin:SetOnMouseDown(func)
     self:SetScript("OnMouseDown", func)
 end
@@ -117,6 +130,7 @@ function AF_BaseWidgetMixin:GetOnMouseDown()
     end
 end
 
+-- OnMouseUp
 function AF_BaseWidgetMixin:SetOnMouseUp(func)
     self:SetScript("OnMouseUp", func)
 end
@@ -131,6 +145,7 @@ function AF_BaseWidgetMixin:GetOnMouseUp()
     end
 end
 
+-- OnMouseWheel
 function AF_BaseWidgetMixin:SetOnMouseWheel(func)
     self:SetScript("OnMouseWheel", func)
 end
@@ -145,6 +160,7 @@ function AF_BaseWidgetMixin:GetOnMouseWheel()
     end
 end
 
+-- OnLoad
 function AF_BaseWidgetMixin:SetOnLoad(func)
     self:SetScript("OnLoad", func)
 end
@@ -159,6 +175,7 @@ function AF_BaseWidgetMixin:GetOnLoad()
     end
 end
 
+-- OnEnable
 function AF_BaseWidgetMixin:SetOnEnable(func)
     if self:HasScript("OnEnable") then
         self:SetScript("OnEnable", func)
@@ -179,6 +196,7 @@ function AF_BaseWidgetMixin:GetOnEnable()
     end
 end
 
+-- OnDisable
 function AF_BaseWidgetMixin:SetOnDisable(func)
     if self:HasScript("OnDisable") then
         self:SetScript("OnDisable", func)
@@ -199,6 +217,7 @@ function AF_BaseWidgetMixin:GetOnDisable()
     end
 end
 
+-- OnUpdate
 function AF_BaseWidgetMixin:SetOnUpdate(func)
     if self:HasScript("OnUpdate") then
         self:SetScript("OnUpdate", func)
@@ -219,6 +238,7 @@ function AF_BaseWidgetMixin:GetOnUpdate()
     end
 end
 
+-- OnSizeChanged
 function AF_BaseWidgetMixin:SetOnSizeChanged(func)
     if self:HasScript("OnSizeChanged") then
         self:SetScript("OnSizeChanged", func)
@@ -400,4 +420,62 @@ function AF.SetDraggable(frame, notUserPlaced)
         if notUserPlaced then self:SetUserPlaced(false) end
     end)
     frame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
+end
+
+---------------------------------------------------------------------
+-- attach to cursor
+---------------------------------------------------------------------
+local GetCursorPosition = GetCursorPosition
+
+---@param frame Frame
+---@param anchorPoint string|nil e.g. "CENTER", "TOPLEFT", etc.
+---@param offsetX number|nil
+---@param offsetY number|nil
+function AF.AttachToCursor(frame, anchorPoint, offsetX, offsetY)
+    assert(frame and frame.HasScript and frame:HasScript("OnUpdate"), "AF.AttachToCursor: frame must have 'OnUpdate' script.")
+
+    anchorPoint = anchorPoint or "CENTER"
+    offsetX = offsetX or 0
+    offsetY = offsetY or 0
+
+    local mouseX, mouseY = GetCursorPosition()
+
+    local effectiveScale = frame:GetEffectiveScale()
+    local startX = mouseX / effectiveScale
+    local startY = mouseY / effectiveScale
+
+    frame:SetScript("OnUpdate", function()
+        local newMouseX, newMouseY = GetCursorPosition()
+        if newMouseX == lastX and newMouseY == lastY then return end
+
+        lastX = newMouseX
+        lastY = newMouseY
+
+        local newX = startX + (newMouseX - mouseX) / effectiveScale
+
+        local newY = startY + (newMouseY - mouseY) / effectiveScale
+
+        frame:ClearAllPoints()
+        frame:SetPoint(anchorPoint, AF.UIParent, "BOTTOMLEFT", newX + offsetX, newY + offsetY)
+    end)
+
+    frame:Show()
+end
+
+function AF.DetachFromCursor(frame)
+    if frame and frame.HasScript and frame:HasScript("OnUpdate") then
+        frame:SetScript("OnUpdate", nil)
+        frame:ClearAllPoints()
+    end
+end
+
+---------------------------------------------------------------------
+-- mouse focus
+---------------------------------------------------------------------
+function AF.GetMouseFocus()
+    if GetMouseFoci then
+        return GetMouseFoci()[1]
+    else
+        return GetMouseFocus()
+    end
 end
