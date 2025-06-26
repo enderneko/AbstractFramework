@@ -772,16 +772,6 @@ function AF.SnapRegionToPixel(region)
 end
 
 ---------------------------------------------------------------------
--- update text container size
----------------------------------------------------------------------
-function AF.SetSizeToFitText(frame, fontString, padding)
-    padding = padding or 0
-    local width = ceil(fontString:GetStringWidth() + padding)
-    local height = ceil(fontString:GetStringHeight() + padding)
-    frame:SetSize(width, height)
-end
-
----------------------------------------------------------------------
 -- statusbar
 ---------------------------------------------------------------------
 local ClampedPercentageBetween = ClampedPercentageBetween

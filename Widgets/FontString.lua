@@ -41,6 +41,8 @@ end
 -- GetStringSize
 ---------------------------------------------------------------------
 local font_string
+
+---@deprecated
 ---@param text string
 ---@param fontFile string
 ---@param fontSize number
@@ -54,6 +56,56 @@ function AF.GetStringSize(text, fontFile, fontSize, fontFlag, fontShadow)
     AF.SetFont(font_string, fontFile, fontSize, fontFlag, fontShadow)
     font_string:SetText(text)
     return font_string:GetStringWidth(), font_string:GetStringHeight()
+end
+
+---@deprecated
+---@param fs FontString
+---@return number width, number height
+function AF.GetFontStringSize(fs)
+    local text = fs:GetText()
+    local fontFile, fontSize, fontFlag = fs:GetFont()
+    return AF.GetStringSize(text, fontFile, fontSize, fontFlag)
+end
+
+---------------------------------------------------------------------
+-- update text container size
+---------------------------------------------------------------------
+local ceil = math.ceil
+
+local function ResizeToFitText(self, frame, fontString, hPadding, vPadding)
+    self.elapsed = 0
+    self:SetScript("OnUpdate", function(self, elapsed)
+        if hPadding then
+            frame:SetWidth(ceil(fontString:GetStringWidth() + hPadding))
+        end
+        if vPadding then
+            frame:SetHeight(ceil(fontString:GetStringHeight() + vPadding))
+        end
+
+        self.elapsed = self.elapsed + elapsed
+        if self.elapsed >= 0.5 or not frame:IsShown() then
+            self:Hide()
+        end
+    end)
+    self:Show()
+end
+
+local pool = AF.CreateObjectPool(function(pool)
+    local f = CreateFrame("Frame")
+    f:Hide()
+    f.ResizeToFitText = ResizeToFitText
+    f:SetScript("OnHide", function()
+        pool:Release(f)
+    end)
+    return f
+end)
+
+---@param frame Frame
+---@param fontString FontString
+---@param hPadding number? horizontal padding, if omitted, will not change width
+---@param vPadding number? vertical padding, if omitted, will not change height
+function AF.ResizeToFitText(frame, fontString, hPadding, vPadding)
+    pool:Acquire():ResizeToFitText(frame, fontString, hPadding, vPadding)
 end
 
 ---------------------------------------------------------------------
