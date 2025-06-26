@@ -83,12 +83,89 @@ font_tooltip:SetShadowOffset(1, -1)
 font_tooltip:SetJustifyH("LEFT")
 
 ---------------------------------------------------------------------
--- create
+-- update font size
 ---------------------------------------------------------------------
-function AF.CreateFont(name, font, size, flags, shadow, color)
+local fontObjects = {}
+
+---@param fontObj Font|FontString
+---@param originalSize number defaults to the current font size of the fontObj
+function AF.AddToFontSizeUpdater(fontObj, originalSize)
+    originalSize = originalSize or select(2, fontObj:GetFont()) or 13
+    fontObjects[fontObj] = originalSize
+end
+
+AF.fontSizeOffset = 0
+
+---@param offset number
+function AF.UpdateFontSize(offset)
+    AF.fontSizeOffset = offset
+    font_title:SetFont(BASE_FONT_NORMAL, FONT_TITLE_SIZE + offset, "")
+    font_normal:SetFont(BASE_FONT_NORMAL, FONT_NORMAL_SIZE + offset, "")
+    font_chat:SetFont(BASE_FONT_CHAT, FONT_CHAT_SIZE + offset, "")
+    font_outline:SetFont(BASE_FONT_NORMAL, FONT_OUTLINE_SIZE + offset, "")
+    font_small:SetFont(BASE_FONT_NORMAL, FONT_SMALL_SIZE + offset, "")
+    font_chinese:SetFont(UNIT_NAME_FONT_CHINESE, FONT_CHINESE_SIZE + offset, "")
+    font_tooltip_header:SetFont(BASE_FONT_TOOLTIP, FONT_TOOLTIP_HEADER_SIZE + offset, "")
+    font_tooltip:SetFont(BASE_FONT_TOOLTIP, FONT_TOOLTIP_SIZE + offset, "")
+
+    for fontObj, originalSize in pairs(fontObjects) do
+        local f, _, o = fontObj:GetFont()
+        fontObj:SetFont(f, originalSize + offset, o)
+    end
+end
+
+---------------------------------------------------------------------
+-- font group
+---------------------------------------------------------------------
+local LSM = AF.Libs.LSM
+local fontGroup = {}
+
+---@param group string
+---@param fontObj Font|FontString
+---@param originalSize number defaults to the current font size of the fontObj
+function AF.AddToFontSizeUpdaterGroup(group, fontObj, originalSize)
+    if not fontGroup[group] then
+        fontGroup[group] = {}
+    end
+    originalSize = originalSize or select(2, fontObj:GetFont()) or 13
+    fontGroup[group][fontObj] = originalSize
+end
+
+---@param group string
+---@param offset number
+function AF.UpdateFontSizeForGroup(group, offset)
+    if not fontGroup[group] then return end
+
+    for fontObj, originalSize in pairs(fontGroup[group]) do
+        local f, _, o = fontObj:GetFont()
+        fontObj:SetFont(f, originalSize + offset, o)
+    end
+end
+
+---@param group string group name for the font, used to update font size
+---@param name string
+---@param font string defaults to GameFontNormal:GetFont()
+---@param size number defaults to 13
+---@param flags string defaults to ""
+---@param shadow boolean defaults to no shadow
+---@param color string|table defaults to "white"
+---@param justifyH string defaults to "CENTER"
+---@param justifyV string defaults to "MIDDLE"
+function AF.CreateFont(group, name, font, size, flags, shadow, color, justifyH, justifyV)
+    assert(type(group) == "string", "AF.CreateFont expects a group name as the first argument.")
+
+    font = font or BASE_FONT_NORMAL
+    color = color or "white"
+
+    if LSM:IsValid("font", font) then
+        font = LSM:Fetch("font", font)
+    end
+
     local obj = CreateFont(name)
-    obj:SetFont(font, size, flags or "")
-    obj:SetJustifyH("CENTER")
+    obj:SetFont(font, size or FONT_NORMAL_SIZE, flags or "")
+
+    obj:SetJustifyH(justifyH or "CENTER")
+    obj:SetJustifyV(justifyV or "MIDDLE")
 
     if shadow then
         obj:SetShadowColor(0, 0, 0, 1)
@@ -102,38 +179,9 @@ function AF.CreateFont(name, font, size, flags, shadow, color)
         obj:SetTextColor(AF.GetColorRGB(color))
     elseif type(color) == "table" then
         obj:SetTextColor(AF.UnpackColor(color))
-    else
-        obj:SetTextColor(AF.GetColorRGB("white"))
     end
 
-    AF.AddToFontSizeUpdater(obj, size)
-end
-
----------------------------------------------------------------------
--- update size for all used fonts
----------------------------------------------------------------------
-local fontStrings = {}
-function AF.AddToFontSizeUpdater(fs, originalSize)
-    fs.originalSize = originalSize
-    tinsert(fontStrings, fs)
-end
-
-AF.fontSizeOffset = 0
-function AF.UpdateFontSize(offset)
-    AF.fontSizeOffset = offset
-    font_title:SetFont(BASE_FONT_NORMAL, FONT_TITLE_SIZE + offset, "")
-    font_normal:SetFont(BASE_FONT_NORMAL, FONT_NORMAL_SIZE + offset, "")
-    font_chat:SetFont(BASE_FONT_CHAT, FONT_CHAT_SIZE + offset, "")
-    font_outline:SetFont(BASE_FONT_NORMAL, FONT_OUTLINE_SIZE + offset, "")
-    font_small:SetFont(BASE_FONT_NORMAL, FONT_SMALL_SIZE + offset, "")
-    font_chinese:SetFont(UNIT_NAME_FONT_CHINESE, FONT_CHINESE_SIZE + offset, "")
-    font_tooltip_header:SetFont(BASE_FONT_TOOLTIP, FONT_TOOLTIP_HEADER_SIZE + offset, "")
-    font_tooltip:SetFont(BASE_FONT_TOOLTIP, FONT_TOOLTIP_SIZE + offset, "")
-
-    for _, fs in ipairs(fontStrings) do
-        local f, _, o = fs:GetFont()
-        fs:SetFont(f, (fs.originalSize or FONT_NORMAL_SIZE) + offset, o)
-    end
+    AF.AddToFontSizeUpdater(group, obj, size)
 end
 
 ---------------------------------------------------------------------
