@@ -6,23 +6,23 @@ local PlaySound = PlaySound
 
 local function RegisterMouseDownUp(b)
     b:SetScript("OnMouseDown", function()
-        if b._pushEffectEnabled then
+        if b:IsEnabled() and b._pushEffectEnabled then
             b:HandleMouseDownText()
             b:HandleMouseDownTexture()
         end
     end)
     b:SetScript("OnMouseUp", function()
-        if b._pushEffectEnabled then
+        if b:IsEnabled() and b._pushEffectEnabled then
             b:HandleMouseUpText()
             b:HandleMouseUpTexture()
         end
     end)
 end
 
-local function UnregisterMouseDownUp(b)
-    b:SetScript("OnMouseDown", nil)
-    b:SetScript("OnMouseUp", nil)
-end
+-- local function UnregisterMouseDownUp(b)
+--     b:SetScript("OnMouseDown", nil)
+--     b:SetScript("OnMouseUp", nil)
+-- end
 
 ---------------------------------------------------------------------
 -- button
@@ -350,12 +350,12 @@ function AF.CreateButton(parent, text, color, width, height, template, borderCol
 
     b:SetScript("OnEnable", function()
         b.text:SetColor("white")
-        RegisterMouseDownUp(b)
+        -- RegisterMouseDownUp(b)
     end)
 
     b:SetScript("OnDisable", function()
         b.text:SetColor("disabled")
-        UnregisterMouseDownUp(b)
+        -- UnregisterMouseDownUp(b)
     end)
 
     -- border -----------------------------------
