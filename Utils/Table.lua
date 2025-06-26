@@ -77,6 +77,20 @@ function AF.Contains(t, v)
     return false
 end
 
+function AF.IndexOf(t, v)
+    for i, value in pairs(t) do
+        if value == v then return i end
+    end
+    return nil
+end
+
+function AF.LastIndexOf(t, v)
+    for i = #t, 1, -1 do
+        if t[i] == v then return i end
+    end
+    return nil
+end
+
 -- insert into the first empty slot
 function AF.Insert(t, v)
     local i, done = 1
