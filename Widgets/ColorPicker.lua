@@ -349,7 +349,7 @@ local function CreateColorGrid(color)
     AF.RemoveFromPixelUpdater(grid)
 
     if type(color) == "table" then
-        AF.SetTooltips(grid, "ANCHOR_TOPLEFT", 0, 2, "|c"..AF.GetColorHex(color[1])..color[2])
+        AF.SetTooltip(grid, "ANCHOR_TOPLEFT", 0, 2, "|c"..AF.GetColorHex(color[1])..color[2])
         color = color[1]
     end
 

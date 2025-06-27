@@ -466,12 +466,12 @@ function AF.CreateButtonGroup(buttons, onClick, selectedFn, unselectedFn, onEnte
             else
                 b:SetBackdropColor(unpack(b._color))
                 b:SetScript("OnEnter", function()
-                    if b._tooltips then AF.ShowTooltips(b, b._tooltipsAnchor, b._tooltipsX, b._tooltipsY, b._tooltips) end
+                    if b._tooltip then AF.ShowTooltip(b, b._tooltipAnchor, b._tooltipX, b._tooltipY, b._tooltip) end
                     b:SetBackdropColor(unpack(b._hoverColor))
                     if onEnter then onEnter(b) end
                 end)
                 b:SetScript("OnLeave", function()
-                    AF.HideTooltips()
+                    AF.HideTooltip()
                     b:SetBackdropColor(unpack(b._color))
                     if onLeave then onLeave(b) end
                 end)
@@ -644,12 +644,12 @@ local AF_TipsButtonMixin = {}
 
 local function TipsButton_OnEnter(self)
     if not AF.IsEmpty(self.tips) then
-        AF.ShowTooltips(self, self.position, self.x, self.y, self.tips)
+        AF.ShowTooltip(self, self.position, self.x, self.y, self.tips)
     end
 end
 
 local function TipsButton_OnLeave(self)
-    AF.HideTooltips()
+    AF.HideTooltip()
 end
 
 ---@param ... string

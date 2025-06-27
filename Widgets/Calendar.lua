@@ -241,8 +241,8 @@ local function CreateCalendar()
         end
         calendar:Hide()
     end, nil, nil, function(self)
-        AF.ShowTooltips(self, "TOPLEFT", 0, 2, self.tooltips)
-    end, AF.HideTooltips)
+        AF.ShowTooltip(self, "TOPLEFT", 0, 2, self.tooltips)
+    end, AF.HideTooltip)
 
     -- "today" mark
     local todayMark = AF.CreateTexture(calendar, nil, "gray")

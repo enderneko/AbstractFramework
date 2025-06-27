@@ -77,7 +77,7 @@ function AF.ShowDemo()
     -----------------------------------------------------------------------------
     local b1 = AF.CreateButton(demo, "Button A", "accent", 100, 20)
     AF.SetPoint(b1, "TOPLEFT", 10, -10)
-    AF.SetTooltips(b1, "ANCHOR_TOPLEFT", 0, 2, "Tooltip Title", "This is a tooltip")
+    AF.SetTooltip(b1, "ANCHOR_TOPLEFT", 0, 2, "Tooltip Title", "This is a tooltip")
 
     local b2 = AF.CreateButton(demo, "Button B", "green", 100, 20)
     AF.SetPoint(b2, "TOPLEFT", b1, "TOPRIGHT", 10, 0)
@@ -85,7 +85,7 @@ function AF.ShowDemo()
 
     local b3 = AF.CreateButton(demo, "Button C", "static", 100, 20)
     AF.SetPoint(b3, "TOPLEFT", b2, "TOPRIGHT", 10, 0)
-    AF.SetTooltips(b3, "ANCHOR_TOPLEFT", 0, 2, "Another Style", "SetTextHighlightColor", "SetBorderHighlightColor")
+    AF.SetTooltip(b3, "ANCHOR_TOPLEFT", 0, 2, "Another Style", "SetTextHighlightColor", "SetBorderHighlightColor")
     b3:SetTextHighlightColor("accent")
     b3:SetBorderHighlightColor("accent")
 
@@ -111,7 +111,7 @@ function AF.ShowDemo()
     -----------------------------------------------------------------------------
     local cb1 = AF.CreateCheckButton(demo, "Check boxes")
     AF.SetPoint(cb1, "TOPLEFT", b1, "BOTTOMLEFT", 0, -10)
-    AF.SetTooltips(cb1, "ANCHOR_TOPLEFT", 0, 3, "Check Button", "The hit rectangle of these check buttons are different")
+    AF.SetTooltip(cb1, "ANCHOR_TOPLEFT", 0, 2, "Check Button", "The hit rectangle of these check buttons are different")
 
     local cb2 = AF.CreateCheckButton(demo, "With")
     AF.SetPoint(cb2, "TOPLEFT", cb1, "BOTTOMLEFT", 0, -7)
@@ -189,21 +189,21 @@ function AF.ShowDemo()
     gb1:SetTextJustifyH("LEFT")
     AF.SetPoint(gb1, "TOPLEFT")
     AF.SetPoint(gb1, "RIGHT")
-    AF.SetTooltips(gb1, "LEFT", -2, 0, "Item A")
+    AF.SetTooltip(gb1, "LEFT", -2, 0, "Item A")
 
     local gb2 = AF.CreateButton(bf2, "Item B", "red_transparent", 100, 20, nil, "none", "")
     gb2.id = "gb2"
     gb2:SetTextJustifyH("LEFT")
     AF.SetPoint(gb2, "TOPLEFT", gb1, "BOTTOMLEFT", 0, 1)
     AF.SetPoint(gb2, "RIGHT")
-    AF.SetTooltips(gb2, "LEFT", -2, 0, "Item B")
+    AF.SetTooltip(gb2, "LEFT", -2, 0, "Item B")
 
     local gb3 = AF.CreateButton(bf2, "Item C", "lime_transparent", 100, 20, nil, "none", "")
     gb3.id = "gb3"
     gb3:SetTextJustifyH("LEFT")
     AF.SetPoint(gb3, "TOPLEFT", gb2, "BOTTOMLEFT", 0, 1)
     AF.SetPoint(gb3, "RIGHT")
-    AF.SetTooltips(gb3, "LEFT", -2, 0, "Item C")
+    AF.SetTooltip(gb3, "LEFT", -2, 0, "Item C")
 
     AF.CreateButtonGroup({gb1, gb2, gb3}, function(id)
         AF.Print("selected", id)
@@ -270,7 +270,7 @@ function AF.ShowDemo()
     -----------------------------------------------------------------------------
     local sl1 = AF.CreateSlider(tp1, "Scale", 130, 0.5, 2, 0.01)
     AF.SetPoint(sl1, "TOPLEFT", 5, -40)
-    AF.SetTooltips(sl1, "TOPLEFT", 0, 20, "Set scale of AF.UIParent", "If scale is too small, there can be some display issues", "It's highly recommended to do a UI reload after changing scale")
+    AF.SetTooltip(sl1, "TOPLEFT", 0, 20, "Set scale of AF.UIParent", "If scale is too small, there can be some display issues", "It's highly recommended to do a UI reload after changing scale")
     sl1:SetValue(AF.GetScale())
     sl1:SetAfterValueChanged(function(value)
         AF.SetScale(value)
@@ -433,7 +433,7 @@ function AF.ShowDemo()
     -- normal dropdown (items <= 10)
     local dd1 = AF.CreateDropdown(demo, 150)
     AF.SetPoint(dd1, "TOPLEFT", cm, "BOTTOMLEFT", 0, -30)
-    AF.SetTooltips(dd1, "TOPLEFT", 0, 2, "Normal Dropdown 1")
+    AF.SetTooltip(dd1, "TOPLEFT", 0, 2, "Normal Dropdown 1")
     dd1:SetLabel("Normal Dropdown 1")
     dd1:SetOnClick(function(value)
         AF.Print("NormalDropdown1 Selected:", value)
@@ -447,7 +447,7 @@ function AF.ShowDemo()
     -- normal dropdown (items > 10)
     local dd2 = AF.CreateDropdown(demo, 150)
     AF.SetPoint(dd2, "TOPLEFT", dd1, "BOTTOMLEFT", 0, -30)
-    AF.SetTooltips(dd2, "TOPLEFT", 0, 2, "Normal Dropdown 2")
+    AF.SetTooltip(dd2, "TOPLEFT", 0, 2, "Normal Dropdown 2")
     dd2:SetLabel("Normal Dropdown 2")
     dd2:SetOnClick(function(value)
         AF.Print("NormalDropdown2 Selected:", value)
@@ -481,7 +481,7 @@ function AF.ShowDemo()
     local dd5 = AF.CreateDropdown(demo, 150, 10, "font")
     AF.SetPoint(dd5, "TOPLEFT", dd4, "BOTTOMLEFT", 0, -30)
     dd5:SetLabel("Font Dropdown")
-    AF.SetTooltips(dd5, "TOPLEFT", 0, 2, "Font Dropdown", "Using LibSharedMedia")
+    AF.SetTooltip(dd5, "TOPLEFT", 0, 2, "Font Dropdown", "Using LibSharedMedia")
 
     local LSM = LibStub("LibSharedMedia-3.0", true)
     if LSM then
@@ -500,7 +500,7 @@ function AF.ShowDemo()
     local dd6 = AF.CreateDropdown(demo, 150, 10, "texture")
     AF.SetPoint(dd6, "TOPLEFT", dd5, "BOTTOMLEFT", 0, -30)
     dd6:SetLabel("Texture Dropdown")
-    AF.SetTooltips(dd6, "TOPLEFT", 0, 2, "Texture Dropdown", "Using LibSharedMedia")
+    AF.SetTooltip(dd6, "TOPLEFT", 0, 2, "Texture Dropdown", "Using LibSharedMedia")
 
     if LSM then
         local items = {}
@@ -830,7 +830,7 @@ function AF.ShowDemo()
 
     local b14 = AF.CreateButton(bf5, "PPopup+", "accent", 95, 20)
     AF.SetPoint(b14, "BOTTOMRIGHT")
-    AF.SetTooltips(b14, "ANCHOR_TOPLEFT", 0, 2, "Progress Popup", "With progress bar", "Hide in 5 sec after completion")
+    AF.SetTooltip(b14, "ANCHOR_TOPLEFT", 0, 2, "Progress Popup", "With progress bar", "Hide in 5 sec after completion")
     b14:SetScript("OnClick", function()
         local callback = AF.ShowProgressPopup("In Progress...", 100)
         local v = 0
@@ -842,7 +842,7 @@ function AF.ShowDemo()
 
     local b15 = AF.CreateButton(bf5, "CPopup+", "accent", 95, 20)
     AF.SetPoint(b15, "BOTTOMRIGHT", b14, "BOTTOMLEFT", 1, 0)
-    AF.SetTooltips(b15, "ANCHOR_TOPLEFT", 0, 2, "Confirm Popup", "With \"Yes\" & \"No\" buttons", "Won't hide automatically")
+    AF.SetTooltip(b15, "ANCHOR_TOPLEFT", 0, 2, "Confirm Popup", "With \"Yes\" & \"No\" buttons", "Won't hide automatically")
     b15:SetScript("OnClick", function()
         for i = 1, 3 do
             AF.ShowConfirmPopup("Confirm " .. i, function()
@@ -855,7 +855,7 @@ function AF.ShowDemo()
 
     local b16 = AF.CreateButton(bf5, "NPopup+", "accent", 95, 20)
     AF.SetPoint(b16, "BOTTOMRIGHT", b15, "BOTTOMLEFT", 1, 0)
-    AF.SetTooltips(b16, "ANCHOR_TOPLEFT", 0, 2, "Notification Popup", "With timeout", "Right-Click to hide")
+    AF.SetTooltip(b16, "ANCHOR_TOPLEFT", 0, 2, "Notification Popup", "With timeout", "Right-Click to hide")
     b16:SetScript("OnClick", function()
         for i = 1, 3 do
             local timeout = random(2, 7)
@@ -908,7 +908,7 @@ function AF.ShowDemo()
 
     mDropdown = AF.CreateDropdown(mbf, 85, 10, nil, true)
     AF.SetPoint(mDropdown, "TOPRIGHT", hmBtn, "TOPLEFT", 1, 0)
-    AF.SetTooltips(mDropdown, "TOPLEFT", 0, 2, "Mover Tips", "- Drag to move", "- Use (shift) mouse wheel to move frame by 1 pixel", "- Right-Click to open fine-tuning frame", "- Shift+Right-Click to hide a mover")
+    AF.SetTooltip(mDropdown, "TOPLEFT", 0, 2, "Mover Tips", "- Drag to move", "- Use (shift) mouse wheel to move frame by 1 pixel", "- Right-Click to open fine-tuning frame", "- Shift+Right-Click to hide a mover")
     mDropdown:SetItems({
         {
             ["text"] = "All",

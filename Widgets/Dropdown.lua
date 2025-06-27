@@ -521,12 +521,12 @@ function AF.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
 
     -- hook for tooltips
     dropdown.button:HookScript("OnEnter", function()
-        if dropdown._tooltips then
+        if dropdown._tooltip then
             dropdown:GetScript("OnEnter")()
         end
     end)
     dropdown.button:HookScript("OnLeave", function()
-        if dropdown._tooltips then
+        if dropdown._tooltip then
             dropdown:GetScript("OnLeave")()
         end
     end)

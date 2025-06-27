@@ -21,7 +21,7 @@ local anchorOverride = {
 ---@param x number
 ---@param y number
 ---@param lines string[]
-function AF.ShowTooltips(widget, anchor, x, y, lines)
+function AF.ShowTooltip(widget, anchor, x, y, lines)
     if type(lines) ~= "table" or #lines == 0 then
         AF.Tooltip:Hide()
         return
@@ -66,21 +66,21 @@ end
 ---@param x number
 ---@param y number
 ---@param ... string
-function AF.SetTooltips(widget, anchor, x, y, ...)
+function AF.SetTooltip(widget, anchor, x, y, ...)
     if type(select(1, ...)) == "table" then
-        widget._tooltips = ...
+        widget._tooltip = ...
     else
-        widget._tooltips = {...}
+        widget._tooltip = {...}
     end
-    widget._tooltipsAnchor = anchor
-    widget._tooltipsX = x
-    widget._tooltipsY = y
+    widget._tooltipAnchor = anchor
+    widget._tooltipX = x
+    widget._tooltipY = y
 
-    if not widget._tooltipsInited then
-        widget._tooltipsInited = true
+    if not widget._tooltipInited then
+        widget._tooltipInited = true
 
         widget:HookScript("OnEnter", function()
-            AF.ShowTooltips(widget, anchor, x, y, widget._tooltips)
+            AF.ShowTooltip(widget, anchor, x, y, widget._tooltip)
         end)
         widget:HookScript("OnLeave", function()
             AF.Tooltip:Hide()
@@ -88,12 +88,12 @@ function AF.SetTooltips(widget, anchor, x, y, ...)
     end
 end
 
-function AF.ClearTooltips(widget)
-    widget._tooltips = nil
+function AF.ClearTooltip(widget)
+    widget._tooltip = nil
 end
 
 local tooltips = {}
-function AF.HideTooltips()
+function AF.HideTooltip()
     for _, tooltip in pairs(tooltips) do
         tooltip:Hide()
     end
