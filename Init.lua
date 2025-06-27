@@ -120,7 +120,12 @@ function AF.UIParent:ADDON_LOADED(addon)
         if type(AFConfig) ~= "table" then AFConfig = {} end
 
         -- debug
-        if type(AFConfig.debugMode) ~= "boolean" then AFConfig.debugMode = false end
+        if type(AFConfig.debug) ~= "table" then
+            AFConfig.debug = {
+                ["AF"] = false,
+                ["EVENTS"] = false,
+            }
+        end
 
         -- scale
         if type(AFConfig.scale) ~= "number" then AFConfig.scale = 1 end

@@ -86,7 +86,7 @@ AF.DEBUG_EVENTS = {
 }
 
 function AF.Fire(event, ...)
-    if AFConfig.debugMode then
+    if AFConfig and AFConfig.debug.EVENTS then
         local e = event
         if AF.DEBUG_EVENTS[event] then
             e = AF.WrapTextInColor(event, AF.DEBUG_EVENTS[event])
