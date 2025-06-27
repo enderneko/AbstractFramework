@@ -7,11 +7,11 @@ local AF = _G.AbstractFramework
 ---@class AF_EditBox:EditBox,AF_BaseWidgetMixin
 local AF_EditBoxMixin = {}
 
----@param func function?
----@param text string?
----@param position string? "RIGHT_INSIDE"|"RIGHT_OUTSIDE"|"BOTTOM"|"BOTTOMLEFT"|"BOTTOMRIGHT"|nil, default "RIGHT_INSIDE".
----@param width number? default is 30, but use editbox width if position is "BOTTOM".
----@param height number? default is 20.
+---@param func? fun(value: any) function to call when confirm button is clicked
+---@param text? string
+---@param position? string "RIGHT_INSIDE"|"RIGHT_OUTSIDE"|"BOTTOM"|"BOTTOMLEFT"|"BOTTOMRIGHT"|nil, default "RIGHT_INSIDE".
+---@param width? number default is 30, but use editbox width if position is "BOTTOM".
+---@param height? number default is 20.
 function AF_EditBoxMixin:SetConfirmButton(func, text, position, width, height)
     self.confirmBtn = self.confirmBtn or AF.CreateButton(self, text, self.accentColor, width or 30, height or 20)
     self.confirmBtn:Hide()

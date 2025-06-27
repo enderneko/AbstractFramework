@@ -116,9 +116,9 @@ end
 ---@param width number
 ---@param low number
 ---@param high number
----@param step number
----@param isPercentage boolean
----@param showLowHighText boolean
+---@param step? number defaults to 1
+---@param isPercentage? boolean
+---@param showLowHighText? boolean
 ---@return AF_Slider slider
 function AF.CreateSlider(parent, text, width, low, high, step, isPercentage, showLowHighText)
     local slider = CreateFrame("Slider", nil, parent, "BackdropTemplate")
