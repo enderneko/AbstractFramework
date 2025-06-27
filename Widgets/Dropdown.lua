@@ -117,7 +117,7 @@ end
 function AF.CloseDropdown()
     if list then
         list:Hide()
-        if list.dropdown and not list.dropdown.isMini then
+        if list.dropdown and not list.dropdown.miniMode then
             list.dropdown.button:SetTexture(AF.GetIcon("ArrowDown1"))
         end
     end
@@ -308,7 +308,7 @@ function AF_DropdownMixin:LoadItems()
         local b
         if not self.list.buttons[i] then
             -- create new button
-            b = AF.CreateButton(self.isHorizontal and self.list or self.list.slotFrame, item.text, "accent_transparent", 18, 18, nil, "", "")
+            b = AF.CreateButton(self.miniMode == "horizontal" and self.list or self.list.slotFrame, item.text, "accent_transparent", 18, 18, nil, "", "")
             table.insert(self.list.buttons, b)
 
             b:EnablePushEffect(false)
@@ -378,18 +378,18 @@ function AF_DropdownMixin:LoadItems()
             elseif self.onClick then
                 self.onClick(item.value)
             end
-            if not self.isMini then self.button:SetTexture(AF.GetIcon("ArrowDown1")) end
+            if not self.miniMode then self.button:SetTexture(AF.GetIcon("ArrowDown1")) end
         end)
 
         -- text justify
-        if self.isMini then
+        if self.miniMode then
             b:SetTextJustifyH(self.justify or "CENTER")
         else
             b:SetTextJustifyH(self.justify or "LEFT")
         end
 
         -- update point
-        if self.isMini and self.isHorizontal then
+        if self.miniMode == "horizontal" then
             AF.SetWidth(b, self.width)
             if i == 1 then
                 AF.SetPoint(b, "TOPLEFT", 1, -1)
@@ -406,7 +406,7 @@ function AF_DropdownMixin:LoadItems()
     AF.SetFrameLevel(self.list, 10, self)
     AF.ClearPoints(self.list)
 
-    if self.isMini and self.isHorizontal then
+    if self.miniMode == "horizontal" then
         AF.SetPoint(self.list, "TOPLEFT", self, "TOPRIGHT", 2, 0)
         AF.SetHeight(self.list, 20)
 
@@ -451,9 +451,15 @@ function AF_DropdownMixin:SetTooltip(...)
     AF.SetTooltip(self, "ANCHOR_TOPLEFT", 0, 2, ...)
 end
 
----@param maxSlots number max shown items, not available for mini horizontal dropdown
+---@param parent Frame
+---@param width number
+---@param maxSlots? number max shown items, not available for mini horizontal dropdown, default 10
+---@param miniMode? string "vertical" or "horizontal", if set, dropdown will be mini mode
+---@param dropdownType? string for special dropdown, "texture" or "font"
+---@param textureAlpha? number default 0.75
+---@param justify? string
 ---@return AF_Dropdown
-function AF.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHorizontal, justify, textureAlpha)
+function AF.CreateDropdown(parent, width, maxSlots, miniMode, dropdownType, textureAlpha, justify)
     if not list then CreateListFrame() end
     if not horizontalList then CreateHorizontalList() end
 
@@ -468,17 +474,16 @@ function AF.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
     dropdown.enabled = true
     dropdown.width = width
     dropdown.maxSlots = maxSlots
-    dropdown.type = dropdownType
-    dropdown.isMini = isMini
-    dropdown.isHorizontal = isHorizontal
-    dropdown.justify = justify
+    dropdown.miniMode = miniMode and miniMode:lower()
+    dropdown.type = dropdownType and dropdownType:lower()
     dropdown.textureAlpha = textureAlpha
-    dropdown.list = (isMini and isHorizontal) and horizontalList or list
+    dropdown.justify = justify
+    dropdown.list = miniMode == "horizontal" and horizontalList or list
 
     Mixin(dropdown, AF_DropdownMixin)
 
     -- button: open/close menu list
-    if isMini then
+    if miniMode then
         dropdown.button = AF.CreateButton(dropdown, nil, "accent_hover", 20, 20)
         dropdown.button:SetAllPoints(dropdown)
 
@@ -505,13 +510,13 @@ function AF.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
     dropdown.button:SetColor(dropdown.accentColor .. "_hover")
 
     -- iconBG
-    dropdown.iconBG = AF.CreateTexture(isMini and dropdown.button or dropdown, nil, nil, "ARTWORK", -2)
+    dropdown.iconBG = AF.CreateTexture(miniMode and dropdown.button or dropdown, nil, nil, "ARTWORK", -2)
     AF.SetSize(dropdown.iconBG, 16, 16)
     AF.SetPoint(dropdown.iconBG, "TOPLEFT", 2, -2)
     dropdown.iconBG:Hide()
 
     -- icon
-    dropdown.icon = AF.CreateTexture(isMini and dropdown.button or dropdown, nil, nil, "ARTWORK", 0)
+    dropdown.icon = AF.CreateTexture(miniMode and dropdown.button or dropdown, nil, nil, "ARTWORK", 0)
     dropdown.icon:Hide()
     dropdown:SetIconBGColor("black")
 
@@ -539,9 +544,9 @@ function AF.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
     dropdown.text:SetWordWrap(false)
 
     if dropdownType == "texture" then
-        dropdown.bgTexture = AF.CreateTexture(isMini and dropdown.button or dropdown)
+        dropdown.bgTexture = AF.CreateTexture(miniMode and dropdown.button or dropdown)
         AF.SetPoint(dropdown.bgTexture, "TOPLEFT", 1, -1)
-        if isMini then
+        if miniMode then
             AF.SetPoint(dropdown.bgTexture, "BOTTOMRIGHT", -1, 1)
         else
             AF.SetPoint(dropdown.bgTexture, "BOTTOMRIGHT", dropdown.button, "BOTTOMLEFT", -1, 1)
@@ -571,7 +576,7 @@ function AF.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
     dropdown:SetScript("OnHide", function()
         if dropdown.list.dropdown == dropdown then
             dropdown.list:Hide()
-            if not isMini then dropdown.button:SetTexture(AF.GetIcon("ArrowDown1")) end
+            if not miniMode then dropdown.button:SetTexture(AF.GetIcon("ArrowDown1")) end
         end
     end)
 
@@ -583,17 +588,17 @@ function AF.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
         end
 
         if dropdown.list.dropdown ~= dropdown then -- list shown by other dropdown
-            if dropdown.list.dropdown and not dropdown.list.dropdown.isMini then
+            if dropdown.list.dropdown and not dropdown.list.dropdown.miniMode then
                 -- restore previous menu's button texture
                 dropdown.list.dropdown.button:SetTexture(AF.GetIcon("ArrowDown1"))
             end
             dropdown:LoadItems()
             dropdown.list:Show()
-            if not isMini then dropdown.button:SetTexture(AF.GetIcon("ArrowUp1")) end
+            if not miniMode then dropdown.button:SetTexture(AF.GetIcon("ArrowUp1")) end
 
         elseif dropdown.list:IsShown() then -- list showing by this, hide it
             dropdown.list:Hide()
-            if not isMini then dropdown.button:SetTexture(AF.GetIcon("ArrowDown1")) end
+            if not miniMode then dropdown.button:SetTexture(AF.GetIcon("ArrowDown1")) end
 
         else
             if dropdown.reloadRequired then
@@ -605,7 +610,7 @@ function AF.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHori
                 end
             end
             dropdown.list:Show()
-            if not isMini then dropdown.button:SetTexture(AF.GetIcon("ArrowUp1")) end
+            if not miniMode then dropdown.button:SetTexture(AF.GetIcon("ArrowUp1")) end
         end
     end)
 

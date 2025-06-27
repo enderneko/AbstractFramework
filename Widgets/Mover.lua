@@ -311,7 +311,7 @@ CreatePositionEditorFrame = function()
     AF.SetPoint(positionEditorFrame.tp, "BOTTOMRIGHT", -7, 7)
 
     -- anchor
-    positionEditorFrame.anchor = AF.CreateDropdown(positionEditorFrame.tp, 20, 9, "texture", true, true, nil, 1)
+    positionEditorFrame.anchor = AF.CreateDropdown(positionEditorFrame.tp, 20, 9, "horizontal", "texture", 1)
 
     local items = {}
     local anchors = {"CENTER", "LEFT", "BOTTOMLEFT", "BOTTOM", "BOTTOMRIGHT", "RIGHT", "TOPLEFT", "TOP", "TOPRIGHT"}

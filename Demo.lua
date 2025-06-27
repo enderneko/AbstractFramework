@@ -479,7 +479,7 @@ function AF.ShowDemo()
     -- dd4:SetSelectedValue("item0")
 
     -- font dropdown
-    local dd5 = AF.CreateDropdown(demo, 150, 10, "font")
+    local dd5 = AF.CreateDropdown(demo, 150, 10, nil, "font")
     AF.SetPoint(dd5, "TOPLEFT", dd4, "BOTTOMLEFT", 0, -30)
     dd5:SetLabel("Font Dropdown")
     AF.SetTooltip(dd5, "TOPLEFT", 0, 2, "Font Dropdown", "Using LibSharedMedia")
@@ -498,7 +498,7 @@ function AF.ShowDemo()
     end
 
     -- texture dropdown
-    local dd6 = AF.CreateDropdown(demo, 150, 10, "texture")
+    local dd6 = AF.CreateDropdown(demo, 150, 10, nil, "texture")
     AF.SetPoint(dd6, "TOPLEFT", dd5, "BOTTOMLEFT", 0, -30)
     dd6:SetLabel("Texture Dropdown")
     AF.SetTooltip(dd6, "TOPLEFT", 0, 2, "Texture Dropdown", "Using LibSharedMedia")
@@ -516,7 +516,7 @@ function AF.ShowDemo()
     end
 
     -- vertical mini dropdown
-    local dd7 = AF.CreateDropdown(demo, 100, 10, nil, true)
+    local dd7 = AF.CreateDropdown(demo, 100, 10, "vertical")
     AF.SetPoint(dd7, "TOPLEFT", dd6, "BOTTOMLEFT", 0, -30)
     dd7:SetTooltip("Mini Dropdown (V)")
     dd7:SetLabel("Mini Dropdown (V)")
@@ -529,7 +529,7 @@ function AF.ShowDemo()
     dd7:SetItems(items)
 
     -- horizontal mini dropdown
-    local dd8 = AF.CreateDropdown(demo, 100, 10, nil, true, true)
+    local dd8 = AF.CreateDropdown(demo, 100, 10, "horizontal")
     AF.SetPoint(dd8, "TOPLEFT", dd7, "BOTTOMLEFT", 0, -30)
     dd8:SetLabel("Mini Dropdown (H)")
     local items = {}
@@ -908,7 +908,7 @@ function AF.ShowDemo()
         mDropdown:ClearSelected()
     end)
 
-    mDropdown = AF.CreateDropdown(mbf, 85, 10, nil, true)
+    mDropdown = AF.CreateDropdown(mbf, 85, 10, "vertical")
     AF.SetPoint(mDropdown, "TOPRIGHT", hmBtn, "TOPLEFT", 1, 0)
     AF.SetTooltip(mDropdown, "TOPLEFT", 0, 2, "Mover Tips", "- Drag to move", "- Use (shift) mouse wheel to move frame by 1 pixel", "- Right-Click to open fine-tuning frame", "- Shift+Right-Click to hide a mover")
     mDropdown:SetItems({

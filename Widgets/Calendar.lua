@@ -109,7 +109,7 @@ local function CreateCalendar()
     calendar:EnableMouse(true)
 
     -- year dropdown
-    local year = AF.CreateDropdown(calendar, 65, 7, nil, true)
+    local year = AF.CreateDropdown(calendar, 65, 7, "vertical")
     calendar.year = year
     local items = {}
     for i = MIN_YEAR, MAX_YEAR do
@@ -124,7 +124,7 @@ local function CreateCalendar()
     year:SetItems(items)
 
     -- month dropdown
-    local month = AF.CreateDropdown(calendar, 51, 7, nil, true)
+    local month = AF.CreateDropdown(calendar, 51, 7, "vertical")
     calendar.month = month
     items = {}
     for i = 1, 12 do
