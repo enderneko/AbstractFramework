@@ -447,6 +447,10 @@ function AF_DropdownMixin:SetEnabled(enabled)
     end
 end
 
+function AF_DropdownMixin:SetTooltip(...)
+    AF.SetTooltip(self, "ANCHOR_TOPLEFT", 0, 2, ...)
+end
+
 ---@param maxSlots number max shown items, not available for mini horizontal dropdown
 ---@return AF_Dropdown
 function AF.CreateDropdown(parent, width, maxSlots, dropdownType, isMini, isHorizontal, justify, textureAlpha)

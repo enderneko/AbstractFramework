@@ -275,6 +275,10 @@ function AF_CascadingMenuButtonMixin:ToggleMenu()
     end
 end
 
+function AF_CascadingMenuButtonMixin:SetTooltip(...)
+    AF.SetTooltip(self, "ANCHOR_TOPLEFT", 0, 2, ...)
+end
+
 ---@param parent Frame
 ---@param width number
 ---@param items table

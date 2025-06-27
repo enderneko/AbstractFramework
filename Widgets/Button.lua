@@ -324,6 +324,10 @@ function AF_ButtonMixin:SilentClick()
     self._noSound = nil
 end
 
+function AF_ButtonMixin:SetTooltip(...)
+    AF.SetTooltip(self, "ANCHOR_TOPLEFT", 0, 2, ...)
+end
+
 ---@param parent Frame
 ---@param text string
 ---@param color? string|table if table, color[1] is normal color, color[2] is hover color
@@ -455,11 +459,11 @@ function AF.CreateButtonGroup(buttons, onClick, selectedFn, unselectedFn, onEnte
             if id == b.id then
                 b:SetBackdropColor(unpack(b._hoverColor))
                 b:SetScript("OnEnter", function()
-                    if b._tooltips then AF.ShowTooltips(b, b._tooltipsAnchor, b._tooltipsX, b._tooltipsY, b._tooltips) end
+                    if b._tooltip then AF.ShowTooltip(b, b._tooltipAnchor, b._tooltipX, b._tooltipY, b._tooltip) end
                     if onEnter then onEnter(b) end
                 end)
                 b:SetScript("OnLeave", function()
-                    AF.HideTooltips()
+                    AF.HideTooltip()
                     if onLeave then onLeave(b) end
                 end)
                 if selectedFn then selectedFn(b.id, b) end
@@ -581,6 +585,10 @@ function AF_IconButtonMixin:SetFilterMode(filterMode)
     self.icon:SetTexture(self._iconPath, nil, nil, filterMode)
 end
 
+function AF_IconButtonMixin:SetTooltip(...)
+    AF.SetTooltip(self, "ANCHOR_TOPLEFT", 0, 2, ...)
+end
+
 function AF_IconButtonMixin:UpdatePixels()
     AF.ReSize(self)
     AF.RePoint(self)
@@ -686,6 +694,10 @@ function AF_CheckButtonMixin:SetText(text)
     else
         self:SetHitRectInsets(0, 0, 0, 0)
     end
+end
+
+function AF_CheckButtonMixin:SetTooltip(...)
+    AF.SetTooltip(self, "ANCHOR_TOPLEFT", 0, 2, ...)
 end
 
 function AF_CheckButtonMixin:UpdatePixels()

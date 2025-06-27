@@ -107,6 +107,10 @@ function AF_SliderMixin:OnEnable()
     self:SetBackdropBorderColor(AF.GetColorRGB("black", 1))
 end
 
+function AF_SliderMixin:SetTooltip(...)
+    AF.SetTooltip(sl1, "TOPLEFT", 0, 20, ...)
+end
+
 ---@param parent Frame
 ---@param text string
 ---@param width number
@@ -329,6 +333,10 @@ function AF_VerticalSliderMixin:UpdateWordWrap(wordWrapWidth)
             self:SetScript("OnUpdate", nil)
         end
     end)
+end
+
+function AF_VerticalSliderMixin:SetTooltip(...)
+    AF.SetTooltip(self, "RIGHT", 5, 0, ...)
 end
 
 local function VerticalSlider_UpdatePixels(self)

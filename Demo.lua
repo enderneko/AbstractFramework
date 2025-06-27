@@ -77,7 +77,7 @@ function AF.ShowDemo()
     -----------------------------------------------------------------------------
     local b1 = AF.CreateButton(demo, "Button A", "accent", 100, 20)
     AF.SetPoint(b1, "TOPLEFT", 10, -10)
-    AF.SetTooltip(b1, "ANCHOR_TOPLEFT", 0, 2, "Tooltip Title", "This is a tooltip")
+    b1:SetTooltip("Tooltip Title", "This is a tooltip")
 
     local b2 = AF.CreateButton(demo, "Button B", "green", 100, 20)
     AF.SetPoint(b2, "TOPLEFT", b1, "TOPRIGHT", 10, 0)
@@ -96,14 +96,14 @@ function AF.ShowDemo()
     local b5 = AF.CreateButton(demo, nil, "accent", 20, 20)
     b5:SetTexture("classicon-" .. strlower(PlayerUtil.GetClassFile()), {16, 16}, {"CENTER", 0, 0}, true)
     AF.SetPoint(b5, "TOPLEFT", b4, "TOPRIGHT", 10, 0)
+    b5:SetEnabled(false)
 
-    local b6 = AF.CreateButton(demo, nil, "accent", 20, 20)
-    b6:SetTexture("classicon-" .. strlower(PlayerUtil.GetClassFile()), {16, 16}, {"CENTER", 0, 0}, true)
-    AF.SetPoint(b6, "TOPLEFT", b5, "TOPRIGHT", 10, 0)
-    b6:SetEnabled(false)
+    local iconBtn = AF.CreateIconButton(demo, AF.GetIcon("Question_Round"), 20, 20, 2, "gray", "accent", "TRILINEAR")
+    AF.SetPoint(iconBtn, "TOPLEFT", b5, "TOPRIGHT", 10, 0)
 
-    local iconBtn = AF.CreateIconButton(demo, AF.GetIcon("Info_Square"), 20, 20, 2, "gray")
-    AF.SetPoint(iconBtn, "TOPLEFT", b6, "TOPRIGHT", 10, 0)
+    local tipsBtn = AF.CreateTipsButton(demo)
+    AF.SetPoint(tipsBtn, "TOPLEFT", iconBtn, "TOPRIGHT", 10, -2)
+    tipsBtn:SetTips("Tips Button", "This button shows tips when hovered over")
 
 
     -----------------------------------------------------------------------------
@@ -297,6 +297,7 @@ function AF.ShowDemo()
     local sl3 = AF.CreateVerticalSlider(demo, "Vertical Slider", 100, -50, 50, 1)
     AF.SetPoint(sl3, "TOPLEFT", sl2, "BOTTOMLEFT", 45, -30)
     sl3:UpdateWordWrap()
+    sl3:SetTooltip("Vertical Slider")
     sl3:SetValue(0) -- for percentage, set value * 100
     sl3:SetOnValueChanged(function(value)
         AF.Print("VERTICAL_OnSliderValueChanged:", value) -- for percentage, get value / 100
@@ -433,7 +434,7 @@ function AF.ShowDemo()
     -- normal dropdown (items <= 10)
     local dd1 = AF.CreateDropdown(demo, 150)
     AF.SetPoint(dd1, "TOPLEFT", cm, "BOTTOMLEFT", 0, -30)
-    AF.SetTooltip(dd1, "TOPLEFT", 0, 2, "Normal Dropdown 1")
+    dd1:SetTooltip("Normal Dropdown 1")
     dd1:SetLabel("Normal Dropdown 1")
     dd1:SetOnClick(function(value)
         AF.Print("NormalDropdown1 Selected:", value)
@@ -517,6 +518,7 @@ function AF.ShowDemo()
     -- vertical mini dropdown
     local dd7 = AF.CreateDropdown(demo, 100, 10, nil, true)
     AF.SetPoint(dd7, "TOPLEFT", dd6, "BOTTOMLEFT", 0, -30)
+    dd7:SetTooltip("Mini Dropdown (V)")
     dd7:SetLabel("Mini Dropdown (V)")
     local items = {}
     for i = 1, 5 do
