@@ -62,6 +62,10 @@ function AF_BaseWidgetMixin:GetOnShow()
     end
 end
 
+function AF_BaseWidgetMixin:InvokeOnShow()
+    self:GetScript("OnShow")(self)
+end
+
 -- OnHide
 function AF_BaseWidgetMixin:SetOnHide(func)
     self:SetScript("OnHide", func)
@@ -75,6 +79,10 @@ function AF_BaseWidgetMixin:GetOnHide()
     return function()
         self:GetScript("OnHide")(self)
     end
+end
+
+function AF_BaseWidgetMixin:InvokeOnHide()
+    self:GetScript("OnHide")(self)
 end
 
 -- OnEnter

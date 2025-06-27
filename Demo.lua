@@ -567,11 +567,9 @@ function AF.ShowDemo()
     AF.SetPoint(b7, "TOPLEFT", cp3, "BOTTOMLEFT", 0, -10)
     b7:SetScript("OnClick", function()
         local text = AF.WrapTextInColor("Test Message", "firebrick") .. "\nReload UI now?\n" .. AF.WrapTextInColor("The quick brown fox jumps over the lazy dog", "gray")
-        AF.ShowDialog(demo, text, 200, nil, nil, true)
-        AF.SetDialogPoint("TOPLEFT", 255, -170)
-        AF.SetDialogOnConfirm(function()
-            C_UI.Reload()
-        end)
+        local dialog = AF.GetDialog(demo, text, 200)
+        AF.SetPoint(dialog, "TOPLEFT", 255, -170)
+        dialog:SetOnConfirm(C_UI.Reload)
     end)
 
 
@@ -582,7 +580,7 @@ function AF.ShowDemo()
     AF.SetPoint(b8, "TOPLEFT", b7, "BOTTOMLEFT", 0, -7)
 
     -- content
-    local form = AF.CreateDialogContent(50)
+    local form = CreateFrame("Frame", nil, demo)
 
     -- NOTE: use WIDTH for pixel perfect
 
@@ -600,13 +598,17 @@ function AF.ShowDemo()
     dd9:SetItems(items)
 
     eb5:SetOnTextChanged(function(text)
-        form.dialog.yes:SetEnabled(text ~= "" and dd9:GetSelected())
         form.value1 = text
+        if form.dialog then
+            form.dialog.yes:SetEnabled(text ~= "" and dd9:GetSelected())
+        end
     end)
 
     dd9:SetOnClick(function(value)
-        form.dialog.yes:SetEnabled(strtrim(eb5:GetText()) ~= "" and dd9:GetSelected())
         form.value2 = value
+        if form.dialog then
+            form.dialog.yes:SetEnabled(strtrim(eb5:GetText()) ~= "" and dd9:GetSelected())
+        end
     end)
 
     form:SetScript("OnShow", function()
@@ -615,25 +617,27 @@ function AF.ShowDemo()
     end)
 
     b8:SetScript("OnClick", function()
-        AF.ShowDialog(demo, AF.WrapTextInColor("Test Form", "yellow"), 200, _G.OKAY, _G.CANCEL, true, form, true)
-        AF.SetDialogPoint("TOPLEFT", 255, -170)
-        AF.ResizeDialogButtonToFitText(70)
-        AF.SetDialogOnConfirm(function()
+        local dialog = AF.GetDialog(demo, AF.WrapTextInColor("Test Form", "yellow"))
+        AF.SetPoint(dialog, "TOPLEFT", 255, -170)
+        dialog:SetToOkayCancel()
+        dialog:EnableYes(false)
+        dialog:SetContent(form, 50)
+        dialog:SetOnConfirm(function()
             AF.Print("Dialog Confirmed:", form.value1, form.value2)
         end)
     end)
 
 
     -----------------------------------------------------------------------------
-    --                            notificator dialog                           --
+    --                              message dialog                             --
     -----------------------------------------------------------------------------
-    local b9 = AF.CreateButton(demo, "NotificationDialog", "accent_hover", 150, 20)
+    local b9 = AF.CreateButton(demo, "MessageDialog", "accent_hover", 150, 20)
     AF.SetPoint(b9, "TOPLEFT", b8, "BOTTOMLEFT", 0, -7)
     b9:SetScript("OnClick", function()
         local text = AF.WrapTextInColor("NOTICE", "orange") .. "\n" .. "One day, when what has happened behind the scene could be told, developers and gamers will have a whole new level understanding of how much damage a jerk can make."
-        local dialog = AF.ShowNotificationDialog(demo, text, 200, true, 3)
+        local dialog = AF.GetMessageDialog(demo, text, 200, nil, 15)
         AF.ShowNormalGlow(dialog, "accent", 3)
-        AF.SetNotificationDialogPoint("TOPLEFT", 255, -120)
+        AF.SetPoint(dialog, "TOPLEFT", 255, -120)
     end)
 
 

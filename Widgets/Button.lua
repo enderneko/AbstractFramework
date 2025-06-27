@@ -78,6 +78,10 @@ function AF_ButtonMixin:SetText(str)
     self.text:SetText(str)
 end
 
+function AF_ButtonMixin:SetFormattedText(text, ...)
+    self.text:SetFormattedText(text, ...)
+end
+
 function AF_ButtonMixin:GetText()
     return self.text:GetText()
 end
