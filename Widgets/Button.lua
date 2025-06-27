@@ -437,12 +437,13 @@ end
 ---------------------------------------------------------------------
 -- button group
 ---------------------------------------------------------------------
+-- buttonId is button.id
 ---@param buttons table
----@param onClick function
----@param selectedFn function
----@param unselectedFn function
----@param onEnter function
----@param onLeave function
+---@param onClick fun(buttonId: string, button: AF_Button)
+---@param selectedFn? fun(buttonId: string, button: AF_Button)
+---@param unselectedFn? fun(buttonId: string, button: AF_Button)
+---@param onEnter? fun(button: AF_Button)
+---@param onLeave? fun(button: AF_Button)
 ---@return function HighlightButton accept button.id as parameter
 function AF.CreateButtonGroup(buttons, onClick, selectedFn, unselectedFn, onEnter, onLeave)
     local function HighlightButton(id)
@@ -488,6 +489,11 @@ end
 ---------------------------------------------------------------------
 -- close button
 ---------------------------------------------------------------------
+---@param parent Frame
+---@param frameToHide? Frame default is parent
+---@param width? number default is 16
+---@param height? number default is 16
+---@param padding? number default is 6
 ---@return AF_Button
 function AF.CreateCloseButton(parent, frameToHide, width, height, padding)
     width = width or 16

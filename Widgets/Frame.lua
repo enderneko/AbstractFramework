@@ -201,6 +201,10 @@ function AF_BorderedFrameMixin:SetLabel(label, fontColor, font, isInside)
     end
 end
 
+---@param parent Frame
+---@param name? string
+---@param width? number
+---@param height? number
 ---@param color string|table color name / table
 ---@param borderColor string|table color name / table
 ---@return AF_BorderedFrame borderedFrame

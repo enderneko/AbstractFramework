@@ -481,8 +481,6 @@ end
 --     end
 -- end
 
-function AF.AddToPixelUpdater() end
-
 ---------------------------------------------------------------------
 -- combat safe pixel updater
 ---------------------------------------------------------------------
@@ -769,6 +767,35 @@ function AF.SnapRegionToPixel(region)
     offsetY = AF.Round(offsetY)
     AF.ClearPoints(region)
     region:SetPoint(point, relativeTo, relativePoint, offsetX, offsetY)
+end
+
+---------------------------------------------------------------------
+-- re-anchor
+---------------------------------------------------------------------
+-- region must have only one point set, relativeTo must be AF.UIParent
+---@param anchor string "TOPLEFT", "TOPRIGHT", "BOTTOMLEFT", "BOTTOMRIGHT".
+function AF.ReAnchorRegion(region, anchor)
+    if region:GetNumPoints() ~= 1 then return end
+
+    AF.ClearPoints(region)
+
+    if anchor == "TOPLEFT" then
+        local left = AF.Round(region:GetLeft())
+        local top = AF.Round(region:GetTop())
+        region:SetPoint(anchor, AF.UIParent, "BOTTOMLEFT", left, top)
+    elseif anchor == "TOPRIGHT" then
+        local right = AF.Round(region:GetRight())
+        local top = AF.Round(region:GetTop())
+        region:SetPoint(anchor, AF.UIParent, "BOTTOMLEFT", right, top)
+    elseif anchor == "BOTTOMLEFT" then
+        local left = AF.Round(region:GetLeft())
+        local bottom = AF.Round(region:GetBottom())
+        region:SetPoint(anchor, AF.UIParent, "BOTTOMLEFT", left, bottom)
+    elseif anchor == "BOTTOMRIGHT" then
+        local right = AF.Round(region:GetRight())
+        local bottom = AF.Round(region:GetBottom())
+        region:SetPoint(anchor, AF.UIParent, "BOTTOMLEFT", right, bottom)
+    end
 end
 
 ---------------------------------------------------------------------
