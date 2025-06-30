@@ -60,7 +60,7 @@ function AF_DialogMixin:SetContent(content, height)
     content:SetPoint("TOPLEFT", self.contentHolder)
     content:SetPoint("TOPRIGHT", self.contentHolder)
     if height then
-        content:SetHeight(height)
+        AF.SetHeight(content, height)
     end
     content:Show()
 end
@@ -100,17 +100,17 @@ function AF_DialogMixin:UpdateHeight()
         end
         self:SetHeight(AF.Round(self.textHolder:GetHeight() + self.contentHolder:GetHeight()) + 40)
         self:SetScript("OnUpdate", nil)
-
-        -- accent color system
-        local r, g, b = AF.GetColorRGB(self.accentColor)
-        self:SetBackdropBorderColor(r, g, b)
-        self.yes:SetBackdropBorderColor(r, g, b)
-        self.no:SetBackdropBorderColor(r, g, b)
     end)
 end
 
 local function Dialog_OnShow(self)
     self:UpdateHeight()
+
+    -- accent color system
+    local r, g, b = AF.GetColorRGB(self.accentColor)
+    self:SetBackdropBorderColor(r, g, b)
+    self.yes:SetBackdropBorderColor(r, g, b)
+    self.no:SetBackdropBorderColor(r, g, b)
 end
 
 local function Dialog_OnHide(self)
@@ -264,15 +264,15 @@ function AF_MessageDialogMixin:UpdateHeight()
         end
         self:SetHeight(AF.Round(self.textHolder:GetHeight()) + 40)
         self:SetScript("OnUpdate", nil)
-
-        -- accent color system
-        self:SetBackdropBorderColor(AF.GetColorRGB(self.accentColor, 1))
-        self.close:SetColor(self.accentColor)
     end)
 end
 
 local function MessageDialog_OnShow(self)
     self:UpdateHeight()
+
+    -- accent color system
+    self:SetBackdropBorderColor(AF.GetColorRGB(self.accentColor, 1))
+    self.close:SetColor(self.accentColor)
 end
 
 local function MessageDialog_OnHide(self)
@@ -382,4 +382,261 @@ function AF.GetMessageDialog(parent, text, width, noMask, countdown)
     messageDialog:Show()
 
     return messageDialog
+end
+
+---------------------------------------------------------------------
+-- global dialog
+---------------------------------------------------------------------
+local ceil, max = math.ceil, math.max
+local globalDialog
+local globalDialogQueue = AF.NewQueue()
+
+local function globalDialog_UpdateHeight()
+    globalDialog.elapsed = 0
+    globalDialog:SetScript("OnUpdate", function(self, elapsed)
+        self:SetHeight(max(AF.CeilToEven(self.text:GetStringHeight()), 40) + 15 + 15 + 22)
+    end)
+end
+
+local function GlobalDialog_OnShow()
+    globalDialog_UpdateHeight()
+    globalDialog.showUpAnimation:Play()
+    AF.PlaySound("smooth_alert1")
+end
+
+local function GlobalDialog_OnHide()
+    globalDialog.yes.highlight:SetHeight(0.001)
+    globalDialog.no.highlight:SetHeight(0.001)
+    C_Timer.After(0.5, globalDialog.ShowNext)
+end
+
+local function GlobalDialog_ShowNext()
+    if globalDialogQueue:isEmpty() then
+        globalDialog:Hide()
+        return
+    end
+
+    if globalDialog:IsShown() then
+        return
+    end
+
+    local dialogData = globalDialogQueue:pop()
+
+    globalDialog.text:SetText(dialogData.text)
+    globalDialog.onConfirm = dialogData.onConfirm
+    globalDialog.onCancel = dialogData.onCancel
+
+    if dialogData.yesText then
+        globalDialog.yes:SetText(dialogData.yesText)
+    else
+        globalDialog.yes:SetText(OKAY)
+    end
+
+    if dialogData.noText then
+        globalDialog.no:SetText(dialogData.noText)
+    else
+        globalDialog.no:SetText(CANCEL)
+    end
+
+    globalDialog:Show()
+end
+
+local function CreateButtonHighlight(button, color1, color2)
+    button.highlight = AF.CreateGradientTexture(button, "VERTICAL", color1, color2)
+    button.highlight:SetPoint("BOTTOMLEFT")
+    button.highlight:SetPoint("BOTTOMRIGHT")
+    button.highlight:SetHeight(0.001)
+    button.highlight:Hide()
+
+    button:SetOnEnter(function(self)
+        self.highlight:Show()
+        AF.FrameResizeHeight(self.highlight, 0.1, nil, self:GetHeight())
+    end)
+    button:SetOnLeave(function(self)
+        self.highlight:Hide()
+        AF.FrameResizeHeight(self.highlight, 0.1, nil, 0)
+    end)
+end
+
+-- local function GlobalDialog_OnHide(dialog)
+--     dialog.yes.highlight:SetHeight(0.001)
+--     dialog.no.highlight:SetHeight(0.001)
+-- end
+
+-- local function CreateButtonHighlight(button, color1, color2)
+--     if button.isLeft then
+--         button.highlight = AF.CreateGradientTexture(button, "HORIZONTAL", color2, color1)
+--         button.highlight:SetPoint("TOPRIGHT")
+--         button.highlight:SetPoint("BOTTOMRIGHT")
+--     else
+--         button.highlight = AF.CreateGradientTexture(button, "HORIZONTAL", color1, color2)
+--         button.highlight:SetPoint("TOPLEFT")
+--         button.highlight:SetPoint("BOTTOMLEFT")
+--     end
+--     button.highlight:SetWidth(0.001)
+--     button.highlight:Hide()
+
+--     button:SetOnEnter(function(self)
+--         self.highlight:Show()
+--         AF.FrameResizeWidth(self.highlight, 0.1, nil, self:GetWidth())
+--     end)
+--     button:SetOnLeave(function(self)
+--         self.highlight:Hide()
+--         AF.FrameResizeWidth(self.highlight, 0.1, nil, 0)
+--     end)
+-- end
+
+local function CreateGlobalDialog()
+    globalDialog = AF.CreateBorderedFrame(AF.UIParent, "AFGlobalDialog", 310)
+    globalDialog:Hide()
+    globalDialog:SetPoint("BOTTOM", AF.UIParent, "CENTER", 0, 15)
+    globalDialog:SetFrameStrata("FULLSCREEN_DIALOG")
+    globalDialog:SetBackdropColor(AF.GetColorRGB("background", 0.95))
+    globalDialog:EnableMouse(true)
+
+    -- showUpAnimation
+    local showUpAnimation = globalDialog:CreateAnimationGroup()
+    globalDialog.showUpAnimation = showUpAnimation
+
+    showUpAnimation:SetScript("OnFinished", function()
+        globalDialog:SetPoint("BOTTOM", AF.UIParent, "CENTER")
+    end)
+
+    local moveDown = showUpAnimation:CreateAnimation("Translation")
+    moveDown:SetOffset(0, -15)
+    moveDown:SetDuration(0.1)
+    moveDown:SetSmoothing("OUT")
+    moveDown:SetOrder(1)
+
+    local fadeIn = showUpAnimation:CreateAnimation("Alpha")
+    fadeIn:SetFromAlpha(0)
+    fadeIn:SetToAlpha(1)
+    fadeIn:SetDuration(0.1)
+    fadeIn:SetSmoothing("OUT")
+    fadeIn:SetOrder(1)
+
+    -- hideOutAnimation
+    local hideOutAnimation = globalDialog:CreateAnimationGroup()
+    globalDialog.hideOutAnimation = hideOutAnimation
+
+    hideOutAnimation:SetScript("OnFinished", function()
+        globalDialog:Hide()
+        globalDialog:SetPoint("BOTTOM", AF.UIParent, "CENTER", 0, 15)
+    end)
+
+    local moveUp = hideOutAnimation:CreateAnimation("Translation")
+    moveUp:SetOffset(0, 15)
+    moveUp:SetDuration(0.1)
+    moveUp:SetSmoothing("IN")
+    moveUp:SetOrder(1)
+
+    local fadeOut = hideOutAnimation:CreateAnimation("Alpha")
+    fadeOut:SetFromAlpha(1)
+    fadeOut:SetToAlpha(0)
+    fadeOut:SetDuration(0.1)
+    fadeOut:SetSmoothing("IN")
+    fadeOut:SetOrder(1)
+
+
+    -- decoration
+    local border = AF.CreateBorderedFrame(globalDialog, nil, nil, nil, "none", "accent")
+    AF.SetOnePixelOutside(border, globalDialog)
+    AF.RemoveFromPixelUpdater(border)
+
+    AF.ShowNormalGlow(border, "shadow", 2)
+
+    local bottomBG = AF.CreateTexture(globalDialog, nil, AF.GetColorTable("accent", 0.1))
+    AF.SetPoint(bottomBG, "BOTTOMLEFT", globalDialog, 1, 1)
+    AF.SetPoint(bottomBG, "BOTTOMRIGHT", globalDialog, -1, 1)
+    AF.SetHeight(bottomBG, 22)
+    AF.RemoveFromPixelUpdater(bottomBG)
+
+    local bottomLine = AF.CreateTexture(globalDialog, nil, "border")
+    bottomLine:SetPoint("BOTTOMLEFT", bottomBG, "TOPLEFT")
+    bottomLine:SetPoint("BOTTOMRIGHT", bottomBG, "TOPRIGHT")
+    AF.SetHeight(bottomLine, 1)
+    AF.RemoveFromPixelUpdater(bottomLine)
+
+    -- text
+    local text = AF.CreateFontString(globalDialog)
+    globalDialog.text = text
+    AF.SetPoint(text, "TOPLEFT", 15, -15)
+    AF.SetPoint(text, "TOPRIGHT", -15, -15)
+    -- AF.SetPoint(text, "BOTTOM", bottomBG, "TOP", 0, 15)
+    text:SetJustifyH("CENTER")
+    -- text:SetJustifyV("MIDDLE")
+    text:SetWordWrap(true)
+    text:SetSpacing(5)
+    AF.RemoveFromPixelUpdater(text)
+
+    -- yes
+    local yes = AF.CreateButton(globalDialog, OKAY, "none", nil, nil, nil, "", "")
+    globalDialog.yes = yes
+    yes:SetPoint("TOPLEFT", bottomBG)
+    yes:SetPoint("BOTTOMRIGHT", bottomBG, "BOTTOM")
+    yes.isLeft = true
+    CreateButtonHighlight(yes, AF.GetColorTable("green", 0.8), AF.GetColorTable("green", 0.1))
+    yes:SetOnClick(function()
+        if globalDialog.onConfirm then
+            globalDialog.onConfirm()
+        end
+        hideOutAnimation:Play()
+    end)
+    AF.RemoveFromPixelUpdater(yes)
+
+    -- no
+    local no = AF.CreateButton(globalDialog, CANCEL, "none", nil, nil, nil, "", "")
+    globalDialog.no = no
+    no:SetPoint("BOTTOMLEFT", bottomBG, "BOTTOM")
+    no:SetPoint("TOPRIGHT", bottomBG)
+    CreateButtonHighlight(no, AF.GetColorTable("red", 0.8), AF.GetColorTable("red", 0.1))
+    no:SetOnClick(function()
+        if globalDialog.onCancel then
+            globalDialog.onCancel()
+        end
+        hideOutAnimation:Play()
+    end)
+    AF.RemoveFromPixelUpdater(no)
+
+    -- OnShow/OnHide
+    globalDialog:SetOnShow(GlobalDialog_OnShow)
+    globalDialog:SetOnHide(GlobalDialog_OnHide)
+
+    -- show next
+    globalDialog.ShowNext = GlobalDialog_ShowNext
+
+    -- pixel perfect
+    AF.AddToPixelUpdater_Auto(globalDialog, function()
+        AF.ReBorder(globalDialog)
+        AF.ReSize(globalDialog)
+        globalDialog_UpdateHeight()
+
+        AF.RePoint(border)
+        AF.ReBorder(border)
+
+        AF.RePoint(bottomBG)
+        AF.ReSize(bottomBG)
+
+        AF.ReSize(bottomLine)
+
+        AF.RePoint(text)
+    end)
+end
+
+function AF.ShowGlobalDialog(text, onConfirm, onCancel, yesText, noText)
+    if AF.IsBlank(text) then return end
+
+    globalDialogQueue:push({
+        text = text,
+        onConfirm = onConfirm,
+        onCancel = onCancel,
+        yesText = yesText,
+        noText = noText
+    })
+
+    if not globalDialog then
+        CreateGlobalDialog()
+    end
+
+    globalDialog.ShowNext()
 end

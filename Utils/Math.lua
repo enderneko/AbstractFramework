@@ -36,6 +36,15 @@ function AF.RoundToNearestMultiple(num, multiplier)
     return AF.Round(num / multiplier) * multiplier
 end
 
+function AF.CeilToEven(num)
+    local ceiledNum = ceil(num)
+    if ceiledNum % 2 == 0 then
+        return ceiledNum
+    else
+        return ceiledNum + 1
+    end
+end
+
 function AF.Interpolate(start, stop, step, maxSteps)
     return start + (stop - start) * step / maxSteps
 end

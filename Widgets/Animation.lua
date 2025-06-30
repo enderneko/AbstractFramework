@@ -33,8 +33,8 @@ local function Fading(_, elapsed)
                 frame:SetAlpha(info.endAlpha)
                 -- NOTE: remove from FADEFRAMES
                 if frame and FADEFRAMES[frame] then
-                    if frame.fade then
-                        frame.fade.fadeTimer = nil
+                    if frame._fade then
+                        frame._fade.fadeTimer = nil
                     end
                     FADEFRAMES[frame] = nil
                 end
@@ -66,38 +66,38 @@ local function FrameFade(frame, info)
 end
 
 function AF.FrameFadeIn(frame, timeToFade, startAlpha, endAlpha)
-    if frame.fade then
-        frame.fade.fadeTimer = nil
+    if frame._fade then
+        frame._fade.fadeTimer = nil
     else
-        frame.fade = {}
+        frame._fade = {}
     end
 
-    frame.fade.mode = "IN"
-    frame.fade.timeToFade = timeToFade
-    frame.fade.startAlpha = startAlpha or frame:GetAlpha()
-    frame.fade.endAlpha = endAlpha or 1
-    frame.fade.diffAlpha = frame.fade.endAlpha - frame.fade.startAlpha
+    frame._fade.mode = "IN"
+    frame._fade.timeToFade = timeToFade or 0.25
+    frame._fade.startAlpha = startAlpha or frame:GetAlpha()
+    frame._fade.endAlpha = endAlpha or 1
+    frame._fade.diffAlpha = frame._fade.endAlpha - frame._fade.startAlpha
 
-    if frame.fade.startAlpha ~= frame.fade.endAlpha then
-        FrameFade(frame, frame.fade)
+    if frame._fade.startAlpha ~= frame._fade.endAlpha then
+        FrameFade(frame, frame._fade)
     end
 end
 
 function AF.FrameFadeOut(frame, timeToFade, startAlpha, endAlpha)
-    if frame.fade then
-        frame.fade.fadeTimer = nil
+    if frame._fade then
+        frame._fade.fadeTimer = nil
     else
-        frame.fade = {}
+        frame._fade = {}
     end
 
-    frame.fade.mode = "OUT"
-    frame.fade.timeToFade = timeToFade
-    frame.fade.startAlpha = startAlpha or frame:GetAlpha()
-    frame.fade.endAlpha = endAlpha or 0
-    frame.fade.diffAlpha = frame.fade.startAlpha - frame.fade.endAlpha
+    frame._fade.mode = "OUT"
+    frame._fade.timeToFade = timeToFade
+    frame._fade.startAlpha = startAlpha or frame:GetAlpha()
+    frame._fade.endAlpha = endAlpha or 0
+    frame._fade.diffAlpha = frame._fade.startAlpha - frame._fade.endAlpha
 
-    if frame.fade.startAlpha ~= frame.fade.endAlpha then
-        FrameFade(frame, frame.fade)
+    if frame._fade.startAlpha ~= frame._fade.endAlpha then
+        FrameFade(frame, frame._fade)
     end
 end
 
@@ -353,7 +353,7 @@ ZOOMMANAGER.interval = 0.025
 ---------------------------------------------------------------------
 -- zoom manager onupdate
 ---------------------------------------------------------------------
-local function Fading(_, elapsed)
+local function Zooming(_, elapsed)
     ZOOMMANAGER.timer = (ZOOMMANAGER.timer or 0) + elapsed
 
     if ZOOMMANAGER.timer > ZOOMMANAGER.interval then
@@ -376,8 +376,8 @@ local function Fading(_, elapsed)
                 frame:SetScale(info.endScale)
                 -- NOTE: remove from ZOOMFRAMES
                 if frame and ZOOMFRAMES[frame] then
-                    if frame.zoom then
-                        frame.zoom.zoomTimer = nil
+                    if frame._zoom then
+                        frame._zoom.zoomTimer = nil
                     end
                     ZOOMFRAMES[frame] = nil
                 end
@@ -402,61 +402,162 @@ local function FrameZoom(frame, info)
 
     if not ZOOMFRAMES[frame] then
         ZOOMFRAMES[frame] = info
-        ZOOMMANAGER:SetScript("OnUpdate", Fading)
+        ZOOMMANAGER:SetScript("OnUpdate", Zooming)
     else
         ZOOMFRAMES[frame] = info
     end
 end
 
 function AF.FrameZoomIn(frame, timeToZoom, startScale, endScale)
-    if frame.zoom then
-        frame.zoom.zoomTimer = nil
+    if frame._zoom then
+        frame._zoom.zoomTimer = nil
     else
-        frame.zoom = {}
+        frame._zoom = {}
     end
 
-    frame.zoom.mode = "IN"
-    frame.zoom.timeToZoom = timeToZoom
-    frame.zoom.startScale = startScale or frame:GetScale()
-    frame.zoom.endScale = endScale or 1
-    frame.zoom.diffScale = frame.zoom.endScale - frame.zoom.startScale
+    frame._zoom.mode = "IN"
+    frame._zoom.timeToZoom = timeToZoom or 0.25
+    frame._zoom.startScale = startScale or frame:GetScale()
+    frame._zoom.endScale = endScale or 1
+    frame._zoom.diffScale = frame._zoom.endScale - frame._zoom.startScale
 
-    FrameZoom(frame, frame.zoom)
+    FrameZoom(frame, frame._zoom)
 end
 
 function AF.FrameZoomOut(frame, timeToZoom, startScale, endScale)
-    if frame.zoom then
-        frame.zoom.zoomTimer = nil
+    if frame._zoom then
+        frame._zoom.zoomTimer = nil
     else
-        frame.zoom = {}
+        frame._zoom = {}
     end
 
-    frame.zoom.mode = "OUT"
-    frame.zoom.timeToZoom = timeToZoom
-    frame.zoom.startScale = startScale or frame:GetScale()
-    frame.zoom.endScale = endScale or 0
-    frame.zoom.diffScale = frame.zoom.startScale - frame.zoom.endScale
+    frame._zoom.mode = "OUT"
+    frame._zoom.timeToZoom = timeToZoom
+    frame._zoom.startScale = startScale or frame:GetScale()
+    frame._zoom.endScale = endScale or 0
+    frame._zoom.diffScale = frame._zoom.startScale - frame._zoom.endScale
 
-    FrameZoom(frame, frame.zoom)
+    FrameZoom(frame, frame._zoom)
 end
 
 function AF.FrameZoomTo(frame, timeToZoom, endScale)
-    if frame.zoom then
-        frame.zoom.zoomTimer = nil
+    if frame._zoom then
+        frame._zoom.zoomTimer = nil
     else
-        frame.zoom = {}
+        frame._zoom = {}
     end
 
-    frame.zoom.timeToZoom = timeToZoom
-    frame.zoom.startScale = frame:GetScale()
-    frame.zoom.endScale = endScale
-    frame.zoom.diffScale = abs(frame.zoom.startScale - frame.zoom.endScale)
+    frame._zoom.timeToZoom = timeToZoom
+    frame._zoom.startScale = frame:GetScale()
+    frame._zoom.endScale = endScale
+    frame._zoom.diffScale = abs(frame._zoom.startScale - frame._zoom.endScale)
 
-    if frame.zoom.startScale > frame.zoom.endScale then
-        frame.zoom.mode = "OUT"
-        FrameZoom(frame, frame.zoom)
-    elseif frame.zoom.startScale < frame.zoom.endScale then
-        frame.zoom.mode = "IN"
-        FrameZoom(frame, frame.zoom)
+    if frame._zoom.startScale > frame._zoom.endScale then
+        frame._zoom.mode = "OUT"
+        FrameZoom(frame, frame._zoom)
+    elseif frame._zoom.startScale < frame._zoom.endScale then
+        frame._zoom.mode = "IN"
+        FrameZoom(frame, frame._zoom)
     end
+end
+
+---------------------------------------------------------------------
+-- size
+---------------------------------------------------------------------
+local SIZEFRAMES, SIZEMANAGER = {}, CreateFrame("FRAME")
+SIZEMANAGER.interval = 0.025
+
+---------------------------------------------------------------------
+-- size manager onupdate
+---------------------------------------------------------------------
+local function Sizing(_, elapsed)
+    SIZEMANAGER.timer = (SIZEMANAGER.timer or 0) + elapsed
+
+    if SIZEMANAGER.timer > SIZEMANAGER.interval then
+        SIZEMANAGER.timer = 0
+
+        for frame, info in next, SIZEFRAMES do
+            if frame:IsVisible() then
+                info.sizeTimer = (info.sizeTimer or 0) + (elapsed + SIZEMANAGER.interval)
+            else -- faster for hidden frames
+                info.sizeTimer = info.timeToSize + 1
+            end
+
+            if info.sizeTimer < info.timeToSize then
+                local progress = info.sizeTimer / info.timeToSize
+                local currentWidth = info.startWidth + info.diffWidth * progress
+                local currentHeight = info.startHeight + info.diffHeight * progress
+
+                frame:SetSize(currentWidth, currentHeight)
+            else
+                frame:SetSize(info.endWidth, info.endHeight)
+                -- NOTE: remove from SIZEFRAMES
+                if frame and SIZEFRAMES[frame] then
+                    if frame._size then
+                        frame._size.sizeTimer = nil
+                    end
+                    SIZEFRAMES[frame] = nil
+                end
+            end
+        end
+
+        if not next(SIZEFRAMES) then
+            SIZEMANAGER:SetScript("OnUpdate", nil)
+        end
+    end
+end
+
+---------------------------------------------------------------------
+-- size
+---------------------------------------------------------------------
+local function FrameSize(frame, info)
+    frame:SetSize(info.startWidth, info.startHeight)
+
+    if not frame:IsProtected() then
+        frame:Show()
+    end
+
+    if not SIZEFRAMES[frame] then
+        SIZEFRAMES[frame] = info
+        SIZEMANAGER:SetScript("OnUpdate", Sizing)
+    else
+        SIZEFRAMES[frame] = info
+    end
+end
+
+local function FixZero(n)
+    if n == 0 then
+        return 0.001
+    end
+    return n
+end
+
+function AF.FrameSizeTo(frame, timeToSize, startWidth, startHeight, endWidth, endHeight)
+    if frame._size then
+        frame._size.sizeTimer = nil
+    else
+        frame._size = {}
+    end
+
+    frame._size.timeToSize = timeToSize or 0.25
+    frame._size.startWidth = FixZero(startWidth or frame:GetWidth())
+    frame._size.startHeight = FixZero(startHeight or frame:GetHeight())
+    frame._size.endWidth = FixZero(endWidth or frame:GetWidth())
+    frame._size.endHeight = FixZero(endHeight or frame:GetHeight())
+    frame._size.diffWidth = frame._size.endWidth - frame._size.startWidth
+    frame._size.diffHeight = frame._size.endHeight - frame._size.startHeight
+
+    if frame._size.startWidth ~= frame._size.endWidth or frame._size.startHeight ~= frame._size.endHeight then
+        FrameSize(frame, frame._size)
+    end
+end
+
+function AF.FrameResizeWidth(frame, timeToSize, startWidth, endWidth)
+    local currentHeight = frame:GetHeight()
+    AF.FrameSizeTo(frame, timeToSize, startWidth, currentHeight, endWidth, currentHeight)
+end
+
+function AF.FrameResizeHeight(frame, timeToSize, startHeight, endHeight)
+    local currentWidth = frame:GetWidth()
+    AF.FrameSizeTo(frame, timeToSize, currentWidth, startHeight, currentWidth, endHeight)
 end

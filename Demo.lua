@@ -13,8 +13,7 @@ function AF.ShowDemo()
     local demo = AF.CreateHeaderedFrame(AF.UIParent, "AF_DEMO",
         AF.GetIconString("AF", 16) .. AF.GetGradientText("AbstractFramework", "blazing_tangerine", "vivid_raspberry")
         .. " " .. AF.WrapTextInColor(AF.GetAddOnVersion(AF.name) .. " Demo", "white"), 710, 520)
-    -- AF.SetPoint(demo, "LEFT", 100, 0)
-    demo:SetPoint("CENTER")
+    AF.SetPoint(demo, "LEFT", 100, 0)
     demo:SetFrameLevel(500)
     demo:SetTitleJustify("LEFT")
 
@@ -565,9 +564,9 @@ function AF.ShowDemo()
     -----------------------------------------------------------------------------
     --                                 dialog1                                 --
     -----------------------------------------------------------------------------
-    local b7 = AF.CreateButton(demo, "Dialog1", "accent_hover", 150, 20)
-    AF.SetPoint(b7, "TOPLEFT", cp3, "BOTTOMLEFT", 0, -10)
-    b7:SetScript("OnClick", function()
+    local dialog1Btn = AF.CreateButton(demo, "Dialog1", "accent_hover", 75, 20)
+    AF.SetPoint(dialog1Btn, "TOPLEFT", cp3, "BOTTOMLEFT", 0, -10)
+    dialog1Btn:SetScript("OnClick", function()
         local text = AF.WrapTextInColor("Test Message", "firebrick") .. "\nReload UI now?\n" .. AF.WrapTextInColor("The quick brown fox jumps over the lazy dog", "gray")
         local dialog = AF.GetDialog(demo, text, 200)
         AF.SetPoint(dialog, "TOPLEFT", 255, -170)
@@ -578,47 +577,47 @@ function AF.ShowDemo()
     -----------------------------------------------------------------------------
     --                                 dialog2                                 --
     -----------------------------------------------------------------------------
-    local b8 = AF.CreateButton(demo, "Dialog2", "accent_hover", 150, 20)
-    AF.SetPoint(b8, "TOPLEFT", b7, "BOTTOMLEFT", 0, -7)
+    local dialog2Btn = AF.CreateButton(demo, "Dialog2", "accent_hover", 75, 20)
+    AF.SetPoint(dialog2Btn, "TOPLEFT", dialog1Btn, "TOPRIGHT", -1, 0)
 
     -- content
     local form = CreateFrame("Frame", nil, demo)
 
     -- NOTE: use WIDTH for pixel perfect
 
-    local eb5 = AF.CreateEditBox(form, "type somthing", 172, 20)
-    AF.SetPoint(eb5, "TOPLEFT")
+    local dialogEB = AF.CreateEditBox(form, "type somthing", 172, 20)
+    AF.SetPoint(dialogEB, "TOPLEFT")
     -- AF.SetPoint(eb5, "TOPRIGHT")
 
-    local dd9 = AF.CreateDropdown(form, 172)
-    AF.SetPoint(dd9, "TOPLEFT", eb5, "BOTTOMLEFT", 0, -7)
+    local dialogDD = AF.CreateDropdown(form, 172)
+    AF.SetPoint(dialogDD, "TOPLEFT", dialogEB, "BOTTOMLEFT", 0, -7)
     -- AF.SetPoint(dd9, "TOPRIGHT", eb5, "BOTTOMRIGHT", 0, -7)
     local items = {}
     for i = 1, 7 do
         tinsert(items, {["text"] = "Item " .. i})
     end
-    dd9:SetItems(items)
+    dialogDD:SetItems(items)
 
-    eb5:SetOnTextChanged(function(text)
+    dialogEB:SetOnTextChanged(function(text)
         form.value1 = text
         if form.dialog then
-            form.dialog.yes:SetEnabled(text ~= "" and dd9:GetSelected())
+            form.dialog.yes:SetEnabled(text ~= "" and dialogDD:GetSelected())
         end
     end)
 
-    dd9:SetOnClick(function(value)
+    dialogDD:SetOnClick(function(value)
         form.value2 = value
         if form.dialog then
-            form.dialog.yes:SetEnabled(strtrim(eb5:GetText()) ~= "" and dd9:GetSelected())
+            form.dialog.yes:SetEnabled(strtrim(dialogEB:GetText()) ~= "" and dialogDD:GetSelected())
         end
     end)
 
     form:SetScript("OnShow", function()
-        eb5:Clear()
-        dd9:ClearSelected()
+        dialogEB:Clear()
+        dialogDD:ClearSelected()
     end)
 
-    b8:SetScript("OnClick", function()
+    dialog2Btn:SetScript("OnClick", function()
         local dialog = AF.GetDialog(demo, AF.WrapTextInColor("Test Form", "yellow"))
         AF.SetPoint(dialog, "TOPLEFT", 255, -170)
         dialog:SetToOkayCancel()
@@ -633,13 +632,31 @@ function AF.ShowDemo()
     -----------------------------------------------------------------------------
     --                              message dialog                             --
     -----------------------------------------------------------------------------
-    local b9 = AF.CreateButton(demo, "MessageDialog", "accent_hover", 150, 20)
-    AF.SetPoint(b9, "TOPLEFT", b8, "BOTTOMLEFT", 0, -7)
-    b9:SetScript("OnClick", function()
+    local msgDialogBtn = AF.CreateButton(demo, "MessageDialog", "accent_hover", 150, 20)
+    AF.SetPoint(msgDialogBtn, "TOPLEFT", dialog1Btn, "BOTTOMLEFT", 0, -7)
+    msgDialogBtn:SetScript("OnClick", function()
         local text = AF.WrapTextInColor("NOTICE", "orange") .. "\n" .. "One day, when what has happened behind the scene could be told, developers and gamers will have a whole new level understanding of how much damage a jerk can make."
-        local dialog = AF.GetMessageDialog(demo, text, 200, nil, 15)
+        local dialog = AF.GetMessageDialog(demo, text, 200, nil, 3)
         AF.ShowNormalGlow(dialog, "accent", 3)
         AF.SetPoint(dialog, "TOPLEFT", 255, -120)
+    end)
+
+
+    -----------------------------------------------------------------------------
+    --                              global dialog                              --
+    -----------------------------------------------------------------------------
+    local globalDialogBtn = AF.CreateButton(demo, "GlobalDialog", "accent_hover", 150, 20)
+    AF.SetPoint(globalDialogBtn, "TOPLEFT", msgDialogBtn, "BOTTOMLEFT", 0, -7)
+    globalDialogBtn.count = 0
+    globalDialogBtn:SetOnClick(function()
+        globalDialogBtn.count = globalDialogBtn.count + 1
+        local text = "This is a global dialog.\nIt uses a queue mechanism to respond to each " .. AF.WrapTextInColor("AF.ShowGlobalDialog", "accent") .. " in order.\n"
+            .. AF.WrapTextInColor("(" .. globalDialogBtn.count .. ")", "gray")
+        AF.ShowGlobalDialog(text, function()
+            AF.Print("Global Dialog " .. globalDialogBtn.count .. " Confirmed")
+        end, function()
+            AF.Print("Global Dialog " .. globalDialogBtn.count .. " Canceled")
+        end)
     end)
 
 
@@ -869,7 +886,7 @@ function AF.ShowDemo()
     --                                 calendar                                --
     -----------------------------------------------------------------------------
     local dw = AF.CreateCalendarButton(demo, 150, "TOPLEFT")
-    AF.SetPoint(dw, "TOPLEFT", b9, "BOTTOMLEFT", 0, -7)
+    AF.SetPoint(dw, "TOPLEFT", globalDialogBtn, "BOTTOMLEFT", 0, -7)
     local niceDays = {}
     local colors = {"firebrick", "hotpink", "chartreuse", "vividblue"}
     local today = date("*t")
@@ -978,7 +995,7 @@ function AF.ShowDemo()
             end
         },
         {
-            widget = b7,
+            widget = dialog1Btn,
             position = "LEFT",
             text = "Dialog\n(Group HelpTip 2/3)",
             glow = true,

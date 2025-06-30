@@ -44,6 +44,8 @@ function AF.ShowNormalGlow(parent, color, size, autoHide)
     end
 
     parent.normalGlow:Show()
+
+    AF.AddToPixelUpdater_OnShow(parent.normalGlow)
 end
 
 function AF.HideNormalGlow(parent)
@@ -77,6 +79,8 @@ function AF.ShowCalloutGlow(parent, blink, autoHide, relativeFrameLevel)
     end
 
     parent.calloutGlow:Show()
+
+    AF.AddToPixelUpdater_OnShow(parent.calloutGlow)
 end
 
 function AF.HideCalloutGlow(parent)

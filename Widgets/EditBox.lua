@@ -218,6 +218,9 @@ function AF.CreateEditBox(parent, label, width, height, mode, font)
 
     eb.value = "" -- init value
 
+    -- NOTE: this is weird
+    -- OnTextChanged seems to be invoked immediately after this script is set & OnShow (if is hidden before)
+    --! be careful when using on a dialog
     eb:SetScript("OnTextChanged", function(self, userChanged)
         if eb:GetText() == "" then
             eb.label:Show()
