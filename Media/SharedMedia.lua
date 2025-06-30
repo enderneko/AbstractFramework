@@ -2,6 +2,9 @@
 local AF = _G.AbstractFramework
 local LSM = AF.Libs.LSM
 
+local strlower = string.lower
+local tinsert, tconcat = table.insert, table.concat
+
 ---------------------------------------------------------------------
 -- register media
 ---------------------------------------------------------------------
@@ -21,15 +24,17 @@ local DEFAULT_BAR_TEXTURE = AF.GetPlainTexture()
 local DEFAULT_FONT = GameFontNormal:GetFont()
 
 function AF.LSM_GetBarTexture(name)
-    if LSM:IsValid("statusbar", name) then
+    if name and LSM:IsValid("statusbar", name) then
         return LSM:Fetch("statusbar", name)
     end
     return DEFAULT_BAR_TEXTURE
 end
 
 function AF.LSM_GetFont(name)
-    if LSM:IsValid("font", name) then
+    if name and LSM:IsValid("font", name) then
         return LSM:Fetch("font", name)
+    elseif type(name) == "string" and name:lower():find(".ttf$") then
+        return name
     end
     return DEFAULT_FONT
 end
@@ -42,16 +47,21 @@ function AF.SetFont(fs, font, size, outline, shadow)
 
     font = AF.LSM_GetFont(font)
 
-    local flags
-    if outline == "none" then
-        flags = ""
-    elseif outline == "outline" then
-        flags = "OUTLINE"
-    elseif outline == "monochrome_outline" then
-        flags = "OUTLINE,MONOCHROME"
-    elseif outline == "monochrome" then
-        flags = "MONOCHROME"
+    local flags = {}
+
+    outline = strlower(outline or "none")
+
+    if outline:find("thickoutline") then
+        tinsert(flags, "THICKOUTLINE")
+    elseif outline:find("outline") then
+        tinsert(flags, "OUTLINE")
     end
+
+    if outline:find("monochrome") then
+        tinsert(flags, "MONOCHROME")
+    end
+
+    flags = tconcat(flags, ",")
 
     fs:SetFont(font, size, flags)
 

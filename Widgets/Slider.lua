@@ -217,7 +217,7 @@ function AF.CreateSlider(parent, text, width, low, high, step, isPercentage, sho
     local percentSign = AF.CreateFontString(eb, "%", "gray")
     slider.percentSign = percentSign
     AF.SetPoint(percentSign, "LEFT", eb, "RIGHT", 2, 0)
-    if isPercentage then
+    if isPercentage and not showLowHighText then
         percentSign:Show()
     else
         percentSign:Hide()

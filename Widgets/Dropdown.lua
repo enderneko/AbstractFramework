@@ -178,6 +178,7 @@ end
 function AF_DropdownMixin:SetSelectedValue(value)
     SetSelected(self, "value", value)
 end
+AF_DropdownMixin.SetSelected = AF_DropdownMixin.SetSelectedValue
 
 function AF_DropdownMixin:ClearSelected()
     self.selected = nil
