@@ -264,6 +264,8 @@ end
 ---@class AF_ScrollingText:ScrollFrame
 local AF_ScrollingTextMixin = {}
 
+---@param str string
+---@param color? string color name defined in Color.lua
 function AF_ScrollingTextMixin:SetText(str, color)
     self.text:SetText(color and AF.WrapTextInColor(str, color) or str)
     if self:IsVisible() then
@@ -322,10 +324,10 @@ function AF_ScrollingTextMixin:UpdatePixels()
 end
 
 ---@param parent Frame
----@param frequency number
----@param step number
----@param startDelay number
----@param endDelay number
+---@param frequency? number default 0.02
+---@param step? number default 1
+---@param startDelay? number default 2
+---@param endDelay? number default 2
 ---@return AF_ScrollingText scroller
 function AF.CreateScrollingText(parent, frequency, step, startDelay, endDelay)
     local holder = CreateFrame("ScrollFrame", nil, parent)

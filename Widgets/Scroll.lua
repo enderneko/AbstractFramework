@@ -106,6 +106,12 @@ function AF_ScrollFrameMixin:UpdatePixels()
     self:ResetScroll()
 end
 
+---@param parent Frame
+---@param name? string
+---@param width? number
+---@param height? number
+---@param color? string|table
+---@param borderColor? string|table
 ---@return AF_ScrollFrame scrollParent
 function AF.CreateScrollFrame(parent, name, width, height, color, borderColor)
     local scrollParent = AF.CreateBorderedFrame(parent, name, width, height, color, borderColor)
@@ -341,6 +347,7 @@ function AF_ScrollListMixin:SetSlotHeight(newHeight)
     self:SetSlotNum(self.slotNum)
 end
 
+---@param widgets table
 function AF_ScrollListMixin:SetWidgets(widgets)
     self:Reset()
     self.widgets = widgets
@@ -410,6 +417,7 @@ function AF_ScrollListMixin:SetScroll(startIndex)
         if i < from or i > to then
             w:Hide()
         else
+            w:SetParent(self.slotFrame)
             w:Show()
             w:SetAllPoints(self.slots[slotIndex])
             if w.UpdatePixels then
@@ -491,9 +499,15 @@ function AF_ScrollListMixin:UpdatePixels()
     end
 end
 
+---@param parent Frame
+---@param name? string
 ---@param verticalMargin number top/bottom margin
 ---@param horizontalMargin number left/right margin
+---@param slotNum number number of slots
+---@param slotHeight number height of each slot
 ---@param slotSpacing number spacing between widgets next to each other
+---@param color? string|table background color
+---@param borderColor? string|table border color
 ---@return AF_ScrollList scrollList
 function AF.CreateScrollList(parent, name, verticalMargin, horizontalMargin, slotNum, slotHeight, slotSpacing, color, borderColor)
     local scrollList = AF.CreateBorderedFrame(parent, name, nil, nil, color, borderColor)
