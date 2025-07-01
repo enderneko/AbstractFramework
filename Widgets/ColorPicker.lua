@@ -1,9 +1,9 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 
-----------------------------------------------------------------
+---------------------------------------------------------------------
 -- color picker widget
-----------------------------------------------------------------
+---------------------------------------------------------------------
 ---@class AF_ColorPicker:Button
 local AF_ColorPickerMixin = {}
 
@@ -135,9 +135,9 @@ function AF.CreateColorPicker(parent, label, alphaEnabled, onChange, onConfirm)
     return cp
 end
 
-----------------------------------------------------------------
+---------------------------------------------------------------------
 -- color picker frame
-----------------------------------------------------------------
+---------------------------------------------------------------------
 local colorPickerFrame
 local currentPane, originalPane, saturationBrightnessPane, hueSlider, alphaSlider, picker
 local rEB, gEB, bEB, aEB, h_EB, s_EB, b_EB, hexEB
@@ -148,9 +148,9 @@ local Callback
 local oR, oG, oB, oA
 local H, S, B, A
 
--------------------------------------------------
+---------------------------------------------------------------------
 -- update functions
--------------------------------------------------
+---------------------------------------------------------------------
 local function UpdateColor_RGBA(r, g, b, a)
     -- update currentPane & originalPane
     currentPane:SetColor(r, g, b, a)
@@ -202,9 +202,9 @@ local function UpdateAll(use, v1, v2, v3, a, updateWidgetColor, updatePickerAndS
     end
 end
 
--------------------------------------------------
+---------------------------------------------------------------------
 -- create color pane
--------------------------------------------------
+---------------------------------------------------------------------
 local function CreateColorPane()
     local pane = AF.CreateBorderedFrame(colorPickerFrame, nil, 102, 27)
 
@@ -226,9 +226,9 @@ local function CreateColorPane()
     return pane
 end
 
--------------------------------------------------
+---------------------------------------------------------------------
 -- create color slider
--------------------------------------------------
+---------------------------------------------------------------------
 local function CreateColorSliderHolder(onValueChanged)
     local holder = CreateFrame("Frame", nil, colorPickerFrame, "BackdropTemplate")
     AF.SetSize(holder, 20, 132)
@@ -264,9 +264,9 @@ local function CreateColorSliderHolder(onValueChanged)
     return holder
 end
 
--------------------------------------------------
+---------------------------------------------------------------------
 -- create color editbox
--------------------------------------------------
+---------------------------------------------------------------------
 local function CreateEB(label, width, height, isNumeric, group)
     local eb = AF.CreateEditBox(colorPickerFrame, nil, width, height, isNumeric and "number" or "trim")
     AF.RemoveFromPixelUpdater(eb)
@@ -346,9 +346,9 @@ local function CreateEB(label, width, height, isNumeric, group)
     return eb
 end
 
--------------------------------------------------
+---------------------------------------------------------------------
 -- color grids
--------------------------------------------------
+---------------------------------------------------------------------
 local function CreateColorGrid(color)
     local grid = AF.CreateButton(colorPickerFrame, nil, nil, 14, 14)
     AF.RemoveFromPixelUpdater(grid)
@@ -407,28 +407,35 @@ local preset3 = {
     "blazing_tangerine", "vivid_raspberry"
 }
 
--------------------------------------------------
+---------------------------------------------------------------------
 -- CreateColorPickerFrame
--------------------------------------------------
+---------------------------------------------------------------------
 local function CreateColorPickerFrame()
-    colorPickerFrame = AF.CreateHeaderedFrame(UIParent, "AFColorPicker", _G.COLOR_PICKER, 269, 297, "DIALOG")
+    colorPickerFrame = AF.CreateHeaderedFrame(AF.UIParent, "AFColorPicker", _G.COLOR_PICKER, 269, 297, "DIALOG")
     colorPickerFrame.header.closeBtn:Hide()
     -- AF.ApplyDefaultBackdropWithColors(colorPickerFrame, nil, "accent")
     -- AF.ApplyDefaultBackdropWithColors(colorPickerFrame.header, "header", "accent")
     AF.SetPoint(colorPickerFrame, "CENTER")
 
-    ---------------------------------------------
+    --------------------------------------------------
+    -- logo
+    --------------------------------------------------
+    local logo = AF.CreateTexture(colorPickerFrame.header, AF.GetIcon("AF"))
+    AF.SetSize(logo, 16, 16)
+    AF.SetPoint(logo, "LEFT", 2, 0)
+
+    --------------------------------------------------
     -- color pane
-    ---------------------------------------------
+    --------------------------------------------------
     currentPane = CreateColorPane()
     AF.SetPoint(currentPane, "TOPLEFT", 7, -7)
 
     originalPane = CreateColorPane()
     AF.SetPoint(originalPane, "TOPLEFT", currentPane, "TOPRIGHT", 7, 0)
 
-    ---------------------------------------------
+    --------------------------------------------------
     -- saturation, brightness
-    ---------------------------------------------
+    --------------------------------------------------
     local saturationBrightnessPaneBG = AF.CreateBorderedFrame(colorPickerFrame, nil, 132, 132)
     AF.SetPoint(saturationBrightnessPaneBG, "TOPLEFT", currentPane, "BOTTOMLEFT", 0, -7)
     AF.RemoveFromPixelUpdater(saturationBrightnessPaneBG)
@@ -444,9 +451,9 @@ local function CreateColorPickerFrame()
     brightness:SetAllPoints(saturationBrightnessPane)
     AF.RemoveFromPixelUpdater(brightness)
 
-    ---------------------------------------------
+    --------------------------------------------------
     -- hue slider
-    ---------------------------------------------
+    --------------------------------------------------
     local hueSliderHolder = CreateColorSliderHolder(function(self, value, userChanged)
         if not userChanged then return end
         H = value
@@ -482,9 +489,9 @@ local function CreateColorPickerFrame()
         hueSlider[i]:SetPoint("RIGHT")
     end
 
-    ---------------------------------------------
+    --------------------------------------------------
     -- alpha slider
-    ---------------------------------------------
+    --------------------------------------------------
     local alphaSliderHolder = CreateColorSliderHolder(function(self, value, userChanged)
         if not userChanged then return end
         A = tonumber(format("%.3f", 1 - value))
@@ -521,9 +528,9 @@ local function CreateColorPickerFrame()
         alphaSlider.thumb2:SetVertexColor(AF.GetColorRGB("disabled"))
     end)
 
-    ---------------------------------------------
+    --------------------------------------------------
     -- picker
-    ---------------------------------------------
+    --------------------------------------------------
     picker = CreateFrame("Frame", nil, saturationBrightnessPane)
     AF.SetSize(picker, 16, 16)
     picker:SetPoint("CENTER", saturationBrightnessPane, "BOTTOMLEFT")
@@ -605,9 +612,9 @@ local function CreateColorPickerFrame()
         picker:SetScript("OnUpdate", nil)
     end)
 
-    ---------------------------------------------
+    --------------------------------------------------
     -- editboxes
-    ---------------------------------------------
+    --------------------------------------------------
     -- red
     rEB = CreateEB("R", 40, 20, true, "rgb")
     AF.SetPoint(rEB, "TOPLEFT", saturationBrightnessPaneBG, "BOTTOMLEFT", 0, -25)
@@ -640,9 +647,9 @@ local function CreateColorPickerFrame()
     hexEB = CreateEB("Hex", 69, 20, false, "rgb")
     AF.SetPoint(hexEB, "TOPLEFT", b_EB, "TOPRIGHT", 7, 0)
 
-    ---------------------------------------------
+    --------------------------------------------------
     -- buttons
-    ---------------------------------------------
+    --------------------------------------------------
     confirmBtn = AF.CreateButton(colorPickerFrame, _G.OKAY, "green", 102, 20)
     AF.SetPoint(confirmBtn, "TOPLEFT", h_EB, "BOTTOMLEFT", 0, -7)
     AF.RemoveFromPixelUpdater(confirmBtn)
@@ -651,9 +658,9 @@ local function CreateColorPickerFrame()
     AF.SetPoint(cancelBtn, "TOPLEFT", confirmBtn, "TOPRIGHT", 7, 0)
     AF.RemoveFromPixelUpdater(cancelBtn)
 
-    ---------------------------------------------
+    --------------------------------------------------
     -- color grids
-    ---------------------------------------------
+    --------------------------------------------------
     local sep = AF.CreateSeparator(colorPickerFrame, 269, 1, AF.GetColorTable("disabled", 0.25), true)
     AF.SetPoint(sep, "TOPLEFT", originalPane, "TOPRIGHT", 7, -7)
     AF.RemoveFromPixelUpdater(sep)
@@ -699,9 +706,9 @@ local function CreateColorPickerFrame()
         end
     end
 
-    ---------------------------------------------
+    --------------------------------------------------
     -- update pixels
-    ---------------------------------------------
+    --------------------------------------------------
     colorPickerFrame._UpdatePixels = colorPickerFrame.UpdatePixels
     function colorPickerFrame:UpdatePixels()
         colorPickerFrame:_UpdatePixels()
@@ -760,9 +767,9 @@ local function CreateColorPickerFrame()
     AF.AddToPixelUpdater_Auto(colorPickerFrame)
 end
 
--------------------------------------------------
+---------------------------------------------------------------------
 -- show
--------------------------------------------------
+---------------------------------------------------------------------
 function AF.ShowColorPicker(owner, callback, onConfirm, hasAlpha, r, g, b, a)
     if not colorPickerFrame then
         CreateColorPickerFrame()

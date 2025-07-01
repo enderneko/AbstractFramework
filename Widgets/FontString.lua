@@ -196,7 +196,7 @@ end
 
 local function creationFunc()
     -- NOTE: do not use AF.CreateFontString, since we don't need UpdatePixels() for it
-    local fs = UIParent:CreateFontString(nil, "OVERLAY", "AF_FONT_NORMAL")
+    local fs = AF.UIParent:CreateFontString(nil, "OVERLAY", "AF_FONT_NORMAL")
     fs:Hide()
 
     fs:SetWordWrap(true) -- multiline allowed
