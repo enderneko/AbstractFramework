@@ -57,6 +57,11 @@ function AF_ScrollFrameMixin:ScrollToBottom()
     self.scrollFrame:SetVerticalScroll(self:GetVerticalScrollRange())
 end
 
+---@param height number
+---@param num? number
+---@param spacing? number
+---@param topPadding? number
+---@param bottomPadding? number
 function AF_ScrollFrameMixin:SetContentHeight(height, num, spacing, topPadding, bottomPadding)
     self:ResetScroll()
     if num and spacing then

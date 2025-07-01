@@ -354,6 +354,9 @@ end
 ---------------------------------------------------------------------
 -- frame level relative to parent
 ---------------------------------------------------------------------
+---@param frame Frame
+---@param level number|nil default 0
+---@param relativeTo Frame|nil default parent
 function AF.SetFrameLevel(frame, level, relativeTo)
     level = level or 0
     relativeTo = relativeTo or frame:GetParent()
