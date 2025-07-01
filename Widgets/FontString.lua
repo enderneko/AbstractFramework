@@ -419,3 +419,108 @@ function AF.SetText(fs, text, length, suffix)
         fs:SetText(fs:GetText() .. suffix)
     end
 end
+
+---------------------------------------------------------------------
+-- rainbow text
+---------------------------------------------------------------------
+local tconcat, tcreate = table.concat, table.create
+
+local function UpdateRainbow(updater, elapsed)
+    updater.elapsed = updater.elapsed + elapsed
+
+    if updater.elapsed >= updater.interval then
+        updater.elapsed = 0
+
+        local fs = updater.fs
+        local hue = updater.hue
+        local step = updater.step
+        local colors = updater.colors
+
+        -- generate color for each character
+        for i = 1, updater.charCount do
+            local r, g, b = AF.ConvertHSBToRGB(hue, 1, 1)
+            colors[i] = AF.ConvertRGBToHEX(r, g, b)
+            hue = (hue + step) % 360
+        end
+
+        -- apply all colors at once
+        fs:SetFormattedText(updater.formatString, unpack(colors))
+
+        -- update hue position
+        if updater.reverse then
+            updater.hue = (updater.hue + updater.speed) % 360
+        else
+            updater.hue = (updater.hue - updater.speed + 360) % 360
+        end
+    end
+end
+
+---@param fs FontString
+---@param interval number? update interval, default 0.05
+---@param speed number? hue movement speed, default 3
+---@param reverse boolean? reverse direction
+function AF.RainbowText_Start(fs, interval, speed, reverse)
+    -- save original text
+    fs._text = fs:GetText()
+
+    -- split text into characters and generate format string
+    local chars = {}
+    local charCount = 0
+
+    -- split by UTF-8 characters
+    for char in fs._text:gmatch("[%z\1-\127\194-\244][\128-\191]*") do
+        charCount = charCount + 1
+        chars[charCount] = char
+    end
+
+    -- generate format string, e.g.: "|cff%sA|r|cff%sB|r|cff%sC|r"
+    local formatParts = {}
+    for i = 1, charCount do
+        formatParts[i] = "|cff%s" .. chars[i] .. "|r"
+    end
+    local formatString = tconcat(formatParts)
+
+    -- create or update updater
+    fs._rainbow = true
+    if not fs._updater then
+        fs._updater = CreateFrame("Frame", nil, fs:GetParent())
+        fs._updater.fs = fs
+        fs._updater:Hide()
+        fs._updater:SetScript("OnUpdate", UpdateRainbow)
+    end
+
+    local updater = fs._updater
+    updater.interval = interval or 0.05
+    updater.elapsed = 0
+    updater.reverse = reverse
+    updater.hue = 0
+    updater.speed = speed or 3  -- hue degrees to move per update
+    updater.step = charCount > 1 and (360 / charCount) or 360
+    updater.charCount = charCount
+    updater.formatString = formatString
+    updater.colors = tcreate(charCount)
+    updater:Show()
+end
+
+function AF.RainbowText_Stop(fs)
+    fs._rainbow = nil
+    if fs._updater then
+        fs._updater:Hide()
+        if fs._text then
+            fs:SetText(fs._text)
+            fs._text = nil
+        end
+    end
+end
+
+function AF.RainbowText_Pause(fs)
+    if fs._updater then
+        fs._updater:Hide()
+    end
+end
+
+function AF.RainbowText_Resume(fs)
+    if fs._updater then
+        fs._updater:Show()
+    end
+end

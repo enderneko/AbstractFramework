@@ -48,7 +48,7 @@ end
 ---@param g number
 ---@param b number
 ---@param a? number
----@return string hex
+---@return string hex rrggbb or aarrggbb
 function AF.ConvertRGB256ToHEX(r, g, b, a)
     local result = ""
 
@@ -80,7 +80,7 @@ end
 ---@param g number
 ---@param b number
 ---@param a? number
----@return string hex
+---@return string hex rrggbb or aarrggbb
 function AF.ConvertRGBToHEX(r, g, b, a)
     return AF.ConvertRGB256ToHEX(AF.ConvertToRGB256(r, g, b, a))
 end
@@ -145,9 +145,9 @@ end
 ---@param r number [0, 1]
 ---@param g number [0, 1]
 ---@param b number [0, 1]
----@return number h [0, 360]
----@return number s [0, 1]
----@return number b [0, 1]
+---@return number h [0, 360] hue
+---@return number s [0, 1] saturation
+---@return number b [0, 1] brightness
 function AF.ConvertRGBToHSB(r, g, b)
     local colorMax = max(r, g, b)
     local colorMin = min(r, g, b)
@@ -191,9 +191,9 @@ function AF.ConvertRGBToHSB(r, g, b)
 end
 
 -- From ColorPickerAdvanced by Feyawen-Llane
----@param h number [0, 360]
----@param s number [0, 1]
----@param b number [0, 1]
+---@param h number [0, 360] hue
+---@param s number [0, 1] saturation
+---@param b number [0, 1] brightness
 ---@return number r [0, 1]
 ---@return number g [0, 1]
 ---@return number b [0, 1]
