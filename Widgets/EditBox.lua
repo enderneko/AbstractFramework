@@ -137,6 +137,24 @@ function AF_EditBoxMixin:SetNotUserChangable(notUserChangable)
     self.notUserChangable = notUserChangable
 end
 
+function AF_EditBoxMixin:SetBorderColor(color)
+    if type(color) == "string" then
+        color = AF.GetColorTable(color)
+    elseif type(color) ~= "table" then
+        color = AF.GetColorTable("border")
+    end
+
+    if self:IsEnabled() then
+        self:SetBackdropBorderColor(AF.UnpackColor(color))
+    else
+        self._borderColor = color
+    end
+end
+
+function AF_EditBoxMixin:SetLabel(label)
+    self.label:SetText(label or "")
+end
+
 ---@param parent Frame
 ---@param label? string
 ---@param width? number
@@ -187,18 +205,22 @@ function AF.CreateEditBox(parent, label, width, height, mode, font)
     end)
 
     eb:SetScript("OnEnterPressed", function()
-        if eb.onEnterPressed then eb.onEnterPressed(eb:GetText()) end
+        if eb.onEnterPressed then eb.onEnterPressed(eb:GetValue()) end
         eb:ClearFocus()
     end)
 
     eb:SetScript("OnDisable", function()
         eb:SetTextColor(AF.GetColorRGB("disabled"))
-        eb:SetBackdropBorderColor(0, 0, 0, 0.7)
+        eb:SetBackdropBorderColor(AF.GetColorRGB("border", 0.7))
     end)
 
     eb:SetScript("OnEnable", function()
         eb:SetTextColor(1, 1, 1, 1)
-        eb:SetBackdropBorderColor(0, 0, 0, 1)
+        if eb._borderColor then
+            eb:SetBackdropBorderColor(AF.UnpackColor(eb._borderColor))
+        else
+            eb:SetBackdropBorderColor(0, 0, 0, 1)
+        end
     end)
 
     eb.highlight = AF.CreateTexture(eb, nil, AF.GetColorTable(eb.accentColor, 0.07))
@@ -277,6 +299,17 @@ function AF_ScrollEditBoxMixin:GetText()
     return self.eb:GetText()
 end
 
+function AF_ScrollEditBoxMixin:Clear()
+    self:ResetScroll()
+    self.eb:Clear()
+    self.eb:SetCursorPosition(0)
+end
+
+---@param position number
+function AF_ScrollEditBoxMixin:SetCursorPosition(position)
+    self.eb:SetCursorPosition(position)
+end
+
 function AF_ScrollEditBoxMixin:IsEnabled()
     return self._isEnabled
 end
@@ -299,6 +332,23 @@ function AF_ScrollEditBoxMixin:SetEnabled(enabled)
     end
 end
 
+function AF_ScrollEditBoxMixin:SetOnEditFocusGained(func)
+    self.eb:SetOnEditFocusGained(func)
+end
+
+function AF_ScrollEditBoxMixin:SetOnEditFocusLost(func)
+    self.eb:SetOnEditFocusLost(func)
+end
+
+function AF_ScrollEditBoxMixin:SetOnEnterPressed(func)
+    self.eb:SetOnEnterPressed(func)
+end
+
+function AF_ScrollEditBoxMixin:SetOnEscapePressed(func)
+    self.eb:SetOnEscapePressed(func)
+end
+
+---@param func fun(value: string, userChanged: boolean)
 function AF_ScrollEditBoxMixin:SetOnTextChanged(func)
     self.eb:SetOnTextChanged(func)
 end
@@ -351,6 +401,38 @@ function AF_ScrollEditBoxMixin:SetNotUserChangable(notUserChangable)
     self.eb:SetNotUserChangable(notUserChangable)
 end
 
+function AF_ScrollEditBoxMixin:SetFocus()
+    self.eb:SetFocus()
+end
+
+function AF_ScrollEditBoxMixin:ClearFocus()
+    self.eb:ClearFocus()
+end
+
+function AF_ScrollEditBoxMixin:HasFocus()
+    return self.eb:HasFocus()
+end
+
+function AF_ScrollEditBoxMixin:SetAutoFocus(autoFocus)
+    self.eb:SetAutoFocus(autoFocus)
+end
+
+function AF_ScrollEditBoxMixin:IsAutoFocus()
+    return self.eb:IsAutoFocus()
+end
+
+---@param start? number
+---@param stop? number
+function AF_ScrollEditBoxMixin:HighlightText(start, stop)
+    self.eb:HighlightText(start, stop)
+end
+
+---@param parent Frame
+---@param name string
+---@param label? string
+---@param width? number
+---@param height? number
+---@param scrollStep? number default 1
 ---@return AF_ScrollEditBox frame
 function AF.CreateScrollEditBox(parent, name, label, width, height, scrollStep)
     scrollStep = scrollStep or 1
@@ -426,3 +508,51 @@ function AF.CreateScrollEditBox(parent, name, label, width, height, scrollStep)
 
     return frame
 end
+
+---------------------------------------------------------------------
+-- transient edit box
+---------------------------------------------------------------------
+-- local editBoxPool = AF.CreateObjectPool(function(pool)
+--     local eb = AF.CreateEditBox(AF.UIParent)
+
+--     eb:SetOnHide(function()
+--         eb:Hide()
+--         eb:Clear()
+--         pool:Release(eb)
+--     end)
+
+--     return eb
+-- end)
+
+-- ---@param parent Frame
+-- ---@param label? string
+-- ---@param width? number
+-- ---@param height? number
+-- ---@param mode? string "multiline"|"number"|"trim"|nil
+-- ---@param font? string|Font
+-- ---@return AF_EditBox
+-- function AF.GetTransientEditBox(parent, label, width, height, mode, font)
+--     if not parent._editbox then
+--         parent._editbox = AF.CreateEditBox(parent)
+--         parent._editbox:SetOnHide(function(self)
+--             self:Hide()
+--             self:Clear()
+--         end)
+--     end
+
+--     local eb = parent._editbox
+
+--     eb.onEditFocusGained = nil
+--     eb.onEditFocusLost = nil
+--     eb.onEnterPressed = nil
+--     eb.onEscapePressed = nil
+
+--     eb:SetParent(parent or AF.UIParent)
+--     eb:SetLabel(label)
+--     AF.SetSize(eb, width, height)
+--     eb:SetMode(mode)
+--     eb:SetFontObject(font or "AF_FONT_NORMAL")
+--     eb:Show()
+
+--     return eb
+-- end
