@@ -214,8 +214,10 @@ function AF.InitMoverParent()
 end
 
 ---------------------------------------------------------------------
--- calc new point
+-- calc best point
 ---------------------------------------------------------------------
+---@param owner Frame
+---@return string point, number x, number y
 function AF.CalcPoint(owner)
     local point, x, y
     local scale = owner:GetScale()

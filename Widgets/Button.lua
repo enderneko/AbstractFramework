@@ -761,7 +761,7 @@ function AF.CreateCheckButton(parent, label, onClick)
     cb:SetScript("OnDisable", function()
         cb.label:SetTextColor(AF.GetColorRGB("disabled"))
         checkedTexture:SetColorTexture(AF.GetColorRGB("disabled", 0.7))
-        cb:SetBackdropBorderColor(0, 0, 0, 0.7)
+        cb:SetBackdropBorderColor(AF.GetColorRGB("black", 0.5))
     end)
 
     AF.AddToPixelUpdater_OnShow(cb)

@@ -29,6 +29,10 @@ function AF_ColorPickerMixin:SetColor(...)
         self.color[4] = a
         self:SetBackdropColor(r, g, b, a)
     end
+
+    if not self:IsEnabled() then
+        self:SetBackdropColor(AF.GetColorRGB("disabled"))
+    end
 end
 
 function AF_ColorPickerMixin:GetColorTable()
@@ -121,7 +125,8 @@ function AF.CreateColorPicker(parent, label, alphaEnabled, onChange, onConfirm)
 
     cp:SetScript("OnDisable", function()
         cp.label:SetTextColor(AF.GetColorRGB("disabled"))
-        cp:SetBackdropColor(AF.ConvertToGrayscale(AF.UnpackColor(cp.color)))
+        -- cp:SetBackdropColor(AF.ConvertToGrayscale(AF.UnpackColor(cp.color)))
+        cp:SetBackdropColor(AF.GetColorRGB("disabled"))
         -- cp.mask:Show()
     end)
 

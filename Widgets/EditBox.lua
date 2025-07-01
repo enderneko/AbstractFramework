@@ -241,7 +241,7 @@ function AF.CreateEditBox(parent, label, width, height, mode, font)
             end
 
             if eb.confirmBtn then
-                if eb.value ~= value then
+                if eb.value ~= value and (self.mode ~= "number" or value) then
                     eb.confirmBtn:Show()
                 else
                     eb.confirmBtn:Hide()
