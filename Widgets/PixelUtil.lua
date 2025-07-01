@@ -1089,36 +1089,52 @@ end
 ---------------------------------------------------------------------
 -- load position
 ---------------------------------------------------------------------
+---@param region Frame
 ---@param pos table|string {point, x, y} or "point,x,y"
-function AF.LoadPosition(region, pos)
+function AF.LoadPosition(region, pos, relativeTo)
     region._useOriginalPoints = true
-    AF.ClearPoints(region)
+
     if type(pos) == "string" then
+        if AF.IsBlank(pos) then return end
+        AF.ClearPoints(region)
         pos = string.gsub(pos, " ", "")
         local point, x, y = strsplit(",", pos)
         x = tonumber(x)
         y = tonumber(y)
-        AF.SetPoint(region, point, x, y)
+        AF.SetPoint(region, point, relativeTo or region:GetParent(), x, y)
+
     elseif type(pos) == "table" then
-        AF.SetPoint(region, unpack(pos))
+        if AF.IsEmpty(pos) then return end
+        AF.ClearPoints(region)
+        AF.SetPoint(region, pos[1], relativeTo or region:GetParent(), pos[2], pos[3])
     end
 end
 
 ---------------------------------------------------------------------
 -- save position
 ---------------------------------------------------------------------
+local tconcat = table.concat
+
+-- the region must have only one point set, and relativeTo must be AF.UIParent
+---@param region Frame
+---@param t table|nil if provided, will save the position to the table, otherwise returns a new table
 function AF.SavePositionAsTable(region, t)
+    local point, x, y = AF.CalcPoint(region)
     if t then
         wipe(t)
-        t[1], t[2], t[3], t[4], t[5] = region:GetPoint()
+        t[1], t[2], t[3] = point, x, y
     else
-        return {region:GetPoint()}
+        return {point, x, y}
     end
 end
 
--- function AF.SavePositionAsString(region, t, i)
---     t[i] = table.concat({region:GetPoint()}, ",")
--- end
+-- the region must have only one point set, and relativeTo must be AF.UIParent
+---@param region Frame
+---@param t table
+---@param k any key to save the position under
+function AF.SavePositionAsString(region, t, k)
+    t[k] = tconcat(AF.SavePositionAsTable(region), ",")
+end
 
 ---------------------------------------------------------------------
 -- pixel perfect (ElvUI)
