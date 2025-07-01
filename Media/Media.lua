@@ -3,6 +3,14 @@ local AF = _G.AbstractFramework
 
 local format = string.format
 
+function AF.GetMedia(path, addon)
+    if addon then
+        return "Interface\\AddOns\\" .. addon .. "\\Media\\" .. path
+    else
+        return "Interface\\AddOns\\AbstractFramework\\Media\\" .. path
+    end
+end
+
 ---------------------------------------------------------------------
 -- get icon
 ---------------------------------------------------------------------
