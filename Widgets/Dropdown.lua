@@ -550,7 +550,7 @@ function AF.CreateDropdown(parent, width, maxSlots, miniMode, dropdownType, text
         if miniMode then
             AF.SetPoint(dropdown.bgTexture, "BOTTOMRIGHT", -1, 1)
         else
-            AF.SetPoint(dropdown.bgTexture, "BOTTOMRIGHT", dropdown.button, "BOTTOMLEFT", -1, 1)
+            AF.SetPoint(dropdown.bgTexture, "BOTTOMRIGHT", dropdown.button, "BOTTOMLEFT", 0, 1)
         end
         dropdown.bgTexture:SetVertexColor(AF.GetColorRGB("white", textureAlpha))
         dropdown.bgTexture:Hide()
