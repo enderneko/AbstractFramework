@@ -7,6 +7,11 @@ local AF = _G.AbstractFramework
 ---@class AF_Frame:Frame,AF_BaseWidgetMixin
 local AF_FrameMixin = {}
 
+---@param parent Frame
+---@param name? string
+---@param width? number
+---@param height? number
+---@param template? string
 ---@return AF_Frame frame
 function AF.CreateFrame(parent, name, width, height, template)
     local f = CreateFrame("Frame", name, parent, template)
@@ -23,6 +28,7 @@ end
 ---@class AF_HeaderedFrame:AF_Frame
 local AF_HeaderedFrameMixin = {}
 
+---@param justify "LEFT" | "RIGHT" | "CENTER"
 function AF_HeaderedFrameMixin:SetTitleJustify(justify)
     AF.ClearPoints(self.header.text)
     if justify == "LEFT" then
@@ -198,6 +204,28 @@ function AF_BorderedFrameMixin:SetLabel(label, fontColor, font, isInside)
         AF.SetPoint(self.label, "TOPLEFT", 2, -2)
     else
         AF.SetPoint(self.label, "BOTTOMLEFT", self, "TOPLEFT", 2, 2)
+    end
+end
+
+---@param color string|table|nil color name / table
+function AF_BorderedFrameMixin:SetBorderColor(color)
+    if type(color) == "string" then
+        self:SetBackdropBorderColor(AF.GetColorRGB(color))
+    elseif type(color) == "table" then
+        self:SetBackdropBorderColor(AF.UnpackColor(color))
+    else
+        self:SetBackdropBorderColor(AF.GetColorRGB("border"))
+    end
+end
+
+---@param color string|table|nil color name / table
+function AF_BorderedFrameMixin:SetBackgroundColor(color)
+    if type(color) == "string" then
+        self:SetBackdropColor(AF.GetColorRGB(color))
+    elseif type(color) == "table" then
+        self:SetBackdropColor(AF.UnpackColor(color))
+    else
+        self:SetBackdropColor(AF.GetColorRGB("background"))
     end
 end
 
