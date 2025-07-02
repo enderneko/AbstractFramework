@@ -53,18 +53,22 @@ function AF_EditBoxMixin:SetConfirmButton(func, text, position, width, height)
     end)
 end
 
+---@param func fun(self: AF_EditBox)
 function AF_EditBoxMixin:SetOnEditFocusGained(func)
     self.onEditFocusGained = func
 end
 
+---@param func fun(self: AF_EditBox)
 function AF_EditBoxMixin:SetOnEditFocusLost(func)
     self.onEditFocusLost = func
 end
 
+---@param func fun(value: any, self: AF_EditBox)
 function AF_EditBoxMixin:SetOnEnterPressed(func)
     self.onEnterPressed = func
 end
 
+---@param func fun(self: AF_EditBox)
 function AF_EditBoxMixin:SetOnEscapePressed(func)
     self.onEscapePressed = func
 end
@@ -137,6 +141,7 @@ function AF_EditBoxMixin:SetNotUserChangable(notUserChangable)
     self.notUserChangable = notUserChangable
 end
 
+---@param color string|table
 function AF_EditBoxMixin:SetBorderColor(color)
     if type(color) == "string" then
         color = AF.GetColorTable(color)
@@ -151,6 +156,7 @@ function AF_EditBoxMixin:SetBorderColor(color)
     end
 end
 
+---@param label string
 function AF_EditBoxMixin:SetLabel(label)
     self.label:SetText(label or "")
 end
@@ -190,22 +196,22 @@ function AF.CreateEditBox(parent, label, width, height, mode, font)
     eb:SetAutoFocus(false)
 
     eb:SetScript("OnEditFocusGained", function()
-        if eb.onEditFocusGained then eb.onEditFocusGained() end
+        if eb.onEditFocusGained then eb.onEditFocusGained(eb) end
         eb:HighlightText()
     end)
 
     eb:SetScript("OnEditFocusLost", function()
-        if eb.onEditFocusLost then eb.onEditFocusLost() end
+        if eb.onEditFocusLost then eb.onEditFocusLost(eb) end
         eb:HighlightText(0, 0)
     end)
 
     eb:SetScript("OnEscapePressed", function()
-        if eb.onEscapePressed then eb.onEscapePressed() end
+        if eb.onEscapePressed then eb.onEscapePressed(eb) end
         eb:ClearFocus()
     end)
 
     eb:SetScript("OnEnterPressed", function()
-        if eb.onEnterPressed then eb.onEnterPressed(eb:GetValue()) end
+        if eb.onEnterPressed then eb.onEnterPressed(eb:GetValue(), eb) end
         eb:ClearFocus()
     end)
 
@@ -427,6 +433,11 @@ function AF_ScrollEditBoxMixin:HighlightText(start, stop)
     self.eb:HighlightText(start, stop)
 end
 
+---@param label string
+function AF_ScrollEditBoxMixin:SetLabel(label)
+    self.eb:SetLabel(label)
+end
+
 ---@param parent Frame
 ---@param name string
 ---@param label? string
@@ -512,47 +523,84 @@ end
 ---------------------------------------------------------------------
 -- transient edit box
 ---------------------------------------------------------------------
--- local editBoxPool = AF.CreateObjectPool(function(pool)
---     local eb = AF.CreateEditBox(AF.UIParent)
+local editBoxPool
 
---     eb:SetOnHide(function()
---         eb:Hide()
---         eb:Clear()
---         pool:Release(eb)
---     end)
+local function EditBox_OnEscapePressed(self)
+    if self.onEscapePressed then
+        self.onEscapePressed(self)
+    end
+    self:Hide()
+end
 
---     return eb
--- end)
+local function EditBox_OnEnterPressed(self)
+    if self.onEnterPressed then
+        self.onEnterPressed(self:GetValue(), self)
+    end
+    self:Hide()
+end
 
--- ---@param parent Frame
--- ---@param label? string
--- ---@param width? number
--- ---@param height? number
--- ---@param mode? string "multiline"|"number"|"trim"|nil
--- ---@param font? string|Font
--- ---@return AF_EditBox
--- function AF.GetTransientEditBox(parent, label, width, height, mode, font)
---     if not parent._editbox then
---         parent._editbox = AF.CreateEditBox(parent)
---         parent._editbox:SetOnHide(function(self)
---             self:Hide()
---             self:Clear()
---         end)
---     end
+local function EditBox_OnShow(self)
+    self:SetFocus()
+    AF.SetFrameLevel(self, 20)
+end
 
---     local eb = parent._editbox
+local function EditBox_OnHide(self)
+    self:Hide()
+    self:Clear()
+    AF.ClearPoints(self)
 
---     eb.onEditFocusGained = nil
---     eb.onEditFocusLost = nil
---     eb.onEnterPressed = nil
---     eb.onEscapePressed = nil
+    -- reset
+    self.onEditFocusGained = nil
+    self.onEditFocusLost = nil
+    self.onEnterPressed = nil
+    self.onEscapePressed = nil
 
---     eb:SetParent(parent or AF.UIParent)
---     eb:SetLabel(label)
---     AF.SetSize(eb, width, height)
---     eb:SetMode(mode)
---     eb:SetFontObject(font or "AF_FONT_NORMAL")
---     eb:Show()
+    self:SetBorderColor("border")
+    self:SetBackdropColor(AF.GetColorRGB("widget"))
 
---     return eb
--- end
+    editBoxPool:Release(self)
+end
+
+local function EditBox_OnSetScript()
+    error("EditBox:SetScript is not allowed, use SetOnEnter/EscapePressed instead.")
+end
+
+local function EditBox_OnHookScript()
+    error("EditBox:HookScript is not allowed, use SetOnEnter/EscapePressed instead.")
+end
+
+editBoxPool = AF.CreateObjectPool(function()
+    local eb = AF.CreateEditBox(AF.UIParent)
+    eb:Hide()
+    eb:SetOnShow(EditBox_OnShow)
+    eb:SetOnHide(EditBox_OnHide)
+    eb:SetOnEscapePressed(EditBox_OnEscapePressed)
+    eb:SetScript("OnEscapePressed", EditBox_OnEscapePressed)
+    eb:SetScript("OnEnterPressed", EditBox_OnEnterPressed)
+    hooksecurefunc(eb, "SetScript", EditBox_OnSetScript)
+    hooksecurefunc(eb, "HookScript", EditBox_OnHookScript)
+    return eb
+end)
+
+-- this is a transient edit box, it will be created on demand and released when not needed.
+-- please DO NOT use this for dialogs or other persistent edit boxes,
+-- and DO NOT modify its script handlers besides "SetOnEnter/EscapePressed".
+---@param parent Frame
+---@param label? string
+---@param width? number
+---@param height? number
+---@param mode? string "multiline"|"number"|"trim"|nil
+---@param font? string|Font
+---@return AF_EditBox
+function AF.GetEditBox(parent, label, width, height, mode, font)
+    local eb = editBoxPool:Acquire()
+
+    eb:SetParent(parent)
+    eb:SetLabel(label)
+    AF.SetSize(eb, width, height)
+    eb:SetMode(mode)
+    eb:SetFontObject(font or "AF_FONT_NORMAL")
+    eb:Show()
+
+    return eb
+end
