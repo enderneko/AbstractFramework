@@ -96,6 +96,14 @@ end
 -- function AF_HeaderedFrameMixin:SetHeaderColor(color)
 -- end
 
+---@param parent Frame
+---@param name? string
+---@param title string
+---@param width? number
+---@param height? number
+---@param frameStrata? string default is "HIGH"
+---@param frameLevel? number default is 1
+---@param notUserPlaced? boolean default is false
 ---@return AF_HeaderedFrame headeredFrame
 function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata, frameLevel, notUserPlaced)
     local f = CreateFrame("Frame", name, parent, "BackdropTemplate")
