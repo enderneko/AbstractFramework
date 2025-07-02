@@ -142,18 +142,17 @@ function AF.UpdateFontSizeForGroup(group, offset)
     end
 end
 
----@param group string group name for the font, used to update font size
+---@param group? string if not provided, font size will change with the global AF font size offset
 ---@param name string
----@param font string defaults to GameFontNormal:GetFont()
----@param size number defaults to 13
----@param flags string defaults to ""
----@param shadow boolean defaults to no shadow
----@param color string|table defaults to "white"
----@param justifyH string defaults to "CENTER"
----@param justifyV string defaults to "MIDDLE"
+---@param font? string defaults to GameFontNormal:GetFont()
+---@param size? number defaults to 13
+---@param flags? string defaults to ""
+---@param shadow? boolean defaults to no shadow
+---@param color? string|table defaults to "white"
+---@param justifyH? string defaults to "CENTER"
+---@param justifyV? string defaults to "MIDDLE"
+---@return Font|FontString
 function AF.CreateFont(group, name, font, size, flags, shadow, color, justifyH, justifyV)
-    assert(type(group) == "string", "AF.CreateFont expects a group name as the first argument.")
-
     font = font or BASE_FONT_NORMAL
     color = color or "white"
 
@@ -162,7 +161,7 @@ function AF.CreateFont(group, name, font, size, flags, shadow, color, justifyH, 
     end
 
     local obj = CreateFont(name)
-    obj:SetFont(font, size or FONT_NORMAL_SIZE, flags or "")
+    obj:SetFont(font, (size or FONT_NORMAL_SIZE) + AF.fontSizeOffset, flags or "")
 
     obj:SetJustifyH(justifyH or "CENTER")
     obj:SetJustifyV(justifyV or "MIDDLE")
@@ -181,7 +180,13 @@ function AF.CreateFont(group, name, font, size, flags, shadow, color, justifyH, 
         obj:SetTextColor(AF.UnpackColor(color))
     end
 
-    AF.AddToFontSizeUpdater(group, obj, size)
+    if group then
+        AF.AddToFontSizeUpdaterGroup(group, obj, size or FONT_NORMAL_SIZE)
+    else
+        AF.AddToFontSizeUpdater(obj, size or FONT_NORMAL_SIZE)
+    end
+
+    return obj
 end
 
 ---------------------------------------------------------------------
