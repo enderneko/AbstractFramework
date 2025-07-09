@@ -195,7 +195,7 @@ end
 ---@param isAtlas boolean
 ---@param bgColor? string no texture border if nil
 ---@param justifyH? string default is "LEFT"
-function AF_ButtonMixin:SetTexture(tex, size, point, isAtlas, bgColor, justifyH)
+function AF_ButtonMixin:SetTexture(tex, size, point, isAtlas, bgColor, justifyH, filterMode)
     if not self.texture then
         self.texture = self:CreateTexture(nil, "BORDER")
 
@@ -244,14 +244,14 @@ function AF_ButtonMixin:SetTexture(tex, size, point, isAtlas, bgColor, justifyH)
     end
 
     if isAtlas then
-        self.realTexture:SetAtlas(tex)
+        self.realTexture:SetAtlas(tex, nil, filterMode)
     else
         if type(tex) == "number" then
             self.realTexture:SetTexCoord(0.08, 0.92, 0.08, 0.92)
         else
             self.realTexture:SetTexCoord(0, 1, 0, 1)
         end
-        self.realTexture:SetTexture(tex)
+        self.realTexture:SetTexture(tex, nil, nil, filterMode)
     end
 end
 
@@ -499,17 +499,17 @@ end
 ---------------------------------------------------------------------
 ---@param parent Frame
 ---@param frameToHide? Frame default is parent
----@param width? number default is 16
----@param height? number default is 16
----@param padding? number default is 6
+---@param width? number default is 20
+---@param height? number default is 20
+---@param iconSize? number default is 14
 ---@return AF_Button
-function AF.CreateCloseButton(parent, frameToHide, width, height, padding)
-    width = width or 16
-    height = height or 16
-    padding = padding or 6
+function AF.CreateCloseButton(parent, frameToHide, width, height, iconSize)
+    width = width or 20
+    height = height or 20
+    iconSize = iconSize or 14
 
     local b = AF.CreateButton(parent, nil, "red", width, height)
-    b:SetTexture(AF.GetIcon("Close"), {width - padding, height - padding}, {"CENTER", 0, 0})
+    b:SetTexture(AF.GetIcon("Close"), {iconSize, iconSize}, {"CENTER", 0, 0})
     b:SetScript("OnClick", function()
         if frameToHide then
             frameToHide:Hide()
