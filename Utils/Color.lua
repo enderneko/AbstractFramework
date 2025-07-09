@@ -227,6 +227,47 @@ function AF.ConvertHSBToRGB(h, s, b)
     return R, G, B
 end
 
+---@param r number [0, 1]
+---@param g number [0, 1]
+---@param b number [0, 1]
+---@param factor number [0, 1]
+---@return number r [0, 1]
+---@return number g [0, 1]
+---@return number b [0, 1]
+function AF.ScaleColor(r, g, b, factor)
+    factor = factor or 1
+    r = AF.Clamp(r * factor, 0, 1)
+    g = AF.Clamp(g * factor, 0, 1)
+    b = AF.Clamp(b * factor, 0, 1)
+    return r, g, b
+end
+
+---@param color string hex color
+---@param factor number [0, 1]
+---@param alpha number|nil [0, 1]
+---@return string hexColor aarrggbb
+function AF.ScaleColorHex(color, factor, alpha)
+    local r, g, b, a = AF.ConvertHEXToRGB(color)
+    factor = factor or 1
+    alpha = alpha or a or 1
+    return AF.ConvertRGBToHEX(r * factor, g * factor, b * factor, alpha)
+end
+
+---@param r number [0, 1]
+---@param g number [0, 1]
+---@param b number [0, 1]
+---@param saturation number [0, 1]
+---@param brightness number [0, 1]
+---@return number r [0, 1]
+---@return number g [0, 1]
+---@return number b [0, 1]
+function AF.AdjustColorSaturationBrightness(r, g, b, saturation, brightness)
+    local _h, _s, _b = AF.ConvertRGBToHSB(r, g, b)
+    _s = AF.Clamp(_s * saturation, 0, 1)
+    _b = AF.Clamp(_b * brightness, 0, 1)
+    return AF.ConvertHSBToRGB(_h, _s, _b)
+end
+
 function AF.ConvertToGrayscale(r, g, b, a)
     local v = 0.299 * r + 0.587 * g + 0.114 * b
     return v, v, v, a
