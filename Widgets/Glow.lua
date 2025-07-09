@@ -2,6 +2,29 @@
 local AF = _G.AbstractFramework
 
 ---------------------------------------------------------------------
+-- simple glow
+---------------------------------------------------------------------
+---@param parent Frame
+---@param color? string|table default is accent color
+---@param size? number default is 5
+---@return Frame parent.glow
+function AF.CreateGlow(parent, color, size)
+    parent.glow = parent.glow or CreateFrame("Frame", nil, parent, "BackdropTemplate")
+    AF.SetBackdrop(parent.glow, {edgeFile = AF.GetTexture("StaticGlow"), edgeSize = size or 5})
+    AF.SetOutside(parent.glow, parent, size or 5)
+
+    color = color or AF.GetAddonAccentColorName()
+
+    if type(color) == "string" then
+        parent.glow:SetBackdropBorderColor(AF.GetColorRGB(color))
+    elseif type(color) == "table" then
+        parent.glow:SetBackdropBorderColor(AF.UnpackColor(color))
+    end
+
+    return parent.glow
+end
+
+---------------------------------------------------------------------
 -- normal glow
 ---------------------------------------------------------------------
 ---@param parent Frame
@@ -16,6 +39,8 @@ function AF.ShowNormalGlow(parent, color, size, autoHide)
         if autoHide then
             parent.normalGlow:SetScript("OnHide", function() parent.normalGlow:Hide() end)
         end
+
+        AF.AddToPixelUpdater_OnShow(parent.normalGlow)
     end
 
     parent.normalGlow.size = size or parent.normalGlow.size or 5
@@ -44,8 +69,6 @@ function AF.ShowNormalGlow(parent, color, size, autoHide)
     end
 
     parent.normalGlow:Show()
-
-    AF.AddToPixelUpdater_OnShow(parent.normalGlow)
 end
 
 function AF.HideNormalGlow(parent)
@@ -76,11 +99,11 @@ function AF.ShowCalloutGlow(parent, blink, autoHide, relativeFrameLevel)
         if blink then
             AF.CreateBlinkAnimation(parent.calloutGlow, 0.5)
         end
+
+        AF.AddToPixelUpdater_OnShow(parent.calloutGlow)
     end
 
     parent.calloutGlow:Show()
-
-    AF.AddToPixelUpdater_OnShow(parent.calloutGlow)
 end
 
 function AF.HideCalloutGlow(parent)
