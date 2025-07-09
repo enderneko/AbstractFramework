@@ -422,15 +422,19 @@ end
 ---------------------------------------------------------------------
 -- drag
 ---------------------------------------------------------------------
-function AF.SetDraggable(frame, notUserPlaced)
+---@param frame Frame draggable frame
+---@param target Frame|nil if set then the target will be moved instead of the frame
+---@param notUserPlaced boolean|nil
+function AF.SetDraggable(frame, target, notUserPlaced)
+    target = target or frame
+    target:SetMovable(true)
     frame:RegisterForDrag("LeftButton")
-    frame:SetMovable(true)
     frame:SetMouseClickEnabled(true)
-    frame:SetScript("OnDragStart", function(self)
-        self:StartMoving()
-        if notUserPlaced then self:SetUserPlaced(false) end
+    frame:SetScript("OnDragStart", function()
+        target:StartMoving()
+        if notUserPlaced then target:SetUserPlaced(false) end
     end)
-    frame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
+    frame:SetScript("OnDragStop", function() target:StopMovingOrSizing() end)
 end
 
 ---------------------------------------------------------------------
