@@ -184,48 +184,65 @@ end
 
 ---@param color string
 ---@param alpha? number
----@param saturation? number
+---@param factor? number
 ---@return number r
 ---@return number g
 ---@return number b
 ---@return number a
-function AF.GetColorRGB(color, alpha, saturation)
+function AF.GetColorRGB(color, alpha, factor)
     if color:find("^#") then
+        if alpha or factor then
+            color = AF.ScaleColorHex(color, factor, alpha)
+        end
         return AF.ConvertHEXToRGB(color)
     end
 
     assert(COLORS[color], "no such color:", color)
 
-    saturation = saturation or 1
+    factor = factor or 1
     alpha = alpha or COLORS[color]["t"][4] or 1
-    return COLORS[color]["t"][1] * saturation, COLORS[color]["t"][2] * saturation, COLORS[color]["t"][3] * saturation, alpha
+    return COLORS[color]["t"][1] * factor, COLORS[color]["t"][2] * factor, COLORS[color]["t"][3] * factor, alpha
 end
 
 ---@param color string
 ---@param alpha? number
----@param saturation? number
----@return table
-function AF.GetColorTable(color, alpha, saturation)
+---@param factor? number
+---@return table colorTable {r, g, b, a}
+function AF.GetColorTable(color, alpha, factor)
     if color:find("^#") then
+        if alpha or factor then
+            color = AF.ScaleColorHex(color, factor, alpha)
+        end
         return {AF.ConvertHEXToRGB(color)}
     end
 
     assert(COLORS[color], "no such color:", color)
 
-    saturation = saturation or 1
-    alpha = alpha or COLORS[color]["t"][4]
+    factor = factor or 1
+    alpha = alpha or COLORS[color]["t"][4] or 1
 
-    return {COLORS[color]["t"][1] * saturation, COLORS[color]["t"][2] * saturation, COLORS[color]["t"][3] * saturation, alpha}
+    return {COLORS[color]["t"][1] * factor, COLORS[color]["t"][2] * factor, COLORS[color]["t"][3] * factor, alpha}
 end
 
 ---@param color string
+---@param alpha? number
+---@param factor? number
 ---@return string hexColor \"rrggbb\" or \"aarrggbb\"
-function AF.GetColorHex(color)
+function AF.GetColorHex(color, alpha, factor)
     if color:find("^#") then
-        return color:gsub("#", "")
+        if alpha or factor then
+            return AF.ScaleColorHex(color, factor, alpha)
+        else
+            return color:gsub("#", "")
+        end
     end
 
     assert(COLORS[color], "no such color:", color)
+
+    if alpha or factor then
+        local r, g, b, a = AF.GetColorRGB(color, alpha, factor)
+        return AF.ConvertRGBToHEX(r, g, b, a)
+    end
 
     if not COLORS[color]["hex"] then
         COLORS[color]["hex"] = AF.ConvertRGB256ToHEX(AF.ConvertToRGB256(unpack(COLORS[color]["t"])))
@@ -234,9 +251,11 @@ function AF.GetColorHex(color)
 end
 
 ---@param color string
+---@param alpha? number
+---@param factor? number
 ---@return string colorStr |caarrggbb
-function AF.GetColorStr(color)
-    local hex = AF.GetColorHex(color)
+function AF.GetColorStr(color, alpha, factor)
+    local hex = AF.GetColorHex(color, alpha, factor)
 
     if #hex == 8 then
         return "|c" .. hex
@@ -333,27 +352,27 @@ function AF.ResetAccentColor()
 end
 
 ---@param alpha? number
----@param saturation? number
+---@param factor? number
 ---@return number r
 ---@return number g
 ---@return number b
 ---@return number a
-function AF.GetAccentColorRGB(alpha, saturation)
-    return AF.GetColorRGB("accent", alpha, saturation)
+function AF.GetAccentColorRGB(alpha, factor)
+    return AF.GetColorRGB("accent", alpha, factor)
 end
 
 ---@param alpha? number
----@param saturation? number
+---@param factor? number
 ---@return table
-function AF.GetAccentColorTable(alpha, saturation)
-    return AF.GetColorTable("accent", alpha, saturation)
+function AF.GetAccentColorTable(alpha, factor)
+    return AF.GetColorTable("accent", alpha, factor)
 end
 
 ---@param alpha? number
----@param saturation? number
+---@param factor? number
 ---@return string
-function AF.GetAccentColorHex(alpha, saturation)
-    return AF.GetColorHex("accent", alpha, saturation)
+function AF.GetAccentColorHex(alpha, factor)
+    return AF.GetColorHex("accent", alpha, factor)
 end
 
 ---@param color string|table colorName, colorHex, colorTable
@@ -401,46 +420,46 @@ function AF.GetAddonAccentColorName(addon)
 end
 
 ---@param alpha? number
----@param saturation? number
+---@param factor? number
 ---@return table
-function AF.GetAddonAccentColorTable(addon, alpha, saturation)
-    return AF.GetColorTable(AF.GetAddonAccentColorName(addon), alpha, saturation)
+function AF.GetAddonAccentColorTable(addon, alpha, factor)
+    return AF.GetColorTable(AF.GetAddonAccentColorName(addon), alpha, factor)
 end
 
 ---@param alpha? number
----@param saturation? number
+---@param factor? number
 ---@return number r
 ---@return number g
 ---@return number b
 ---@return number a
-function AF.GetAddonAccentColorRGB(addon, alpha, saturation)
-    return AF.GetColorRGB(AF.GetAddonAccentColorName(addon), alpha, saturation)
+function AF.GetAddonAccentColorRGB(addon, alpha, factor)
+    return AF.GetColorRGB(AF.GetAddonAccentColorName(addon), alpha, factor)
 end
 
 ---@param alpha? number
----@param saturation? number
+---@param factor? number
 ---@return string
-function AF.GetAddonAccentColorHex(addon, alpha, saturation)
-    return AF.GetColorHex(AF.GetAddonAccentColorName(addon), alpha, saturation)
+function AF.GetAddonAccentColorHex(addon, alpha, factor)
+    return AF.GetColorHex(AF.GetAddonAccentColorName(addon), alpha, factor)
 end
 
 ---@param class string capitalized class name
 ---@param alpha? number
----@param saturation? number
+---@param factor? number
 ---@return number r
 ---@return number g
 ---@return number b
 ---@return number a
-function AF.GetClassColor(class, alpha, saturation)
-    saturation = saturation or 1
+function AF.GetClassColor(class, alpha, factor)
+    factor = factor or 1
 
     if COLORS[class] then
-        return AF.GetColorRGB(class, alpha, saturation)
+        return AF.GetColorRGB(class, alpha, factor)
     end
 
     if RAID_CLASS_COLORS[class] then
         local r, g, b = RAID_CLASS_COLORS[class]:GetRGB()
-        return r * saturation, g * saturation, b * saturation, alpha or 1
+        return r * factor, g * factor, b * factor, alpha or 1
     end
 
     return AF.GetColorRGB("UNKNOWN")
@@ -466,20 +485,20 @@ end
 
 ---@param unit string unitId
 ---@param alpha? number
----@param saturation? number
+---@param factor? number
 ---@return number r
 ---@return number g
 ---@return number b
-function AF.GetReactionColor(unit, alpha, saturation)
+function AF.GetReactionColor(unit, alpha, factor)
     --! reaction to player, MUST use UnitReaction(unit, "player")
     --! NOT UnitReaction("player", unit)
     local reaction = UnitReaction(unit, "player") or 0
     if reaction <= 2 then
-        return AF.GetColorRGB("HOSTILE", alpha, saturation)
+        return AF.GetColorRGB("HOSTILE", alpha, factor)
     elseif reaction <= 4 then
-        return AF.GetColorRGB("NEUTRAL", alpha, saturation)
+        return AF.GetColorRGB("NEUTRAL", alpha, factor)
     else
-        return AF.GetColorRGB("FRIENDLY", alpha, saturation)
+        return AF.GetColorRGB("FRIENDLY", alpha, factor)
     end
 end
 
@@ -520,20 +539,20 @@ end
 ---@param power string capitalized power token
 ---@param unit string unitId
 ---@param alpha? number
----@param saturation? number
+---@param factor? number
 ---@return number r
 ---@return number g
 ---@return number b
 ---@return number a
-function AF.GetPowerColor(power, unit, alpha, saturation)
-    saturation = saturation or 1
+function AF.GetPowerColor(power, unit, alpha, factor)
+    factor = factor or 1
 
     if COLORS[power] then
         if COLORS[power]["start"] then -- gradient
-            return COLORS[power]["start"][1] * saturation, COLORS[power]["start"][2] * saturation, COLORS[power]["start"][3] * saturation, alpha,
-                COLORS[power]["end"][1] * saturation, COLORS[power]["end"][2] * saturation, COLORS[power]["end"][3] * saturation, alpha
+            return COLORS[power]["start"][1] * factor, COLORS[power]["start"][2] * factor, COLORS[power]["start"][3] * factor, alpha,
+                COLORS[power]["end"][1] * factor, COLORS[power]["end"][2] * factor, COLORS[power]["end"][3] * factor, alpha
         else
-            return AF.GetColorRGB(power, alpha, saturation)
+            return AF.GetColorRGB(power, alpha, factor)
         end
     end
 
@@ -544,7 +563,7 @@ function AF.GetPowerColor(power, unit, alpha, saturation)
         end
     end
 
-    return AF.GetColorRGB("MANA", alpha, saturation)
+    return AF.GetColorRGB("MANA", alpha, factor)
 end
 
 ---add new COLORS to the color table with specific name
