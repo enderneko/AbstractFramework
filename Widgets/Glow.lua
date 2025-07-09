@@ -6,12 +6,12 @@ local AF = _G.AbstractFramework
 ---------------------------------------------------------------------
 ---@param parent Frame
 ---@param color? string|table default is accent color
----@param size? number default is 5
+---@param size? number default is 3
 ---@return Frame parent.glow
 function AF.CreateGlow(parent, color, size)
     parent.glow = parent.glow or CreateFrame("Frame", nil, parent, "BackdropTemplate")
     AF.SetBackdrop(parent.glow, {edgeFile = AF.GetTexture("StaticGlow"), edgeSize = size or 5})
-    AF.SetOutside(parent.glow, parent, size or 5)
+    AF.SetOutside(parent.glow, parent, size or 3)
 
     color = color or AF.GetAddonAccentColorName()
 
