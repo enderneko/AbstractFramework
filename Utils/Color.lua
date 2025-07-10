@@ -256,6 +256,26 @@ end
 ---@param r number [0, 1]
 ---@param g number [0, 1]
 ---@param b number [0, 1]
+---@param a? number [0, 1]
+---@return number r [0, 1]
+---@return number g [0, 1]
+---@return number b [0, 1]
+---@return number? a [0, 1]
+function AF.InvertColor(r, g, b, a)
+    return 1 - r, 1 - g, 1 - b, a
+end
+
+---@param hex string hex color
+---@return string hexColor inverted color
+function AF.InvertColorHex(hex)
+    local r, g, b, a = AF.ConvertHEXToRGB(hex)
+    local invR, invG, invB = AF.InvertColor(r, g, b)
+    return AF.ConvertRGBToHEX(invR, invG, invB, a)
+end
+
+---@param r number [0, 1]
+---@param g number [0, 1]
+---@param b number [0, 1]
 ---@param saturation number [0, 1]
 ---@param brightness number [0, 1]
 ---@return number r [0, 1]
