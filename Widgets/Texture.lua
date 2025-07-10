@@ -126,7 +126,7 @@ end
 ---@param color1 table|string
 ---@param color2 table|string
 ---@return Texture tex
-function AF.CreateGradientTexture(parent, orientation, color1, color2, texture, drawLayer, subLevel)
+function AF.CreateGradientTexture(parent, orientation, color1, color2, texture, drawLayer, subLevel, filterMode)
     texture = texture or AF.GetPlainTexture()
     if type(color1) == "string" then color1 = AF.GetColorTable(color1) end
     if type(color2) == "string" then color2 = AF.GetColorTable(color2) end
@@ -134,7 +134,7 @@ function AF.CreateGradientTexture(parent, orientation, color1, color2, texture, 
     color2 = color2 or {0, 0, 0, 0}
 
     local tex = parent:CreateTexture(nil, drawLayer or "ARTWORK", nil, subLevel)
-    tex:SetTexture(texture)
+    tex:SetTexture(texture, nil, nil, filterMode)
     tex:SetGradient(orientation, CreateColor(unpack(color1)), CreateColor(unpack(color2)))
 
     AF.AddToPixelUpdater_OnShow(tex)
