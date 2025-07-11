@@ -445,19 +445,19 @@ end
 ---------------------------------------------------------------------
 -- button group
 ---------------------------------------------------------------------
--- buttonId is button.id
----@param buttons table
+-- buttonId is button.id, if button.id is not set, it will use button:GetText() or button:GetName() or tostring(button)
+---@param buttons table button's OnEnter/OnLeave/OnClick will be overridden
 ---@param onClick fun(buttonId: string, button: AF_Button)
----@param selectedFn? fun(buttonId: string, button: AF_Button)
----@param unselectedFn? fun(buttonId: string, button: AF_Button)
+---@param onSelect? fun(buttonId: string, button: AF_Button)
+---@param onDeselect? fun(buttonId: string, button: AF_Button)
 ---@param onEnter? fun(button: AF_Button)
 ---@param onLeave? fun(button: AF_Button)
----@return function HighlightButton accept button.id as parameter
-function AF.CreateButtonGroup(buttons, onClick, selectedFn, unselectedFn, onEnter, onLeave)
-    local function HighlightButton(id)
-        for _, b in pairs(buttons) do
+---@return function Select accept button.id as parameter, same as button:Click()
+function AF.CreateButtonGroup(buttons, onClick, onSelect, onDeselect, onEnter, onLeave)
+    local function Select(id)
+        for _, b in next, buttons do
             if id == b.id then
-                b:SetBackdropColor(unpack(b._hoverColor))
+                if b._hoverColor then b:SetBackdropColor(AF.UnpackColor(b._hoverColor)) end
                 b:SetScript("OnEnter", function()
                     if b._tooltip then AF.ShowTooltip(b, b._tooltipAnchor, b._tooltipX, b._tooltipY, b._tooltip) end
                     if onEnter then onEnter(b) end
@@ -466,32 +466,37 @@ function AF.CreateButtonGroup(buttons, onClick, selectedFn, unselectedFn, onEnte
                     AF.HideTooltip()
                     if onLeave then onLeave(b) end
                 end)
-                if selectedFn then selectedFn(b.id, b) end
+                if onSelect then onSelect(b.id, b) end
+                b.isSelected = true
             else
-                b:SetBackdropColor(unpack(b._color))
+                if b._color then b:SetBackdropColor(AF.UnpackColor(b._color)) end
                 b:SetScript("OnEnter", function()
                     if b._tooltip then AF.ShowTooltip(b, b._tooltipAnchor, b._tooltipX, b._tooltipY, b._tooltip) end
-                    b:SetBackdropColor(unpack(b._hoverColor))
+                    if b._hoverColor then b:SetBackdropColor(AF.UnpackColor(b._hoverColor)) end
                     if onEnter then onEnter(b) end
                 end)
                 b:SetScript("OnLeave", function()
                     AF.HideTooltip()
-                    b:SetBackdropColor(unpack(b._color))
+                    if b._color then b:SetBackdropColor(AF.UnpackColor(b._color)) end
                     if onLeave then onLeave(b) end
                 end)
-                if unselectedFn then unselectedFn(b.id, b) end
+                if onDeselect then onDeselect(b.id, b) end
+                b.isSelected = false
             end
         end
     end
 
-    for _, b in pairs(buttons) do
+    for _, b in next, buttons do
+        b.id = b.id or b:GetText() or b:GetName() or tostring(b)
+        assert(b.id, "button.id is required")
+
         b:SetScript("OnClick", function()
-            HighlightButton(b.id)
+            Select(b.id)
             onClick(b.id, b)
         end)
     end
 
-    return HighlightButton
+    return Select
 end
 
 ---------------------------------------------------------------------
