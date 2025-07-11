@@ -91,7 +91,8 @@ local function UpdatePixels()
 end
 
 local timer
-local function DelayedUpdatePixels()
+local function DelayedUpdatePixels(_, _, skipPixelsUpdate)
+    if skipPixelsUpdate then return end
     if timer then timer:Cancel() end
     timer = C_Timer.NewTimer(1, UpdatePixels)
 end
@@ -160,8 +161,8 @@ function AF.GetScale()
     return AFConfig.scale
 end
 
-function AF.SetUIParentScale(scale)
-    UIParent:SetScale(scale)
+function AF.SetUIParentScale(scale, skipPixelsUpdate)
+    UIParent:SetScale(scale, skipPixelsUpdate)
 end
 
 ---------------------------------------------------------------------

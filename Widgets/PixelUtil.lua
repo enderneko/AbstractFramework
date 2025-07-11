@@ -10,6 +10,10 @@ function AF.GetPixelFactor()
     return 768.0 / physicalHeight
 end
 
+function AF.GetBestScale()
+    return AF.Clamp(AF.GetPixelFactor(), 0.5, 1.15)
+end
+
 function AF.GetNearestPixelSize(uiUnitSize, layoutScale, minPixels)
     if uiUnitSize == 0 and (not minPixels or minPixels == 0) then
         return 0

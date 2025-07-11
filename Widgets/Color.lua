@@ -322,6 +322,7 @@ end, "high")
 ---@param buttonNormalColor? string|table
 ---@param buttonHoverColor? string|table
 function AF.SetAccentColor(color, buttonNormalColor, buttonHoverColor)
+    assert(AFConfig, "AFConfig not loaded")
     local t = BuildColorTable(color)
 
     -- normal
@@ -347,6 +348,7 @@ function AF.SetAccentColor(color, buttonNormalColor, buttonHoverColor)
 end
 
 function AF.ResetAccentColor()
+    assert(AFConfig, "AFConfig not loaded")
     COLORS["accent"] = AF.Copy(ACCENT_COLOR)
     AFConfig.customAccentColor = nil
 end
