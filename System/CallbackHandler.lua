@@ -86,16 +86,17 @@ AF.DEBUG_EVENTS = {
 }
 
 function AF.Fire(event, ...)
-    if AFConfig and AFConfig.debug.EVENTS then
-        local e = event
-        if AF.DEBUG_EVENTS[event] then
-            e = AF.WrapTextInColor(event, AF.DEBUG_EVENTS[event])
-        end
-        if AF.DEBUG_EVENTS[event] ~= false then
-            if select("#", ...) > 0 then
-                print(AF.WrapTextInColor("[EVENT]", "hotpink"), e, AF.GetColorStr("gray") .. ":", ...)
-            else
-                print(AF.WrapTextInColor("[EVENT]", "hotpink"), e)
+    if AFConfig then
+        local addon = AF.GetAddon()
+        if (addon and AFConfig.debug[addon]) or (not addon and AFConfig.debug.AF_EVENTS) then
+            local color = AF.DEBUG_EVENTS[event]
+            if color then
+                local e = AF.WrapTextInColor(event, type(color) == "string" and color or "white")
+                if select("#", ...) > 0 then
+                    print(AF.WrapTextInColor("[EVENT]", "hotpink"), e, AF.GetColorStr("gray") .. ":", ...)
+                else
+                    print(AF.WrapTextInColor("[EVENT]", "hotpink"), e)
+                end
             end
         end
     end

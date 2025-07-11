@@ -59,7 +59,7 @@ function AF.Debug(arg, ...)
     if not AFConfig then return end
 
     local addon = AF.GetAddon()
-    if addon and AFConfig.debug[addon] or AFConfig.debug.AF then
+    if (addon and AFConfig.debug[addon]) or (not addon and AFConfig.debug.AF) then
         if type(arg) == "string" or type(arg) == "number" or type(arg) == "boolean" then
             print(AF.WrapTextInColor("[DEBUG]", "red") .. GetPrefix(), arg, ...)
         elseif type(arg) == "table" then

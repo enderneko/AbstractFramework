@@ -123,7 +123,7 @@ function AF.UIParent:ADDON_LOADED(addon)
         if type(AFConfig.debug) ~= "table" then
             AFConfig.debug = {
                 ["AF"] = false,
-                ["EVENTS"] = false,
+                ["AF_EVENTS"] = false,
             }
         end
 
