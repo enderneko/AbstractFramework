@@ -288,10 +288,10 @@ function AF_TitledPaneMixin:SetTips(...)
 end
 
 -- Recommended position for the first component:
--- | Type             | Point     | X  | Y       |
--- |------------------|-----------|----|---------|
--- | Button/CheckBox  | "TOPLEFT" | 5  | -25/-27 |
--- | Slider           | "TOPLEFT" | 5  | -40     |
+-- | Type             | Point     | X    | Y       |
+-- |------------------|-----------|------|---------|
+-- | Button/CheckBox  | "TOPLEFT" | 5/15 | -25/-27 |
+-- | Slider           | "TOPLEFT" | 5/15 | -40/-45 |
 ---@param parent Frame
 ---@param title string
 ---@param width? number

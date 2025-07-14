@@ -498,7 +498,9 @@ local function UpdatePixelsForCombatSafeOnlyRegions()
         r:UpdatePixels()
         n = n + 1
     end
-    AF.Debug(AF.GetColorStr("yellow") .. "Updated pixels for combat safe only regions: ", n)
+    if n ~= 0 then
+        AF.Debug(AF.GetColorStr("yellow") .. "Updated pixels for combat safe only regions: ", n)
+    end
 end
 AF.CreateBasicEventHandler(UpdatePixelsForCombatSafeOnlyRegions, "PLAYER_REGEN_ENABLED")
 
