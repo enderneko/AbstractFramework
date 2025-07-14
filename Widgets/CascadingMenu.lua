@@ -98,10 +98,12 @@ local function LoadItems(items, maxShownItems, level, parentItem)
             b:HideTexture()
         end
 
-        if item.onClick then
+        local callback = item.callback or item.onClick
+
+        if callback then
             b:SetScript("OnClick", function()
                 if item.notClickable then return end
-                item.onClick(item.value)
+                callback(item.value)
                 if current_root and current_root.OnMenuSelection then
                     tinsert(selection_path, item)
                     current_root:OnMenuSelection(item, selection_path)
@@ -171,7 +173,7 @@ end
 --         ["iconBorderColor"] = (string),
 --         ["isIconAtlas"] = (boolean),
 --         ["notClickable"] = (boolean),
---         ["onClick"] = (function),
+--         ["callback|onClick"] = (function),
 --         ["disabled"] = (boolean),
 --         ["children"] = {...},
 --     }, ...

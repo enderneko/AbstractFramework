@@ -231,7 +231,7 @@ end
 --         ["font"] = (string),
 --         ["icon"] = (string),
 --         ["disabled"] = (boolean),
---         ["onClick"] = (function)
+--         ["callback|onClick"] = (function)
 --     },
 -- }
 
@@ -246,6 +246,7 @@ function AF_DropdownMixin:SetItems(items)
             }
         else
             if not item.value then item.value = item.text end
+            item.callback = item.callback or item.onClick -- for backward compatibility
         end
     end
     self.items = items
@@ -291,8 +292,8 @@ end
 
 -- onSelect -------------------------------------
 ---@param fn function
-    self.onClick = fn
 function AF_DropdownMixin:SetOnSelect(fn)
+    self.callback = fn
 end
 -------------------------------------------------
 
@@ -373,11 +374,11 @@ function AF_DropdownMixin:LoadItems()
         b:SetScript("OnClick", function()
             self:SetSelectedValue(item.value)
             self.list:Hide()
-            if item.onClick then
-                -- NOTE: item.onClick has higher priority
-                item.onClick(item.value, self)
-            elseif self.onClick then
-                self.onClick(item.value)
+            if item.callback then
+                -- NOTE: item.callback has higher priority
+                item.callback(item.value, self)
+            elseif self.callback then
+                self.callback(item.value)
             end
             if not self.miniMode then self.button:SetTexture(AF.GetIcon("ArrowDown1")) end
         end)
@@ -565,7 +566,7 @@ function AF.CreateDropdown(parent, width, maxSlots, miniMode, dropdownType, text
         --     ["font"] = (string),
         --     ["icon"] = (string),
         --     ["disabled"] = (boolean),
-        --     ["onClick"] = (function)
+        --     ["callback|onClick"] = (function)
         -- },
     }
 
