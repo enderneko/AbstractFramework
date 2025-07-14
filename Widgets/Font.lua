@@ -99,6 +99,10 @@ AF.fontSizeOffset = 0
 ---@param offset number
 function AF.UpdateFontSize(offset)
     AF.fontSizeOffset = offset
+    if AFConfig then
+        AFConfig.fontSizeOffset = AF.fontSizeOffset
+    end
+
     font_title:SetFont(BASE_FONT_NORMAL, FONT_TITLE_SIZE + offset, "")
     font_normal:SetFont(BASE_FONT_NORMAL, FONT_NORMAL_SIZE + offset, "")
     font_chat:SetFont(BASE_FONT_CHAT, FONT_CHAT_SIZE + offset, "")

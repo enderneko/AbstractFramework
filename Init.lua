@@ -128,6 +128,10 @@ function AF.UIParent:ADDON_LOADED(addon)
             }
         end
 
+        -- font size offset
+        if type(AFConfig.fontSizeOffset) ~= "number" then AFConfig.fontSizeOffset = 0 end
+        AF.UpdateFontSize(AFConfig.fontSizeOffset)
+
         -- debug
         if type(AFConfig.debug) ~= "table" then
             AFConfig.debug = {
