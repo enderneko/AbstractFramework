@@ -425,7 +425,9 @@ end
 ---@param frame Frame draggable frame
 ---@param target Frame|nil if set then the target will be moved instead of the frame
 ---@param notUserPlaced boolean|nil
-function AF.SetDraggable(frame, target, notUserPlaced)
+---@param onDragStart function|nil
+---@param onDragStop function|nil
+function AF.SetDraggable(frame, target, notUserPlaced, onDragStart, onDragStop)
     target = target or frame
     target:SetMovable(true)
     frame:RegisterForDrag("LeftButton")
@@ -433,8 +435,12 @@ function AF.SetDraggable(frame, target, notUserPlaced)
     frame:SetScript("OnDragStart", function()
         target:StartMoving()
         if notUserPlaced then target:SetUserPlaced(false) end
+        if onDragStart then onDragStart(target) end
     end)
-    frame:SetScript("OnDragStop", function() target:StopMovingOrSizing() end)
+    frame:SetScript("OnDragStop", function()
+        target:StopMovingOrSizing()
+        if onDragStop then onDragStop(target) end
+    end)
 end
 
 ---------------------------------------------------------------------
