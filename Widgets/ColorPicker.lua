@@ -46,8 +46,8 @@ end
 ---@param parent Frame
 ---@param label string
 ---@param alphaEnabled boolean
----@param onChange function
----@param onConfirm function
+---@param onChange fun(r: number, g: number, b: number, a: number)
+---@param onConfirm fun(r: number, g: number, b: number, a: number)
 ---@return AF_ColorPicker cp
 function AF.CreateColorPicker(parent, label, alphaEnabled, onChange, onConfirm)
     local cp = CreateFrame("Button", nil, parent, "BackdropTemplate")
@@ -416,6 +416,7 @@ local function CreateColorPickerFrame()
     -- AF.ApplyDefaultBackdropWithColors(colorPickerFrame, nil, "accent")
     -- AF.ApplyDefaultBackdropWithColors(colorPickerFrame.header, "header", "accent")
     AF.SetPoint(colorPickerFrame, "CENTER")
+    -- tinsert(_G.UISpecialFrames, colorPickerFrame:GetName())
 
     --------------------------------------------------
     -- logo
@@ -775,7 +776,7 @@ function AF.ShowColorPicker(owner, callback, onConfirm, hasAlpha, r, g, b, a)
         CreateColorPickerFrame()
     end
 
-    colorPickerFrame:SetParent(owner)
+    -- colorPickerFrame:SetParent(owner)
     colorPickerFrame:SetFrameStrata("DIALOG")
     colorPickerFrame:SetToplevel(true)
 
@@ -810,9 +811,18 @@ function AF.ShowColorPicker(owner, callback, onConfirm, hasAlpha, r, g, b, a)
     end)
 
     cancelBtn:SetScript("OnClick", function()
+        colorPickerFrame:SetScript("OnUpdate", nil)
         Callback = nil
         colorPickerFrame:Hide()
         callback(oR, oG, oB, oA)
+    end)
+
+    colorPickerFrame:SetScript("OnUpdate", function()
+        if owner:IsVisible() then return end
+        colorPickerFrame:SetScript("OnUpdate", nil)
+        Callback = nil
+        callback(oR, oG, oB, oA)
+        colorPickerFrame:Hide()
     end)
 
     -- update originalPane
