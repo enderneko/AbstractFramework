@@ -782,13 +782,6 @@ local AF_SwitchMixin = {}
 
 function AF_SwitchMixin:SetSelectedValue(value)
     for _, b in ipairs(self.buttons) do
-        -- if b.value == value then
-        --     if not b.isSelected then b.fill:Play() end
-        --     b.isSelected = true
-        -- else
-        --     if b.isSelected then b.empty:Play() end
-        --     b.isSelected = false
-        -- end
         if b.value == value then
             b:SilentClick()
             break
@@ -798,6 +791,11 @@ end
 
 function AF_SwitchMixin:GetSelectedValue()
     return self.selected
+end
+
+---@param callback fun(value: any)
+function AF_SwitchMixin:SetOnSelect(callback)
+    self.callback = callback
 end
 
 -- function AF_SwitchMixin:UpdatePixels()
@@ -813,128 +811,156 @@ end
 --     -- end
 -- end
 
----@param labels table {{["text"]=(string), ["value"]=(any), ["onClick"]=(function)}, ...}
+---@param labels table {{["text"]=(string), ["value"]=(any), ["callback|onClick"]=(function)}, ...}
 function AF_SwitchMixin:SetLabels(labels)
     if type(labels) ~= "table" then return end
 
-    local buttons = self.buttons
-    for _, b in ipairs(buttons) do
-        b:Hide()
-    end
-    wipe(buttons)
-
     local switch = self
+    switch.labels = labels
     local n = #labels
+
+    local buttons = self.buttons
+    for i, b in next, buttons do
+        if i > n then
+            b:Hide()
+            AF.SetHeight(b.highlight, 1)
+        end
+    end
+
     local width = self._width / n
     local height = self._height
 
     for i, l in pairs(labels) do
-        buttons[i] = AF.CreateButton(switch, labels[i].text, "none", width, height, nil, "", "")
-        buttons[i].value = labels[i].value or labels[i].text
-        buttons[i].isSelected = false
+        if not buttons[i] then
+            buttons[i] = AF.CreateButton(switch, nil, "none", nil, nil, nil, "", "")
 
-        buttons[i].highlight = AF.CreateTexture(buttons[i], nil, AF.GetColorTable(switch.accentColor, 0.7))
-        AF.SetPoint(buttons[i].highlight, "BOTTOMLEFT", 1, 1)
-        AF.SetPoint(buttons[i].highlight, "BOTTOMRIGHT", -1, 1)
-        AF.SetHeight(buttons[i].highlight, 1)
-
-        -- fill animation -------------------------------------------
-        local fill = buttons[i].highlight:CreateAnimationGroup()
-        buttons[i].fill = fill
-
-        fill.t = fill:CreateAnimation("Translation")
-        fill.t:SetOffset(0, AF.ConvertPixelsForRegion(height/2-1, buttons[i]))
-        fill.t:SetSmoothing("IN")
-        fill.t:SetDuration(0.1)
-
-        fill.s = fill:CreateAnimation("Scale")
-        fill.s:SetScaleTo(1, AF.ConvertPixelsForRegion(height-2, buttons[i]))
-        fill.s:SetDuration(0.1)
-        fill.s:SetSmoothing("IN")
-
-        fill:SetScript("OnPlay", function()
-            AF.ClearPoints(buttons[i].highlight)
+            buttons[i].highlight = AF.CreateTexture(buttons[i], nil, AF.GetColorTable(switch.accentColor, 0.7))
             AF.SetPoint(buttons[i].highlight, "BOTTOMLEFT", 1, 1)
             AF.SetPoint(buttons[i].highlight, "BOTTOMRIGHT", -1, 1)
-        end)
-
-        fill:SetScript("OnFinished", function()
-            AF.SetHeight(buttons[i].highlight, height-2)
-            -- to ensure highlight always fill the whole button exactly
-            AF.ClearPoints(buttons[i].highlight)
-            AF.SetPoint(buttons[i].highlight, "TOPLEFT", 1, -1)
-            AF.SetPoint(buttons[i].highlight, "BOTTOMRIGHT", -1, 1)
-        end)
-        -------------------------------------------------------------
-
-        -- empty animation ------------------------------------------
-        local empty = buttons[i].highlight:CreateAnimationGroup()
-        buttons[i].empty = empty
-
-        empty.t = empty:CreateAnimation("Translation")
-        empty.t:SetOffset(0, -AF.ConvertPixelsForRegion(height/2-1, buttons[i]))
-        empty.t:SetSmoothing("IN")
-        empty.t:SetDuration(0.1)
-
-        empty.s = empty:CreateAnimation("Scale")
-        empty.s:SetScaleTo(1, 1/AF.ConvertPixelsForRegion(height-2, buttons[i]))
-        empty.s:SetDuration(0.1)
-        empty.s:SetSmoothing("IN")
-
-        empty:SetScript("OnPlay", function()
-            AF.ClearPoints(buttons[i].highlight)
-            AF.SetPoint(buttons[i].highlight, "BOTTOMLEFT", 1, 1)
-            AF.SetPoint(buttons[i].highlight, "BOTTOMRIGHT", -1, 1)
-        end)
-
-        empty:SetScript("OnFinished", function()
             AF.SetHeight(buttons[i].highlight, 1)
-        end)
-        -------------------------------------------------------------
 
-        buttons[i]:SetScript("OnClick", function(self)
-            if self.isSelected or fill:IsPlaying() or empty:IsPlaying() then return end
+            -- fill animation -------------------------------------------
+            -- local fill = buttons[i].highlight:CreateAnimationGroup()
+            -- buttons[i].fill = fill
 
-            fill:Play()
-            self.isSelected = true
-            switch.selected = self.value
+            -- fill.t = fill:CreateAnimation("Translation")
+            -- fill.t:SetOffset(0, AF.ConvertPixelsForRegion(height / 2 - 1, buttons[i]))
+            -- fill.t:SetSmoothing("IN")
+            -- fill.t:SetDuration(0.1)
 
-            if labels[i].onClick then
-                labels[i].onClick()
-            end
+            -- fill.s = fill:CreateAnimation("Scale")
+            -- fill.s:SetScaleTo(1, AF.ConvertPixelsForRegion(height - 2, buttons[i]))
+            -- fill.s:SetDuration(0.1)
+            -- fill.s:SetSmoothing("IN")
 
-            -- deselect others
-            for j, b in ipairs(buttons) do
-                if j ~= i then
-                    if b.isSelected then b.empty:Play() end
-                    b.isSelected = false
+            -- fill:SetScript("OnPlay", function()
+            --     AF.ClearPoints(buttons[i].highlight)
+            --     AF.SetPoint(buttons[i].highlight, "BOTTOMLEFT", 1, 1)
+            --     AF.SetPoint(buttons[i].highlight, "BOTTOMRIGHT", -1, 1)
+            -- end)
+
+            -- fill:SetScript("OnFinished", function()
+            --     AF.SetHeight(buttons[i].highlight, height - 2)
+            --     -- to ensure highlight always fill the whole button exactly
+            --     AF.ClearPoints(buttons[i].highlight)
+            --     AF.SetPoint(buttons[i].highlight, "TOPLEFT", 1, -1)
+            --     AF.SetPoint(buttons[i].highlight, "BOTTOMRIGHT", -1, 1)
+            -- end)
+            -------------------------------------------------------------
+
+            -- empty animation ------------------------------------------
+            -- local empty = buttons[i].highlight:CreateAnimationGroup()
+            -- buttons[i].empty = empty
+
+            -- empty.t = empty:CreateAnimation("Translation")
+            -- empty.t:SetOffset(0, -AF.ConvertPixelsForRegion(height / 2 - 1, buttons[i]))
+            -- empty.t:SetSmoothing("IN")
+            -- empty.t:SetDuration(0.1)
+
+            -- empty.s = empty:CreateAnimation("Scale")
+            -- empty.s:SetScaleTo(1, 1 / AF.ConvertPixelsForRegion(height - 2, buttons[i]))
+            -- empty.s:SetDuration(0.1)
+            -- empty.s:SetSmoothing("IN")
+
+            -- empty:SetScript("OnPlay", function()
+            --     AF.ClearPoints(buttons[i].highlight)
+            --     AF.SetPoint(buttons[i].highlight, "BOTTOMLEFT", 1, 1)
+            --     AF.SetPoint(buttons[i].highlight, "BOTTOMRIGHT", -1, 1)
+            -- end)
+
+            -- empty:SetScript("OnFinished", function()
+            --     AF.SetHeight(buttons[i].highlight, 1)
+            -- end)
+            -------------------------------------------------------------
+
+            buttons[i]:SetScript("OnClick", function(self)
+                -- if self.isSelected or fill:IsPlaying() or empty:IsPlaying() then return end
+                if self.isSelected then return end
+
+                AF.AnimatedResize(self.highlight, nil, height - 2, 0.02, 5)
+                self.isSelected = true
+                switch.selected = self.value
+
+                local callback = switch.labels[i].onClick or switch.labels[i].callback
+                if callback then
+                    callback(self.value)
+                elseif switch.callback then
+                    switch.callback(self.value)
                 end
-            end
-        end)
 
-        buttons[i]:SetScript("OnEnter", function()
-            switch:GetScript("OnEnter")()
-        end)
+                -- deselect others
+                for j, b in next, buttons do
+                    if j ~= i and b:IsVisible() then
+                        if b.isSelected then
+                            AF.AnimatedResize(b.highlight, nil, 1, 0.02, 5)
+                        end
+                        b.isSelected = false
+                    end
+                end
+            end)
 
-        buttons[i]:SetScript("OnLeave", function()
-            switch:GetScript("OnLeave")()
-        end)
+            buttons[i]:SetScript("OnEnter", function()
+                switch:GetScript("OnEnter")()
+            end)
 
+            buttons[i]:SetScript("OnLeave", function()
+                switch:GetScript("OnLeave")()
+            end)
+        end
+
+        -- reset
+        buttons[i].value = labels[i].value or labels[i].text
+        if buttons[i].isSelected then
+            AF.AnimatedResize(buttons[i].highlight, nil, 1, 0.02, 5)
+            buttons[i].isSelected = false
+        end
+
+        -- text
+        buttons[i]:SetText(labels[i].text)
+
+        -- size
+        AF.SetSize(buttons[i], width, height)
+
+        -- point
+        AF.ClearPoints(buttons[i])
         if i == 1 then
             AF.SetPoint(buttons[i], "TOPLEFT")
         elseif i == n then
-            AF.SetPoint(buttons[i], "TOPLEFT", buttons[i-1], "TOPRIGHT", -1, 0)
+            AF.SetPoint(buttons[i], "TOPLEFT", buttons[i - 1], "TOPRIGHT", -1, 0)
             AF.SetPoint(buttons[i], "TOPRIGHT")
         else
-            AF.SetPoint(buttons[i], "TOPLEFT", buttons[i-1], "TOPRIGHT", -1, 0)
+            AF.SetPoint(buttons[i], "TOPLEFT", buttons[i - 1], "TOPRIGHT", -1, 0)
         end
+
+        -- show
+        buttons[i]:Show()
     end
 end
 
 ---@param parent Frame
 ---@param width number can not be nil
 ---@param height number can not be nil
----@param labels table? {{["text"]=(string), ["value"]=(any), ["onClick"]=(function)}, ...}
+---@param labels table? {{["text"]=(string), ["value"]=(any), ["callback|onClick"]=(function)}, ...}
 ---@return AF_Switch switch
 function AF.CreateSwitch(parent, width, height, labels)
     local switch = AF.CreateBorderedFrame(parent, nil, width, height, "widget")
