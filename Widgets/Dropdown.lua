@@ -289,10 +289,10 @@ function AF_DropdownMixin:SetCurrentItem(item)
 end
 -------------------------------------------------
 
--- generic onClick ------------------------------
+-- onSelect -------------------------------------
 ---@param fn function
-function AF_DropdownMixin:SetOnClick(fn)
     self.onClick = fn
+function AF_DropdownMixin:SetOnSelect(fn)
 end
 -------------------------------------------------
 

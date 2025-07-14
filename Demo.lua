@@ -435,7 +435,7 @@ function AF.ShowDemo()
     AF.SetPoint(dd1, "TOPLEFT", cm, "BOTTOMLEFT", 0, -30)
     dd1:SetTooltip("Normal Dropdown 1")
     dd1:SetLabel("Normal Dropdown 1")
-    dd1:SetOnClick(function(value)
+    dd1:SetOnSelect(function(value)
         AF.Print("NormalDropdown1 Selected:", value)
     end)
     local items = {}
@@ -449,7 +449,7 @@ function AF.ShowDemo()
     AF.SetPoint(dd2, "TOPLEFT", dd1, "BOTTOMLEFT", 0, -30)
     AF.SetTooltip(dd2, "TOPLEFT", 0, 2, "Normal Dropdown 2")
     dd2:SetLabel("Normal Dropdown 2")
-    dd2:SetOnClick(function(value)
+    dd2:SetOnSelect(function(value)
         AF.Print("NormalDropdown2 Selected:", value)
     end)
     local items = {}
@@ -605,7 +605,7 @@ function AF.ShowDemo()
         end
     end)
 
-    dialogDD:SetOnClick(function(value)
+    dialogDD:SetOnSelect(function(value)
         form.value2 = value
         if form.dialog then
             form.dialog.yes:SetEnabled(strtrim(dialogEB:GetText()) ~= "" and dialogDD:GetSelected())
