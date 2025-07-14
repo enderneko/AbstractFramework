@@ -295,6 +295,9 @@ end
 function AF_DropdownMixin:SetOnSelect(fn)
     self.callback = fn
 end
+
+---@deprecated
+AF_DropdownMixin.SetOnClick = AF_DropdownMixin.SetOnSelect
 -------------------------------------------------
 
 function AF_DropdownMixin:LoadItems()

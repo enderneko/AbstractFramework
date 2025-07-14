@@ -313,16 +313,15 @@ local function BuildColorTable(color)
 end
 
 AF.RegisterCallback("AF_LOADED", function()
-    if type(AFConfig.customAccentColor) == "table" then
-        COLORS["accent"] = AFConfig.customAccentColor
+    if AFConfig.accentColor.type == "custom" then
+        COLORS["accent"] = AFConfig.accentColor.color
     end
 end, "high")
 
 ---@param color string|table colorName, colorHex, colorTable
 ---@param buttonNormalColor? string|table
 ---@param buttonHoverColor? string|table
-function AF.SetAccentColor(color, buttonNormalColor, buttonHoverColor)
-    assert(AFConfig, "AFConfig not loaded")
+function AF.BuildAccentColorTable(color, buttonNormalColor, buttonHoverColor)
     local t = BuildColorTable(color)
 
     -- normal
@@ -343,14 +342,23 @@ function AF.SetAccentColor(color, buttonNormalColor, buttonHoverColor)
         hover[4] = 0.6
     end
 
-    COLORS["accent"] = {["hex"] = t["hex"], ["t"] = t["t"], ["normal"] = normal, ["hover"] = hover}
-    AFConfig.customAccentColor = COLORS["accent"]
+    return {["hex"] = t["hex"], ["t"] = t["t"], ["normal"] = normal, ["hover"] = hover}
+end
+
+---@param color string|table colorName, colorHex, colorTable
+---@param buttonNormalColor? string|table
+---@param buttonHoverColor? string|table
+function AF.SetAccentColor(color, buttonNormalColor, buttonHoverColor)
+    assert(AFConfig, "AFConfig not loaded")
+    COLORS["accent"] = AF.BuildAccentColorTable(color, buttonNormalColor, buttonHoverColor)
+    AFConfig.accentColor.type = "custom"
+    AFConfig.accentColor.color = COLORS["accent"]
 end
 
 function AF.ResetAccentColor()
     assert(AFConfig, "AFConfig not loaded")
     COLORS["accent"] = AF.Copy(ACCENT_COLOR)
-    AFConfig.customAccentColor = nil
+    AFConfig.accentColor.type = "default"
 end
 
 ---@param alpha? number

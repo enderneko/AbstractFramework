@@ -120,6 +120,14 @@ function AF.UIParent:ADDON_LOADED(addon)
 
         if type(AFConfig) ~= "table" then AFConfig = {} end
 
+        -- accent color
+        if type(AFConfig.accentColor) ~= "table" then
+            AFConfig.accentColor = {
+                type = "default",
+                color = AF.BuildAccentColorTable("hotpink"),
+            }
+        end
+
         -- debug
         if type(AFConfig.debug) ~= "table" then
             AFConfig.debug = {
