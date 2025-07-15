@@ -326,7 +326,6 @@ function AF.ShowDemo()
     slist1:SetWidgets(widgets)
 
 
-
     -----------------------------------------------------------------------------
     --                             cascading menu                              --
     -----------------------------------------------------------------------------
@@ -652,10 +651,12 @@ function AF.ShowDemo()
         globalDialogBtn.count = globalDialogBtn.count + 1
         local text = "This is a global dialog.\nIt uses a queue mechanism to respond to each " .. AF.WrapTextInColor("AF.ShowGlobalDialog", "accent") .. " in order.\n"
             .. AF.WrapTextInColor("(" .. globalDialogBtn.count .. ")", "gray")
+        local confirmed = "Global Dialog " .. globalDialogBtn.count .. " Confirmed"
+        local canceled = "Global Dialog " .. globalDialogBtn.count .. " Canceled"
         AF.ShowGlobalDialog(text, function()
-            AF.Print("Global Dialog " .. globalDialogBtn.count .. " Confirmed")
+            AF.Print(confirmed)
         end, function()
-            AF.Print("Global Dialog " .. globalDialogBtn.count .. " Canceled")
+            AF.Print(canceled)
         end)
     end)
 

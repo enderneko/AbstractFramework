@@ -240,7 +240,7 @@ local function CreateCalendar()
             calendar.onDateChanged(calendar.date)
         end
         calendar:Hide()
-    end, nil, nil, function(self)
+    end, nil, function(self)
         AF.ShowTooltip(self, "TOPLEFT", 0, 2, self.tooltips)
     end, AF.HideTooltip)
 

@@ -447,13 +447,14 @@ end
 ---------------------------------------------------------------------
 -- buttonId is button.id, if button.id is not set, it will use button:GetText() or button:GetName() or tostring(button)
 ---@param buttons table button's OnEnter/OnLeave/OnClick will be overridden
----@param onClick fun(buttonId: string, button: AF_Button)
 ---@param onSelect? fun(buttonId: string, button: AF_Button)
 ---@param onDeselect? fun(buttonId: string, button: AF_Button)
 ---@param onEnter? fun(button: AF_Button)
 ---@param onLeave? fun(button: AF_Button)
 ---@return function Select accept button.id as parameter, same as button:Click()
-function AF.CreateButtonGroup(buttons, onClick, onSelect, onDeselect, onEnter, onLeave)
+function AF.CreateButtonGroup(buttons, onSelect, onDeselect, onEnter, onLeave)
+    local lastSelected
+
     local function Select(id)
         for _, b in next, buttons do
             if id == b.id then
@@ -491,8 +492,10 @@ function AF.CreateButtonGroup(buttons, onClick, onSelect, onDeselect, onEnter, o
         assert(b.id, "button.id is required")
 
         b:SetScript("OnClick", function()
-            Select(b.id)
-            onClick(b.id, b)
+            if lastSelected ~= b.id then
+                Select(b.id)
+            end
+            lastSelected = b.id
         end)
     end
 
