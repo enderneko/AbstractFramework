@@ -477,7 +477,7 @@ function AF.ShowDemo()
     -- dd4:SetSelectedValue("item0")
 
     -- font dropdown
-    local dd5 = AF.CreateDropdown(demo, 150, 10, nil, "font")
+    local dd5 = AF.CreateDropdown(demo, 150, 10)
     AF.SetPoint(dd5, "TOPLEFT", dd4, "BOTTOMLEFT", 0, -30)
     dd5:SetLabel("Font Dropdown")
     AF.SetTooltip(dd5, "TOPLEFT", 0, 2, "Font Dropdown", "Using LibSharedMedia")
@@ -496,7 +496,7 @@ function AF.ShowDemo()
     end
 
     -- texture dropdown
-    local dd6 = AF.CreateDropdown(demo, 150, 10, nil, "texture")
+    local dd6 = AF.CreateDropdown(demo, 150, 10)
     AF.SetPoint(dd6, "TOPLEFT", dd5, "BOTTOMLEFT", 0, -30)
     dd6:SetLabel("Texture Dropdown")
     AF.SetTooltip(dd6, "TOPLEFT", 0, 2, "Texture Dropdown", "Using LibSharedMedia")

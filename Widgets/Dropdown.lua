@@ -144,11 +144,18 @@ local function SetSelected(dropdown, type, v)
         if item[type] == v then
             dropdown.selected = i
             dropdown.text:SetText(item.text)
-            if dropdown.type == "texture" then
+
+            if item.texture then
                 dropdown.bgTexture:SetTexture(item.texture)
                 dropdown.bgTexture:Show()
-            elseif dropdown.type == "font" then
+            else
+                dropdown.bgTexture:Hide()
+            end
+
+            if item.font then
                 dropdown.text:SetFont(AF.GetFontProps(item.font))
+            else
+                dropdown.text:SetFont(AF.GetFontProps("normal"))
             end
 
             if item.icon then
@@ -183,7 +190,7 @@ AF_DropdownMixin.SetSelected = AF_DropdownMixin.SetSelectedValue
 function AF_DropdownMixin:ClearSelected()
     self.selected = nil
     self.text:SetText("")
-    if self.type == "texture" then self.bgTexture:Hide() end
+    self.bgTexture:Hide()
     self.list:SetHighlightItem()
 end
 
@@ -278,14 +285,23 @@ end
 
 function AF_DropdownMixin:SetCurrentItem(item)
     self.items[self.selected] = item
+
     -- usually, update current item means to change its name (text) and func
     self.text:SetText(item.text)
-    if self.type == "texture" then
+
+    if item.texture then
         self.bgTexture:SetTexture(item.texture)
         self.bgTexture:Show()
-    elseif self.type == "font" then
-        self.text:SetFont(AF.GetFontProps(item.font))
+    else
+        self.bgTexture:Hide()
     end
+
+    if item.font then
+        self.text:SetFont(AF.GetFontProps(item.font))
+    else
+        self.text:SetFont(AF.GetFontProps("normal"))
+    end
+
     self.reloadRequired = true
 end
 -------------------------------------------------
@@ -352,7 +368,7 @@ function AF_DropdownMixin:LoadItems()
         end
 
         -- texture
-        if self.type == "texture" and item.texture then
+        if item.texture then
             b.bgTexture:SetTexture(item.texture)
             b.bgTexture:Show()
         else
@@ -460,11 +476,10 @@ end
 ---@param width number
 ---@param maxSlots? number max shown items, not available for mini horizontal dropdown, default 10
 ---@param miniMode? string "vertical" or "horizontal", if set, dropdown will be mini mode
----@param dropdownType? string for special dropdown, "texture" or "font"
 ---@param textureAlpha? number default 0.75
 ---@param justify? string
 ---@return AF_Dropdown
-function AF.CreateDropdown(parent, width, maxSlots, miniMode, dropdownType, textureAlpha, justify)
+function AF.CreateDropdown(parent, width, maxSlots, miniMode, textureAlpha, justify)
     if not list then CreateListFrame() end
     if not horizontalList then CreateHorizontalList() end
 
@@ -480,7 +495,6 @@ function AF.CreateDropdown(parent, width, maxSlots, miniMode, dropdownType, text
     dropdown.width = width
     dropdown.maxSlots = maxSlots
     dropdown.miniMode = miniMode and miniMode:lower()
-    dropdown.type = dropdownType and dropdownType:lower()
     dropdown.textureAlpha = textureAlpha
     dropdown.justify = justify
     dropdown.list = miniMode == "horizontal" and horizontalList or list
@@ -548,17 +562,16 @@ function AF.CreateDropdown(parent, width, maxSlots, miniMode, dropdownType, text
     -- selected item
     dropdown.text:SetWordWrap(false)
 
-    if dropdownType == "texture" then
-        dropdown.bgTexture = AF.CreateTexture(miniMode and dropdown.button or dropdown)
-        AF.SetPoint(dropdown.bgTexture, "TOPLEFT", 1, -1)
-        if miniMode then
-            AF.SetPoint(dropdown.bgTexture, "BOTTOMRIGHT", -1, 1)
-        else
-            AF.SetPoint(dropdown.bgTexture, "BOTTOMRIGHT", dropdown.button, "BOTTOMLEFT", 0, 1)
-        end
-        dropdown.bgTexture:SetVertexColor(AF.GetColorRGB("white", textureAlpha))
-        dropdown.bgTexture:Hide()
+    -- bgTexture
+    dropdown.bgTexture = AF.CreateTexture(miniMode and dropdown.button or dropdown)
+    AF.SetPoint(dropdown.bgTexture, "TOPLEFT", 1, -1)
+    if miniMode then
+        AF.SetPoint(dropdown.bgTexture, "BOTTOMRIGHT", -1, 1)
+    else
+        AF.SetPoint(dropdown.bgTexture, "BOTTOMRIGHT", dropdown.button, "BOTTOMLEFT", 0, 1)
     end
+    dropdown.bgTexture:SetVertexColor(AF.GetColorRGB("white", textureAlpha))
+    dropdown.bgTexture:Hide()
 
     -- keep all menu item definitions
     dropdown.items = {
