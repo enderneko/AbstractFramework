@@ -103,8 +103,7 @@ local function CreateAlignmentGrid()
 end
 
 local function CreateMoverDialog()
-    moverDialog = AF.CreateHeaderedFrame(moverParent, "AFMoverDialog", "AF " .. _G.HUD_EDIT_MODE_MENU, 300, 180, "FULLSCREEN_DIALOG", nil, true)
-    moverDialog:SetFrameStrata("FULLSCREEN_DIALOG")
+    moverDialog = AF.CreateHeaderedFrame(moverParent, "AFMoverDialog", "AF " .. _G.HUD_EDIT_MODE_MENU, 300, 180, "FULLSCREEN", nil, true)
     moverDialog:Hide()
 
     anchorLockedText = AF.CreateFontString(moverDialog, L["Anchor Locked"], "accent", "AF_FONT_OUTLINE")
@@ -313,7 +312,7 @@ CreatePositionEditorFrame = function()
     AF.SetPoint(positionEditorFrame.tp, "BOTTOMRIGHT", -7, 7)
 
     -- anchor
-    positionEditorFrame.anchor = AF.CreateDropdown(positionEditorFrame.tp, 20, 9, "horizontal", "texture", 1)
+    positionEditorFrame.anchor = AF.CreateDropdown(positionEditorFrame.tp, 20, 9, "horizontal", 1)
 
     local items = {}
     local anchors = {"CENTER", "LEFT", "BOTTOMLEFT", "BOTTOM", "BOTTOMRIGHT", "RIGHT", "TOPLEFT", "TOP", "TOPRIGHT"}

@@ -664,7 +664,5 @@ function AF.CreateDropdown(parent, width, maxSlots, miniMode, textureAlpha, just
         end
     end)
 
-    AF.RegisterForCloseCascadingMenu(dropdown.button)
-
     return dropdown
 end

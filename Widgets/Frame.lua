@@ -130,9 +130,9 @@ function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata,
     header:EnableMouse(true)
     header:SetClampedToScreen(true)
     header:RegisterForDrag("LeftButton")
-    header:SetScript("OnMouseDown", function()
-        f:Raise()
-    end)
+    -- header:SetScript("OnMouseDown", function()
+    --     f:Raise()
+    -- end)
 
     AF.ShowNormalGlow(f, "shadow", 2)
     AF.ClearPoints(f.normalGlow)
