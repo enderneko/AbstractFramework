@@ -204,7 +204,7 @@ function AF.ShowDemo()
     AF.SetPoint(gb3, "RIGHT")
     AF.SetTooltip(gb3, "LEFT", -2, 0, "Item C")
 
-    AF.CreateButtonGroup({gb1, gb2, gb3}, function(id)
+    AF.CreateButtonGroup({gb1, gb2, gb3}, function(_, id)
         AF.Print("selected", id)
     end)
 
@@ -967,7 +967,7 @@ function AF.ShowDemo()
     -- group1
     CreateMoverTestFrame(1, "Test 1", "TOPLEFT")
     CreateMoverTestFrame(2, "Test 1", "LEFT")
-    CreateMoverTestFrame(3, "Test 1", "BOTTOMLEFT")
+    -- CreateMoverTestFrame(3, "Test 1", "BOTTOMLEFT")
     CreateMoverTestFrame(4, "Test 1", "TOP")
     CreateMoverTestFrame(5, "Test 1", "CENTER")
 

@@ -7,14 +7,23 @@ local PlaySound = PlaySound
 local function RegisterMouseDownUp(b)
     b:SetScript("OnMouseDown", function()
         if b:IsEnabled() and b._pushEffectEnabled then
+            b._pushed = true
             b:HandleMouseDownText()
             b:HandleMouseDownTexture()
         end
     end)
     b:SetScript("OnMouseUp", function()
-        if b:IsEnabled() and b._pushEffectEnabled then
+        if b._pushed or (b:IsEnabled() and b._pushEffectEnabled) then
             b:HandleMouseUpText()
             b:HandleMouseUpTexture()
+        end
+        b._pushed = nil
+    end)
+    b:SetScript("OnHide", function()
+        if b._pushed then
+            b:HandleMouseUpText()
+            b:HandleMouseUpTexture()
+            b._pushed = nil
         end
     end)
 end
@@ -32,16 +41,17 @@ end
 local AF_ButtonMixin = {}
 
 function AF_ButtonMixin:HandleMouseDownText()
-    if self.texture and self.texture:IsShown()
-    and self.textureJustifyH ~= "RIGHT" -- NOTE: not sure why the text wont move if texture is on the right
-    then return end
+    if self.texture and self.texture:IsShown() and self.textureJustifyH ~= "RIGHT" then -- NOTE: not sure why the text wont move if texture is on the right
+        return
+    end
     self.text:AdjustPointsOffset(0, -AF.GetOnePixelForRegion(self))
 end
 
 function AF_ButtonMixin:HandleMouseUpText()
-    if self.texture and self.texture:IsShown()
-    and self.textureJustifyH ~= "RIGHT" -- NOTE: not sure why the text wont move if texture is on the right
-    then return end
+    if self.texture and self.texture:IsShown() and self.textureJustifyH ~= "RIGHT" then
+        -- NOTE: not sure why the text wont move if texture is on the right
+        return
+    end
     AF.RePoint(self.text)
 end
 
@@ -445,43 +455,30 @@ end
 ---------------------------------------------------------------------
 -- button group
 ---------------------------------------------------------------------
--- buttonId is button.id, if button.id is not set, it will use button:GetText() or button:GetName() or tostring(button)
+-- params for OnSelect/OnDeselect/OnClick/OnEnter/OnLeave: (button, buttonId)
 ---@param buttons table button's OnEnter/OnLeave/OnClick will be overridden
----@param onSelect? fun(buttonId: string, button: AF_Button)
----@param onDeselect? fun(buttonId: string, button: AF_Button)
----@param onEnter? fun(button: AF_Button)
----@param onLeave? fun(button: AF_Button)
----@return function Select accept button.id as parameter, same as button:Click()
-function AF.CreateButtonGroup(buttons, onSelect, onDeselect, onEnter, onLeave)
+---@param onSelect? function
+---@param onDeselect? function
+---@param onClick? function
+---@param onEnter? function
+---@param onLeave? function
+---@return function Highlight accept button.id as parameter, just to highlight the button without calling onSelect/onDeselect
+-- buttonId is button.id, if button.id is not set, it will use button:GetText() or button:GetName() or tostring(button)
+function AF.CreateButtonGroup(buttons, onSelect, onDeselect, onClick, onEnter, onLeave)
     local lastSelected
 
-    local function Select(id)
+    local function Select(id, skipCallback)
+        if lastSelected and lastSelected == id then return end
+        lastSelected = id
+
         for _, b in next, buttons do
             if id == b.id then
                 if b._hoverColor then b:SetBackdropColor(AF.UnpackColor(b._hoverColor)) end
-                b:SetScript("OnEnter", function()
-                    if b._tooltip then AF.ShowTooltip(b, b._tooltipAnchor, b._tooltipX, b._tooltipY, b._tooltip) end
-                    if onEnter then onEnter(b) end
-                end)
-                b:SetScript("OnLeave", function()
-                    AF.HideTooltip()
-                    if onLeave then onLeave(b) end
-                end)
-                if onSelect then onSelect(b.id, b) end
+                if not skipCallback and onSelect then onSelect(b, b.id) end
                 b.isSelected = true
             else
                 if b._color then b:SetBackdropColor(AF.UnpackColor(b._color)) end
-                b:SetScript("OnEnter", function()
-                    if b._tooltip then AF.ShowTooltip(b, b._tooltipAnchor, b._tooltipX, b._tooltipY, b._tooltip) end
-                    if b._hoverColor then b:SetBackdropColor(AF.UnpackColor(b._hoverColor)) end
-                    if onEnter then onEnter(b) end
-                end)
-                b:SetScript("OnLeave", function()
-                    AF.HideTooltip()
-                    if b._color then b:SetBackdropColor(AF.UnpackColor(b._color)) end
-                    if onLeave then onLeave(b) end
-                end)
-                if onDeselect then onDeselect(b.id, b) end
+                if not skipCallback and onDeselect then onDeselect(b, b.id) end
                 b.isSelected = false
             end
         end
@@ -492,14 +489,33 @@ function AF.CreateButtonGroup(buttons, onSelect, onDeselect, onEnter, onLeave)
         assert(b.id, "button.id is required")
 
         b:SetScript("OnClick", function()
-            if lastSelected ~= b.id then
-                Select(b.id)
+            Select(b.id)
+            if onClick then onClick(b, b.id) end
+        end)
+
+        b:SetScript("OnEnter", function()
+            if not b.isSelected and b._hoverColor then
+                b:SetBackdropColor(AF.UnpackColor(b._hoverColor))
             end
-            lastSelected = b.id
+            if b._tooltip then AF.ShowTooltip(b, b._tooltipAnchor, b._tooltipX, b._tooltipY, b._tooltip) end
+            if onEnter then onEnter(b, b.id) end
+        end)
+
+        b:SetScript("OnLeave", function()
+            if not b.isSelected and b._color then
+                b:SetBackdropColor(AF.UnpackColor(b._color))
+            end
+            AF.HideTooltip()
+            if onLeave then onLeave(b, b.id) end
         end)
     end
 
-    return Select
+    local function Highlight(id)
+        lastSelected = nil
+        Select(id, true)
+    end
+
+    return Highlight
 end
 
 ---------------------------------------------------------------------

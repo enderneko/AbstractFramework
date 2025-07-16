@@ -54,8 +54,8 @@ local function FillDays(year, month)
             b:SetEnabled(true)
             b:SetText(day)
 
-            b.accentColor = calendar.parent.accentColor
-            b:SetColor(b.accentColor .. "_hover")
+            b.accentColor = calendar.parent.accentColor -- for Tooltip
+            b._hoverColor = AF.GetButtonHoverColor(b.accentColor) -- for highlight
 
             -- date highlights
             local str = string.format("%04d%02d%02d", calendar.date.year, calendar.date.month, day)
@@ -215,7 +215,7 @@ local function CreateCalendar()
         days[i] = AF.CreateButton(calendar, "", "accent_hover", 27, 20)
 
         AF.ClearPoints(days[i].text)
-        days[i].text:SetPoint("CENTER")
+        AF.SetPoint(days[i].text, "CENTER")
 
         -- mark
         days[i].mark = AF.CreateTexture(days[i], AF.GetIcon("Mark"))
@@ -232,7 +232,7 @@ local function CreateCalendar()
         end
     end
 
-    calendar.highlight = AF.CreateButtonGroup(days, function(d)
+    calendar.highlight = AF.CreateButtonGroup(days, nil, nil, function(b, d)
         calendar.date.day = d
         calendar.parent:SetDate(calendar.date)
         calendar.date.timestamp = calendar.parent.date.timestamp
@@ -240,9 +240,9 @@ local function CreateCalendar()
             calendar.onDateChanged(calendar.date)
         end
         calendar:Hide()
-    end, nil, function(self)
+    end, function(self)
         AF.ShowTooltip(self, "TOPLEFT", 0, 2, self.tooltips)
-    end, AF.HideTooltip)
+    end)
 
     -- "today" mark
     local todayMark = AF.CreateTexture(calendar, nil, "gray")
@@ -429,7 +429,6 @@ function AF.CreateCalendarButton(parent, width, calendarPosition)
 
     button:SetOnClick(function()
         ShowCalendar(button, button.date, button.marks, calendarPosition, button.onDateChanged)
-        button:SetMarks(button.marks)
     end)
 
     AF.RegisterForCloseDropdown(button)
