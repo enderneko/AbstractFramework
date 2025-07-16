@@ -9,6 +9,8 @@ local list, horizontalList
 local function CreateListFrame()
     list = AF.CreateScrollList(AF.UIParent, "AFDropdownList", 1, 1, 10, 18, 0, "widget")
     list:SetClampedToScreen(true)
+    list:SetIgnoreParentScale(true)
+    list:SetFrameStrata("FULLSCREEN_DIALOG")
     list:Hide()
 
     -- adjust scrollBar points
@@ -16,7 +18,14 @@ local function CreateListFrame()
     AF.SetPoint(list.scrollBar, "BOTTOMRIGHT")
 
     -- make list closable by pressing ESC
-    tinsert(UISpecialFrames, "AFDropdownList")
+    tinsert(_G.UISpecialFrames, "AFDropdownList")
+
+    -- make list closable by clicking outside
+    list:SetScript("OnEvent", function()
+        if not (list:IsMouseOver() or list.dropdown:IsMouseOver()) then
+            AF.CloseDropdown()
+        end
+    end)
 
     -- store created buttons
     list.buttons = {}
@@ -37,12 +46,19 @@ local function CreateListFrame()
         end
     end
 
-    list:SetScript("OnHide", function() list:Hide() end)
+    list:SetScript("OnHide", function()
+        list:UnregisterEvent("GLOBAL_MOUSE_DOWN")
+        list:Hide()
+    end)
 
     -- do not use OnShow, since it only triggers when hide -> show
     hooksecurefunc(list, "Show", function()
-        list:UpdatePixels()
+        list:RegisterEvent("GLOBAL_MOUSE_DOWN")
+        list:SetScale(list.dropdown:GetEffectiveScale())
+
         horizontalList:Hide()
+        list:UpdatePixels()
+        highlight:UpdatePixels()
 
         local scrollThumb = list.scrollThumb
         scrollThumb.r, scrollThumb.g, scrollThumb.b = AF.GetColorRGB(list.dropdown.accentColor)
@@ -50,7 +66,6 @@ local function CreateListFrame()
         highlight:SetBackdropBorderColor(scrollThumb.r, scrollThumb.g, scrollThumb.b)
 
         if list.dropdown.selected then
-            highlight:UpdatePixels()
             if list.dropdown.selected > list.slotNum then
                 list:SetScroll(list.dropdown.selected - list.slotNum + 1)
             else
@@ -66,10 +81,19 @@ end
 local function CreateHorizontalList()
     horizontalList = AF.CreateBorderedFrame(AF.UIParent, "AFHorizontalDropdownList", 10, 20, "widget")
     horizontalList:SetClampedToScreen(true)
+    horizontalList:SetIgnoreParentScale(true)
+    horizontalList:SetFrameStrata("FULLSCREEN_DIALOG")
     horizontalList:Hide()
 
     -- make list closable by pressing ESC
-    tinsert(UISpecialFrames, "AFHorizontalDropdownList")
+    tinsert(_G.UISpecialFrames, "AFHorizontalDropdownList")
+
+    -- make list closable by clicking outside
+    horizontalList:SetScript("OnEvent", function()
+        if not (horizontalList:IsMouseOver() or horizontalList.dropdown:IsMouseOver()) then
+            AF.CloseDropdown()
+        end
+    end)
 
     -- store created buttons
     horizontalList.buttons = {}
@@ -96,12 +120,19 @@ local function CreateHorizontalList()
         end
     end
 
-    horizontalList:SetScript("OnHide", function() horizontalList:Hide() end)
+    horizontalList:SetScript("OnHide", function()
+        horizontalList:UnregisterEvent("GLOBAL_MOUSE_DOWN")
+        horizontalList:Hide()
+    end)
 
     -- do not use OnShow, since it only triggers when hide -> show
     hooksecurefunc(horizontalList, "Show", function()
+        horizontalList:RegisterEvent("GLOBAL_MOUSE_DOWN")
+        horizontalList:SetScale(horizontalList.dropdown:GetEffectiveScale())
+
         list:Hide()
         horizontalList:UpdatePixels()
+        highlight:UpdatePixels()
 
         highlight:SetBackdropBorderColor(AF.GetColorRGB(horizontalList.dropdown.accentColor))
 
@@ -126,10 +157,10 @@ function AF.CloseDropdown()
     end
 end
 
-function AF.RegisterForCloseDropdown(f)
-    assert(f and f.HasScript and f:HasScript("OnMouseDown"), "no OnMouseDown for this region!")
-    f:HookScript("OnMouseDown", AF.CloseDropdown)
-end
+-- function AF.RegisterForCloseDropdown(f)
+--     assert(f and f.HasScript and f:HasScript("OnMouseDown"), "no OnMouseDown for this region!")
+--     f:HookScript("OnMouseDown", AF.CloseDropdown)
+-- end
 
 ---------------------------------------------------------------------
 -- dropdown menu
@@ -423,8 +454,8 @@ function AF_DropdownMixin:LoadItems()
 
     -- update list size / point
     self.list.dropdown = self -- check for menu's OnHide -> list:Hide
-    self.list:SetParent(self)
-    AF.SetFrameLevel(self.list, 10, self)
+    -- self.list:SetParent(self)
+    -- AF.SetFrameLevel(self.list, 10, self)
     AF.ClearPoints(self.list)
 
     if self.miniMode == "horizontal" then
@@ -505,6 +536,7 @@ function AF.CreateDropdown(parent, width, maxSlots, miniMode, textureAlpha, just
     if miniMode then
         dropdown.button = AF.CreateButton(dropdown, nil, "accent_hover", 20, 20)
         dropdown.button:SetAllPoints(dropdown)
+        dropdown.button:EnablePushEffect(false)
 
         -- text
         dropdown.text = AF.CreateFontString(dropdown.button)

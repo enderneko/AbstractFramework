@@ -153,7 +153,6 @@ local function CreateCalendar()
         FillDays(calendar.date.year, calendar.date.month)
         month:SetSelectedValue(calendar.date.month)
     end)
-    AF.RegisterForCloseDropdown(previous)
 
     -- next month
     local next = AF.CreateButton(calendar, nil, "accent_hover", 35, 20)
@@ -169,7 +168,6 @@ local function CreateCalendar()
         FillDays(calendar.date.year, calendar.date.month)
         month:SetSelectedValue(calendar.date.month)
     end)
-    AF.RegisterForCloseDropdown(next)
 
     AF.SetPoint(previous, "TOPLEFT", 1, -1)
     AF.SetPoint(next, "TOPRIGHT", -1, -1)
@@ -430,8 +428,6 @@ function AF.CreateCalendarButton(parent, width, calendarPosition)
     button:SetOnClick(function()
         ShowCalendar(button, button.date, button.marks, calendarPosition, button.onDateChanged)
     end)
-
-    AF.RegisterForCloseDropdown(button)
 
     return button
 end
