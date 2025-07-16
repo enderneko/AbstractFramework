@@ -15,7 +15,11 @@ LSM:Register("font", "Expressway", AF.GetFont("Expressway"), 255)
 
 -- statusbar
 LSM:Register("statusbar", "AF Plain", AF.GetPlainTexture())
-LSM:Register("statusbar", "AF 1", AF.GetTexture("StatusBar1"))
+LSM:Register("statusbar", "AF", AF.GetTexture("Bar_AF"))
+LSM:Register("statusbar", "AF Underline", AF.GetTexture("Bar_Underline"))
+-- https://github.com/mrrosh/pfUI-CustomMedia
+LSM:Register("statusbar", "pfUI-S", AF.GetTexture("Bar_pfUI_S"))
+LSM:Register("statusbar", "pfUI-U", AF.GetTexture("Bar_pfUI_U"))
 
 ---------------------------------------------------------------------
 -- functions
