@@ -716,8 +716,15 @@ function AF_CheckButtonMixin:UpdatePixels()
     AF.RePoint(self.highlightTexture)
 end
 
+function AF_CheckButtonMixin:SetOnCheck(func)
+    self.onCheck = func
+end
+
+---@param parent Frame
+---@param label string|nil
+---@param onCheck fun(checked: boolean, cb: AF_CheckButton)
 ---@return AF_CheckButton cb
-function AF.CreateCheckButton(parent, label, onClick)
+function AF.CreateCheckButton(parent, label, onCheck)
     -- InterfaceOptionsCheckButtonTemplate --> FrameXML\InterfaceOptionsPanels.xml line 19
     -- OptionsBaseCheckButtonTemplate -->  FrameXML\OptionsPanelTemplates.xml line 10
 
@@ -726,10 +733,10 @@ function AF.CreateCheckButton(parent, label, onClick)
 
     cb.accentColor = AF.GetAddonAccentColorName()
 
-    cb.onClick = onClick
+    cb.onCheck = onCheck
     cb:SetScript("OnClick", function(self)
         PlaySound(self:GetChecked() and SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON or SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF)
-        if self.onClick then self.onClick(self:GetChecked() and true or false, self) end
+        if self.onCheck then self.onCheck(self:GetChecked() and true or false, self) end
     end)
 
     cb.label = cb:CreateFontString(nil, "OVERLAY", "AF_FONT_NORMAL")
