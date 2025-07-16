@@ -34,6 +34,22 @@ function AF.LSM_GetBarTexture(name)
     return DEFAULT_BAR_TEXTURE
 end
 
+function AF.LSM_GetBarTextureDropdownItems()
+    local items = {}
+    local textureNames = LSM:List("statusbar")
+    local textures = LSM:HashTable("statusbar")
+
+    for _, name in next, textureNames do
+        tinsert(items, {
+            text = name,
+            value = name,
+            texture = textures[name],
+        })
+    end
+
+    return items
+end
+
 function AF.LSM_GetFont(name)
     if name and LSM:IsValid("font", name) then
         return LSM:Fetch("font", name)
