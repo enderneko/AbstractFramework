@@ -1,5 +1,6 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
+local CreateColor = CreateColor
 
 ---------------------------------------------------------------------
 -- blizzard
