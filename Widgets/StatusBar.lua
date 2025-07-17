@@ -111,13 +111,15 @@ function AF_SimpleStatusBarMixin:SetColor(r, g, b, a)
     self.fg:SetVertexColor(r, g, b, a)
 end
 
-function AF_SimpleStatusBarMixin:SetGradientColor(...)
+---@param orientation Orientation|nil
+---@param ... number|table (r1, g1, b1, a1, r2, g2, b2, a2) or {startColorTable, endColorTable}
+function AF_SimpleStatusBarMixin:SetGradientColor(orientation, ...)
     if select("#", ...) == 2 then
         local startColor, endColor = ...
-        self.fg:SetGradient("HORIZONTAL", CreateColor(AF.UnpackColor(startColor)), CreateColor(AF.UnpackColor(endColor)))
+        self.fg:SetGradient(orientation or "HORIZONTAL", CreateColor(AF.UnpackColor(startColor)), CreateColor(AF.UnpackColor(endColor)))
     else
         local r1, g1, b1, a1, r2, g2, b2, a2 = ...
-        self.fg:SetGradient("HORIZONTAL", CreateColor(r1, g1, b1, a1), CreateColor(r2, g2, b2, a2))
+        self.fg:SetGradient(orientation or "HORIZONTAL", CreateColor(r1, g1, b1, a1), CreateColor(r2, g2, b2, a2))
     end
 end
 
@@ -125,13 +127,15 @@ function AF_SimpleStatusBarMixin:SetLossColor(r, g, b, a)
     self.loss:SetVertexColor(r, g, b, a)
 end
 
-function AF_SimpleStatusBarMixin:SetGradientLossColor(...)
+----@param orientation Orientation|nil
+---@param ... number|table (r1, g1, b1, a1, r2, g2, b2, a2) or {startColorTable, endColorTable}
+function AF_SimpleStatusBarMixin:SetGradientLossColor(orientation, ...)
     if select("#", ...) == 2 then
         local startColor, endColor = ...
-        self.loss:SetGradient("HORIZONTAL", CreateColor(AF.UnpackColor(startColor)), CreateColor(AF.UnpackColor(endColor)))
+        self.loss:SetGradient(orientation or "HORIZONTAL", CreateColor(AF.UnpackColor(startColor)), CreateColor(AF.UnpackColor(endColor)))
     else
         local r1, g1, b1, a1, r2, g2, b2, a2 = ...
-        self.loss:SetGradient("HORIZONTAL", CreateColor(r1, g1, b1, a1), CreateColor(r2, g2, b2, a2))
+        self.loss:SetGradient(orientation or "HORIZONTAL", CreateColor(r1, g1, b1, a1), CreateColor(r2, g2, b2, a2))
     end
 end
 
