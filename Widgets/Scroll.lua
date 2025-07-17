@@ -77,8 +77,8 @@ end
 
 function AF_ScrollFrameMixin:ClearContent()
     for _, c in pairs({self.scrollContent:GetChildren()}) do
-        c:SetParent(nil)
-        c:ClearAllPoints()
+        -- c:SetParent(nil)
+        -- c:ClearAllPoints()
         c:Hide()
     end
     self:ResetHeight()

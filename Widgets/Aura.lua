@@ -345,7 +345,7 @@ function AF_AuraButtonMixin:SetCooldownStyle(style)
     if self.style == style then return end
 
     if self.cooldown then
-        self.cooldown:SetParent(nil)
+        -- self.cooldown:SetParent(nil)
         self.cooldown:Hide()
     end
 
