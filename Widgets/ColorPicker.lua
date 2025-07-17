@@ -563,7 +563,7 @@ local function CreateColorPickerFrame()
     alphaSlider:SetMinMaxValues(0, 1)
 
     alphaSlider.tex1 = alphaSlider:CreateTexture(nil, "ARTWORK", nil, 0)
-    alphaSlider.tex1:SetTexture(AF.GetIcon("ColorPicker"))
+    alphaSlider.tex1:SetTexture(AF.GetTexture("ColorPicker"))
     alphaSlider.tex1:SetHorizTile(true)
     alphaSlider.tex1:SetVertTile(true)
     alphaSlider.tex1:SetAllPoints(alphaSlider)

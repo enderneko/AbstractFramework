@@ -611,7 +611,7 @@ function AF.AddToPixelUpdater_OnShow(r, target, fn, combatSafeOnly)
     if not onShowHooks[target] then
         onShowHooks[target] = function(self)
             if not lastPixelUpdateTime or (lastOnShows[self] == lastPixelUpdateTime) then
-                return -- prevent rapid updates
+                return -- prevent repeated updates
             end
             lastOnShows[self] = lastPixelUpdateTime
 
