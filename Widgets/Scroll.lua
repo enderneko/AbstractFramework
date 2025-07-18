@@ -70,8 +70,8 @@ function AF_ScrollFrameMixin:SetContentHeight(height, useRawValue)
     end)
 end
 
----@param heights table -- heights of each item
----@param spacing number -- spacing between items
+---@param heights table heights of each item
+---@param spacing number spacing between items
 function AF_ScrollFrameMixin:SetContentHeights(heights, spacing)
     AF.SetScrollContentHeight(self.scrollContent, heights, spacing)
     C_Timer.After(0, function()
@@ -79,8 +79,9 @@ function AF_ScrollFrameMixin:SetContentHeights(heights, spacing)
     end)
 end
 
+---@param step number default is 25
 function AF_ScrollFrameMixin:SetScrollStep(step)
-    self.step = step
+    self.step = step or 25
 end
 
 function AF_ScrollFrameMixin:Reset()

@@ -204,7 +204,10 @@ function AF.CreateSlider(parent, text, width, low, high, step, isPercentage, sho
     end)
 
     eb:SetScript("OnShow", function(self)
-        if slider.value then self:SetText(slider.value * (isPercentage and 100 or 1)) end
+        if slider.value then
+            self:SetText(slider.value * (isPercentage and 100 or 1))
+            self:SetCursorPosition(0)
+        end
     end)
 
     eb.highlight:SetColor(AF.GetColorTable(slider.accentColor, 0.07))
