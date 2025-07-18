@@ -27,7 +27,7 @@ local AF_ScrollFrameMixin = {}
 
 -- reset scrollContent height (reset scroll range)
 function AF_ScrollFrameMixin:ResetHeight()
-    AF.SetHeight(self.scrollContent, 5)
+    AF.SetHeight(self.scrollContent, 1)
 end
 
 -- reset scroll to top
@@ -58,35 +58,39 @@ function AF_ScrollFrameMixin:ScrollToBottom()
 end
 
 ---@param height number
----@param num? number
----@param spacing? number
----@param topPadding? number
----@param bottomPadding? number
-function AF_ScrollFrameMixin:SetContentHeight(height, num, spacing, topPadding, bottomPadding)
-    self:ResetScroll()
-    if num and spacing then
-        AF.SetListHeight(self.scrollContent, num, height, spacing, topPadding, bottomPadding)
+---@param useRawValue? boolean if true, set height directly, otherwise use AF.SetHeight
+function AF_ScrollFrameMixin:SetContentHeight(height, useRawValue)
+    if useRawValue then
+        self.scrollContent:SetHeight(height)
     else
         AF.SetHeight(self.scrollContent, height)
     end
+    C_Timer.After(0, function()
+        self:ResetScroll()
+    end)
+end
+
+---@param heights table -- heights of each item
+---@param spacing number -- spacing between items
+function AF_ScrollFrameMixin:SetContentHeights(heights, spacing)
+    AF.SetScrollContentHeight(self.scrollContent, heights, spacing)
+    C_Timer.After(0, function()
+        self:ResetScroll()
+    end)
 end
 
 function AF_ScrollFrameMixin:SetScrollStep(step)
     self.step = step
 end
 
-function AF_ScrollFrameMixin:ClearContent()
-    for _, c in pairs({self.scrollContent:GetChildren()}) do
-        -- c:SetParent(nil)
-        -- c:ClearAllPoints()
+function AF_ScrollFrameMixin:Reset()
+    local children = self.contentChildren or {self.scrollContent:GetChildren()}
+    for _, c in pairs(children) do
+        AF.ClearPoints(c)
         c:Hide()
     end
     self:ResetHeight()
-end
-
-function AF_ScrollFrameMixin:Reset()
     self:ResetScroll()
-    self:ClearContent()
 end
 
 function AF_ScrollFrameMixin:UpdatePixels()
@@ -125,11 +129,16 @@ function AF.CreateScrollFrame(parent, name, width, height, color, borderColor)
     AF.SetPoint(scrollFrame, "BOTTOMRIGHT")
 
     -- scrollContent
-    local scrollContent = CreateFrame("Frame", nil, scrollFrame, "BackdropTemplate")
+    local scrollContent = CreateFrame("Frame", nil, scrollFrame)
     scrollParent.scrollContent = scrollContent
-    AF.SetSize(scrollContent, width, 5)
+    AF.SetHeight(scrollContent, 1)
+    scrollContent:SetWidth(scrollFrame:GetWidth())
     scrollFrame:SetScrollChild(scrollContent)
-    -- AF.SetPoint(scrollContent, "RIGHT") -- update width with scrollFrame
+
+    -- for debugging
+    -- local tex = scrollContent:CreateTexture(nil, "ARTWORK")
+    -- tex:SetAllPoints(scrollContent)
+    -- tex:SetColorTexture(0, 1, 0, 0.1)
 
     -- scrollBar
     local scrollBar = AF.CreateBorderedFrame(scrollParent, nil, 5, nil, color, borderColor)

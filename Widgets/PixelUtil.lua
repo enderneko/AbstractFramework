@@ -60,8 +60,8 @@ end
 ---------------------------------------------------------------------
 function AF.SetWidth(region, width, minPixels)
     -- clear conflicts
-    region._size_grid = nil
-    region._size_list_h = nil
+    region._gridWidth = nil
+    region._itemWidth = nil
     -- add new
     region._width = width
     region._minwidth = minPixels
@@ -70,8 +70,9 @@ end
 
 function AF.SetHeight(region, height, minPixels)
     -- clear conflicts
-    region._size_grid = nil
-    region._size_list_v = nil
+    region._gridHeight = nil
+    region._itemHeight = nil
+    region._contentHeights = nil
     -- add new
     region._height = height
     region._minheight = minPixels
@@ -86,12 +87,11 @@ end
 ---@param rightPadding number|nil
 function AF.SetListWidth(region, itemNum, itemWidth, itemSpacing, leftPadding, rightPadding)
     -- clear conflicts
-    region._size_grid = nil
+    region._gridWidth = nil
     region._width = nil
     region._minwidth = nil
 
     -- add new
-    region._size_list_h = true
     region._itemNumH = itemNum
     region._itemWidth = itemWidth
     region._itemSpacingX = itemSpacing
@@ -119,12 +119,11 @@ end
 ---@param bottomPadding number|nil
 function AF.SetListHeight(region, itemNum, itemHeight, itemSpacing, topPadding, bottomPadding)
     -- clear conflicts
-    region._size_grid = nil
+    region._gridHeight = nil
     region._height = nil
     region._minheight = nil
 
     -- add new
-    region._size_list_v = true
     region._itemNumV = itemNum
     region._itemHeight = itemHeight
     region._itemSpacingY = itemSpacing
@@ -144,6 +143,32 @@ function AF.SetListHeight(region, itemNum, itemHeight, itemSpacing, topPadding, 
     end
 end
 
+---@private
+function AF.SetScrollContentHeight(content, heights, spacing)
+    -- clear conflicts
+    content._height = nil
+    content._minheight = nil
+    content._itemHeight = nil
+    content._gridHeight = nil
+
+    -- add new
+    content._contentHeights = heights or {}
+    content._contentSpacing = spacing or 0
+
+    local totalHeight = 0
+
+    if #heights == 0 then
+        totalHeight = 1
+    else
+        for _, height in next, heights do
+            totalHeight = totalHeight + AF.GetNearestPixelSize(height, content:GetEffectiveScale())
+        end
+        totalHeight = totalHeight + AF.GetNearestPixelSize(spacing, content:GetEffectiveScale()) * (#heights - 1)
+    end
+
+    content:SetHeight(totalHeight)
+end
+
 ---@param region Frame
 ---@param gridWidth number
 ---@param gridHeight number
@@ -157,11 +182,13 @@ end
 ---@param rightPadding number|nil
 function AF.SetGridSize(region, gridWidth, gridHeight, gridSpacingX, gridSpacingY, columns, rows, topPadding, bottomPadding, leftPadding, rightPadding)
     -- clear conflicts
-    region._size_list_h = nil
-    region._size_list_v = nil
+    region._width = nil
+    region._height = nil
+    region._itemWidth = nil
+    region._itemHeight = nil
+    region._contentHeights = nil
 
     -- add new
-    region._size_grid = true
     region._gridWidth = gridWidth
     region._gridHeight = gridHeight
     region._gridSpacingX = gridSpacingX
@@ -358,7 +385,7 @@ end
 -- re-set
 ---------------------------------------------------------------------
 function AF.ReSize(region)
-    if region._size_grid then
+    if region._gridWidth and region._gridHeight then
         AF.SetGridSize(region, region._gridWidth, region._gridHeight, region._gridSpacingX, region._gridSpacingY, region._columns, region._rows,
             region._topPadding, region._bottomPadding, region._leftPadding, region._rightPadding)
     else
@@ -368,11 +395,14 @@ function AF.ReSize(region)
         if region._height then
             AF.SetHeight(region, region._height, region._minheight)
         end
-        if region._size_list_h then
+        if region._itemWidth then
             AF.SetListWidth(region, region._itemNumH, region._itemWidth, region._itemSpacingX, region._leftPadding, region._rightPadding)
         end
-        if region._size_list_v then
+        if region._itemHeight then
             AF.SetListHeight(region, region._itemNumV, region._itemHeight, region._itemSpacingY, region._topPadding, region._bottomPadding)
+        end
+        if region._contentHeights then
+            AF.SetScrollContentHeight(region, region._contentHeights, region._contentSpacing)
         end
     end
 end

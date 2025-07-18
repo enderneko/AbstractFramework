@@ -505,8 +505,7 @@ function AF.CreateScrollEditBox(parent, name, label, width, height, scrollStep)
     end)
 
     eb:HookScript("OnTextChanged", function()
-        -- NOTE: should not use SetContentHeight
-        frame.scrollContent:SetHeight(eb:GetHeight())
+        frame:SetContentHeight(eb:GetHeight(), true)
     end)
 
     frame.scrollFrame:SetScript("OnMouseDown", function()
