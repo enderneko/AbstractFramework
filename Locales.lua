@@ -2,7 +2,7 @@
 local AF = _G.AbstractFramework
 
 AF.L = setmetatable({
-
+    ["WIP"] = "Work In Progress",
 }, {
     __index = function(self, Key)
         if (Key ~= nil) then
@@ -60,4 +60,7 @@ if LOCALE_zhCN then
     L["Translators"] = "翻译"
     L["Undo"] = "撤消"
     L["Version"] = "版本"
+    L["WIP"] = "正在开发中"
 end
+
+L["WIP_WITH_ICON"] = "|TInterface\\AddOns\\AbstractFramework\\Media\\Icons\\Fluent_Tools:16|t |cffffd300" .. L["WIP"] .. "|r"
