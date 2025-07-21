@@ -59,8 +59,7 @@ function AF_ColorPickerMixin:UpdatePixels()
     AF.RePoint(self.label)
     AF.RePoint(self.mouseoverHighlight)
     AF.ReBorder(self.mouseoverHighlight)
-    -- AF.ReSize(self.mouseoverHighlight1)
-    -- AF.ReSize(self.mouseoverHighlight2)
+    AF.RePoint(self.insetHighlight0)
     AF.RePoint(self.insetHighlight)
 end
 
@@ -89,29 +88,19 @@ function AF.CreateColorPicker(parent, label, alphaEnabled, onChange, onConfirm)
     cp.mouseoverHighlight:SetBackdropBorderColor(AF.GetColorRGB(cp.accentColor, 0.9))
     cp.mouseoverHighlight:Hide()
 
-    -- cp.mouseoverHighlight1 = AF.CreateGradientTexture(cp, "HORIZONTAL", cp.accentColor, AF.GetColorTable(cp.accentColor, 0.25))
-    -- cp.mouseoverHighlight1:Hide()
-    -- AF.RemoveFromPixelUpdater(cp.mouseoverHighlight1)
-    -- AF.SetHeight(cp.mouseoverHighlight1, 1)
-    -- cp.mouseoverHighlight1:SetPoint("TOPLEFT")
-    -- cp.mouseoverHighlight1:SetPoint("TOPRIGHT")
-
-    -- cp.mouseoverHighlight2 = AF.CreateGradientTexture(cp, "VERTICAL", AF.GetColorTable(cp.accentColor, 0.25), cp.accentColor)
-    -- cp.mouseoverHighlight2:Hide()
-    -- AF.RemoveFromPixelUpdater(cp.mouseoverHighlight2)
-    -- AF.SetWidth(cp.mouseoverHighlight2, 1)
-    -- cp.mouseoverHighlight2:SetPoint("TOPLEFT")
-    -- cp.mouseoverHighlight2:SetPoint("BOTTOMLEFT")
-
     cp.insetHighlight = cp:CreateTexture(nil, "OVERLAY")
     AF.SetOnePixelInside(cp.insetHighlight, cp)
-    cp.insetHighlight:SetTexture(AF.GetTexture("InsetHighlight_32"))
+    cp.insetHighlight:SetTexture(AF.GetTexture("InsetHighlight"))
+
+    cp.insetHighlight0 = cp:CreateMaskTexture()
+    cp.insetHighlight0:SetTexture(AF.GetTexture("Empty"), "CLAMPTOWHITE", "CLAMPTOWHITE")
+    cp.insetHighlight:AddMaskTexture(cp.insetHighlight0)
+    AF.SetPoint(cp.insetHighlight0, "TOPLEFT", cp.insetHighlight, 1, -1)
+    AF.SetPoint(cp.insetHighlight0, "BOTTOMRIGHT", cp.insetHighlight)
 
     cp:SetScript("OnEnter", function()
         -- cp:SetBackdropBorderColor(AF.GetColorRGB(cp.accentColor, nil, 0.5))
         cp.mouseoverHighlight:Show()
-        -- cp.mouseoverHighlight1:Show()
-        -- cp.mouseoverHighlight2:Show()
         cp.label:SetColor(cp.accentColor)
     end)
 
@@ -406,7 +395,7 @@ local function CreateColorGrid(color)
     AF.RemoveFromPixelUpdater(grid)
 
     if type(color) == "table" then
-        AF.SetTooltip(grid, "ANCHOR_TOPLEFT", 0, 2, "|c"..AF.GetColorHex(color[1])..color[2])
+        AF.SetTooltip(grid, "TOPLEFT", 0, 2, "|c"..AF.GetColorHex(color[1])..color[2])
         color = color[1]
     end
 
