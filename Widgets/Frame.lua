@@ -301,7 +301,7 @@ end
 function AF.CreateTitledPane(parent, title, width, height, color)
     color = color or AF.GetAddonAccentColorName()
 
-    local pane = CreateFrame("Frame", nil, parent, "BackdropTemplate")
+    local pane = CreateFrame("Frame", nil, parent)
     AF.SetSize(pane, width, height)
 
     -- underline

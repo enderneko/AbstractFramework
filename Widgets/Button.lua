@@ -335,7 +335,7 @@ function AF_ButtonMixin:SilentClick()
 end
 
 function AF_ButtonMixin:SetTooltip(...)
-    AF.SetTooltip(self, "ANCHOR_TOPLEFT", 0, 2, ...)
+    AF.SetTooltip(self, "TOPLEFT", 0, 2, ...)
 end
 
 ---@param parent Frame
@@ -610,7 +610,7 @@ function AF_IconButtonMixin:SetFilterMode(filterMode)
 end
 
 function AF_IconButtonMixin:SetTooltip(...)
-    AF.SetTooltip(self, "ANCHOR_TOPLEFT", 0, 2, ...)
+    AF.SetTooltip(self, "TOPLEFT", 0, 2, ...)
 end
 
 function AF_IconButtonMixin:UpdatePixels()
@@ -721,7 +721,7 @@ function AF_CheckButtonMixin:SetText(text)
 end
 
 function AF_CheckButtonMixin:SetTooltip(...)
-    AF.SetTooltip(self, "ANCHOR_TOPLEFT", 0, 2, ...)
+    AF.SetTooltip(self, "TOPLEFT", 0, 2, ...)
 end
 
 function AF_CheckButtonMixin:UpdatePixels()

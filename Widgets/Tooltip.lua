@@ -12,8 +12,12 @@ local SetSpellByID = tt.SetSpellByID
 local anchorOverride = {
     ["LEFT"] = "RIGHT",
     ["RIGHT"] = "LEFT",
+    ["TOP"] = "BOTTOM",
+    ["BOTTOM"] = "TOP",
     ["BOTTOMLEFT"] = "TOPLEFT",
     ["BOTTOMRIGHT"] = "TOPRIGHT",
+    ["TOPLEFT"] = "BOTTOMLEFT",
+    ["TOPRIGHT"] = "BOTTOMRIGHT",
 }
 
 ---@param widget Frame
@@ -32,12 +36,19 @@ function AF.ShowTooltip(widget, anchor, x, y, lines)
 
     AF.Tooltip:ClearLines()
 
-    if anchorOverride[anchor] then
-        AF.Tooltip:SetOwner(widget, "ANCHOR_NONE")
+    local owner = widget._scrollParent or widget
+
+    if widget._scrollParent then
+        AF.Tooltip:SetOwner(widget._scrollParent, "ANCHOR_NONE")
         AF.Tooltip:SetPoint(anchorOverride[anchor], widget, anchor, x, y)
     else
-        if anchor and not strfind(anchor, "^ANCHOR_") then anchor = "ANCHOR_" .. anchor end
-        AF.Tooltip:SetOwner(widget, anchor or "ANCHOR_TOP", x or 0, y or 0)
+        if anchorOverride[anchor] then
+            AF.Tooltip:SetOwner(widget, "ANCHOR_NONE")
+            AF.Tooltip:SetPoint(anchorOverride[anchor], widget, anchor, x, y)
+        else
+            -- if anchor and not strfind(anchor, "^ANCHOR_") then anchor = "ANCHOR_" .. anchor end
+            AF.Tooltip:SetOwner(widget, anchor or "ANCHOR_TOP", x or 0, y or 0)
+        end
     end
 
     local r, g, b = AF.GetColorRGB(widget.accentColor or "accent")

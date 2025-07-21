@@ -747,6 +747,7 @@ function AF_ScrollGridMixin:SetScroll(startRow)
         if i < from or i > to then
             w:Hide()
         else
+            w:SetParent(self.slotFrame)
             w:Show()
             w:SetAllPoints(self.slots[slotIndex])
             if w.UpdatePixels then

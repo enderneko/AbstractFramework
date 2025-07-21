@@ -84,7 +84,7 @@ function AF.ShowDemo()
 
     local b3 = AF.CreateButton(demo, "Button C", "static", 100, 20)
     AF.SetPoint(b3, "TOPLEFT", b2, "TOPRIGHT", 10, 0)
-    AF.SetTooltip(b3, "ANCHOR_TOPLEFT", 0, 2, "Another Style", "SetTextHighlightColor", "SetBorderHighlightColor")
+    AF.SetTooltip(b3, "TOPLEFT", 0, 2, "Another Style", "SetTextHighlightColor", "SetBorderHighlightColor")
     b3:SetTextHighlightColor("accent")
     b3:SetBorderHighlightColor("accent")
 
@@ -110,7 +110,7 @@ function AF.ShowDemo()
     -----------------------------------------------------------------------------
     local cb1 = AF.CreateCheckButton(demo, "Check boxes")
     AF.SetPoint(cb1, "TOPLEFT", b1, "BOTTOMLEFT", 0, -10)
-    AF.SetTooltip(cb1, "ANCHOR_TOPLEFT", 0, 2, "Check Button", "The hit rectangle of these check buttons are different")
+    AF.SetTooltip(cb1, "TOPLEFT", 0, 2, "Check Button", "The hit rectangle of these check buttons are different")
 
     local cb2 = AF.CreateCheckButton(demo, "With")
     AF.SetPoint(cb2, "TOPLEFT", cb1, "BOTTOMLEFT", 0, -7)
@@ -850,7 +850,7 @@ function AF.ShowDemo()
 
     local b14 = AF.CreateButton(bf5, "PPopup+", "accent", 95, 20)
     AF.SetPoint(b14, "BOTTOMRIGHT")
-    AF.SetTooltip(b14, "ANCHOR_TOPLEFT", 0, 2, "Progress Popup", "With progress bar", "Hide in 5 sec after completion")
+    AF.SetTooltip(b14, "TOPLEFT", 0, 2, "Progress Popup", "With progress bar", "Hide in 5 sec after completion")
     b14:SetScript("OnClick", function()
         local callback = AF.ShowProgressPopup("In Progress...", 100)
         local v = 0
@@ -862,7 +862,7 @@ function AF.ShowDemo()
 
     local b15 = AF.CreateButton(bf5, "CPopup+", "accent", 95, 20)
     AF.SetPoint(b15, "BOTTOMRIGHT", b14, "BOTTOMLEFT", 1, 0)
-    AF.SetTooltip(b15, "ANCHOR_TOPLEFT", 0, 2, "Confirm Popup", "With \"Yes\" & \"No\" buttons", "Won't hide automatically")
+    AF.SetTooltip(b15, "TOPLEFT", 0, 2, "Confirm Popup", "With \"Yes\" & \"No\" buttons", "Won't hide automatically")
     b15:SetScript("OnClick", function()
         for i = 1, 3 do
             AF.ShowConfirmPopup("Confirm " .. i, function()
@@ -875,7 +875,7 @@ function AF.ShowDemo()
 
     local b16 = AF.CreateButton(bf5, "NPopup+", "accent", 95, 20)
     AF.SetPoint(b16, "BOTTOMRIGHT", b15, "BOTTOMLEFT", 1, 0)
-    AF.SetTooltip(b16, "ANCHOR_TOPLEFT", 0, 2, "Notification Popup", "With timeout", "Right-Click to hide")
+    AF.SetTooltip(b16, "TOPLEFT", 0, 2, "Notification Popup", "With timeout", "Right-Click to hide")
     b16:SetScript("OnClick", function()
         for i = 1, 3 do
             local timeout = random(2, 7)
