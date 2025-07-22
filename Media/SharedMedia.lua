@@ -59,6 +59,22 @@ function AF.LSM_GetFont(name)
     return DEFAULT_FONT
 end
 
+function AF.LSM_GetFontDropdownItems()
+    local items = {}
+    local fontNames = LSM:List("font")
+    local fonts = LSM:HashTable("font")
+
+    for _, name in next, fontNames do
+        tinsert(items, {
+            text = name,
+            value = name,
+            font = fonts[name],
+        })
+    end
+
+    return items
+end
+
 ---@param fs FontString|EditBox
 function AF.SetFont(fs, font, size, outline, shadow)
     if type(font) == "table" then
