@@ -190,6 +190,8 @@ end
 ---@return number b
 ---@return number a
 function AF.GetColorRGB(color, alpha, factor)
+    color = color or "white"
+
     if color:find("^#") then
         if alpha or factor then
             color = AF.ScaleColorHex(color, factor, alpha)
@@ -197,11 +199,15 @@ function AF.GetColorRGB(color, alpha, factor)
         return AF.ConvertHEXToRGB(color)
     end
 
-    assert(COLORS[color], "no such color:", color)
+    -- assert(COLORS[color], "no such color:", color)
 
-    factor = factor or 1
-    alpha = alpha or COLORS[color]["t"][4] or 1
-    return COLORS[color]["t"][1] * factor, COLORS[color]["t"][2] * factor, COLORS[color]["t"][3] * factor, alpha
+    if alpha or factor then
+        factor = factor or 1
+        alpha = alpha or COLORS[color]["t"][4] or 1
+        return COLORS[color]["t"][1] * factor, COLORS[color]["t"][2] * factor, COLORS[color]["t"][3] * factor, alpha
+    end
+
+    return COLORS[color]["t"][1], COLORS[color]["t"][2], COLORS[color]["t"][3], COLORS[color]["t"][4] or 1
 end
 
 ---@param color string
@@ -209,6 +215,8 @@ end
 ---@param factor? number
 ---@return table colorTable {r, g, b, a}
 function AF.GetColorTable(color, alpha, factor)
+    color = color or "white"
+
     if color:find("^#") then
         if alpha or factor then
             color = AF.ScaleColorHex(color, factor, alpha)
@@ -216,7 +224,7 @@ function AF.GetColorTable(color, alpha, factor)
         return {AF.ConvertHEXToRGB(color)}
     end
 
-    assert(COLORS[color], "no such color:", color)
+    -- assert(COLORS[color], "no such color:", color)
 
     factor = factor or 1
     alpha = alpha or COLORS[color]["t"][4] or 1
@@ -229,6 +237,8 @@ end
 ---@param factor? number
 ---@return string hexColor \"rrggbb\" or \"aarrggbb\"
 function AF.GetColorHex(color, alpha, factor)
+    color = color or "white"
+
     if color:find("^#") then
         if alpha or factor then
             return AF.ScaleColorHex(color, factor, alpha)
@@ -237,7 +247,7 @@ function AF.GetColorHex(color, alpha, factor)
         end
     end
 
-    assert(COLORS[color], "no such color:", color)
+    -- assert(COLORS[color], "no such color:", color)
 
     if alpha or factor then
         local r, g, b, a = AF.GetColorRGB(color, alpha, factor)
