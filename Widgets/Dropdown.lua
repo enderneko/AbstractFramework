@@ -374,11 +374,11 @@ function AF_DropdownMixin:LoadItems()
             AF.AddToFontSizeUpdater(b.text)
 
             function b:Update()
-                --! invoked in SetScroll, or text may not "visible"
+                --! NOTE: invoked in SetScroll, or text may not "visible"
                 b.text:Hide()
-                C_Timer.After(0, function()
+                C_Timer.NewTicker(0, function()
                     b.text:Show()
-                end)
+                end, 3)
             end
         else
             -- re-use button

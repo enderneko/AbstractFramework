@@ -95,10 +95,8 @@ end
 ---------------------------------------------------------------------
 -- number format
 ---------------------------------------------------------------------
-local symbol_1K, symbol_10K, symbol_1B = "", "", ""
-if LOCALE_zhCN then
-    symbol_1K, symbol_10K, symbol_1B = "千", "万", "亿"
-elseif LOCALE_zhTW then
+local symbol_1K, symbol_10K, symbol_1B = "千", "万", "亿"
+if LOCALE_zhTW then
     symbol_1K, symbol_10K, symbol_1B = "千", "萬", "億"
 elseif LOCALE_koKR then
     symbol_1K, symbol_10K, symbol_1B = "천", "만", "억"

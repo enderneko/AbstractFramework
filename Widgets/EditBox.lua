@@ -1,6 +1,8 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 
+local strmatch, strsub, strgsub, strfind, strlower = string.match, string.sub, string.gsub, string.find, string.lower
+
 ---------------------------------------------------------------------
 -- edit box
 ---------------------------------------------------------------------
@@ -117,12 +119,16 @@ function AF_EditBoxMixin:SetMode(mode)
         end
     elseif mode == "decimal" then
         self.GetValue = function(self)
-            local text = string.gsub(self:GetText(), "[^%d%.]", "")
+            local text = strgsub(self:GetText(), "[^%d%.%-]", "")
 
-            local firstDecimal = string.find(text, "%.")
+            local neg, rest = strmatch(text, "^(-?)(.*)")
+            rest = strgsub(rest, "%-", "")
+            text = neg .. rest
+
+            local firstDecimal = strfind(text, "%.")
             if firstDecimal then
-                text = string.sub(text, 1, firstDecimal) ..
-                    string.gsub(string.sub(text, firstDecimal + 1), "%.", "")
+                text = strsub(text, 1, firstDecimal) ..
+                    strgsub(strsub(text, firstDecimal + 1), "%.", "")
             end
             return tonumber(text) -- or 0
         end

@@ -227,8 +227,8 @@ function AF_SimpleStatusBarMixin:SetValue(value)
     UpdateValue(self)
 end
 
--- desaturate
-function AF_SimpleStatusBarMixin:Desaturate(enabled)
+-- dim
+function AF_SimpleStatusBarMixin:Dim(enabled)
     self.mod:SetShown(enabled)
 end
 
@@ -286,7 +286,7 @@ function AF.CreateSimpleStatusBar(parent, name, noBackdrop)
     local bg = bar:CreateTexture(nil, "BORDER", nil, -2)
     bar.bg = bg
 
-    -- desaturate
+    -- dim
     local mod = bar:CreateTexture(nil, "ARTWORK", nil, 1)
     bar.mod = mod
     mod:SetAllPoints(fg.mask)

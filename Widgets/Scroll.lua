@@ -74,9 +74,7 @@ end
 ---@param spacing number spacing between items
 function AF_ScrollFrameMixin:SetContentHeights(heights, spacing)
     AF.SetScrollContentHeight(self.scrollContent, heights, spacing)
-    C_Timer.After(0, function()
-        self:ResetScroll()
-    end)
+    self:ResetScroll()
 end
 
 ---@param step number default is 25
