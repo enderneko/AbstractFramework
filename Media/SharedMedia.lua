@@ -1,6 +1,7 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 local LSM = AF.Libs.LSM
+local L = AF.L
 
 local strlower = string.lower
 local tinsert, tconcat = table.insert, table.concat
@@ -73,6 +74,17 @@ function AF.LSM_GetFontDropdownItems()
     end
 
     return items
+end
+
+function AF.LSM_GetFontOutlineDropdownItems()
+    return {
+        {text = L["None"], value = "none"},
+        {text = L["Outline"], value = "outline"},
+        {text = L["Thick Outline"], value = "thickoutline"},
+        {text = L["Monochrome"], value = "monochrome"},
+        {text = L["Mono Outline"], value = "monochrome_outline"},
+        {text = L["Mono Thick"], value = "monochrome_thickoutline"},
+    }
 end
 
 ---@param fs FontString|EditBox
