@@ -402,22 +402,27 @@ end
 ---@param fs FontString
 ---@param text string
 ---@param length? number
+---@param prefix? string|number
 ---@param suffix? string|number
-function AF.SetText(fs, text, length, suffix)
+function AF.SetText(fs, text, length, prefix, suffix)
     if length and length > 0 then
         if length <= 1 then
             local width = fs:GetParent():GetWidth() - 2
-            for i = string.utf8len(text), 0, -1 do
-                fs:SetText(string.utf8sub(text, 1, i))
+            for i = utf8len(text), 0, -1 do
+                fs:SetText(utf8sub(text, 1, i))
                 if fs:GetWidth() / width <= length then
                     break
                 end
             end
         else
-            fs:SetText(string.utf8sub(text, 1, length))
+            fs:SetText(utf8sub(text, 1, length))
         end
     else
         fs:SetText(text)
+    end
+
+    if prefix then
+        fs:SetText(prefix .. fs:GetText())
     end
 
     if suffix then
