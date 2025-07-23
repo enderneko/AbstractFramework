@@ -65,9 +65,7 @@ function AF_ScrollFrameMixin:SetContentHeight(height, useRawValue)
     else
         AF.SetHeight(self.scrollContent, height)
     end
-    C_Timer.After(0, function()
-        self:ResetScroll()
-    end)
+    self:ResetScroll()
 end
 
 ---@param heights table heights of each item
@@ -191,6 +189,8 @@ function AF.CreateScrollFrame(parent, name, width, height, color, borderColor)
             local scrollP = scrollFrame:GetVerticalScroll() / scrollParent:GetVerticalScrollRange()
             local yoffset = -((scrollBar:GetHeight() - scrollThumb:GetHeight()) * scrollP)
             scrollThumb:SetPoint("TOP", 0, yoffset)
+        else
+            scrollThumb:SetPoint("TOP")
         end
     end
     scrollFrame:SetScript("OnVerticalScroll", OnVerticalScroll)
