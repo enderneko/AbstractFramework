@@ -11,7 +11,27 @@ function AF.GetPixelFactor()
 end
 
 function AF.GetBestScale()
-    return AF.Clamp(AF.GetPixelFactor(), 0.5, 1.15)
+    -- local physicalWidth, physicalHeight = GetPhysicalScreenSize()
+    -- local pixelFactor = 768.0 / physicalHeight
+
+    -- if physicalHeight >= 2160 then -- 4K
+    --     return 0.6
+    -- elseif physicalHeight >= 1440 then -- 2K/1440p
+    --     return 0.65
+    -- else -- 1080p
+    --     return AF.Clamp(pixelFactor, 0.5, 1.15)
+    -- end
+
+    local factor = AF.GetPixelFactor()
+    local mult
+    if factor >= 0.71 then -- 1080p
+        mult = 1
+    elseif factor >= 0.53 then -- 1440p
+        mult = 1.2
+    else -- 2160p
+        mult = 1.7
+    end
+    return AF.Clamp(AF.RoundToDecimal(factor * mult, 2), 0.5, 1.5)
 end
 
 function AF.GetNearestPixelSize(uiUnitSize, layoutScale, minPixels)
@@ -224,6 +244,9 @@ function AF.SetGridSize(region, gridWidth, gridHeight, gridSpacingX, gridSpacing
     end
 end
 
+---@param region Region
+---@param width number|nil
+---@param height number|nil
 function AF.SetSize(region, width, height)
     -- height = height or width
     if width then AF.SetWidth(region, width) end
