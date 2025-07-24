@@ -538,6 +538,28 @@ function AF.GetUnitColor(unit)
 end
 
 ---@param unit string unitId
+---@return string name "FRIENDLY", "NEUTRAL", "HOSTILE" or class name
+function AF.GetUnitColorName(unit)
+    local name
+    if UnitIsPlayer(unit) or UnitInPartyIsAI(unit) then -- player
+        local class = UnitClassBase(unit)
+        name = class
+    else
+        --! reaction to player, MUST use UnitReaction(unit, "player")
+        --! NOT UnitReaction("player", unit)
+        local reaction = UnitReaction(unit, "player") or 0
+        if reaction <= 2 then
+            name = "HOSTILE"
+        elseif reaction <= 4 then
+            name = "NEUTRAL"
+        else
+            name = "FRIENDLY"
+        end
+    end
+    return name
+end
+
+---@param unit string unitId
 ---@return number r
 ---@return number g
 ---@return number b
