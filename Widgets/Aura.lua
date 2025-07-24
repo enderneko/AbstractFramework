@@ -37,16 +37,17 @@ local function UpdateDuration_ColorByPercentSeconds(aura, elapsed)
         if aura._remain < 0 then aura._remain = 0 end
 
         -- color = {
-        --     AF.GetColorTable("white"), -- normal
-        --     {false, 0.5, AF.GetColorTable("aura_percent")}, -- less than 50%
-        --     {true,  5,   AF.GetColorTable("aura_seconds")}, -- less than 5sec
+        --     normal = AF.GetColorTable("white"), -- normal
+        --     percent = {enabled = false, value = 0.5, rgb = AF.GetColorTable("aura_percent")}, -- less than 50%
+        --     seconds = {enabled = true, value = 5, rgb = AF.GetColorTable("aura_seconds")}, -- less than 5sec
         -- }
-        if aura.durationColor[3][1] and aura._remain < aura.durationColor[3][2] then
-            aura.duration:SetTextColor(AF.UnpackColor(aura.durationColor[3][3]))
-        elseif aura.durationColor[2][1] and aura._remain < (aura.durationColor[2][2] * aura._duration) then
-            aura.duration:SetTextColor(AF.UnpackColor(aura.durationColor[2][3]))
+
+        if aura.durationColor.seconds.enabled and aura._remain < aura.durationColor.seconds.value then
+            aura.duration:SetTextColor(AF.UnpackColor(aura.durationColor.seconds.rgb))
+        elseif aura.durationColor.percent.enabled and aura._remain < (aura.durationColor.percent.value * aura._duration) then
+            aura.duration:SetTextColor(AF.UnpackColor(aura.durationColor.percent.rgb))
         else
-            aura.duration:SetTextColor(AF.UnpackColor(aura.durationColor[1]))
+            aura.duration:SetTextColor(AF.UnpackColor(aura.durationColor.normal))
         end
 
         UpdateDurationText(aura)
@@ -56,27 +57,27 @@ local function UpdateDuration_ColorByPercentSeconds(aura, elapsed)
     end
 end
 
-local function UpdateDuration_ColorByExpiring(aura, elapsed)
-    if aura._elapsed >= 0.1 then
-        aura._remain = aura._duration - (GetTime() - aura._start)
-        if aura._remain < 0 then aura._remain = 0 end
+-- local function UpdateDuration_ColorByExpiring(aura, elapsed)
+--     if aura._elapsed >= 0.1 then
+--         aura._remain = aura._duration - (GetTime() - aura._start)
+--         if aura._remain < 0 then aura._remain = 0 end
 
-        -- color = {
-        --     AF.GetColorTable("white"), -- normal
-        --     AF.GetColorTable("aura_seconds"), -- expiring
-        -- },
-        if aura._remain < 5 then
-            aura.duration:SetTextColor(AF.UnpackColor(aura.durationColor[2]))
-        else
-            aura.duration:SetTextColor(AF.UnpackColor(aura.durationColor[1]))
-        end
+--         -- color = {
+--         --     AF.GetColorTable("white"), -- normal
+--         --     AF.GetColorTable("aura_seconds"), -- expiring
+--         -- },
+--         if aura._remain < 5 then
+--             aura.duration:SetTextColor(AF.UnpackColor(aura.durationColor[2]))
+--         else
+--             aura.duration:SetTextColor(AF.UnpackColor(aura.durationColor[1]))
+--         end
 
-        UpdateDurationText(aura)
-        aura._elapsed = 0
-    else
-        aura._elapsed = aura._elapsed + elapsed
-    end
-end
+--         UpdateDurationText(aura)
+--         aura._elapsed = 0
+--     else
+--         aura._elapsed = aura._elapsed + elapsed
+--     end
+-- end
 
 -- local function UpdateDuration_ColorByUnit(aura, elapsed)
 --     if aura._elapsed >= 0.1 then
@@ -105,17 +106,17 @@ end
 --     end
 -- end
 
-local function UpdateDuration_NoColor(aura, elapsed)
-    if aura._elapsed >= 0.1 then
-        aura._remain = aura._duration - (GetTime() - aura._start)
-        if aura._remain < 0 then aura._remain = 0 end
+-- local function UpdateDuration_NoColor(aura, elapsed)
+--     if aura._elapsed >= 0.1 then
+--         aura._remain = aura._duration - (GetTime() - aura._start)
+--         if aura._remain < 0 then aura._remain = 0 end
 
-        UpdateDurationText(aura)
-        aura._elapsed = 0
-    else
-        aura._elapsed = aura._elapsed + elapsed
-    end
-end
+--         UpdateDurationText(aura)
+--         aura._elapsed = 0
+--     else
+--         aura._elapsed = aura._elapsed + elapsed
+--     end
+-- end
 
 ---@param aura AF_AuraButton
 ---@param start number
@@ -202,24 +203,13 @@ function AF.SetupAuraDurationText(aura, config)
     AF.LoadWidgetPosition(aura.duration, config.position, aura)
     AF.SetFont(aura.duration, unpack(config.font))
 
-    if not config.enabled then
-        aura.UpdateDuration = AF.noop
-        return
-    end
-
     aura.showSecondsUnit = config.showSecondsUnit
+    aura.durationColor = config.color
 
-    if config.colorBy == "percent_seconds" then
-        -- [1]normal, [2]percent, [3]seconds
-        aura.durationColor = config.color
+    if config.enabled then
         aura.UpdateDuration = UpdateDuration_ColorByPercentSeconds
-    elseif config.colorBy == "expiring" then
-        -- [1]normal, [2]expiring
-        aura.durationColor = config.color
-        aura.UpdateDuration = UpdateDuration_ColorByExpiring
-    elseif config.colorBy == "none" or not config.colorBy then
-        aura.duration:SetTextColor(unpack(config.color))
-        aura.UpdateDuration = UpdateDuration_NoColor
+    else
+        aura.UpdateDuration = AF.noop
     end
 end
 
