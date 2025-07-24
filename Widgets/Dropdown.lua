@@ -317,9 +317,6 @@ end
 function AF_DropdownMixin:SetCurrentItem(item)
     self.items[self.selected] = item
 
-    -- usually, update current item means to change its name (text) and func
-    self.text:SetText(item.text)
-
     if item.texture then
         self.bgTexture:SetTexture(item.texture)
         self.bgTexture:Show()
@@ -332,6 +329,9 @@ function AF_DropdownMixin:SetCurrentItem(item)
     else
         self.text:SetFont(AF.GetFontProps("normal"))
     end
+
+    -- usually, update current item means to change its name (text) and func
+    self.text:SetText(item.text)
 
     self.reloadRequired = true
 end
@@ -374,11 +374,14 @@ function AF_DropdownMixin:LoadItems()
             AF.AddToFontSizeUpdater(b.text)
 
             function b:Update()
-                --! NOTE: invoked in SetScroll, or text may not "visible"
-                b.text:Hide()
-                C_Timer.NewTicker(0, function()
-                    b.text:Show()
-                end, 3)
+                --! NOTE: invoked in SetScroll, or text may be "invisible"
+                if b._font then
+                    C_Timer.NewTicker(0, function()
+                        b:SetFont(AF.GetFontProps(b._font))
+                        b.text:SetText("TEST TEST TEST TEST TEST") -- force update text
+                        b.text:SetText(b._text)
+                    end, 2)
+                end
             end
         else
             -- re-use button
@@ -410,10 +413,13 @@ function AF_DropdownMixin:LoadItems()
         if item.font then
             -- set
             b:SetFont(AF.GetFontProps(item.font))
+            b._font = item.font
+            b._text = item.text
         else
             -- restore
             b:SetFont(AF.GetFontProps("normal"))
-            b.Update = nil
+            b._font = nil
+            b._text = nil
         end
 
         -- highlight

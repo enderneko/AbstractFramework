@@ -360,12 +360,14 @@ function AF_ScrollListMixin:SetWidgets(widgets)
     self:Reset()
     self.widgets = widgets
     self.widgetNum = #widgets
-    self:SetScroll(1)
 
     -- call UpdatePixels on show
     for _, w in ipairs(self.widgets) do
         AF.RemoveFromPixelUpdater(w)
+        w:SetParent(self.slotFrame)
     end
+
+    self:SetScroll(1)
 
     if self.widgetNum > self.slotNum then -- can scroll
         self.scrollBar:Show()
@@ -425,7 +427,6 @@ function AF_ScrollListMixin:SetScroll(startIndex)
         if i < from or i > to then
             w:Hide()
         else
-            w:SetParent(self.slotFrame)
             w:Show()
             w:SetAllPoints(self.slots[slotIndex])
             if w.UpdatePixels then
