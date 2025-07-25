@@ -377,10 +377,9 @@ end
 -- tooltip
 ---------------------------------------------------------------------
 local function Aura_SetTooltipPosition(aura)
-    -- TODO: more anchorTo
-    if aura.tooltipAnchorTo == "self" then
+    if aura.tooltip.anchorTo == "self" then
         GameTooltip:SetOwner(aura, "ANCHOR_NONE")
-        GameTooltip:SetPoint(aura.tooltipPosition[1], aura, aura.tooltipPosition[2], aura.tooltipPosition[3], aura.tooltipPosition[4])
+        GameTooltip:SetPoint(aura.tooltip.position[1], aura, aura.tooltip.position[2], aura.tooltip.position[3], aura.tooltip.position[4])
     else -- default
         GameTooltip_SetDefaultAnchor(GameTooltip, aura)
     end
@@ -400,17 +399,15 @@ local function Aura_HideTooltips()
     GameTooltip:Hide()
 end
 
----@param config table
+---@param config table {enabled = boolean, anchorTo = string, position = {string, string, number, number}}
 ---@param isHelpful boolean
 function AF_AuraButtonMixin:EnableTooltip(config, isHelpful)
     if config.enabled then
-        self.tooltipAnchorTo = config.anchorTo
-        self.tooltipPosition = config.position
+        self.tooltip = config
         self:SetScript("OnEnter", isHelpful and Aura_ShowBuffTooltip or Aura_ShowDebuffTooltip)
         self:SetScript("OnLeave", Aura_HideTooltips)
     else
-        self.tooltipAnchorTo = nil
-        self.tooltipPosition = nil
+        self.tooltip = nil
         self:SetScript("OnEnter", nil)
         self:SetScript("OnLeave", nil)
         self:EnableMouse(false)
