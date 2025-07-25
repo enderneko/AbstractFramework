@@ -181,7 +181,11 @@ function AF.SetScrollContentHeight(content, heights, spacing)
         totalHeight = 1
     else
         for _, height in next, heights do
-            totalHeight = totalHeight + AF.GetNearestPixelSize(height, content:GetEffectiveScale())
+            if type(height) == "number" then
+                totalHeight = totalHeight + AF.GetNearestPixelSize(height, content:GetEffectiveScale())
+            else
+                totalHeight = totalHeight + tonumber(height) or 0
+            end
         end
         totalHeight = totalHeight + AF.GetNearestPixelSize(spacing, content:GetEffectiveScale()) * (#heights - 1)
     end

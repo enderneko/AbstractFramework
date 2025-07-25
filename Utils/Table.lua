@@ -103,6 +103,9 @@ function AF.Insert(t, v)
     until done
 end
 
+-- remove all occurrences of a value from a table
+---@param t table
+---@param v any the value to remove
 function AF.Remove(t, v)
     for i = #t, 1, -1 do
         if t[i] == v then

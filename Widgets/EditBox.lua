@@ -579,17 +579,24 @@ editBoxPool = AF.CreateObjectPool(function()
     eb:Hide()
     eb:SetOnShow(EditBox_OnShow)
     eb:SetOnHide(EditBox_OnHide)
-    eb:SetOnEscapePressed(EditBox_OnEscapePressed)
     eb:SetScript("OnEscapePressed", EditBox_OnEscapePressed)
     eb:SetScript("OnEnterPressed", EditBox_OnEnterPressed)
     hooksecurefunc(eb, "SetScript", EditBox_OnSetScript)
     hooksecurefunc(eb, "HookScript", EditBox_OnHookScript)
     return eb
+end, function(_, eb)
+    -- reset
+    eb:SetOnEscapePressed(nil)
+    eb:SetOnEnterPressed(nil)
+    eb:SetOnEditFocusGained(nil)
+    eb:SetOnEditFocusLost(nil)
+    eb:SetOnTextChanged(nil)
+    eb:SetText("")
 end)
 
 -- this is a transient edit box, it will be created on demand and released when not needed.
 -- please DO NOT use this for dialogs or other persistent edit boxes,
--- and DO NOT modify its script handlers besides "SetOnEnter/EscapePressed".
+-- and DO NOT modify its script handlers besides "SetOnEnter/EscapePressed", "SetOnEditFocusGained/Lost", "SetOnTextChanged".
 ---@param parent Frame
 ---@param label? string
 ---@param width? number
