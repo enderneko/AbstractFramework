@@ -4,12 +4,20 @@ local AF = _G.AbstractFramework
 ---------------------------------------------------------------------
 -- spells
 ---------------------------------------------------------------------
+local UNKNOWN_NAME = _G.UNKNOWN
+local UNKNOWN_ICON = AF.GetIcon("QuestionMark")
+
 if AF.isWrath then
-    ---@return number spellId
+    ---@param spellId number
+    ---@param alwaysReturnValue boolean? If true, always return non-nil values even if the spellId is invalid
+    ---@return string spellName
     ---@return number spellIcon
-    function AF.GetSpellInfo(spellId)
+    function AF.GetSpellInfo(spellId, alwaysReturnValue)
         if not spellId then return end
         local name, _, icon = GetSpellInfo(spellId)
+        if alwaysReturnValue then
+            return name or UNKNOWN_NAME, icon or UNKNOWN_ICON
+        end
         return name, icon
     end
 else
@@ -17,9 +25,11 @@ else
     local GetSpellName = C_Spell.GetSpellName
     local GetSpellTexture = C_Spell.GetSpellTexture
 
-    ---@return number spellId
+    ---@param spellId number
+    ---@param alwaysReturnValue boolean? If true, always return non-nil values even if the spellId is invalid
+    ---@return string spellName
     ---@return number spellIcon
-    function AF.GetSpellInfo(spellId)
+    function AF.GetSpellInfo(spellId, alwaysReturnValue)
         local info = GetSpellInfo(spellId)
         if not info then return end
 
@@ -27,6 +37,9 @@ else
             info.iconID = GetSpellTexture(spellId)
         end
 
+        if alwaysReturnValue then
+            return info.name or UNKNOWN_NAME, info.iconID or UNKNOWN_ICON
+        end
         return info.name, info.iconID
     end
 end

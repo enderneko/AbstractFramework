@@ -240,7 +240,9 @@ function AF.ConvertTable(t, processor)
     local temp = {}
     for k, v in ipairs(t) do
         local newKey, newValue = processor(k, v)
-        temp[newKey] = newValue
+        if newKey and newValue then
+            temp[newKey] = newValue
+        end
     end
     return temp
 end
