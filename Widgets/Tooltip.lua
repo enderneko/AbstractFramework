@@ -104,9 +104,13 @@ function AF.ClearTooltip(widget)
 end
 
 local tooltips = {}
-function AF.HideTooltip()
-    for _, tooltip in pairs(tooltips) do
-        tooltip:Hide()
+function AF.HideTooltip(hideAll)
+    if hideAll == true then
+        for _, tooltip in pairs(tooltips) do
+            tooltip:Hide()
+        end
+    else
+        AF.Tooltip:Hide() -- AFTooltip
     end
 end
 
@@ -229,7 +233,7 @@ function AF_TooltipMixin:RequireModifier(modifier)
     self:RegisterEvent("MODIFIER_STATE_CHANGED", MODIFIER_STATE_CHANGED)
 end
 
-function AF_TooltipMixin:SetItemByID(itemID)
+function AF_TooltipMixin:SetItemByID(itemID, showIcon)
     self.itemID = itemID
     self.spellID = nil
 
@@ -240,12 +244,15 @@ function AF_TooltipMixin:SetItemByID(itemID)
         self:SetBackdropBorderColor(AF.GetItemQualityColor(quality))
     end
 
-    local icon = GetItemIconByID(itemID)
-    if icon then
+    if showIcon then
+        local icon = GetItemIconByID(itemID) or AF.GetIcon("QuestionMark")
         if not self.icon then
             self:SetupIcon("TOPRIGHT", "TOPLEFT", -1, 0)
         end
         self.icon:SetTexture(icon)
+        self:ShowIcon()
+    else
+        self:HideIcon()
     end
 
     self:Show()
@@ -254,18 +261,21 @@ end
 
 AF_TooltipMixin.SetItem = AF_TooltipMixin.SetItemByID
 
-function AF_TooltipMixin:SetSpellByID(spellID)
+function AF_TooltipMixin:SetSpellByID(spellID, showIcon)
     self.spellID = spellID
     self.itemID = nil
 
     SetSpellByID(self, spellID)
 
-    local icon = GetSpellTexture(spellID)
-    if icon then
+    if showIcon then
+        local icon = GetSpellTexture(spellID) or AF.GetIcon("QuestionMark")
         if not self.icon then
             self:SetupIcon("TOPRIGHT", "TOPLEFT", -1, 0)
         end
         self.icon:SetTexture(icon)
+        self:ShowIcon()
+    else
+        self:HideIcon()
     end
 
     self:Show()
