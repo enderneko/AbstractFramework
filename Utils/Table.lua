@@ -295,7 +295,7 @@ end
 
 local function SortComparator(criteria)
     return function(a, b)
-        for _, criterion in ipairs(criteria) do
+        for _, criterion in next, criteria do
             local result = CompareField(a, b, criterion.key, criterion.order)
             if result ~= nil then
                 return result

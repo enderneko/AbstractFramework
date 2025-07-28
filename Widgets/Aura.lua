@@ -156,6 +156,7 @@ function AF.SetAuraCooldown(aura, start, duration, count, icon, auraType, desatu
         aura:SetScript("OnUpdate", aura.UpdateDuration)
     end
 
+    -- TODO: change to glowType string
     if glow then
         LCG.ButtonGlow_Start(aura, nil, nil, 0)
         AF.ShowCalloutGlow(aura, true)
@@ -166,6 +167,8 @@ function AF.SetAuraCooldown(aura, start, duration, count, icon, auraType, desatu
 
     if r then
         aura:SetBackdropColor(r, g, b, a)
+    else
+        aura:SetBackdropColor(0, 0, 0, 1)
     end
 
     aura:SetDesaturated(desaturated)
@@ -337,6 +340,7 @@ function AF_AuraButtonMixin:SetCooldownStyle(style)
     if self.cooldown then
         -- self.cooldown:SetParent(nil)
         self.cooldown:Hide()
+        self.cooldown = nil
     end
 
     self.style = style

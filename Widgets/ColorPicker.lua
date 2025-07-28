@@ -4,7 +4,7 @@ local AF = _G.AbstractFramework
 ---------------------------------------------------------------------
 -- color picker widget
 ---------------------------------------------------------------------
----@class AF_ColorPicker:Button
+---@class AF_ColorPicker:Button,AF_BaseWidgetMixin
 local AF_ColorPickerMixin = {}
 
 function AF_ColorPickerMixin:EnableAlpha(enabled)
@@ -118,6 +118,7 @@ function AF.CreateColorPicker(parent, label, alphaEnabled, onChange, onConfirm)
     -- cp.mask:Hide()
 
     Mixin(cp, AF_ColorPickerMixin)
+    Mixin(cp, AF_BaseWidgetMixin)
 
     cp.alphaEnabled = alphaEnabled
     cp.onChange = onChange

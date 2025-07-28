@@ -94,6 +94,15 @@ function AF.AddToFontSizeUpdater(fontObj, originalSize)
     fontObjects[fontObj] = originalSize
 end
 
+AF.AddToFontSizeUpdater(font_title, FONT_TITLE_SIZE)
+AF.AddToFontSizeUpdater(font_normal, FONT_NORMAL_SIZE)
+AF.AddToFontSizeUpdater(font_chat, FONT_CHAT_SIZE)
+AF.AddToFontSizeUpdater(font_outline, FONT_OUTLINE_SIZE)
+AF.AddToFontSizeUpdater(font_small, FONT_SMALL_SIZE)
+AF.AddToFontSizeUpdater(font_chinese, FONT_CHINESE_SIZE)
+AF.AddToFontSizeUpdater(font_tooltip_header, FONT_TOOLTIP_HEADER_SIZE)
+AF.AddToFontSizeUpdater(font_tooltip, FONT_TOOLTIP_SIZE)
+
 AF.fontSizeOffset = 0
 
 ---@param offset number
@@ -103,14 +112,14 @@ function AF.UpdateFontSize(offset)
         AFConfig.fontSizeOffset = AF.fontSizeOffset
     end
 
-    font_title:SetFont(BASE_FONT_NORMAL, FONT_TITLE_SIZE + offset, "")
-    font_normal:SetFont(BASE_FONT_NORMAL, FONT_NORMAL_SIZE + offset, "")
-    font_chat:SetFont(BASE_FONT_CHAT, FONT_CHAT_SIZE + offset, "")
-    font_outline:SetFont(BASE_FONT_NORMAL, FONT_OUTLINE_SIZE + offset, "OUTLINE")
-    font_small:SetFont(BASE_FONT_NORMAL, FONT_SMALL_SIZE + offset, "")
-    font_chinese:SetFont(UNIT_NAME_FONT_CHINESE, FONT_CHINESE_SIZE + offset, "")
-    font_tooltip_header:SetFont(BASE_FONT_TOOLTIP, FONT_TOOLTIP_HEADER_SIZE + offset, "")
-    font_tooltip:SetFont(BASE_FONT_TOOLTIP, FONT_TOOLTIP_SIZE + offset, "")
+    -- font_title:SetFont(BASE_FONT_NORMAL, FONT_TITLE_SIZE + offset, "")
+    -- font_normal:SetFont(BASE_FONT_NORMAL, FONT_NORMAL_SIZE + offset, "")
+    -- font_chat:SetFont(BASE_FONT_CHAT, FONT_CHAT_SIZE + offset, "")
+    -- font_outline:SetFont(BASE_FONT_NORMAL, FONT_OUTLINE_SIZE + offset, "OUTLINE")
+    -- font_small:SetFont(BASE_FONT_NORMAL, FONT_SMALL_SIZE + offset, "")
+    -- font_chinese:SetFont(UNIT_NAME_FONT_CHINESE, FONT_CHINESE_SIZE + offset, "")
+    -- font_tooltip_header:SetFont(BASE_FONT_TOOLTIP, FONT_TOOLTIP_HEADER_SIZE + offset, "")
+    -- font_tooltip:SetFont(BASE_FONT_TOOLTIP, FONT_TOOLTIP_SIZE + offset, "")
 
     for fontObj, originalSize in pairs(fontObjects) do
         local f, _, o = fontObj:GetFont()
@@ -236,15 +245,15 @@ end
 
 function AF.GetFontProps(font)
     if font == "title" then
-        return BASE_FONT_NORMAL, FONT_TITLE_SIZE + AF.fontSizeOffset, ""
+        return font_title:GetFont(), FONT_TITLE_SIZE + AF.fontSizeOffset, ""
     elseif font == "normal" then
-        return BASE_FONT_NORMAL, FONT_NORMAL_SIZE + AF.fontSizeOffset, ""
+        return font_normal:GetFont(), FONT_NORMAL_SIZE + AF.fontSizeOffset, ""
     elseif font == "chat" then
-        return BASE_FONT_CHAT, FONT_CHAT_SIZE + AF.fontSizeOffset, ""
+        return font_chat:GetFont(), FONT_CHAT_SIZE + AF.fontSizeOffset, ""
     elseif font == "small" then
-        return BASE_FONT_NORMAL, FONT_SMALL_SIZE + AF.fontSizeOffset, ""
+        return font_small:GetFont(), FONT_SMALL_SIZE + AF.fontSizeOffset, ""
     elseif font == "outline" then
-        return BASE_FONT_NORMAL, FONT_OUTLINE_SIZE + AF.fontSizeOffset, "OUTLINE"
+        return font_outline:GetFont(), FONT_OUTLINE_SIZE + AF.fontSizeOffset, "OUTLINE"
     else
         return font, FONT_NORMAL_SIZE + AF.fontSizeOffset, ""
     end

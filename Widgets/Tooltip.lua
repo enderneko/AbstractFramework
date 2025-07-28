@@ -146,9 +146,9 @@ local function TOOLTIP_DATA_UPDATE(self)
         -- Interface\FrameXML\GameTooltip.lua GameTooltipDataMixin:RefreshData()
         -- self:RefreshData()
         if self.itemID then
-            self:SetItemByID(self.itemID)
+            self:SetItemByID(self.itemID, self.showIcon)
         elseif self.spellID then
-            self:SetSpellByID(self.spellID)
+            self:SetSpellByID(self.spellID, self.showIcon)
         end
     end
 end
@@ -236,6 +236,7 @@ end
 function AF_TooltipMixin:SetItemByID(itemID, showIcon)
     self.itemID = itemID
     self.spellID = nil
+    self.showIcon = showIcon
 
     SetItemByID(self, itemID)
 
@@ -264,6 +265,7 @@ AF_TooltipMixin.SetItem = AF_TooltipMixin.SetItemByID
 function AF_TooltipMixin:SetSpellByID(spellID, showIcon)
     self.spellID = spellID
     self.itemID = nil
+    self.showIcon = showIcon
 
     SetSpellByID(self, spellID)
 

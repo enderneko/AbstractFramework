@@ -108,7 +108,7 @@ function AF_SliderMixin:OnEnable()
 end
 
 function AF_SliderMixin:SetTooltip(...)
-    AF.SetTooltip(sl1, "TOPLEFT", 0, 20, ...)
+    AF.SetTooltip(self, "TOPLEFT", 0, 20, ...)
 end
 
 ---@param parent Frame

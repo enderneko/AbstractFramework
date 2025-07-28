@@ -211,6 +211,12 @@ dialogPool = AF.CreateObjectPool(function()
     return dialog
 end)
 
+---@param dialog AF_Dialog
+---@return boolean
+function AF.IsDialogActive(dialog)
+    return dialog and dialogPool:IsActive(dialog)
+end
+
 ---@param parent Frame
 ---@param text string
 ---@param width? number default 200
