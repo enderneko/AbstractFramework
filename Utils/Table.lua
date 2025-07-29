@@ -137,7 +137,6 @@ function AF.MergeExistingKeys(t, ...)
     for i = 1, select("#", ...) do
         local _t = select(i, ...)
         for k, v in next, _t do
-            print(k, type(t[k]))
             if type(t[k]) ~= "nil" then
                 if type(v) == "table" then
                     t[k] = AF.Copy(v)

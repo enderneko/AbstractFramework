@@ -837,7 +837,7 @@ end
 --     -- end
 -- end
 
----@param labels table {{["text"]=(string), ["value"]=(any), ["callback|onClick"]=(function)}, ...}
+---@param labels table {{["text"]=(string), ["value"]=(any), ["callback|onClick"]=(function), ["disabled"]= (boolean|nil)}, ...}
 function AF_SwitchMixin:SetLabels(labels)
     if type(labels) ~= "table" then return end
 
@@ -953,6 +953,8 @@ function AF_SwitchMixin:SetLabels(labels)
                 switch:GetScript("OnLeave")()
             end)
         end
+
+        buttons[i]:SetEnabled(not labels[i].disabled)
 
         -- reset
         buttons[i].value = labels[i].value or labels[i].text

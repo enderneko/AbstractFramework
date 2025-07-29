@@ -117,7 +117,7 @@ local function ContinualFading(_, elapsed)
 
             if info.phase == "IN" then
                 if info.fadeTimer < info.timeToFade then
-                    frame:SetAlpha((info.fadeTimer / info.timeToFade))
+                    frame:SetAlpha((info.fadeTimer / info.timeToFade) * (1 - info.startAlpha) + info.startAlpha)
                 else
                     frame:SetAlpha(1)
                     info.phase = "HOLD"
@@ -151,7 +151,7 @@ local function ContinualFading(_, elapsed)
 end
 
 local function FrameFadeInOut(frame, info)
-    frame:SetAlpha(0)
+    frame:SetAlpha(info.startAlpha)
 
     if not frame:IsProtected() then
         frame:Show()
@@ -161,7 +161,7 @@ local function FrameFadeInOut(frame, info)
     CONTINUAL_FADEMANAGER:SetScript("OnUpdate", ContinualFading)
 end
 
-function AF.FrameFadeInOut(frame, timeToFade, holdTime)
+function AF.FrameFadeInOut(frame, timeToFade, holdTime, startFromCurrentAlpha)
     if frame._continualFade then
         frame._continualFade.fadeTimer = nil
     else
@@ -173,6 +173,7 @@ function AF.FrameFadeInOut(frame, timeToFade, holdTime)
     info.holdTime = holdTime or 0.5
     info.phase = "IN"
     info.fadeTimer = 0
+    info.startAlpha = startFromCurrentAlpha and frame:GetAlpha() or 0
 
     FrameFadeInOut(frame, info)
 end
