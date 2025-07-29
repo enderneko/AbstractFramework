@@ -30,6 +30,12 @@ function AF_SliderMixin:SetMinMaxValues(minV, maxV)
     self.highText:SetText(maxV * (self.isPercentage and 100 or 1) .. self.unit)
 end
 
+---@param step number
+function AF_SliderMixin:SetStep(step)
+    self.step = step
+    self:SetValueStep(step)
+end
+
 function AF_SliderMixin:SetLabel(text)
     self.label:SetText(text)
 end
