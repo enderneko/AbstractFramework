@@ -3,6 +3,9 @@ local AF = _G.AbstractFramework
 
 AF.L = setmetatable({
     ["WIP"] = "Work In Progress",
+    ["TANK"] = _G["TANK"],
+    ["HEALER"] = _G["HEALER"],
+    ["DAMAGER"] = _G["DAMAGER"],
 }, {
     __index = function(self, Key)
         if (Key ~= nil) then
@@ -13,6 +16,10 @@ AF.L = setmetatable({
 })
 
 local L = AF.L
+
+if L.DAMAGER == "Damage" then
+    L.DAMAGER = "Damager"
+end
 
 if LOCALE_zhCN then
     L["%d days"] = "%d天"
