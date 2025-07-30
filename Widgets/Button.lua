@@ -551,13 +551,11 @@ end
 local AF_IconButtonMixin = {}
 
 function AF_IconButtonMixin:HandleMouseDownTexture()
-    self.icon:ClearAllPoints()
-    self.icon:SetPoint("CENTER", 0, -AF.GetOnePixelForRegion(self))
+    self.icon:AdjustPointsOffset(0, -AF.GetOnePixelForRegion(self))
 end
 
 function AF_IconButtonMixin:HandleMouseUpTexture()
-    self.icon:ClearAllPoints()
-    self.icon:SetPoint("CENTER")
+    AF.RePoint(self.icon)
 end
 
 function AF_IconButtonMixin:EnablePushEffect(enabled)
@@ -604,6 +602,29 @@ function AF_IconButtonMixin:SetHoverColor(color)
     end
 end
 
+---@param color string|table|nil set to nil to remove hover border
+function AF_IconButtonMixin:SetHoverBorder(color)
+    if color then
+        if not self.border then
+            self.border = CreateFrame("Frame", nil, self, "BackdropTemplate")
+            self.border:SetAllPoints(self.icon)
+            AF.ApplyDefaultBackdrop_NoBackground(self.border)
+            self.border:Hide()
+        end
+        if type(color) == "string" then
+            self.border:SetBackdropBorderColor(AF.GetColorRGB(color))
+        elseif type(color) == "table" then
+            self.border:SetBackdropBorderColor(AF.UnpackColor(color))
+        end
+        self._hoverBorder = true
+    else
+        if self.border then
+            self.border:Hide()
+        end
+        self._hoverBorder = nil
+    end
+end
+
 function AF_IconButtonMixin:SetFilterMode(filterMode)
     self._filterMode = filterMode
     self.icon:SetTexture(self._iconPath, nil, nil, filterMode)
@@ -616,7 +637,7 @@ end
 function AF_IconButtonMixin:UpdatePixels()
     AF.ReSize(self)
     AF.RePoint(self)
-    AF.SetSize(self.icon, self._width - self._padding, self._height - self._padding)
+    AF.RePoint(self.icon)
 end
 
 ---@param parent Frame
@@ -634,11 +655,9 @@ function AF.CreateIconButton(parent, icon, width, height, padding, color, hoverC
     local b = CreateFrame("Button", nil, parent)
     AF.SetSize(b, width, height)
 
-    b._padding = (padding or 0) * 2
-
     b.icon = b:CreateTexture(nil, "ARTWORK")
     b.icon:SetPoint("CENTER")
-    AF.SetSize(b.icon, width - b._padding, height - b._padding)
+    AF.SetInside(b.icon, b, padding)
 
     b.icon:SetTexture(icon, nil, nil, filterMode)
     b._icon = icon
@@ -650,9 +669,15 @@ function AF.CreateIconButton(parent, icon, width, height, padding, color, hoverC
 
     b:SetScript("OnEnter", function()
         b.icon:SetVertexColor(AF.UnpackColor(b._hoverColor))
+        if b._hoverBorder then
+            b.border:Show()
+        end
     end)
     b:SetScript("OnLeave", function()
         b.icon:SetVertexColor(AF.UnpackColor(b._color))
+        if b._hoverBorder then
+            b.border:Hide()
+        end
     end)
 
     Mixin(b, AF_IconButtonMixin)
