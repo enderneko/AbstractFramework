@@ -322,8 +322,8 @@ end
 ---@param offsetX number if not provided, offsetX = 0
 ---@param offsetY number|nil if not provided, offsetY = offsetX
 function AF.SetInside(region, relativeTo, offsetX, offsetY)
-    assert(offsetX, "SetInside: offsetX is nil")
     relativeTo = relativeTo or region:GetParent()
+    offsetX = offsetX or 0
     offsetY = offsetY or offsetX
     AF.ClearPoints(region)
     AF.SetPoint(region, "TOPLEFT", relativeTo, "TOPLEFT", offsetX, -offsetY)
@@ -335,8 +335,8 @@ end
 ---@param offsetX number if not provided, offsetX = 0
 ---@param offsetY number|nil if not provided, offsetY = offsetX
 function AF.SetOutside(region, relativeTo, offsetX, offsetY)
-    assert(offsetX, "SetOutside: offsetX is nil")
     relativeTo = relativeTo or region:GetParent()
+    offsetX = offsetX or 0
     offsetY = offsetY or offsetX
     AF.ClearPoints(region)
     AF.SetPoint(region, "TOPLEFT", relativeTo, "TOPLEFT", -offsetX, offsetY)

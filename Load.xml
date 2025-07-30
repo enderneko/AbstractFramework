@@ -22,6 +22,10 @@
     <Script file="Init.lua"/>
     <Script file="Locales.lua"/>
 
+    <!-- data -->
+    <Script file="Data\ObjectPool.lua"/>
+    <Script file="Data\Queue.lua"/>
+
     <!-- utils -->
     <Script file="Utils\Math.lua"/>
     <Script file="Utils\Table.lua"/>
@@ -38,13 +42,12 @@
     <Script file="System\Communication.lua"/>
     <Script file="System\Events.lua"/>
 
-    <!-- data -->
-    <Script file="Data\ObjectPool.lua"/>
-    <Script file="Data\Queue.lua"/>
-
     <!-- Executors -->
     <Script file="Executors\OnUpdateExecutor.lua"/>
     <Script file="Executors\ItemLoadExecutor.lua"/>
+
+    <!-- utils/pixel -->
+    <Script file="Utils\PixelUtil.lua"/>
 
     <!-- units/player -->
     <Script file="Units\Player.lua"/>
@@ -54,7 +57,6 @@
     <Script file="Media\SharedMedia.lua"/>
 
     <!-- widgets -->
-    <Script file="Widgets\PixelUtil.lua"/>
     <Script file="Widgets\Color.lua"/>
     <Script file="Widgets\Texture.lua"/>
     <Script file="Widgets\Font.lua"/>
