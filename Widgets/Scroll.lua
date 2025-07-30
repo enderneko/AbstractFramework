@@ -456,6 +456,18 @@ function AF_ScrollListMixin:SetScroll(startIndex)
     end
 end
 
+-- make target index widget visible
+function AF_ScrollListMixin:ScrollTo(index)
+    if type(index) ~= "number" then return end
+    if index <= 0 then
+        self:SetScroll(1)
+    elseif index >= self.widgetNum then
+        self:ScrollToBottom()
+    else
+        self:SetScroll(index - self.slotNum + 1)
+    end
+end
+
 function AF_ScrollListMixin:ScrollToBottom()
     self:SetScroll(self.widgetNum - self.slotNum + 1)
 end
