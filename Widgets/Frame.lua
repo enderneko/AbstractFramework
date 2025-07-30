@@ -466,27 +466,40 @@ local protectedFrames = {}
 function AF.ApplyCombatProtectionToFrame(frame, tlX, tlY, brX, brY)
     if not frame.combatMask then
         CreateCombatMask(frame, tlX, tlY, brX, brY)
+
+        frame:HookScript("OnShow", function()
+            if not frame.combatMask.enabled then return end
+            protectedFrames[frame] = true
+            if InCombatLockdown() then
+                frame.combatMask:Show()
+            else
+                frame.combatMask:Hide()
+            end
+        end)
+
+        frame:HookScript("OnHide", function()
+            if not frame.combatMask.enabled then return end
+            protectedFrames[frame] = nil
+            frame.combatMask:Hide()
+        end)
     end
 
-    protectedFrames[frame] = true
+    frame.combatMask.enabled = true
 
-    if InCombatLockdown() then
-        frame.combatMask:Show()
-    end
-
-    frame:HookScript("OnShow", function()
+    if frame:IsShown() then
         protectedFrames[frame] = true
         if InCombatLockdown() then
             frame.combatMask:Show()
-        else
-            frame.combatMask:Hide()
         end
-    end)
+    end
+end
 
-    frame:HookScript("OnHide", function()
-        protectedFrames[frame] = nil
+function AF.RemoveCombatProtectionFromFrame(frame)
+    if frame.combatMask then
         frame.combatMask:Hide()
-    end)
+        frame.combatMask.enabled = false
+    end
+    protectedFrames[frame] = nil
 end
 
 local protectedWidgets = {}
