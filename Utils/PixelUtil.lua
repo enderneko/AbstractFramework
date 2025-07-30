@@ -1118,7 +1118,7 @@ function AF.GetAnchorPoints_GroupHeader(orientation, spacingX, spacingY)
         relativePoint = "TOPRIGHT"
         x = spacingX
         y = 0
-        columnSpacing = -spacingY
+        columnSpacing = spacingY
         headerPoint = "LEFT"
         columnAnchorPoint = "TOP"
     elseif orientation == "left_to_right_then_top" then
@@ -1134,7 +1134,7 @@ function AF.GetAnchorPoints_GroupHeader(orientation, spacingX, spacingY)
         relativePoint = "TOPLEFT"
         x = -spacingX
         y = 0
-        columnSpacing = -spacingY
+        columnSpacing = spacingY
         headerPoint = "RIGHT"
         columnAnchorPoint = "TOP"
     elseif orientation == "right_to_left_then_top" then
