@@ -406,10 +406,13 @@ end
 -- level
 ---------------------------------------------------------------------
 
-function AF.IsMaxLevel()
+---@param unit string default "player"
+---@return boolean isMaxLevel
+function AF.IsMaxLevel(unit)
+    unit = unit or "player"
     -- local maxLevel = GetMaxLevelForLatestExpansion() --? GetMaxPlayerLevel()
-    local playerLevel = UnitLevel("player")
-    local isMaxLevel = IsLevelAtEffectiveMaxLevel(playerLevel)
+    local level = UnitLevel(unit)
+    local isMaxLevel = IsLevelAtEffectiveMaxLevel(level)
     -- local isTrialMaxLevel =  (IsRestrictedAccount() or IsTrialAccount() or IsVeteranTrialAccount()) and (playerLevel == 20)
     return isMaxLevel -- or isTrialMaxLevel
 end
