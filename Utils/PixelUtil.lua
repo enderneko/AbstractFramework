@@ -840,23 +840,25 @@ end
 function AF.ReAnchorRegion(region, anchor)
     if region:GetNumPoints() ~= 1 then return end
 
-    AF.ClearPoints(region)
-
     if anchor == "TOPLEFT" then
         local left = AF.Round(region:GetLeft())
         local top = AF.Round(region:GetTop())
+        AF.ClearPoints(region)
         region:SetPoint(anchor, AF.UIParent, "BOTTOMLEFT", left, top)
     elseif anchor == "TOPRIGHT" then
         local right = AF.Round(region:GetRight())
         local top = AF.Round(region:GetTop())
+        AF.ClearPoints(region)
         region:SetPoint(anchor, AF.UIParent, "BOTTOMLEFT", right, top)
     elseif anchor == "BOTTOMLEFT" then
         local left = AF.Round(region:GetLeft())
         local bottom = AF.Round(region:GetBottom())
+        AF.ClearPoints(region)
         region:SetPoint(anchor, AF.UIParent, "BOTTOMLEFT", left, bottom)
     elseif anchor == "BOTTOMRIGHT" then
         local right = AF.Round(region:GetRight())
         local bottom = AF.Round(region:GetBottom())
+        AF.ClearPoints(region)
         region:SetPoint(anchor, AF.UIParent, "BOTTOMLEFT", right, bottom)
     end
 end
