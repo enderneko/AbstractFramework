@@ -745,6 +745,15 @@ function AF_CheckButtonMixin:SetText(text)
     end
 end
 
+---@param color string|table
+function AF_CheckButtonMixin:SetTextColor(color)
+    if type(color) == "string" then
+        self.label:SetTextColor(AF.GetColorRGB(color))
+    elseif type(color) == "table" then
+        self.label:SetTextColor(AF.UnpackColor(color))
+    end
+end
+
 function AF_CheckButtonMixin:SetTooltip(...)
     AF.SetTooltip(self, "TOPLEFT", 0, 2, ...)
 end
