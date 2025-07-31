@@ -163,10 +163,10 @@ end
 ---@return Texture separator
 function AF.CreateSeparator(parent, size, thickness, color, isVertical, noShadow)
     if type(color) == "string" then color = AF.GetColorTable(color) end
-    color = color or AF.GetColorTable("accent")
+    color = color or AF.GetAddonAccentColorTable()
 
     local separator = parent:CreateTexture(nil, "ARTWORK", nil, 0)
-    separator:SetColorTexture(unpack(color))
+    separator:SetColorTexture(AF.UnpackColor(color))
     if isVertical then
         AF.SetSize(separator, thickness, size)
     else
