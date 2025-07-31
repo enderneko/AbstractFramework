@@ -878,7 +878,7 @@ function AF_SwitchMixin:SetLabels(labels)
         end
     end
 
-    local width = self._width / n
+    local width = self._width and self._width / n
     local height = self._height
 
     for i, l in pairs(labels) do
@@ -992,7 +992,10 @@ function AF_SwitchMixin:SetLabels(labels)
         buttons[i]:SetText(labels[i].text)
 
         -- size
-        AF.SetSize(buttons[i], width, height)
+        if width then
+            AF.SetWidth(buttons[i], width)
+        end
+        AF.SetHeight(buttons[i], height)
 
         -- point
         AF.ClearPoints(buttons[i])
@@ -1008,15 +1011,32 @@ function AF_SwitchMixin:SetLabels(labels)
         -- show
         buttons[i]:Show()
     end
+
+    if not width then
+        self:AutoResizeLabels()
+    end
+end
+
+function AF_SwitchMixin:AutoResizeLabels()
+    local width = self:GetWidth()
+    local n = #self.labels
+
+    if n == 0 then return end
+    local labelWidth = width / n
+    for i, b in next, self.buttons do
+        if b:IsShown() then
+            b:SetSize(labelWidth, AF.ConvertPixelsForRegion(self._height, self))
+        end
+    end
 end
 
 ---@param parent Frame
----@param width number can not be nil
----@param height number can not be nil
----@param labels table? {{["text"]=(string), ["value"]=(any), ["callback|onClick"]=(function)}, ...}
+---@param width? number if not set, will invoke AutoResizeLabels after SetLabels
+---@param height? number default is 20
+---@param labels? table {{["text"]=(string), ["value"]=(any), ["callback|onClick"]=(function)}, ...}
 ---@return AF_Switch switch
 function AF.CreateSwitch(parent, width, height, labels)
-    local switch = AF.CreateBorderedFrame(parent, nil, width, height, "widget")
+    local switch = AF.CreateBorderedFrame(parent, nil, width, height or 20, "widget")
 
     switch.accentColor = AF.GetAddonAccentColorName()
 
