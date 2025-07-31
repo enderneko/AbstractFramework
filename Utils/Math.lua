@@ -45,8 +45,15 @@ function AF.CeilToEven(num)
     end
 end
 
-function AF.Interpolate(start, stop, step, maxSteps)
-    return start + (stop - start) * step / maxSteps
+function AF.Interpolate(startValue, endValue, step, maxSteps)
+    if maxSteps <= 0 then
+        return startValue
+    end
+    return startValue + (endValue - startValue) * step / maxSteps
+end
+
+function AF.Lerp(startValue, endValue, amount)
+    return startValue + (endValue - startValue) * amount
 end
 
 function AF.Clamp(value, minValue, maxValue)

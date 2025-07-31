@@ -473,11 +473,9 @@ function AF.RainbowText_Start(fs, interval, speed, reverse)
     -- save original text
     fs._text = fs:GetText()
 
-    -- split text into characters and generate format string
+    -- split text into characters
     local chars = {}
     local charCount = 0
-
-    -- split by UTF-8 characters
     for char in fs._text:gmatch("[%z\1-\127\194-\244][\128-\191]*") do
         charCount = charCount + 1
         chars[charCount] = char
@@ -490,16 +488,15 @@ function AF.RainbowText_Start(fs, interval, speed, reverse)
     end
     local formatString = tconcat(formatParts)
 
-    -- create or update updater
-    fs._rainbow = true
-    if not fs._updater then
-        fs._updater = CreateFrame("Frame", nil, fs:GetParent())
-        fs._updater.fs = fs
-        fs._updater:Hide()
-        fs._updater:SetScript("OnUpdate", UpdateRainbow)
+    -- create updater
+    if not fs._rainbow_updater then
+        fs._rainbow_updater = CreateFrame("Frame", nil, fs:GetParent())
+        fs._rainbow_updater.fs = fs
+        fs._rainbow_updater:Hide()
+        fs._rainbow_updater:SetScript("OnUpdate", UpdateRainbow)
     end
 
-    local updater = fs._updater
+    local updater = fs._rainbow_updater
     updater.interval = interval or 0.05
     updater.elapsed = 0
     updater.reverse = reverse
@@ -513,9 +510,8 @@ function AF.RainbowText_Start(fs, interval, speed, reverse)
 end
 
 function AF.RainbowText_Stop(fs)
-    fs._rainbow = nil
-    if fs._updater then
-        fs._updater:Hide()
+    if fs._rainbow_updater then
+        fs._rainbow_updater:Hide()
         if fs._text then
             fs:SetText(fs._text)
             fs._text = nil
@@ -524,13 +520,15 @@ function AF.RainbowText_Stop(fs)
 end
 
 function AF.RainbowText_Pause(fs)
-    if fs._updater then
-        fs._updater:Hide()
+    if fs._rainbow_updater then
+        fs._rainbow_updater:Hide()
     end
 end
 
 function AF.RainbowText_Resume(fs)
-    if fs._updater then
-        fs._updater:Show()
+    if fs._rainbow_updater then
+        fs._rainbow_updater:Show()
+    end
+end
     end
 end

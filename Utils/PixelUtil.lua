@@ -876,7 +876,7 @@ function AF.SetStatusBarValue(statusBar, value)
             statusBar:SetValue(value)
         else
             local numPixels = AF.GetNearestPixelSize(statusBar:GetWidth() * percent, statusBar:GetEffectiveScale())
-            local roundedValue = Lerp(min, max, numPixels / width)
+            local roundedValue = AF.Lerp(min, max, numPixels / width)
             statusBar:SetValue(roundedValue)
         end
     else
