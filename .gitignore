@@ -1,10 +1,11 @@
+# ignored
 .vscode/
-.release/
+.release/*
 .utils/*.csv
-
-#external libraries
 Libs/*
 
+# excluded
+!.release/release.sh
 !Libs/md5.lua
 !Libs/sha256.lua
 !Libs/base64.lua
