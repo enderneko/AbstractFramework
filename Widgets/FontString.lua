@@ -530,5 +530,112 @@ function AF.RainbowText_Resume(fs)
         fs._rainbow_updater:Show()
     end
 end
+
+---------------------------------------------------------------------
+-- flow text
+---------------------------------------------------------------------
+local function UpdateFlow(updater, elapsed)
+    updater.elapsed = updater.elapsed + elapsed
+    if updater.elapsed >= updater.interval then
+        updater.elapsed = 0
+
+        local fs = updater.fs
+        local charCount = updater.charCount
+        if charCount <= 0 then return end
+
+        -- update flow position using speed parameter
+        updater.flowPos = (updater.flowPos + (updater.reverse and updater.speed or -updater.speed)) % 1
+
+        -- calculate color for each character based on flow position
+        for i = 1, charCount do
+            -- calculate character position on color ring (0-1 range)
+            -- use mult to adjust ring length, higher mult = longer color ring
+            local charPos = ((i - 1) / (charCount * updater.mult) + updater.flowPos) % 1
+
+            -- convert position to gradient position on color ring
+            -- use sine function to create smooth color1->color2->color1 cycle
+            local ratio = (math.sin(charPos * math.pi * 2 - math.pi/2) + 1) / 2
+
+            -- interpolate between colors
+            local r = AF.Lerp(updater.r1, updater.r2, ratio)
+            local g = AF.Lerp(updater.g1, updater.g2, ratio)
+            local b = AF.Lerp(updater.b1, updater.b2, ratio)
+
+            updater.colors[i] = AF.ConvertRGBToHEX(r, g, b)
+        end
+
+        -- apply all colors at once
+        fs:SetFormattedText(updater.formatString, unpack(updater.colors))
+    end
+end
+
+---@param fs FontString
+---@param color1 string first color name
+---@param color2 string second color name
+---@param mult number? color ring length multiplier, default 1, higher = longer ring
+---@param interval number? update interval, default 0.05
+---@param speed number? flow speed, default 0.03, lower = slower
+---@param reverse boolean? reverse flow direction
+function AF.FlowText_Start(fs, color1, color2, mult, interval, speed, reverse)
+    fs._text = fs:GetText()
+
+    -- split text into characters
+    local chars = {}
+    local charCount = 0
+    for char in fs._text:gmatch("[%z\1-\127\194-\244][\128-\191]*") do
+        charCount = charCount + 1
+        chars[charCount] = char
+    end
+
+    -- generate format string, e.g.: "|cff%sA|r|cff%sB|r|cff%sC|r"
+    local formatParts = {}
+    for i = 1, charCount do
+        formatParts[i] = "|cff%s" .. chars[i] .. "|r"
+    end
+    local formatString = table.concat(formatParts)
+
+    -- create updater
+    if not fs._flow_updater then
+        fs._flow_updater = CreateFrame("Frame", nil, fs:GetParent())
+        fs._flow_updater.fs = fs
+        fs._flow_updater:Hide()
+        fs._flow_updater:SetScript("OnUpdate", UpdateFlow)
+    end
+
+    local updater = fs._flow_updater
+    updater.interval = interval or 0.05
+    updater.elapsed = 0
+    updater.reverse = reverse
+    updater.charCount = charCount
+    updater.formatString = formatString
+    updater.colors = tcreate and tcreate(charCount) or {}
+    updater.r1, updater.g1, updater.b1 = AF.GetColorRGB(color1)
+    updater.r2, updater.g2, updater.b2 = AF.GetColorRGB(color2)
+    updater.flowPos = 0 -- flow position represented in 0-1 range
+    updater.mult = mult or 1 -- color ring length multiplier
+    updater.speed = speed or 0.03 -- flow movement speed per update
+
+    updater:Show()
+end
+
+function AF.FlowText_Stop(fs)
+    if fs._flow_updater then
+        fs._flow_updater:Hide()
+        if fs._text then
+            fs:SetText(fs._text)
+            fs._text = nil
+        end
+    end
+end
+
+function AF.FlowText_Pause(fs)
+    if fs._flow_updater then
+        fs._flow_updater:Hide()
+    end
+end
+
+function AF.FlowText_Resume(fs)
+    if fs._flow_updater then
+        fs._flow_updater:Show()
     end
 end
