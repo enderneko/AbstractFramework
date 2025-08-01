@@ -53,6 +53,7 @@ local function PLAYER_LOGIN()
     AF.connectedRealms = AF.TransposeTable(GetAutoCompleteRealms())
     AF.connectedRealms[AF.player.normalizedRealm] = true
 
+    AF.Fire("AF_PLAYER_LOGIN_DELAYED")
     AF.Fire("AF_PLAYER_DATA_UPDATE", true)
 end
 AF.RegisterCallback("AF_PLAYER_LOGIN", PLAYER_LOGIN, "high")
