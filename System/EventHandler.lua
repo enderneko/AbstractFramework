@@ -318,7 +318,7 @@ function AF.CreateSimpleEventHandler(...)
 end
 
 
----@param onEventFunc function (self, event, ...)
+---@param onEventFunc fun(self, event, ...)
 ---@param ... string events
 ---@return AF_BasicEventHandler handler
 function AF.CreateBasicEventHandler(onEventFunc, ...)
@@ -326,7 +326,9 @@ function AF.CreateBasicEventHandler(onEventFunc, ...)
     handler:SetScript("OnEvent", onEventFunc)
 
     Mixin(handler, AF_BasicEventHandlerMixin)
-    handler:RegisterEvent(...)
+    if select("#", ...) > 0 then
+        handler:RegisterEvent(...)
+    end
 
     return handler
 end
