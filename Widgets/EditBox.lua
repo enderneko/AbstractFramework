@@ -10,10 +10,11 @@ local strmatch, strsub, strgsub, strfind, strlower = string.match, string.sub, s
 local AF_EditBoxMixin = {}
 
 ---@param func? fun(value: any) function to call when confirm button is clicked
----@param text? string
----@param position? string "RIGHT_INSIDE"|"RIGHT_OUTSIDE"|"BOTTOM"|"BOTTOMLEFT"|"BOTTOMRIGHT"|nil, default "RIGHT_INSIDE".
----@param width? number default is 30, but use editbox width if position is "BOTTOM".
----@param height? number default is 20.
+---@param text string|nil if nil then use a tick icon
+---@param position "RIGHT_INSIDE"|"RIGHT_OUTSIDE"|"BOTTOM"|"BOTTOMLEFT"|"BOTTOMRIGHT"|"NONE"|nil default "RIGHT_INSIDE".
+---@param width number|nil default is 30, but use editbox width if position is "BOTTOM".
+---@param height number|nil default is 20.
+---@return AF_Button confirmBtn
 function AF_EditBoxMixin:SetConfirmButton(func, text, position, width, height)
     self.confirmBtn = self.confirmBtn or AF.CreateButton(self, text, self.accentColor, width or 30, height or 20)
     self.confirmBtn:Hide()
@@ -36,8 +37,10 @@ function AF_EditBoxMixin:SetConfirmButton(func, text, position, width, height)
         AF.SetPoint(self.confirmBtn, "TOPRIGHT", self, "BOTTOMRIGHT", 0, 1)
     elseif position == "RIGHT_OUTSIDE" then
         AF.SetPoint(self.confirmBtn, "TOPLEFT", self, "TOPRIGHT", -1, 0)
-    else
+    elseif position == "RIGHT_INSIDE" then
         AF.SetPoint(self.confirmBtn, "TOPRIGHT")
+    else
+        -- NONE, do nothing
     end
 
     self.confirmBtn:SetScript("OnHide", function()
@@ -53,6 +56,8 @@ function AF_EditBoxMixin:SetConfirmButton(func, text, position, width, height)
         self.confirmBtn:Hide()
         self:ClearFocus()
     end)
+
+    return self.confirmBtn
 end
 
 ---@param func fun(self: AF_EditBox)
@@ -365,15 +370,15 @@ function AF_ScrollEditBoxMixin:SetOnTextChanged(func)
     self.eb:SetOnTextChanged(func)
 end
 
----@param func function?
----@param text string?
----@param position string? "RIGHT_INSIDE"|"RIGHT_OUTSIDE"|"BOTTOM"|"BOTTOMLEFT"|"BOTTOMRIGHT"|nil, default "BOTTOMLEFT".
----@param width number? default is 30, but use editbox width if position is "BOTTOM".
----@param height number? default is 20.
+---@param func fun(value: any)
+---@param text string|nil if nil then use a tick icon
+---@param position "BOTTOM"|"BOTTOMLEFT"|"BOTTOMRIGHT"|"NONE"|nil default "BOTTOMLEFT".
+---@param width number|nil default is 30, but use editbox width if position is "BOTTOM".
+---@param height number|nil default is 20.
+---@return AF_Button confirmBtn
 function AF_ScrollEditBoxMixin:SetConfirmButton(func, text, position, width, height)
-    self.eb:SetConfirmButton(func, text, nil, width, height)
+    local confirmBtn = self.eb:SetConfirmButton(func, text, nil, width, height)
 
-    local confirmBtn = self.eb.confirmBtn
     confirmBtn:SetParent(self.scrollFrame)
     AF.SetFrameLevel(confirmBtn, 5, self.scrollFrame)
 
@@ -386,11 +391,11 @@ function AF_ScrollEditBoxMixin:SetConfirmButton(func, text, position, width, hei
         AF.SetPoint(confirmBtn, "TOPLEFT", self.scrollFrame, "BOTTOMLEFT", 0, 1)
     elseif position == "BOTTOMRIGHT" then
         AF.SetPoint(confirmBtn, "TOPRIGHT", self.scrollFrame, "BOTTOMRIGHT", 0, 1)
-    elseif position == "RIGHT_OUTSIDE" then
-        AF.SetPoint(confirmBtn, "TOPLEFT", self.scrollFrame, "TOPRIGHT", -1, 0)
     else
-        AF.SetPoint(confirmBtn, "TOPRIGHT", self.scrollFrame)
+        -- NONE, do nothing
     end
+
+    return confirmBtn
 end
 
 function AF_ScrollEditBoxMixin:SetMaxLetters(maxLetters)

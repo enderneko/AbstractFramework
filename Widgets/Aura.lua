@@ -291,7 +291,7 @@ local function CreateCooldown_Vertical(aura, hasIcon)
 
     local icon = cooldown:CreateTexture(nil, "ARTWORK")
     cooldown.icon = icon
-    icon:SetTexCoord(0.12, 0.88, 0.12, 0.88)
+    -- icon:SetTexCoord(0.12, 0.88, 0.12, 0.88)
     icon:SetDesaturated(true)
     icon:SetAllPoints(aura.icon)
     icon:SetVertexColor(0.5, 0.5, 0.5, 1)
@@ -484,7 +484,7 @@ function AF.CreateAura(parent, noPixelUpdates)
     local icon = frame:CreateTexture(nil, "ARTWORK")
     frame.icon = icon
     AF.SetOnePixelInside(icon, frame)
-    icon:SetTexCoord(0.12, 0.88, 0.12, 0.88)
+    -- icon:SetTexCoord(0.12, 0.88, 0.12, 0.88)
     frame:SetScript("OnSizeChanged", AF.ReCalcTexCoordForAura)
 
     -- texts
