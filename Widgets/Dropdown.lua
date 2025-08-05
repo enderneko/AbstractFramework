@@ -672,3 +672,60 @@ function AF.CreateDropdown(parent, width, maxSlots, miniMode, textureAlpha, just
 
     return dropdown
 end
+
+---------------------------------------------------------------------
+-- some frequently used dropdown items
+---------------------------------------------------------------------
+local L = AF.L
+
+function AF.GetDropdownItems_AnchorPoint(noCenter)
+    local items = {"TOPLEFT", "TOPRIGHT", "BOTTOMLEFT", "BOTTOMRIGHT", "TOP", "BOTTOM", "LEFT", "RIGHT"}
+    if not noCenter then
+        tinsert(items, "CENTER")
+    end
+    for i, item in next, items do
+        items[i] = {text = L[item], value = item}
+    end
+    return items
+end
+
+function AF.GetDropdownItems_Modifier()
+    return {
+        {text = "Alt", value = "ALT"},
+        {text = "Ctrl", value = "CTRL"},
+        {text = "Shift", value = "SHIFT"},
+        {text = _G.NONE, value = "NONE"},
+    }
+end
+
+function AF.GetDropdownItems_SimpleOrientation()
+    return {
+        {text = L["Left to Right"], value = "left_to_right"},
+        {text = L["Right to Left"], value = "right_to_left"},
+        {text = L["Top to Bottom"], value = "top_to_bottom"},
+        {text = L["Bottom to Top"], value = "bottom_to_top"},
+    }
+end
+
+function AF.GetDropdownItems_ComplexOrientation()
+    return {
+        {text = L["Left to Right then Top"], value = "left_to_right_then_top"},
+        {text = L["Left to Right then Bottom"], value = "left_to_right_then_bottom"},
+        {text = L["Right to Left then Top"], value = "right_to_left_then_top"},
+        {text = L["Right to Left then Bottom"], value = "right_to_left_then_bottom"},
+        {text = L["Top to Bottom then Left"], value = "top_to_bottom_then_left"},
+        {text = L["Top to Bottom then Right"], value = "top_to_bottom_then_right"},
+        {text = L["Bottom to Top then Left"], value = "bottom_to_top_then_left"},
+        {text = L["Bottom to Top then Right"], value = "bottom_to_top_then_right"},
+    }
+end
+
+function AF.GetDropdownItems_Class()
+    local items = {}
+
+    for class in AF.IterateClasses() do
+        tinsert(items, {text = AF.WrapTextInColor(AF.GetLocalizedClassName(class), class), value = class})
+    end
+
+    return items
+end
