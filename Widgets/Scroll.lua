@@ -479,10 +479,15 @@ function AF_ScrollListMixin:GetScroll()
     return self.slots[1].widgetIndex
 end
 
+---@param index number index of the slot
 function AF_ScrollListMixin:GetWidgetAt(index)
     if index and index > 0 and index <= self.slotNum then
         return self.slots[index].widget
     end
+end
+
+function AF_ScrollListMixin:GetWidgets()
+    return self.widgets
 end
 
 function AF_ScrollListMixin:GetScrollRange()
@@ -799,10 +804,15 @@ function AF_ScrollGridMixin:GetScroll()
     return ceil(self.slots[1].widgetIndex / self.slotColumn)
 end
 
+---@param index number index of the slot
 function AF_ScrollGridMixin:GetWidgetAt(index)
     if index and index > 0 and index <= self.slotNum then
         return self.slots[index].widget
     end
+end
+
+function AF_ScrollGridMixin:GetWidgets()
+    return self.widgets
 end
 
 function AF_ScrollGridMixin:GetScrollRange()
