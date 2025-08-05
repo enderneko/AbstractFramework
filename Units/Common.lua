@@ -127,7 +127,7 @@ function AF.GetPetOwnerUnitID(petUnitID)
 end
 
 ---@return function iterator
-function AF.GroupPlayersIterator()
+function AF.IterateGroupPlayers()
     local groupType = IsInRaid() and "raid" or "party"
     local numGroupMembers = GetNumGroupMembers()
     local i
@@ -152,7 +152,7 @@ function AF.GroupPlayersIterator()
 end
 
 ---@return function iterator
-function AF.GroupPetsIterator()
+function AF.IterateGroupPets()
     local groupType = IsInRaid() and "raid" or "party"
     local numGroupMembers = GetNumGroupMembers()
     local i = groupType == "party" and 0 or 1
