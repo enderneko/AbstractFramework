@@ -921,94 +921,53 @@ end
 ---------------------------------------------------------------------
 -- get anchor points
 ---------------------------------------------------------------------
----@return string point, string relativePoint, string newLineRelativePoint, number x, number y, number newLineX, number newLineY, string headerPoint
-function AF.GetAnchorPoints_Simple(anchor, orientation, spacingX, spacingY)
-    local point, relativePoint, newLineRelativePoint -- normal
-    local x, y, newLineX, newLineY -- normal
-    local headerPoint
+---@param orientation "left_to_right"|"right_to_left"|"top_to_bottom"|"bottom_to_top"
+---@param spacingX number
+---@param spacingY number|nil if not provided, spacingY = spacingX
+---@return string point, string relativePoint, number x, number y
+function AF.GetAnchorPoints_Simple(orientation, spacingX, spacingY)
+    local point, relativePoint, x, y
+    -- headerPoint = point
 
     spacingY = spacingY or spacingX
 
     if orientation == "left_to_right" then
-        if strfind(anchor, "^BOTTOM") then
-            point = "BOTTOMLEFT"
-            relativePoint = "BOTTOMRIGHT"
-            newLineRelativePoint = "TOPLEFT"
-            y = 0
-            newLineY = spacingY
-        else
-            point = "TOPLEFT"
-            relativePoint = "TOPRIGHT"
-            newLineRelativePoint = "BOTTOMLEFT"
-            y = 0
-            newLineY = -spacingY
-        end
+        point = "LEFT"
+        relativePoint = "RIGHT"
         x = spacingX
-        newLineX = 0
-        headerPoint = "LEFT"
+        y = 0
 
     elseif orientation == "right_to_left" then
-        if strfind(anchor, "^BOTTOM") then
-            point = "BOTTOMRIGHT"
-            relativePoint = "BOTTOMLEFT"
-            newLineRelativePoint = "TOPRIGHT"
-            y = 0
-            newLineY = spacingY
-        else
-            point = "TOPRIGHT"
-            relativePoint = "TOPLEFT"
-            newLineRelativePoint = "BOTTOMRIGHT"
-            y = 0
-            newLineY = -spacingY
-        end
+        point = "RIGHT"
+        relativePoint = "LEFT"
         x = -spacingX
-        newLineX = 0
-        headerPoint = "RIGHT"
+        y = 0
 
     elseif orientation == "top_to_bottom" then
-        if strfind(anchor, "RIGHT$") then
-            point = "TOPRIGHT"
-            relativePoint = "BOTTOMRIGHT"
-            newLineRelativePoint = "TOPLEFT"
-            x = 0
-            newLineX = -spacingX
-        else
-            point = "TOPLEFT"
-            relativePoint = "BOTTOMLEFT"
-            newLineRelativePoint = "TOPRIGHT"
-            x = 0
-            newLineX = spacingX
-        end
+        point = "TOP"
+        relativePoint = "BOTTOM"
+        x = 0
         y = -spacingY
-        newLineY = 0
-        headerPoint = "TOP"
 
     elseif orientation == "bottom_to_top" then
-        if strfind(anchor, "RIGHT$") then
-            point = "BOTTOMRIGHT"
-            relativePoint = "TOPRIGHT"
-            newLineRelativePoint = "BOTTOMLEFT"
-            x = 0
-            newLineX = -spacingX
-        else
-            point = "BOTTOMLEFT"
-            relativePoint = "TOPLEFT"
-            newLineRelativePoint = "BOTTOMRIGHT"
-            x = 0
-            newLineX = spacingX
-        end
+        point = "BOTTOM"
+        relativePoint = "TOP"
+        x = 0
         y = spacingY
-        newLineY = 0
-        headerPoint = "BOTTOM"
     end
 
-    return point, relativePoint, newLineRelativePoint, x, y, newLineX, newLineY, headerPoint
+    return point, relativePoint, x, y
 end
 
+---@param orientation "left_to_right_then_bottom"|"left_to_right_then_top"|"right_to_left_then_bottom"|"right_to_left_then_top"|"bottom_to_top_then_left"|"bottom_to_top_then_right"|"top_to_bottom_then_left"|"top_to_bottom_then_right"
+---@param spacingX number
+---@param spacingY number|nil if not provided, spacingY = spacingX
 ---@return string point, string relativePoint, string newLineRelativePoint, number x, number y, number newLineX, number newLineY
 function AF.GetAnchorPoints_Complex(orientation, spacingX, spacingY)
     local point, relativePoint, newLineRelativePoint
     local x, y, newLineX, newLineY
+
+    spacingY = spacingY or spacingX
 
     if orientation == "bottom_to_top_then_left" then
         point = "BOTTOMRIGHT"
