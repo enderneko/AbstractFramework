@@ -82,7 +82,7 @@ function AF_OnUpdateExecutorMixin:OnUpdate()
             -- all tasks finished
             self:Hide()
             if self.Finish then
-                self:Finish()
+                self:Finish(self.totalTasks)
             end
         else
             -- still have tasks to process
@@ -113,7 +113,7 @@ end
 
 -- NOTE: This executor is only suitable for non-asynchronous tasks
 ---@param taskHandler fun(executor: AF_OnUpdateExecutor, task: any, numRemainingTasks: number, numTotalTasks: number)
----@param onFinish? fun(executor: AF_OnUpdateExecutor)
+---@param onFinish? fun(executor: AF_OnUpdateExecutor, numTotalTasks: number) called when all tasks are finished
 ---@param tasksPerFrame? number tasks per frame, default is 1
 ---@return AF_OnUpdateExecutor executor
 function AF.BuildOnUpdateExecutor(taskHandler, onFinish, tasksPerFrame)
