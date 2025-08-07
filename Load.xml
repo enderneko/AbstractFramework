@@ -41,6 +41,7 @@
     <Script file="System\EventHandler.lua"/>
     <Script file="System\Communication.lua"/>
     <Script file="System\Events.lua"/>
+    <Script file="System\Hooks.lua"/>
 
     <!-- Executors -->
     <Script file="Executors\OnUpdateExecutor.lua"/>
