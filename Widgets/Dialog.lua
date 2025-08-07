@@ -411,6 +411,9 @@ local function GlobalDialog_OnShow()
 end
 
 local function GlobalDialog_OnHide()
+    if globalDialog.mask:IsShown() then
+        AF.FrameFadeOut(globalDialog.mask, nil, nil, nil, true)
+    end
     globalDialog.yes.highlight:SetHeight(0.001)
     globalDialog.no.highlight:SetHeight(0.001)
     C_Timer.After(0.5, globalDialog.ShowNext)
@@ -431,6 +434,14 @@ local function GlobalDialog_ShowNext()
     globalDialog.text:SetText(dialogData.text)
     globalDialog.onConfirm = dialogData.onConfirm
     globalDialog.onCancel = dialogData.onCancel
+
+    if dialogData.showMask then
+        if not globalDialog.mask:IsShown() then
+            AF.FrameFadeIn(globalDialog.mask, nil, 0, 1)
+        end
+    elseif globalDialog.mask:IsShown() then
+        AF.FrameFadeOut(globalDialog.mask, nil, nil, nil, true)
+    end
 
     if dialogData.yesText then
         globalDialog.yes:SetText(dialogData.yesText)
@@ -497,8 +508,21 @@ local function CreateGlobalDialog()
     globalDialog:Hide()
     globalDialog:SetPoint("BOTTOM", AF.UIParent, "CENTER", 0, 15)
     globalDialog:SetFrameStrata("FULLSCREEN_DIALOG")
+    globalDialog:SetFrameLevel(7)
     -- globalDialog:SetBackdropColor(AF.GetColorRGB("background", 0.95))
     globalDialog:EnableMouse(true)
+
+    -- mask
+    local mask = AF.CreateFrame(AF.UIParent)
+    globalDialog.mask = mask
+    AF.ApplyDefaultBackdrop_NoBorder(mask)
+    mask:SetBackdropColor(AF.GetColorRGB("mask"))
+    mask:EnableMouse(true)
+    mask:SetScript("OnMouseWheel", AF.noop)
+    mask:SetAllPoints(AF.UIParent)
+    mask:SetFrameStrata("FULLSCREEN_DIALOG")
+    mask:SetFrameLevel(1)
+    mask:Hide()
 
     -- showUpAnimation
     local showUpAnimation = globalDialog:CreateAnimationGroup()
@@ -629,15 +653,16 @@ local function CreateGlobalDialog()
     end)
 end
 
-function AF.ShowGlobalDialog(text, onConfirm, onCancel, yesText, noText)
+function AF.ShowGlobalDialog(text, onConfirm, onCancel, showMask, yesText, noText)
     if AF.IsBlank(text) then return end
 
     globalDialogQueue:push({
         text = text,
         onConfirm = onConfirm,
         onCancel = onCancel,
+        showMask = showMask,
         yesText = yesText,
-        noText = noText
+        noText = noText,
     })
 
     if not globalDialog then
