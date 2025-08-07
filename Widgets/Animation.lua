@@ -30,11 +30,14 @@ local function Fading(_, elapsed)
             if info.fadeTimer < info.timeToFade then
                 if info.mode == "IN" then
                     frame:SetAlpha((info.fadeTimer / info.timeToFade) * info.diffAlpha + info.startAlpha)
-                else
+                else -- OUT
                     frame:SetAlpha(((info.timeToFade - info.fadeTimer) / info.timeToFade) * info.diffAlpha + info.endAlpha)
                 end
             else
                 frame:SetAlpha(info.endAlpha)
+                if info.hideAfterFade and not frame:IsProtected() then
+                    frame:Hide()
+                end
                 if frame and FADEFRAMES[frame] then
                     if frame._fade then
                         frame._fade.fadeTimer = nil
@@ -65,6 +68,9 @@ local function FrameFade(frame, info)
     end
 end
 
+---@param timeToFade number|nil default is 0.25
+---@param startAlpha number|nil default is current alpha
+---@param endAlpha number|nil default is 1
 function AF.FrameFadeIn(frame, timeToFade, startAlpha, endAlpha)
     if frame._fade then
         frame._fade.fadeTimer = nil
@@ -77,13 +83,17 @@ function AF.FrameFadeIn(frame, timeToFade, startAlpha, endAlpha)
     frame._fade.startAlpha = startAlpha or frame:GetAlpha()
     frame._fade.endAlpha = endAlpha or 1
     frame._fade.diffAlpha = frame._fade.endAlpha - frame._fade.startAlpha
+    frame._fade.hideAfterFade = nil
 
     if frame._fade.startAlpha ~= frame._fade.endAlpha then
         FrameFade(frame, frame._fade)
     end
 end
 
-function AF.FrameFadeOut(frame, timeToFade, startAlpha, endAlpha)
+---@param timeToFade number|nil default is 0.25
+---@param startAlpha number|nil default is current alpha
+---@param endAlpha number|nil default is 0
+function AF.FrameFadeOut(frame, timeToFade, startAlpha, endAlpha, hideAfterFade)
     if frame._fade then
         frame._fade.fadeTimer = nil
     else
@@ -91,10 +101,11 @@ function AF.FrameFadeOut(frame, timeToFade, startAlpha, endAlpha)
     end
 
     frame._fade.mode = "OUT"
-    frame._fade.timeToFade = timeToFade
+    frame._fade.timeToFade = timeToFade or 0.25
     frame._fade.startAlpha = startAlpha or frame:GetAlpha()
     frame._fade.endAlpha = endAlpha or 0
     frame._fade.diffAlpha = frame._fade.startAlpha - frame._fade.endAlpha
+    frame._fade.hideAfterFade = hideAfterFade
 
     if frame._fade.startAlpha ~= frame._fade.endAlpha then
         FrameFade(frame, frame._fade)
@@ -259,7 +270,7 @@ function AF.FrameZoomOut(frame, timeToZoom, startScale, endScale)
     end
 
     frame._zoom.mode = "OUT"
-    frame._zoom.timeToZoom = timeToZoom
+    frame._zoom.timeToZoom = timeToZoom or 0.25
     frame._zoom.startScale = startScale or frame:GetScale()
     frame._zoom.endScale = endScale or 0
     frame._zoom.diffScale = frame._zoom.startScale - frame._zoom.endScale
@@ -274,7 +285,7 @@ function AF.FrameZoomTo(frame, timeToZoom, endScale)
         frame._zoom = {}
     end
 
-    frame._zoom.timeToZoom = timeToZoom
+    frame._zoom.timeToZoom = timeToZoom or 0.25
     frame._zoom.startScale = frame:GetScale()
     frame._zoom.endScale = endScale
     frame._zoom.diffScale = abs(frame._zoom.startScale - frame._zoom.endScale)
