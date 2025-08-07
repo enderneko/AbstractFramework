@@ -22,7 +22,7 @@ function AF_SliderMixin:SetValue(value)
 end
 
 function AF_SliderMixin:SetMinMaxValues(minV, maxV)
-    assert(minV < maxV, "minV must be less than maxV")
+    assert(minV <= maxV, "minV must be less than or equal to maxV")
     self:_SetMinMaxValues(minV, maxV)
     self.low = minV
     self.high = maxV
