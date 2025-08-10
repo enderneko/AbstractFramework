@@ -142,8 +142,9 @@ end
 ---@param color string
 function AF_ButtonMixin:SetBorderHighlightColor(color)
     if color then
+        self._hoverBorderColor = AF.GetColorTable(color)
         self.highlightBorder = function()
-            self:SetBackdropBorderColor(AF.GetColorRGB(color))
+            self:SetBackdropBorderColor(AF.UnpackColor(self._hoverBorderColor))
         end
 
         self._borderColor = self._borderColor or AF.GetColorTable("black")
@@ -151,6 +152,7 @@ function AF_ButtonMixin:SetBorderHighlightColor(color)
             self:SetBackdropBorderColor(AF.UnpackColor(self._borderColor))
         end
     else
+        self._hoverBorderColor = nil
         self.highlightBorder = nil
         self.unhighlightBorder = nil
     end
@@ -474,10 +476,12 @@ function AF.CreateButtonGroup(buttons, onSelect, onDeselect, onClick, onEnter, o
         for _, b in next, buttons do
             if id == b.id then
                 if b._hoverColor then b:SetBackdropColor(AF.UnpackColor(b._hoverColor)) end
+                if b._hoverBorderColor then b:SetBackdropBorderColor(AF.UnpackColor(b._hoverBorderColor)) end
                 if not skipCallback and onSelect then onSelect(b, b.id) end
                 b.isSelected = true
             else
                 if b._color then b:SetBackdropColor(AF.UnpackColor(b._color)) end
+                if b._borderColor then b:SetBackdropBorderColor(AF.UnpackColor(b._borderColor)) end
                 if not skipCallback and onDeselect then onDeselect(b, b.id) end
                 b.isSelected = false
             end

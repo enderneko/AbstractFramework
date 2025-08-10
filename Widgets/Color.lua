@@ -35,6 +35,7 @@ local COLORS = {
     ["border"] = {["hex"] = "ff000000", ["t"] = {0, 0, 0, 1}},
     ["header"] = {["hex"] = "ff202020", ["t"] = {0.127, 0.127, 0.127, 1}}, -- header background
     ["widget"] = {["hex"] = "ff262626", ["t"] = {0.15, 0.15, 0.15, 1}}, -- widget background
+    ["widget_highlight"] = {["hex"] = "ff333333", ["t"] = {0.2, 0.2, 0.2, 1}},
     ["mask"] = {["hex"] = "b3333333", ["t"] = {0.2, 0.2, 0.2, 0.7}},
     ["combat_mask"] = {["hex"] = "bf332b2b", ["t"] = {0.2, 0.17, 0.17, 0.75}},
     ["disabled"] = {["hex"] = "ff666666", ["t"] = {0.4, 0.4, 0.4, 1}},

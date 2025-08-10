@@ -400,8 +400,9 @@ function AF.ApplyDefaultBackdropColors(frame)
 end
 
 ---@param frame Frame
----@param color string|table color name defined in Color.lua or color table
----@param borderColor string|table color name defined in Color.lua or color table
+---@param color string|table|nil color name defined in Color.lua or color table
+---@param borderColor string|table|nil color name defined in Color.lua or color table
+---@param borderSize number|nil size of the border, default 1
 function AF.ApplyDefaultBackdropWithColors(frame, color, borderColor, borderSize)
     color = color or "background"
     borderColor = borderColor or "border"
