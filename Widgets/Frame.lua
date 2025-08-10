@@ -427,6 +427,92 @@ function AF.CreateCooldown(parent, name, texture, color, reverse)
     return cd
 end
 
+
+---------------------------------------------------------------------
+-- flipbook animation frame
+---------------------------------------------------------------------
+---@class AF_FlipBook:AF_Frame
+local AF_FlipBookMixin = {}
+
+function AF_FlipBookMixin:Play()
+    self.animation:Play()
+end
+
+function AF_FlipBookMixin:Stop()
+    self.animation:Stop()
+end
+
+function AF_FlipBookMixin:Pause()
+    self.animation:Pause()
+end
+
+function AF_FlipBookMixin:Restart()
+    self.animation:Restart()
+end
+
+function AF_FlipBookMixin:IsPlaying()
+    return self.animation:IsPlaying()
+end
+
+function AF_FlipBookMixin:SetTexture(texture)
+    self.tex:SetTexture(texture)
+    if self:IsPlaying() then
+        self:Restart()
+    else
+        self:Restart()
+        self:Pause()
+    end
+end
+
+---@param duration number
+---@param rows number
+---@param columns number
+---@param frames number
+---@param width number|nil
+---@param height number|nil
+function AF_FlipBookMixin:SetFlipBookInfo(duration, rows, columns, frames, width, height)
+    local flip = self.animation.flipbook
+    flip:SetDuration(duration)
+    flip:SetFlipBookRows(rows)
+    flip:SetFlipBookColumns(columns)
+    flip:SetFlipBookFrames(frames)
+    flip:SetFlipBookFrameWidth(width or 0)
+    flip:SetFlipBookFrameHeight(height or 0)
+end
+
+---@param parent Frame
+---@param createMask boolean whether to create a mask texture for the flipbook, remember to set position/size for the mask
+---@return AF_FlipBook flipbook
+function AF.CreateFlipBookFrame(parent, createMask, template)
+    local flipbook = AF.CreateFrame(parent, nil, nil, nil, template)
+
+    local tex = flipbook:CreateTexture(nil, "ARTWORK")
+    flipbook.tex = tex
+    tex:SetAllPoints()
+    -- tex:SetParentKey("Flipbook")
+
+    if createMask then
+        local mask = flipbook:CreateMaskTexture()
+        flipbook.mask = mask
+        mask:SetTexture(AF.GetPlainTexture(), "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE", "NEAREST")
+        tex:AddMaskTexture(mask)
+    end
+
+    local ag = flipbook:CreateAnimationGroup()
+    flipbook.animation = ag
+    ag:SetLooping("REPEAT")
+
+    local flip = ag:CreateAnimation("FlipBook")
+    flipbook.animation.flipbook = flip
+    -- flip:SetChildKey("Flipbook")
+    flip:SetTarget(tex)
+
+    Mixin(flipbook, AF_FlipBookMixin)
+    AF.AddToPixelUpdater_OnShow(flipbook)
+
+    return flipbook
+end
+
 ---------------------------------------------------------------------
 -- combat mask (+100 frame level)
 ---------------------------------------------------------------------
