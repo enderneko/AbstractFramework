@@ -30,6 +30,15 @@ function AF_SliderMixin:SetMinMaxValues(minV, maxV)
     self.highText:SetText(maxV * (self.isPercentage and 100 or 1) .. self.unit)
 end
 
+function AF_SliderMixin:SetPercentage(isPercentage)
+    self.isPercentage = isPercentage
+    self.unit = isPercentage and "%" or ""
+    -- update display
+    self:SetValue(self.value)
+    self.lowText:SetText(self.low * (self.isPercentage and 100 or 1) .. self.unit)
+    self.highText:SetText(self.high * (self.isPercentage and 100 or 1) .. self.unit)
+end
+
 ---@param step number
 function AF_SliderMixin:SetStep(step)
     self.step = step
@@ -192,8 +201,8 @@ function AF.CreateSlider(parent, text, width, low, high, step, isPercentage, sho
         local value = eb:GetValue()
 
         if value then
-            value = value / (isPercentage and 100 or 1)
-            value = AF.RoundToNearestMultiple(value, step)
+            value = value / (slider.isPercentage and 100 or 1)
+            value = AF.RoundToNearestMultiple(value, slider.step)
             value = AF.Clamp(value, slider.low, slider.high)
 
             if slider.value ~= value then
@@ -203,15 +212,15 @@ function AF.CreateSlider(parent, text, width, low, high, step, isPercentage, sho
 
             slider.value = value
             slider:_SetValue(value) -- update thumb position
-            eb:SetText(value * (isPercentage and 100 or 1))
+            eb:SetText(value * (slider.isPercentage and 100 or 1))
         else
-            eb:SetText(slider.value * (isPercentage and 100 or 1))
+            eb:SetText(slider.value * (slider.isPercentage and 100 or 1))
         end
     end)
 
     eb:SetScript("OnShow", function(self)
         if slider.value then
-            self:SetText(slider.value * (isPercentage and 100 or 1))
+            self:SetText(slider.value * (slider.isPercentage and 100 or 1))
             self:SetCursorPosition(0)
         end
     end)
@@ -255,12 +264,12 @@ function AF.CreateSlider(parent, text, width, low, high, step, isPercentage, sho
 
     -- OnValueChanged -----------------------------------------------
     slider:SetScript("OnValueChanged", function(self, value, userChanged)
-        value = AF.RoundToNearestMultiple(value, step)
+        value = AF.RoundToNearestMultiple(value, slider.step)
         if slider.value == value then return end
 
         if userChanged then -- IsDraggingThumb()
             slider.value = value
-            eb:SetText(value * (isPercentage and 100 or 1))
+            eb:SetText(value * (slider.isPercentage and 100 or 1))
             if slider.onValueChanged then
                 slider.onValueChanged(value)
             end
