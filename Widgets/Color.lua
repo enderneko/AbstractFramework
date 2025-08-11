@@ -718,7 +718,7 @@ end
 ---@return string gradientText
 function AF.GetGradientText(text, startColor, endColor)
     local gradient = ""
-    local length = #text
+    local length = string.utf8len(text)
     local r1, g1, b1, r2, g2, b2
 
     if COLORS[startColor] then
@@ -739,7 +739,7 @@ function AF.GetGradientText(text, startColor, endColor)
         g = AF.Interpolate(g1, g2, i, length - 1)
         b = AF.Interpolate(b1, b2, i, length - 1)
         hex = AF.ConvertRGB256ToHEX(r, g, b)
-        gradient = gradient .. "|cff" .. hex .. text:sub(i + 1, i + 1) .. "|r"
+        gradient = gradient .. "|cff" .. hex .. string.utf8sub(text, i + 1, i + 1) .. "|r"
     end
 
     return gradient
