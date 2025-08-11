@@ -193,6 +193,9 @@ function AF.CreateSeparator(parent, size, thickness, color, isVertical, noShadow
         hooksecurefunc(separator, "Hide", function()
             shadow:Hide()
         end)
+        hooksecurefunc(separator, "SetShown", function(_, shown)
+            shadow:SetShown(shown)
+        end)
     end
 
     AF.AddToPixelUpdater_OnShow(separator, nil, Separator_UpdatePixels)

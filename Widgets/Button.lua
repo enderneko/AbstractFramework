@@ -844,9 +844,14 @@ end
 ---@class AF_Switch:AF_BorderedFrame
 local AF_SwitchMixin = {}
 
-function AF_SwitchMixin:SetSelectedValue(value)
+---@param value any
+---@param force boolean
+function AF_SwitchMixin:SetSelectedValue(value, force)
     for _, b in ipairs(self.buttons) do
         if b.value == value then
+            if force then
+                b.isSelected = nil -- force trigger OnClick
+            end
             b:SilentClick()
             break
         end
