@@ -6,7 +6,7 @@ local AF = _G.AbstractFramework
 ---------------------------------------------------------------------
 -- slider
 ---------------------------------------------------------------------
----@class AF_Slider:Slider
+---@class AF_Slider:Slider,AF_BaseWidgetMixin
 local AF_SliderMixin = {}
 
 function AF_SliderMixin:GetValue()
@@ -80,7 +80,39 @@ function AF_SliderMixin:SetAfterValueChanged(func)
 end
 
 ---@private
+function AF_SliderMixin:OnMouseWheel(delta)
+    -- NOTE: OnValueChanged may not be called: value == low
+    self.value = self.value or self.low
+
+    local value
+    if delta == 1 then -- scroll up
+        value = self.value + self.step
+    elseif delta == -1 then -- scroll down
+        value = self.value - self.step
+    end
+    value = AF.Clamp(value, self.low, self.high)
+
+    if value ~= self.value then
+        self:SetValue(value)
+        if self.onValueChanged then self.onValueChanged(value) end
+        if self.afterValueChanged then self.afterValueChanged(value) end
+    end
+    self.valueBeforeClick = self.value
+end
+
+function AF_SliderMixin:EnableMouseWheel(enabled)
+    self:_EnableMouseWheel(enabled)
+
+    if enabled then
+        self:SetScript("OnMouseWheel", AF_SliderMixin.OnMouseWheel)
+    else
+        self:SetScript("OnMouseWheel", nil)
+    end
+end
+
+---@private
 function AF_SliderMixin:OnEnter()
+    if not self:IsEnabled() then return end
     self.thumb:SetColor(self.accentColor)
     self.highlight:Show()
     self.valueBeforeClick = self.value
@@ -88,6 +120,7 @@ end
 
 ---@private
 function AF_SliderMixin:OnLeave()
+    if not self:IsEnabled() then return end
     self.thumb:SetColor(AF.GetColorTable(self.accentColor, 0.7))
     self.highlight:Hide()
 end
@@ -102,8 +135,6 @@ function AF_SliderMixin:OnDisable()
     self.lowText:SetColor("disabled")
     self.highText:SetColor("disabled")
     self.percentSign:SetColor("disabled")
-    self:SetScript("OnEnter", nil)
-    self:SetScript("OnLeave", nil)
     self:SetBackdropBorderColor(AF.GetColorRGB("black", 0.7))
 end
 
@@ -117,8 +148,6 @@ function AF_SliderMixin:OnEnable()
     self.lowText:SetColor("gray")
     self.highText:SetColor("gray")
     self.percentSign:SetColor("gray")
-    self:SetScript("OnEnter", self.OnEnter)
-    self:SetScript("OnLeave", self.OnLeave)
     self:SetBackdropBorderColor(AF.GetColorRGB("black", 1))
 end
 
@@ -140,6 +169,8 @@ function AF.CreateSlider(parent, text, width, low, high, step, isPercentage, sho
     AF.ApplyDefaultBackdropWithColors(slider, "widget")
 
     slider.isPercentage = isPercentage
+    slider.low = low
+    slider.high = high
     slider.step = step or 1
 
     slider:SetValueStep(step or 1)
@@ -253,7 +284,9 @@ function AF.CreateSlider(parent, text, width, low, high, step, isPercentage, sho
     slider._GetValue = slider.GetValue
     slider._SetValue = slider.SetValue
     slider._SetMinMaxValues = slider.SetMinMaxValues
+    slider._EnableMouseWheel = slider.EnableMouseWheel
 
+    Mixin(slider, AF_BaseWidgetMixin)
     Mixin(slider, AF_SliderMixin)
     slider:SetMinMaxValues(low, high)
 
@@ -288,32 +321,6 @@ function AF.CreateSlider(parent, text, width, low, high, step, isPercentage, sho
         end
     end)
     -----------------------------------------------------------------
-
-    -- REVIEW: OnMouseWheel
-    --[[
-    slider:EnableMouseWheel(true)
-    slider:SetScript("OnMouseWheel", function(self, delta)
-        if not IsShiftKeyDown() then return end
-
-        -- NOTE: OnValueChanged may not be called: value == low
-        slider.value = slider.value and slider.value or low
-
-        local value
-        if delta == 1 then -- scroll up
-            value = slider.value + step
-            value = value > high and high or value
-        elseif delta == -1 then -- scroll down
-            value = slider.value - step
-            value = value < low and low or value
-        end
-
-        if value ~= slider.value then
-            slider:SetValue(value)
-            if slider.onValueChanged then slider.onValueChanged(value) end
-            if slider.afterValueChanged then slider.afterValueChanged(value) end
-        end
-    end)
-    ]]
 
     slider:SetScript("OnEnable", slider.OnEnable)
     slider:SetScript("OnDisable", slider.OnDisable)
