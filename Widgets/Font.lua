@@ -103,27 +103,27 @@ AF.AddToFontSizeUpdater(font_chinese, FONT_CHINESE_SIZE)
 AF.AddToFontSizeUpdater(font_tooltip_header, FONT_TOOLTIP_HEADER_SIZE)
 AF.AddToFontSizeUpdater(font_tooltip, FONT_TOOLTIP_SIZE)
 
-AF.fontSizeOffset = 0
+AF.fontSizeDelta = 0
 
----@param offset number
-function AF.UpdateFontSize(offset)
-    AF.fontSizeOffset = offset
+---@param delta number
+function AF.UpdateFontSize(delta)
+    AF.fontSizeDelta = delta
     if AFConfig then
-        AFConfig.fontSizeOffset = AF.fontSizeOffset
+        AFConfig.fontSizeDelta = AF.fontSizeDelta
     end
 
-    -- font_title:SetFont(BASE_FONT_NORMAL, FONT_TITLE_SIZE + offset, "")
-    -- font_normal:SetFont(BASE_FONT_NORMAL, FONT_NORMAL_SIZE + offset, "")
-    -- font_chat:SetFont(BASE_FONT_CHAT, FONT_CHAT_SIZE + offset, "")
-    -- font_outline:SetFont(BASE_FONT_NORMAL, FONT_OUTLINE_SIZE + offset, "OUTLINE")
-    -- font_small:SetFont(BASE_FONT_NORMAL, FONT_SMALL_SIZE + offset, "")
-    -- font_chinese:SetFont(UNIT_NAME_FONT_CHINESE, FONT_CHINESE_SIZE + offset, "")
-    -- font_tooltip_header:SetFont(BASE_FONT_TOOLTIP, FONT_TOOLTIP_HEADER_SIZE + offset, "")
-    -- font_tooltip:SetFont(BASE_FONT_TOOLTIP, FONT_TOOLTIP_SIZE + offset, "")
+    -- font_title:SetFont(BASE_FONT_NORMAL, FONT_TITLE_SIZE + delta, "")
+    -- font_normal:SetFont(BASE_FONT_NORMAL, FONT_NORMAL_SIZE + delta, "")
+    -- font_chat:SetFont(BASE_FONT_CHAT, FONT_CHAT_SIZE + delta, "")
+    -- font_outline:SetFont(BASE_FONT_NORMAL, FONT_OUTLINE_SIZE + delta, "OUTLINE")
+    -- font_small:SetFont(BASE_FONT_NORMAL, FONT_SMALL_SIZE + delta, "")
+    -- font_chinese:SetFont(UNIT_NAME_FONT_CHINESE, FONT_CHINESE_SIZE + delta, "")
+    -- font_tooltip_header:SetFont(BASE_FONT_TOOLTIP, FONT_TOOLTIP_HEADER_SIZE + delta, "")
+    -- font_tooltip:SetFont(BASE_FONT_TOOLTIP, FONT_TOOLTIP_SIZE + delta, "")
 
     for fontObj, originalSize in pairs(fontObjects) do
         local f, _, o = fontObj:GetFont()
-        fontObj:SetFont(f, originalSize + offset, o)
+        fontObj:SetFont(f, originalSize + delta, o)
     end
 end
 
@@ -145,17 +145,17 @@ function AF.AddToFontSizeUpdaterGroup(group, fontObj, originalSize)
 end
 
 ---@param group string
----@param offset number
-function AF.UpdateFontSizeForGroup(group, offset)
+---@param delta number
+function AF.UpdateFontSizeForGroup(group, delta)
     if not fontGroup[group] then return end
 
     for fontObj, originalSize in pairs(fontGroup[group]) do
         local f, _, o = fontObj:GetFont()
-        fontObj:SetFont(f, originalSize + offset, o)
+        fontObj:SetFont(f, originalSize + delta, o)
     end
 end
 
----@param group? string if not provided, font size will change with the global AF font size offset
+---@param group? string if not provided, font size will change with the global AF font size delta
 ---@param name string
 ---@param font? string defaults to GameFontNormal:GetFont()
 ---@param size? number defaults to 13
@@ -174,7 +174,7 @@ function AF.CreateFont(group, name, font, size, flags, shadow, color, justifyH, 
     end
 
     local obj = CreateFont(name)
-    obj:SetFont(font, (size or FONT_NORMAL_SIZE) + AF.fontSizeOffset, flags or "")
+    obj:SetFont(font, (size or FONT_NORMAL_SIZE) + AF.fontSizeDelta, flags or "")
 
     obj:SetJustifyH(justifyH or "CENTER")
     obj:SetJustifyV(justifyV or "MIDDLE")
@@ -245,16 +245,16 @@ end
 
 function AF.GetFontProps(font)
     if font == "title" then
-        return font_title:GetFont(), FONT_TITLE_SIZE + AF.fontSizeOffset, ""
+        return font_title:GetFont(), FONT_TITLE_SIZE + AF.fontSizeDelta, ""
     elseif font == "normal" then
-        return font_normal:GetFont(), FONT_NORMAL_SIZE + AF.fontSizeOffset, ""
+        return font_normal:GetFont(), FONT_NORMAL_SIZE + AF.fontSizeDelta, ""
     elseif font == "chat" then
-        return font_chat:GetFont(), FONT_CHAT_SIZE + AF.fontSizeOffset, ""
+        return font_chat:GetFont(), FONT_CHAT_SIZE + AF.fontSizeDelta, ""
     elseif font == "small" then
-        return font_small:GetFont(), FONT_SMALL_SIZE + AF.fontSizeOffset, ""
+        return font_small:GetFont(), FONT_SMALL_SIZE + AF.fontSizeDelta, ""
     elseif font == "outline" then
-        return font_outline:GetFont(), FONT_OUTLINE_SIZE + AF.fontSizeOffset, "OUTLINE"
+        return font_outline:GetFont(), FONT_OUTLINE_SIZE + AF.fontSizeDelta, "OUTLINE"
     else
-        return font, FONT_NORMAL_SIZE + AF.fontSizeOffset, ""
+        return font, FONT_NORMAL_SIZE + AF.fontSizeDelta, ""
     end
 end
