@@ -88,6 +88,10 @@ function AF.LSM_GetFontOutlineDropdownItems()
     }
 end
 
+---@param font string|table fontName/fontFile or fontTable {font, size, outline, shadow}
+---@param size number|nil
+---@param outline string|nil
+---@param shadow boolean|nil
 ---@param fs FontString|EditBox
 function AF.SetFont(fs, font, size, outline, shadow)
     if type(font) == "table" then
@@ -95,24 +99,29 @@ function AF.SetFont(fs, font, size, outline, shadow)
     end
 
     font = AF.LSM_GetFont(font)
-
-    local flags = {}
-
     outline = strlower(outline or "none")
 
+    local flag1
     if outline:find("thickoutline") then
-        tinsert(flags, "THICKOUTLINE")
+        flag1 = "THICKOUTLINE"
     elseif outline:find("outline") then
-        tinsert(flags, "OUTLINE")
+        flag1 = "OUTLINE"
     end
 
+    local flag2
     if outline:find("monochrome") then
-        tinsert(flags, "MONOCHROME")
+        flag2 = "MONOCHROME"
     end
 
-    flags = tconcat(flags, ",")
-
-    fs:SetFont(font, size, flags)
+    if flag1 and flag2 then
+        fs:SetFont(font, size or 13, flag1 .. "," .. flag2)
+    elseif flag1 then
+        fs:SetFont(font, size or 13, flag1)
+    elseif flag2 then
+        fs:SetFont(font, size or 13, flag2)
+    else
+        fs:SetFont(font, size or 13, "")
+    end
 
     if shadow then
         fs:SetShadowOffset(1, -1)
@@ -121,4 +130,26 @@ function AF.SetFont(fs, font, size, outline, shadow)
         fs:SetShadowOffset(0, 0)
         fs:SetShadowColor(0, 0, 0, 0)
     end
+end
+
+-- Update the font object with new values, nil values will remain unchanged
+---@param size number|string if a string, represents the font size delta for fontObj, e.g. "-1", "+2"
+function AF.UpdateFont(fontObj, font, size, outline, shadow)
+    local _font, _size, _flags = fontObj:GetFont()
+
+    font = font and AF.LSM_GetFont(font) or _font
+    size = size or _size
+    outline = outline or _flags
+
+    local shadowX, shadowY = fontObj:GetShadowOffset()
+    local shadowR, shadowG, shadowB, shadowA = fontObj:GetShadowColor()
+
+    if type(size) == "string" then
+        size = tonumber(size) + _size
+    end
+
+    AF.SetFont(fontObj, font, size, outline)
+
+    fontObj:SetShadowOffset(shadowX or 0, shadowY or 0)
+    fontObj:SetShadowColor(shadowR or 0, shadowG or 0, shadowB or 0, shadowA or 0)
 end
