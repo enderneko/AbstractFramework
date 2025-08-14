@@ -132,10 +132,15 @@ end
 ---@param addon? string addonFolderName
 ---@return string soundPath
 function AF.GetSound(sound, addon)
+    local suffix = ""
+    if not sound:lower():find("%.ogg$") then
+        suffix = ".ogg"
+    end
+
     if addon then
-        return "Interface\\AddOns\\" .. addon .. "\\Media\\Sounds\\" .. sound .. ".ogg"
+        return "Interface\\AddOns\\" .. addon .. "\\Media\\Sounds\\" .. sound .. suffix
     else
-        return "Interface\\AddOns\\AbstractFramework\\Media\\Sounds\\" .. sound .. ".ogg"
+        return "Interface\\AddOns\\AbstractFramework\\Media\\Sounds\\" .. sound .. suffix
     end
 end
 
@@ -156,10 +161,15 @@ end
 ---@param addon? string addonFolderName
 ---@return string fontPath
 function AF.GetFont(font, addon)
+    local suffix = ""
+    if not font:lower():find("%.ttf$") then
+        suffix = ".ttf"
+    end
+
     if addon then
-        return "Interface\\AddOns\\" .. addon .. "\\Media\\Fonts\\" .. font .. ".ttf"
+        return "Interface\\AddOns\\" .. addon .. "\\Media\\Fonts\\" .. font .. suffix
     else
-        return "Interface\\AddOns\\AbstractFramework\\Media\\Fonts\\" .. font .. ".ttf"
+        return "Interface\\AddOns\\AbstractFramework\\Media\\Fonts\\" .. font .. suffix
     end
 end
 
