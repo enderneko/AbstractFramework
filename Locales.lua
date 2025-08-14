@@ -162,6 +162,7 @@ if LOCALE_zhCN then
     L["Mono Thick"] = "单色粗轮廓"
     L["Shadow"] = "阴影"
     L["Font"] = "字体"
+    L["Fonts"] = "字体"
     L["Font Size"] = "字体大小"
     L["Orientation"] = "方向"
     L["Horizontal"] = "水平"

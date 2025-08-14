@@ -83,6 +83,24 @@ font_tooltip:SetShadowOffset(1, -1)
 font_tooltip:SetJustifyH("LEFT")
 
 ---------------------------------------------------------------------
+-- update base font
+---------------------------------------------------------------------
+---@param font string|nil font file path, set nil to use default font
+function AF.UpdateBaseFont(font)
+    BASE_FONT_NORMAL = font or GameFontNormal:GetFont()
+    BASE_FONT_CHAT = font or ChatFontNormal:GetFont()
+    BASE_FONT_TOOLTIP = font or GameTooltipText:GetFont()
+
+    font_title:SetFont(BASE_FONT_NORMAL, AF.fontSizeDelta + FONT_TITLE_SIZE, "")
+    font_normal:SetFont(BASE_FONT_NORMAL, AF.fontSizeDelta + FONT_NORMAL_SIZE, "")
+    font_chat:SetFont(BASE_FONT_CHAT, AF.fontSizeDelta + FONT_CHAT_SIZE, "")
+    font_outline:SetFont(BASE_FONT_NORMAL, AF.fontSizeDelta + FONT_OUTLINE_SIZE, "OUTLINE")
+    font_small:SetFont(BASE_FONT_NORMAL, AF.fontSizeDelta + FONT_SMALL_SIZE, "")
+    font_tooltip_header:SetFont(BASE_FONT_TOOLTIP, AF.fontSizeDelta + FONT_TOOLTIP_HEADER_SIZE, "")
+    font_tooltip:SetFont(BASE_FONT_TOOLTIP, AF.fontSizeDelta + FONT_TOOLTIP_SIZE, "")
+end
+
+---------------------------------------------------------------------
 -- update font size
 ---------------------------------------------------------------------
 local fontObjects = {}
@@ -203,13 +221,7 @@ function AF.CreateFont(group, name, font, size, flags, shadow, color, justifyH, 
 end
 
 ---------------------------------------------------------------------
--- update font
----------------------------------------------------------------------
--- function AF.SetFont(font)
--- end
-
----------------------------------------------------------------------
--- get font by "type"
+-- font props
 ---------------------------------------------------------------------
 -- function AF.GetFontName(font, isDisabled)
 --     if font == "title" then
