@@ -26,7 +26,7 @@ end
 ---@param wrapModeHorizontal? string
 ---@param wrapModeVertical? string
 ---@param filterMode? string
----@return AF_TextureMixin tex
+---@return AF_Texture tex
 function AF.CreateTexture(parent, texture, color, drawLayer, subLevel, wrapModeHorizontal, wrapModeVertical, filterMode)
     local tex = parent:CreateTexture(nil, drawLayer or "ARTWORK", nil, subLevel)
     Mixin(tex, AF_TextureMixin)

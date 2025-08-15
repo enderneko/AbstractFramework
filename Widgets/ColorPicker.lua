@@ -254,9 +254,14 @@ local function CreateColorPane()
     AF.SetPoint(pane.solid, "TOPLEFT", 1, -1)
     AF.SetPoint(pane.solid, "BOTTOMRIGHT", pane, "BOTTOMLEFT", 50, 1)
 
-    pane.alpha = AF.CreateTexture(pane)
+    pane.alpha = AF.CreateTexture(pane, nil, nil, "ARTWORK", 1)
     AF.SetPoint(pane.alpha, "TOPLEFT", pane.solid, "TOPRIGHT")
     AF.SetPoint(pane.alpha, "BOTTOMRIGHT", -1, 1)
+
+    pane.alphaBG = AF.CreateTexture(pane, AF.GetTexture("Checkerboard"), nil, "ARTWORK", -1)
+    pane.alphaBG:SetAllPoints(pane.alpha)
+    pane.alphaBG:SetHorizTile(true)
+    pane.alphaBG:SetVertTile(true)
 
     AF.RemoveFromPixelUpdater(pane)
 
@@ -553,7 +558,7 @@ local function CreateColorPickerFrame()
     alphaSlider:SetMinMaxValues(0, 1)
 
     alphaSlider.tex1 = alphaSlider:CreateTexture(nil, "ARTWORK", nil, 0)
-    alphaSlider.tex1:SetTexture(AF.GetTexture("ColorPicker"))
+    alphaSlider.tex1:SetTexture(AF.GetTexture("Checkerboard"), nil, nil, "NEAREST")
     alphaSlider.tex1:SetHorizTile(true)
     alphaSlider.tex1:SetVertTile(true)
     alphaSlider.tex1:SetAllPoints(alphaSlider)
