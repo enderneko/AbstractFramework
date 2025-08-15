@@ -10,10 +10,11 @@ local tinsert, tconcat = table.insert, table.concat
 -- register media
 ---------------------------------------------------------------------
 -- fonts
-LSM:Register("font", "Visitor", AF.GetFont("Visitor"), 255)
+LSM:Register("font", "Accidental Presidency", AF.GetFont("Accidental_Presidency"), 255)
+LSM:Register("font", "Dolphin", AF.GetFont("Dolphin"), 255)
 LSM:Register("font", "Emblem", AF.GetFont("Emblem"), 255)
 LSM:Register("font", "Expressway", AF.GetFont("Expressway"), 255)
-LSM:Register("font", "Accidental Presidency", AF.GetFont("Accidental_Presidency"), 255)
+LSM:Register("font", "Visitor", AF.GetFont("Visitor"), 255)
 
 -- statusbar
 LSM:Register("statusbar", "AF Plain", AF.GetPlainTexture())
