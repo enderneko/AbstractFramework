@@ -91,7 +91,7 @@ function AF.SetTooltip(widget, anchor, x, y, ...)
         widget._tooltipInited = true
 
         widget:HookScript("OnEnter", function()
-            if not widget:IsEnabled() then return end -- for slider
+            if widget.IsEnabled and not widget:IsEnabled() then return end -- for slider
             AF.ShowTooltip(widget, anchor, x, y, widget._tooltip)
         end)
         widget:HookScript("OnLeave", function()

@@ -5,7 +5,7 @@ local CreateColor = CreateColor
 ---------------------------------------------------------------------
 -- blizzard
 ---------------------------------------------------------------------
----@class AF_BlizzardStatusBar:AF_SmoothStatusBar
+---@class AF_BlizzardStatusBar:AF_SmoothStatusBar,Frame
 local AF_BlizzardStatusBarMixin = {}
 
 function AF_BlizzardStatusBarMixin:SetBarValue(v)
@@ -40,7 +40,7 @@ function AF.CreateBlizzardStatusBar(parent, minValue, maxValue, width, height, c
         self.maxValue = h
     end)
 
-    Mixin(bar, SmoothStatusBarMixin) -- SetSmoothedValue/ResetSmoothedValue/SetMinMaxSmoothedValue
+    Mixin(bar, AF_SmoothStatusBarMixin) -- SetSmoothedValue/ResetSmoothedValue/SetMinMaxSmoothedValue
     Mixin(bar, AF_BlizzardStatusBarMixin)
 
     bar:SetStatusBarTexture(AF.GetPlainTexture())
@@ -99,7 +99,7 @@ local function UpdateValue(self)
     end
 end
 
----@class AF_SimpleStatusBar:Frame
+---@class AF_SimpleStatusBar:AF_SmoothStatusBar,Frame
 local AF_SimpleStatusBarMixin = {}
 -- appearance
 function AF_SimpleStatusBarMixin:SetTexture(texture, lossTexture)
@@ -261,7 +261,7 @@ function AF.CreateSimpleStatusBar(parent, name, noBackdrop)
     bar.value = 0
 
     -- smooth
-    Mixin(bar, AF.SmoothStatusBarMixin)
+    Mixin(bar, AF_SmoothStatusBarMixin)
     bar:SetSmoothing(false)
 
     -- foreground texture

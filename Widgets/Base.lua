@@ -461,6 +461,7 @@ function AF.AttachToCursor(frame, anchorPoint, offsetX, offsetY)
     offsetY = offsetY or 0
 
     local mouseX, mouseY = GetCursorPosition()
+    local lastX, lastY
 
     local effectiveScale = frame:GetEffectiveScale()
     local startX = mouseX / effectiveScale
