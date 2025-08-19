@@ -27,7 +27,7 @@ function AF.GetBestScale()
     if factor >= 0.71 then -- 1080p
         mult = 1
     elseif factor >= 0.53 then -- 1440p
-        mult = 1.2
+        mult = 1.15
     else -- 2160p
         mult = 1.7
     end
