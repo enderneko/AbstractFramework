@@ -11,7 +11,7 @@ local AF_TextureMixin = {}
 function AF_TextureMixin:SetColor(color)
     if type(color) == "string" then color = AF.GetColorTable(color) end
     color = color or {1, 1, 1, 1}
-    if self._hasTexture then
+    if self:GetTexture() or self:GetAtlas() then
         self:SetVertexColor(AF.UnpackColor(color))
     else
         self:SetColorTexture(AF.UnpackColor(color))
@@ -31,12 +31,17 @@ function AF.CreateTexture(parent, texture, color, drawLayer, subLevel, wrapModeH
     local tex = parent:CreateTexture(nil, drawLayer or "ARTWORK", nil, subLevel)
     Mixin(tex, AF_TextureMixin)
 
-    if texture then
-        tex._hasTexture = true
-        tex:SetTexture(texture, wrapModeHorizontal, wrapModeVertical, filterMode)
+    if texture and texture ~= "" then
+        if type(texture) == "string" and not texture:find("[/\\]") then
+            tex:SetAtlas(texture, nil, filterMode)
+        else
+            tex:SetTexture(texture, wrapModeHorizontal, wrapModeVertical, filterMode)
+        end
     end
 
-    tex:SetColor(color)
+    if color then
+        tex:SetColor(color)
+    end
 
     AF.AddToPixelUpdater_OnShow(tex)
 
@@ -238,12 +243,12 @@ end
 
 ---@param parent Frame
 ---@param icon string|nil texture path or atlas
----@param size number
+---@param size number|nil default is 16
 ---@param bgColor string|table|nil background color, defaults to "black"
 ---@return AF_Icon
 function AF.CreateIcon(parent, icon, size, bgColor)
     local frame = CreateFrame("Frame", nil, parent)
-    AF.SetSize(frame, size, size)
+    AF.SetSize(frame, size or 16, size or 16)
 
     Mixin(frame, AF_IconMixin)
     Mixin(frame, AF_BaseWidgetMixin)
@@ -251,7 +256,7 @@ function AF.CreateIcon(parent, icon, size, bgColor)
     frame.icon = frame:CreateTexture(nil, "ARTWORK")
     AF.ApplyDefaultTexCoord(frame.icon)
     AF.SetOnePixelInside(frame.icon, frame)
-    frame:SetIcon(icon or AF.GetIcon("QuestionMark"))
+    frame:SetIcon(icon or AF.GetIcon("QuestionMark"), (icon and not icon:find("[/\\]") and true or false))
 
     frame.bg = frame:CreateTexture(nil, "BORDER")
     frame.bg:SetAllPoints(frame)
