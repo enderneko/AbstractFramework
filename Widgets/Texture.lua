@@ -78,8 +78,9 @@ end
 ---@param targetAspectRatio? number target aspect ratio (targetWidth / targetHeight), defaults to 1
 ---@param originalAspectRatio? number original texture aspect ratio (width/height), defaults to 1
 ---@return table coordinates {ULx, ULy, LLx, LLy, URx, URy, LRx, LRy}
-function AF.CalcTexCoordPreCrop(crop, targetAspectRatio, originalAspectRatio)
+function AF.CalcTexCoordPreCrop(crop, targetAspectRatio, originalAspectRatio, anchor, unpack)
     crop = crop or 0
+    anchor = anchor and anchor:upper() or "CENTER"
 
     -- apply cropping to initial texCoord
     local texCoord = {
@@ -99,12 +100,38 @@ function AF.CalcTexCoordPreCrop(crop, targetAspectRatio, originalAspectRatio)
     local xRatio = targetAspectRatio < 1 and targetAspectRatio or 1
     local yRatio = targetAspectRatio > 1 and 1 / targetAspectRatio or 1
 
-    for i, coord in ipairs(texCoord) do
-        local ratio = (i % 2 == 1) and xRatio or yRatio
-        texCoord[i] = (coord - 0.5) * ratio + 0.5
+    local anchorX, anchorY
+    if anchor == "CENTER" then
+        anchorX, anchorY = 0.5, 0.5
+    elseif anchor == "TOPLEFT" then
+        anchorX, anchorY = crop, crop
+    elseif anchor == "TOP" then
+        anchorX, anchorY = 0.5, crop
+    elseif anchor == "TOPRIGHT" then
+        anchorX, anchorY = 1 - crop, crop
+    elseif anchor == "LEFT" then
+        anchorX, anchorY = crop, 0.5
+    elseif anchor == "RIGHT" then
+        anchorX, anchorY = 1 - crop, 0.5
+    elseif anchor == "BOTTOMLEFT" then
+        anchorX, anchorY = crop, 1 - crop
+    elseif anchor == "BOTTOM" then
+        anchorX, anchorY = 0.5, 1 - crop
+    elseif anchor == "BOTTOMRIGHT" then
+        anchorX, anchorY = 1 - crop, 1 - crop
     end
 
-    return texCoord
+    for i, coord in next, texCoord do
+        local ratio = (i % 2 == 1) and xRatio or yRatio
+        local anchorPoint = (i % 2 == 1) and anchorX or anchorY
+        texCoord[i] = (coord - anchorPoint) * ratio + anchorPoint
+    end
+
+    if unpack then
+        return AF.Unpack8(texCoord)
+    else
+        return texCoord
+    end
 end
 
 ---ccalculates scaling factor to fit a texture to target size while preserving aspect ratio
