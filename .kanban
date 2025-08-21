@@ -5,15 +5,6 @@
       "title": "BACKLOG",
       "cards": [
         {
-          "id": "d6173515-7d6a-4626-a704-615d747d4166",
-          "listId": "8e8373eb-f6b9-4d4a-9bbb-5847fa668385",
-          "title": "dialogs queue",
-          "description": "",
-          "labels": [],
-          "checkboxes": [],
-          "comments": []
-        },
-        {
           "id": "1725c44d-1e1b-4c4c-a3aa-b0d7ee889dae",
           "listId": "8e8373eb-f6b9-4d4a-9bbb-5847fa668385",
           "title": "event squash",
