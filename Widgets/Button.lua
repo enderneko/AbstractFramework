@@ -346,7 +346,7 @@ end
 ---@param width? number
 ---@param height? number
 ---@param template? string
----@param borderColor? string default is "black", set to "" to remove border
+---@param borderColor? string default is "border", set to "" to remove border
 ---@param backgroundColor? string default is "background", set to "" to remove background
 ---@param font? string?
 ---@return AF_Button button
@@ -383,7 +383,7 @@ function AF.CreateButton(parent, text, color, width, height, template, borderCol
         AF.ApplyDefaultBackdrop_NoBorder(b)
     else
         AF.ApplyDefaultBackdrop(b)
-        b:SetBackdropBorderColor(AF.GetColorRGB(borderColor or "black"))
+        b:SetBackdropBorderColor(AF.GetColorRGB(borderColor or "border"))
     end
 
     -- background -------------------------------
@@ -490,7 +490,7 @@ function AF.CreateButtonGroup(buttons, onSelect, onDeselect, onClick, onEnter, o
 
     for _, b in next, buttons do
         b.id = b.id or b:GetText() or b:GetName() or tostring(b)
-        assert(b.id, "button.id is required")
+        -- assert(b.id, "button.id is required")
 
         b:SetScript("OnClick", function()
             Select(b.id)
