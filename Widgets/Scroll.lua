@@ -355,20 +355,7 @@ function AF_ScrollListMixin:SetSlotHeight(newHeight)
     self:SetSlotNum(self.slotNum)
 end
 
----@param widgets table
-function AF_ScrollListMixin:SetWidgets(widgets)
-    self:Reset()
-    self.widgets = widgets
-    self.widgetNum = #widgets
-
-    -- call UpdatePixels on show
-    for _, w in ipairs(self.widgets) do
-        AF.RemoveFromPixelUpdater(w)
-        w:SetParent(self.slotFrame)
-    end
-
-    self:SetScroll(1)
-
+local function ScrollList_UpdateScrollBar(self)
     if self.widgetNum > self.slotNum then -- can scroll
         self.scrollBar:Show()
         local p = self.slotNum / self.widgetNum
@@ -380,18 +367,73 @@ function AF_ScrollListMixin:SetWidgets(widgets)
     end
 end
 
+--- this method cannot be used together with SetWidgetPool/SetupButtonGroup
+--- load and scroll to the first item
+---@param widgets table
+function AF_ScrollListMixin:SetWidgets(widgets)
+    self.mode = "pre_created"
+
+    self:Reset()
+    self.widgets = widgets
+    self.widgetNum = #widgets
+
+    for _, w in next, self.widgets do
+        AF.RemoveFromPixelUpdater(w)
+    end
+
+    self:SetScroll(1)
+    ScrollList_UpdateScrollBar(self)
+end
+
+--- this method cannot be used together with SetWidgets/SetupButtonGroup
+---@param pool ObjectPool list will use widget:Load(value) to update widget
+function AF_ScrollListMixin:SetWidgetPool(pool)
+    self.mode = "pool_based"
+    self.pool = pool
+end
+
+--- this method is only for SetWidgetPool/SetupButtonGroup
+--- load and scroll to the first item
+---@param data table Keys must be consecutive integers starting from 1; each value will be used for widget.Load(value)
+function AF_ScrollListMixin:SetData(data)
+    assert(self.pool, "AF_ScrollList:SetData requires a widget pool. Call SetWidgetPool/SetupButtonGroup first.")
+
+    self:Reset()
+    self.data = data
+    self.widgetNum = #data
+
+    self:SetScroll(1)
+    ScrollList_UpdateScrollBar(self)
+end
+
 -- reset
 function AF_ScrollListMixin:Reset()
     self.widgets = {}
     self.widgetNum = 0
+
+    if not self.mode then return end
+
     -- hide slot widgets
-    for _, s in ipairs(self.slots) do
-        if s.widget then
-            s.widget:Hide()
+    if self.mode == "pre_created" then
+        for _, s in next, self.slots do
+            if s.widget then
+                s.widget:Hide()
+            end
+            s.widget = nil
+            s.widgetIndex = nil
         end
-        s.widget = nil
-        s.widgetIndex = nil
+    else -- pool_based or button_group
+        for w in self.pool:EnumerateActive() do
+            w:Hide()
+            w._slotIndex = nil
+        end
+        self.pool:ReleaseAll()
+        for _, s in next, self.slots do
+            s.widget = nil
+            s.widgetIndex = nil
+        end
     end
+
     -- resize / repoint
     AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", 0, self.verticalMargin)
     self.scrollBar:Hide()
@@ -421,24 +463,52 @@ function AF_ScrollListMixin:SetScroll(startIndex)
     end
 
     -- fill
+    local slot
     local slotIndex = 1
-    for i, w in ipairs(self.widgets) do
-        w:ClearAllPoints()
-        if i < from or i > to then
+
+    if self.mode == "pre_created" then
+        for i, w in next, self.widgets do
+            slot = self.slots[slotIndex]
+            w:ClearAllPoints()
+            w:SetParent(self.slotFrame)
+
+            if i < from or i > to then
+                w:Hide()
+            else
+                w:SetAllPoints(slot)
+                w:Show()
+
+                if w.UpdatePixels then w:UpdatePixels() end
+                if w.Update then w:Update() end
+
+                w._slotIndex = slotIndex
+                slot.widget = w
+                slot.widgetIndex = i
+                slotIndex = slotIndex + 1
+            end
+        end
+    else -- pool_based or button_group
+        for w in self.pool:EnumerateActive() do
             w:Hide()
-        else
+            w._slotIndex = nil
+        end
+        self.pool:ReleaseAll()
+
+        for i = from, to do
+            slot = self.slots[slotIndex]
+
+            local w = self.pool:Acquire()
+            w:SetParent(self.slotFrame)
+            w:SetAllPoints(slot)
             w:Show()
-            w:SetAllPoints(self.slots[slotIndex])
-            if w.UpdatePixels then
-                w:UpdatePixels()
-            end
+
+            if w.UpdatePixels then w:UpdatePixels() end
+            if w.Update then w:Update() end
+            if w.Load then w:Load(self.data[i]) end
+
             w._slotIndex = slotIndex
-            if w.Update then
-                -- NOTE: fix some widget issues, define them manually
-                w:Update()
-            end
-            self.slots[slotIndex].widget = w
-            self.slots[slotIndex].widgetIndex = i
+            slot.widget = w
+            slot.widgetIndex = i
             slotIndex = slotIndex + 1
         end
     end
@@ -503,6 +573,99 @@ function AF_ScrollListMixin:SetScrollStep(step)
     self.step = step
 end
 
+local function ButtonGroup_Select(self, b, skipCallback)
+    if b._hoverColor then b:SetBackdropColor(AF.UnpackColor(b._hoverColor)) end
+    if b._hoverBorderColor then b:SetBackdropBorderColor(AF.UnpackColor(b._hoverBorderColor)) end
+    if not skipCallback and self.onSelect then self.onSelect(b, b.id) end
+    b.isSelected = true
+end
+
+local function ButtonGroup_Deselect(self, b, skipCallback)
+    if b._color then b:SetBackdropColor(AF.UnpackColor(b._color)) end
+    if b._borderColor then b:SetBackdropBorderColor(AF.UnpackColor(b._borderColor)) end
+    if not skipCallback and self.onDeselect then self.onDeselect(b, b.id) end
+    b.isSelected = false
+end
+
+--- only works with SetupButtonGroup
+function AF_ScrollListMixin:Select(id, skipCallback)
+    if self.mode ~= "button_group" then return end
+    if not IsModifierKeyDown() and self.lastSelected and self.lastSelected == id then return end
+    self.lastSelected = id
+
+    -- TODO: ctrl/shift selection mode
+
+    for b in self.pool:EnumerateActive() do
+        if id == b.id then
+            ButtonGroup_Select(self, b, skipCallback)
+        else
+            ButtonGroup_Deselect(self, b, skipCallback)
+        end
+    end
+end
+
+---@private
+function AF_ScrollListMixin:InitButtonScripts(b)
+    if b._scriptInited then return end
+    b._scriptInited = true
+
+    b.id = b.id or b:GetText() or b:GetName() or tostring(b)
+
+    b:SetScript("OnClick", function()
+        self:Select(b.id)
+    end)
+
+    b:SetScript("OnEnter", function()
+        if not b.isSelected and b._hoverColor then
+            b:SetBackdropColor(AF.UnpackColor(b._hoverColor))
+        end
+        if self.onEnter then self.onEnter(b, b.id) end
+    end)
+
+    b:SetScript("OnLeave", function()
+        if not b.isSelected and b._color then
+            b:SetBackdropColor(AF.UnpackColor(b._color))
+        end
+        if self.onLeave then self.onLeave(b, b.id) end
+    end)
+end
+
+--- this method cannot be used together with SetWidgets/SetWidgetPool
+--- use SetData to set each button's text and id, so each entry in data should be {text = (string), id = (string/number)}
+--- any other keys in data will be stored as button[k] = v
+---@param color string|table
+---@param onSelect fun(button:AF_Button, id:any)
+---@param onDeselect fun(button:AF_Button, id:any)
+---@param onEnter fun(button:AF_Button, id:any)
+---@param onLeave fun(button:AF_Button, id:any)
+function AF_ScrollListMixin:SetupButtonGroup(color, onSelect, onDeselect, onEnter, onLeave)
+    self.mode = "button_group"
+
+    self.onSelect = onSelect
+    self.onDeselect = onDeselect
+    self.onEnter = onEnter
+    self.onLeave = onLeave
+
+    self.pool = AF.CreateObjectPool(function()
+        local b = AF.CreateButton(self.slotFrame, nil, color, nil, nil, nil, "none", "")
+        b:SetTextJustifyH("LEFT")
+        b:EnablePushEffect(false)
+        self:InitButtonScripts(b)
+
+        function b:Load(data)
+            b:SetText(data.text)
+            b.id = data.id or data.text
+            for k, v in next, data do
+                if k ~= "text" and k ~= "id" then
+                    b[k] = v
+                end
+            end
+        end
+
+        return b
+    end)
+end
+
 function AF_ScrollListMixin:UpdatePixels()
     AF.ReSize(self)
     AF.RePoint(self)
@@ -511,7 +674,7 @@ function AF_ScrollListMixin:UpdatePixels()
     self.scrollBar:UpdatePixels()
 
     -- update slots and widgets
-    for _, s in ipairs(self.slots) do
+    for _, s in next, self.slots do
         s:UpdatePixels()
         if s.widget and s.widget.UpdatePixels then
             s.widget:UpdatePixels()
@@ -692,7 +855,7 @@ function AF_ScrollGridMixin:SetWidgets(widgets)
     self:SetScroll(1)
 
     -- call UpdatePixels on show
-    for _, w in ipairs(self.widgets) do
+    for _, w in next, self.widgets do
         AF.RemoveFromPixelUpdater(w)
     end
 
@@ -716,7 +879,7 @@ function AF_ScrollGridMixin:Reset()
     self.widgetNum = 0
 
     -- hide slot widgets
-    for _, s in ipairs(self.slots) do
+    for _, s in next, self.slots do
         if s.widget then
             s.widget:Hide()
         end
@@ -758,7 +921,7 @@ function AF_ScrollGridMixin:SetScroll(startRow)
 
     -- fill
     local slotIndex = 1
-    for i, w in ipairs(self.widgets) do
+    for i, w in next, self.widgets do
         w:ClearAllPoints()
         if i < from or i > to then
             w:Hide()
@@ -836,7 +999,7 @@ function AF_ScrollGridMixin:UpdatePixels()
     self.scrollBar:UpdatePixels()
 
     -- update slots and widgets
-    for _, s in ipairs(self.slots) do
+    for _, s in next, self.slots do
         s:UpdatePixels()
         if s.widget and s.widget.UpdatePixels then
             s.widget:UpdatePixels()
