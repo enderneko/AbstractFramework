@@ -427,6 +427,7 @@ function AF_ScrollListMixin:Reset()
             w:Hide()
             w._slotIndex = nil
         end
+        -- self:Select(nil) -- button_group
         self.pool:ReleaseAll()
         for _, s in next, self.slots do
             s.widget = nil
@@ -511,6 +512,11 @@ function AF_ScrollListMixin:SetScroll(startIndex)
             slot.widgetIndex = i
             slotIndex = slotIndex + 1
         end
+
+
+        if self.mode == "button_group" and self.selected then
+            self:Select(self.selected, true) -- skipCallback
+        end
     end
 
     -- reset empty slots
@@ -590,8 +596,8 @@ end
 --- only works with SetupButtonGroup
 function AF_ScrollListMixin:Select(id, skipCallback)
     if self.mode ~= "button_group" then return end
-    if not IsModifierKeyDown() and self.lastSelected and self.lastSelected == id then return end
-    self.lastSelected = id
+    if not skipCallback and self.selected and self.selected == id then return end
+    self.selected = id
 
     -- TODO: ctrl/shift selection mode
 
