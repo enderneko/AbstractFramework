@@ -193,6 +193,10 @@ function AF_ButtonMixin:SetColor(color)
     end)
 end
 
+function AF_ButtonMixin:GetOnClick()
+    return self:GetScript("OnClick")
+end
+
 function AF_ButtonMixin:SetOnClick(func)
     self:SetScript("OnClick", func)
 end
