@@ -77,6 +77,10 @@ local ceil = math.ceil
 
 local function ResizeToFitText(self, frame, fontString, hPadding, vPadding)
     self.elapsed = 0
+
+    hPadding = hPadding and hPadding * 2
+    vPadding = vPadding and vPadding * 2
+
     self:SetScript("OnUpdate", function(self, elapsed)
         if hPadding then
             frame:SetWidth(ceil(fontString:GetStringWidth() + hPadding))

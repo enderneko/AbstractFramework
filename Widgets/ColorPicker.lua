@@ -464,6 +464,11 @@ local function CreateColorPickerFrame()
     -- AF.ApplyDefaultBackdropWithColors(colorPickerFrame.header, "header", "accent")
     AF.SetPoint(colorPickerFrame, "CENTER")
     -- tinsert(_G.UISpecialFrames, colorPickerFrame:GetName())
+    -- colorPickerFrame:SetScript("OnKeyDown", function(_, key)
+    --     if key == "ESCAPE" then
+    --         cancelBtn:SilentClick()
+    --     end
+    -- end)
 
     --------------------------------------------------
     -- logo
