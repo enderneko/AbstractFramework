@@ -644,7 +644,8 @@ end
 ---@param onDeselect fun(button:AF_Button, id:any)
 ---@param onEnter fun(button:AF_Button, id:any)
 ---@param onLeave fun(button:AF_Button, id:any)
-function AF_ScrollListMixin:SetupButtonGroup(color, onSelect, onDeselect, onEnter, onLeave)
+---@param onLoad fun(button:AF_Button, data:table)
+function AF_ScrollListMixin:SetupButtonGroup(color, onSelect, onDeselect, onEnter, onLeave, onLoad)
     self.mode = "button_group"
 
     self.onSelect = onSelect
@@ -661,10 +662,15 @@ function AF_ScrollListMixin:SetupButtonGroup(color, onSelect, onDeselect, onEnte
         function b:Load(data)
             b:SetText(data.text)
             b.id = data.id or data.text
+
             for k, v in next, data do
                 if k ~= "text" and k ~= "id" then
                     b[k] = v
                 end
+            end
+
+            if onLoad then
+                onLoad(b, data)
             end
         end
 
