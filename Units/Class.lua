@@ -84,6 +84,12 @@ function AF.GetSpecIcon(specID)
     return icon
 end
 
+function AF.GetSpecRole(specID)
+    if not specID then return end
+    local role = select(5, GetSpecializationInfoForSpecID(specID))
+    return role
+end
+
 local GetSpecializationInfoForClassID = GetSpecializationInfoForClassID
 function AF.GetSpecIconForClassID(classID, index)
     if not (classID and index) then return end
