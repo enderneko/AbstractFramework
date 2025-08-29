@@ -291,6 +291,8 @@ function AF_DropdownMixin:SetItems(items)
     self.reloadRequired = true
 end
 
+---@param item table
+---@param pos? number
 function AF_DropdownMixin:AddItem(item, pos)
     -- validate item.value
     if not item.value then item.value = item.text end
@@ -510,7 +512,7 @@ function AF_DropdownMixin:SetTooltip(...)
 end
 
 ---@param parent Frame
----@param width number
+---@param width? number
 ---@param maxSlots? number max shown items, not available for mini horizontal dropdown, default 10
 ---@param miniMode? string "vertical" or "horizontal", if set, dropdown will be mini mode
 ---@param textureAlpha? number default 0.75
