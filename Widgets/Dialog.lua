@@ -228,7 +228,7 @@ function AF.GetDialog(parent, text, width, noMask)
     dialog.accentColor = AF.GetAddonAccentColorName()
 
     dialog:SetParent(parent)
-    AF.SetFrameLevel(dialog, 500, parent)
+    AF.SetFrameLevel(dialog, 150, parent)
     AF.SetWidth(dialog, width or 200)
 
     dialog.text:SetText(text)
@@ -359,7 +359,7 @@ function AF.GetMessageDialog(parent, text, width, noMask, countdown)
     messageDialog.accentColor = AF.GetAddonAccentColorName()
 
     messageDialog:SetParent(parent)
-    AF.SetFrameLevel(messageDialog, 500, parent)
+    AF.SetFrameLevel(messageDialog, 150, parent)
     AF.SetWidth(messageDialog, width or 200)
 
     messageDialog.text:SetText(text)

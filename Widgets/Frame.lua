@@ -367,7 +367,7 @@ function AF.ShowMask(parent, text, tlX, tlY, brX, brY)
     else
         AF.SetOnePixelInside(parent.mask, parent)
     end
-    AF.SetFrameLevel(parent.mask, 30, parent)
+    AF.SetFrameLevel(parent.mask, 100, parent)
     parent.mask:Show()
 
     return parent.mask
@@ -521,7 +521,7 @@ local function CreateCombatMask(parent, tlX, tlY, brX, brY)
     AF.ApplyDefaultBackdrop_NoBorder(parent.combatMask)
     parent.combatMask:SetBackdropColor(AF.GetColorRGB("combat_mask"))
 
-    AF.SetFrameLevel(parent.combatMask, 100, parent)
+    AF.SetFrameLevel(parent.combatMask, 200, parent)
     parent.combatMask:EnableMouse(true)
     parent.combatMask:SetScript("OnMouseWheel", function() end)
 
