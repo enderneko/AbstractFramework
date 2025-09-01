@@ -80,7 +80,7 @@ function AF_EditBoxMixin:SetOnEscapePressed(func)
     self.onEscapePressed = func
 end
 
----@param func fun(value: any, userChanged: boolean)
+---@param func fun(value: any, userChanged: boolean, self: AF_EditBox)
 function AF_EditBoxMixin:SetOnTextChanged(func)
     self.onTextChanged = func
 end
@@ -270,7 +270,7 @@ function AF.CreateEditBox(parent, label, width, height, mode, font)
         local value = eb:GetValue()
 
         if eb.onTextChanged then
-            eb.onTextChanged(value, userChanged)
+            eb.onTextChanged(value, userChanged, self)
         end
 
         if userChanged then
