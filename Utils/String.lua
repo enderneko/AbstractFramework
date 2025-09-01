@@ -18,6 +18,11 @@ function AF.UpperFirst(str, lowerOthers)
     return (str:gsub("^%l", strupper))
 end
 
+function AF.LowerFirst(str)
+    if AF.IsBlank(str) then return str end
+    return (str:gsub("^%u", strlower))
+end
+
 local function CapitalizeWord(space, firstChar, rest)
     return space .. strupper(firstChar) .. rest
 end
