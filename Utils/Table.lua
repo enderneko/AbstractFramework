@@ -13,14 +13,14 @@ local tinsert, tremove, tsort, tconcat = table.insert, table.remove, table.sort,
 ---@return number
 function AF.Getn(t)
     local count = 0
-    for k, v in pairs(t) do
+    for k, v in next, t do
         count = count + 1
     end
     return count
 end
 
 function AF.GetIndex(t, e)
-    for i, v in pairs(t) do
+    for i, v in next, t do
         if e == v then
             return i
         end
@@ -30,7 +30,7 @@ end
 
 function AF.GetKeys(t)
     local keys = {}
-    for k in pairs(t) do
+    for k in next, t do
         tinsert(keys, k)
     end
     return keys
@@ -41,7 +41,7 @@ end
 ---@return any? maxValue value of maxKey
 function AF.GetMaxKeyValue(t)
     local maxKey = nil
-    for k in pairs(t) do
+    for k in next, t do
         local kn = tonumber(k)
         if not maxKey or (kn and kn > tonumber(maxKey)) then
             maxKey = k
@@ -59,7 +59,7 @@ function AF.Copy(...)
     local newTbl = {}
     for i = 1, select("#", ...) do
         local t = select(i, ...)
-        for k, v in pairs(t) do
+        for k, v in next, t do
             if type(v) == "table" then
                 newTbl[k] = AF.Copy(v)
             else
@@ -71,14 +71,14 @@ function AF.Copy(...)
 end
 
 function AF.Contains(t, v)
-    for _, value in pairs(t) do
+    for _, value in next, t do
         if value == v then return true end
     end
     return false
 end
 
 function AF.IndexOf(t, v)
-    for i, value in pairs(t) do
+    for i, value in next, t do
         if value == v then return i end
     end
     return nil
@@ -178,7 +178,7 @@ function AF.RemoveElementsExceptKeys(tbl, ...)
         keys[k] = true
     end
 
-    for k in pairs(tbl) do
+    for k in next, tbl do
         if not keys[k] then
             tbl[k] = nil
         end
@@ -226,7 +226,7 @@ end
 ---@return table temp a new table with the keys and values swapped
 function AF.SwapKeyValue(t)
     local temp = {}
-    for k, v in pairs(t) do
+    for k, v in next, t do
         temp[v] = k
     end
     return temp
@@ -251,7 +251,7 @@ end
 ---@return table temp a new table containing the values of the specified key from each sub-table
 function AF.ExtractSubTableValues(t, key)
     local temp = {}
-    for k, v in pairs(t) do
+    for k, v in next, t do
         if type(v) == "table" and v[key] then
             tinsert(temp, v[key])
         end

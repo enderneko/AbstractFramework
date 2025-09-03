@@ -333,7 +333,7 @@ function AF.CreateTitledPane(parent, title, width, height, color)
 end
 
 ---------------------------------------------------------------------
--- mask (+30 frame level)
+-- mask (+100 frame level)
 ---------------------------------------------------------------------
 ---@param parent Frame
 ---@param tlX number topleft x
@@ -514,7 +514,7 @@ function AF.CreateFlipBookFrame(parent, createMask, template)
 end
 
 ---------------------------------------------------------------------
--- combat mask (+100 frame level)
+-- combat mask (+200 frame level)
 ---------------------------------------------------------------------
 local function CreateCombatMask(parent, tlX, tlY, brX, brY)
     parent.combatMask = AF.CreateFrame(parent)

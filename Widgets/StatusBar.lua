@@ -12,6 +12,12 @@ function AF_BlizzardStatusBarMixin:SetBarValue(v)
     AF.SetStatusBarValue(self, v)
 end
 
+function AF_BlizzardStatusBarMixin:SetMinMaxValues(minValue, maxValue)
+    self:_SetMinMaxValues(minValue, maxValue)
+    self.minValue = minValue
+    self.maxValue = maxValue
+end
+
 function AF_BlizzardStatusBarMixin:UpdatePixels()
     AF.ReSize(self)
     AF.RePoint(self)
@@ -21,25 +27,28 @@ function AF_BlizzardStatusBarMixin:UpdatePixels()
     end
 end
 
----@param color string color name defined in Color.lua
----@param borderColor string color name defined in Color.lua
----@param progressTextType string? "percentage" or "current_value" or "current_max".
+---@param minValue number|nil default is 0
+---@param maxValue number|nil default is 100
+---@param width number|nil
+---@param height number|nil
+---@param color string|nil default is addon accent color
+---@param borderColor string|nil default is border color
+---@param progressTextType string|nil "percentage" or "current_value" or "current_max".
 ---@return AF_BlizzardStatusBar bar
 function AF.CreateBlizzardStatusBar(parent, minValue, maxValue, width, height, color, borderColor, progressTextType)
+    color = color or AF.GetAddonAccentColorName()
+    borderColor = borderColor or "border"
+
     local bar = CreateFrame("StatusBar", nil, parent, "BackdropTemplate")
     AF.ApplyDefaultBackdropWithColors(bar, AF.GetColorTable(color, 0.9, 0.1), borderColor)
     AF.SetSize(bar, width, height)
 
-    minValue = minValue or 1
-    maxValue = maxValue or 1
+    minValue = minValue or 0
+    maxValue = maxValue or 100
 
     bar._SetMinMaxValues = bar.SetMinMaxValues
 
-    hooksecurefunc(bar, "SetMinMaxValues", function(self, l, h)
-        self.minValue = l
-        self.maxValue = h
-    end)
-
+    Mixin(bar, AF_BaseWidgetMixin)
     Mixin(bar, AF_SmoothStatusBarMixin) -- SetSmoothedValue/ResetSmoothedValue/SetMinMaxSmoothedValue
     Mixin(bar, AF_BlizzardStatusBarMixin)
 
@@ -246,6 +255,7 @@ end
 ---@return AF_SimpleStatusBar bar
 function AF.CreateSimpleStatusBar(parent, name, noBackdrop)
     local bar = CreateFrame("Frame", name, parent)
+    Mixin(bar, AF_BaseWidgetMixin)
     Mixin(bar, AF_SimpleStatusBarMixin)
 
     if noBackdrop then

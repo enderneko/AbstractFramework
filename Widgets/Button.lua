@@ -130,7 +130,9 @@ function AF_ButtonMixin:SetTextPadding(padding)
     if self.texture and self.texture:IsShown() then
         if self.textureJustifyH == "RIGHT" then
             AF.SetPoint(self.text, "LEFT", padding, 0)
+            AF.SetPoint(self.text, "RIGHT", self.texture, "LEFT", -padding, 0)
         else
+            AF.SetPoint(self.text, "LEFT", self.texture, "RIGHT", padding, 0)
             AF.SetPoint(self.text, "RIGHT", -padding, 0)
         end
     else
