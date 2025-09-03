@@ -87,12 +87,15 @@ function AF.FrameFadeIn(frame, timeToFade, startAlpha, endAlpha)
 
     if frame._fade.startAlpha ~= frame._fade.endAlpha then
         FrameFade(frame, frame._fade)
+    elseif not frame:IsProtected() then
+        frame:Show()
     end
 end
 
 ---@param timeToFade number|nil default is 0.25
 ---@param startAlpha number|nil default is current alpha
 ---@param endAlpha number|nil default is 0
+---@param hideAfterFade boolean|nil
 function AF.FrameFadeOut(frame, timeToFade, startAlpha, endAlpha, hideAfterFade)
     if frame._fade then
         frame._fade.fadeTimer = nil
@@ -109,6 +112,8 @@ function AF.FrameFadeOut(frame, timeToFade, startAlpha, endAlpha, hideAfterFade)
 
     if frame._fade.startAlpha ~= frame._fade.endAlpha then
         FrameFade(frame, frame._fade)
+    elseif hideAfterFade and not frame:IsProtected() then
+        frame:Hide()
     end
 end
 
