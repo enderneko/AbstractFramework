@@ -352,6 +352,18 @@ function AF.Toggle(...)
 end
 
 ---------------------------------------------------------------------
+-- check
+---------------------------------------------------------------------
+function AF.SetChecked(checked, ...)
+    for i = 1, select("#", ...) do
+        local w = select(i, ...)
+        if w.SetChecked then
+            w:SetChecked(checked)
+        end
+    end
+end
+
+---------------------------------------------------------------------
 -- frame level relative to parent
 ---------------------------------------------------------------------
 ---@param frame Frame
