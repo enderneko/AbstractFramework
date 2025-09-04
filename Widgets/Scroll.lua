@@ -5,6 +5,7 @@ local select, abs, max, ceil = select, abs, max, ceil
 local Round = AF.Round
 local ApproxZero = AF.ApproxZero
 local GetCursorPosition = GetCursorPosition
+local IsShiftKeyDown = IsShiftKeyDown
 
 local MIN_SCROLL_THUMB_HEIGHT = 20
 
@@ -392,6 +393,10 @@ function AF_ScrollListMixin:SetWidgetPool(pool)
     self.pool = pool
 end
 
+local function IdToIndexProcessor(k, v)
+    return v.id or v.text, k
+end
+
 --- this method is only for SetWidgetPool/SetupButtonGroup
 --- load and scroll to the first item
 ---@param data table Keys must be consecutive integers starting from 1; each value will be used for widget.Load(value)
@@ -401,6 +406,12 @@ function AF_ScrollListMixin:SetData(data)
     self:Reset()
     self.data = data
     self.widgetNum = #data
+    self.idToIndex = AF.ConvertTable(data, IdToIndexProcessor)
+    self.lastClickedIndex = nil
+
+    if self.selected then
+        wipe(self.selected)
+    end
 
     self:SetScroll(1)
     ScrollList_UpdateScrollBar(self)
@@ -514,8 +525,8 @@ function AF_ScrollListMixin:SetScroll(startIndex)
         end
 
 
-        if self.mode == "button_group" and self.selected then
-            self:Select(self.selected, true) -- skipCallback
+        if self.mode == "button_group" then
+            self:Select() -- reselect
         end
     end
 
@@ -582,32 +593,137 @@ end
 local function ButtonGroup_Select(self, b, skipCallback)
     if b._hoverColor then b:SetBackdropColor(AF.UnpackColor(b._hoverColor)) end
     if b._hoverBorderColor then b:SetBackdropBorderColor(AF.UnpackColor(b._hoverBorderColor)) end
+
     if not skipCallback and self.onSelect then self.onSelect(b, b.id) end
-    b.isSelected = true
+    self.selected[b.id] = true
+
+    if self.multiSelect then
+        b:SetTextColor("white")
+    end
 end
 
 local function ButtonGroup_Deselect(self, b, skipCallback)
     if b._color then b:SetBackdropColor(AF.UnpackColor(b._color)) end
     if b._borderColor then b:SetBackdropBorderColor(AF.UnpackColor(b._borderColor)) end
+
     if not skipCallback and self.onDeselect then self.onDeselect(b, b.id) end
-    b.isSelected = false
+    self.selected[b.id] = nil
+
+    if self.multiSelect then
+        b:SetTextColor("gray")
+    end
 end
 
 --- only works with SetupButtonGroup
 function AF_ScrollListMixin:Select(id, skipCallback)
-    if self.mode ~= "button_group" then return end
-    if not skipCallback and self.selected and self.selected == id then return end
-    self.selected = id
+    assert(self.mode == "button_group", "AF_ScrollList:Select requires button group mode")
 
-    -- TODO: ctrl/shift selection mode
+    if not id then
+        for b in self.pool:EnumerateActive() do
+            if self.selected[b.id] then
+                ButtonGroup_Select(self, b, true)
+            else
+                ButtonGroup_Deselect(self, b, true)
+            end
+        end
+    elseif self.multiSelect then
+        if IsShiftKeyDown() and self.lastClickedIndex then
+            local from = self.lastClickedIndex
+            local to = self.idToIndex[id]
+            if from > to then
+                from, to = to, from
+            end
 
-    for b in self.pool:EnumerateActive() do
-        if id == b.id then
-            ButtonGroup_Select(self, b, skipCallback)
+            for b in self.pool:EnumerateActive() do
+                if self.idToIndex[b.id] >= from and self.idToIndex[b.id] <= to then
+                    ButtonGroup_Select(self, b, true)
+                else
+                    ButtonGroup_Deselect(self, b, true)
+                end
+            end
+
+            for id, index in next, self.idToIndex do
+                if index >= from and index <= to then
+                    self.selected[id] = true
+                else
+                    self.selected[id] = nil
+                end
+            end
         else
-            ButtonGroup_Deselect(self, b, skipCallback)
+            for b in self.pool:EnumerateActive() do
+                if id == b.id then
+                    if self.selected[b.id] then
+                        ButtonGroup_Deselect(self, b, true)
+                    else
+                        ButtonGroup_Select(self, b, true)
+                    end
+                else
+                end
+            end
+        end
+    else
+        for b in self.pool:EnumerateActive() do
+            if id == b.id then
+                ButtonGroup_Select(self, b, skipCallback or self.selected[b.id])
+            else
+                ButtonGroup_Deselect(self, b, skipCallback or not self.selected[b.id])
+            end
         end
     end
+end
+
+function AF_ScrollListMixin:InvertSelect()
+    assert(self.mode == "button_group", "AF_ScrollList:InvertSelect requires button group mode")
+
+    for id in next, self.idToIndex do
+        if self.selected[id] then
+            self.selected[id] = nil
+        else
+            self.selected[id] = true
+        end
+    end
+    self:Select()
+end
+
+function AF_ScrollListMixin:SelectAll()
+    assert(self.mode == "button_group", "AF_ScrollList:SelectAll requires button group mode")
+
+    self.lastClickedIndex = nil
+    for id in next, self.idToIndex do
+        self.selected[id] = true
+    end
+    self:Select()
+end
+
+---@return table
+function AF_ScrollListMixin:GetSelected()
+    assert(self.mode == "button_group", "AF_ScrollList:GetSelected requires button group mode")
+    return self.selected
+end
+
+---@param enabled boolean
+---@param checkGrayOut boolean normally no need, unless you want to gray out unselected buttons immediately AFTER SetData WITHOUT scrolling
+function AF_ScrollListMixin:SetMultiSelect(enabled, checkGrayOut)
+    assert(self.mode == "button_group", "AF_ScrollList:SetMultiSelect requires button group mode")
+
+    self.lastClickedIndex = nil
+    self.multiSelect = enabled
+
+    if checkGrayOut then
+        self:Select() -- reselect to gray out unselected buttons
+    end
+end
+
+function AF_ScrollListMixin:ClearSelected()
+    assert(self.mode == "button_group", "AF_ScrollList:ClearSelected requires button group mode")
+
+    self.lastClickedIndex = nil
+    for b in self.pool:EnumerateActive() do
+        if self.selected[b.id] then
+            ButtonGroup_Deselect(self, b, true)
+        end
+    end
+    wipe(self.selected)
 end
 
 ---@private
@@ -618,18 +734,21 @@ function AF_ScrollListMixin:InitButtonScripts(b)
     b.id = b.id or b:GetText() or b:GetName() or tostring(b)
 
     b:SetScript("OnClick", function()
+        if not IsShiftKeyDown() then
+            self.lastClickedIndex = self.idToIndex[b.id]
+        end
         self:Select(b.id)
     end)
 
     b:SetScript("OnEnter", function()
-        if not b.isSelected and b._hoverColor then
+        if not self.selected[b.id] and b._hoverColor then
             b:SetBackdropColor(AF.UnpackColor(b._hoverColor))
         end
         if self.onEnter then self.onEnter(b, b.id) end
     end)
 
     b:SetScript("OnLeave", function()
-        if not b.isSelected and b._color then
+        if not self.selected[b.id] and b._color then
             b:SetBackdropColor(AF.UnpackColor(b._color))
         end
         if self.onLeave then self.onLeave(b, b.id) end
@@ -640,13 +759,14 @@ end
 --- use SetData to set each button's text and id, so each entry in data should be {text = (string), id = (string/number)}
 --- any other keys in data will be stored as button[k] = v
 ---@param color string|table
----@param onSelect fun(button:AF_Button, id:any)
----@param onDeselect fun(button:AF_Button, id:any)
+---@param onSelect fun(button:AF_Button, id:any) do not work under multi selection mode
+---@param onDeselect fun(button:AF_Button, id:any) do not work under multi selection mode
 ---@param onEnter fun(button:AF_Button, id:any)
 ---@param onLeave fun(button:AF_Button, id:any)
 ---@param onLoad fun(button:AF_Button, data:table)
 function AF_ScrollListMixin:SetupButtonGroup(color, onSelect, onDeselect, onEnter, onLeave, onLoad)
     self.mode = "button_group"
+    self.selected = {}
 
     self.onSelect = onSelect
     self.onDeselect = onDeselect

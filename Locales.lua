@@ -186,6 +186,8 @@ if LOCALE_zhCN then
     L["Export"] = "导出"
     L["Import"] = "导入"
     L["Import & Export"] = "导入 & 导出"
+    L["From"] = "从"
+    L["To"] = "到"
 
     L["Left Click"] = "左键单击"
     L["Left Drag"] = "左键拖动"

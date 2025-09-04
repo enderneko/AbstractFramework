@@ -237,8 +237,9 @@ end
 ---@param processor fun(key: any, value: any): (any, any) the processor function that takes a key and value and returns a new key and value
 function AF.ConvertTable(t, processor)
     local temp = {}
-    for k, v in ipairs(t) do
-        local newKey, newValue = processor(k, v)
+    local newKey, newValue
+    for k, v in next, t do
+        newKey, newValue = processor(k, v)
         if newKey and newValue then
             temp[newKey] = newValue
         end
