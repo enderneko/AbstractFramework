@@ -340,7 +340,7 @@ end
 -------------------------------------------------
 
 -- onSelect -------------------------------------
----@param fn function
+---@param fn fun(value: any, button: AF_Button|nil)
 function AF_DropdownMixin:SetOnSelect(fn)
     self.callback = fn
 end

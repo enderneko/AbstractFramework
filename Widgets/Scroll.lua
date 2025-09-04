@@ -444,6 +444,13 @@ function AF_ScrollListMixin:Reset()
             s.widget = nil
             s.widgetIndex = nil
         end
+
+        if self.mode == "button_group" then
+            wipe(self.selected)
+            self.data = nil
+            self.idToIndex = nil
+            self.lastClickedIndex = nil
+        end
     end
 
     -- resize / repoint
@@ -555,6 +562,14 @@ function AF_ScrollListMixin:ScrollTo(index)
     end
 end
 
+function AF_ScrollListMixin:ScrollToID(id)
+    assert(self.mode == "button_group", "AF_ScrollList:ScrollToID requires button group mode")
+    local index = id and self.idToIndex[id]
+    if index then
+        self:ScrollTo(index)
+    end
+end
+
 function AF_ScrollListMixin:ScrollToBottom()
     self:SetScroll(self.widgetNum - self.slotNum + 1)
 end
@@ -595,7 +610,7 @@ local function ButtonGroup_Select(self, b, skipCallback)
     if b._hoverBorderColor then b:SetBackdropBorderColor(AF.UnpackColor(b._hoverBorderColor)) end
 
     if not skipCallback and self.onSelect then self.onSelect(b, b.id) end
-    self.selected[b.id] = true
+    -- self.selected[b.id] = true
 
     if self.multiSelect then
         b:SetTextColor("white")
@@ -607,7 +622,7 @@ local function ButtonGroup_Deselect(self, b, skipCallback)
     if b._borderColor then b:SetBackdropBorderColor(AF.UnpackColor(b._borderColor)) end
 
     if not skipCallback and self.onDeselect then self.onDeselect(b, b.id) end
-    self.selected[b.id] = nil
+    -- self.selected[b.id] = nil
 
     if self.multiSelect then
         b:SetTextColor("gray")
@@ -626,6 +641,7 @@ function AF_ScrollListMixin:Select(id, skipCallback)
                 ButtonGroup_Deselect(self, b, true)
             end
         end
+
     elseif self.multiSelect then
         if IsShiftKeyDown() and self.lastClickedIndex then
             local from = self.lastClickedIndex
@@ -642,11 +658,11 @@ function AF_ScrollListMixin:Select(id, skipCallback)
                 end
             end
 
-            for id, index in next, self.idToIndex do
+            for _id, index in next, self.idToIndex do
                 if index >= from and index <= to then
-                    self.selected[id] = true
+                    self.selected[_id] = index
                 else
-                    self.selected[id] = nil
+                    self.selected[_id] = nil
                 end
             end
         else
@@ -654,19 +670,29 @@ function AF_ScrollListMixin:Select(id, skipCallback)
                 if id == b.id then
                     if self.selected[b.id] then
                         ButtonGroup_Deselect(self, b, true)
+                        self.selected[b.id] = nil
                     else
                         ButtonGroup_Select(self, b, true)
+                        self.selected[b.id] = self.idToIndex[b.id]
                     end
-                else
                 end
             end
         end
+
     else
         for b in self.pool:EnumerateActive() do
             if id == b.id then
                 ButtonGroup_Select(self, b, skipCallback or self.selected[b.id])
             else
                 ButtonGroup_Deselect(self, b, skipCallback or not self.selected[b.id])
+            end
+        end
+
+        for _id, index in next, self.idToIndex do
+            if id == _id then
+                self.selected[_id] = index
+            else
+                self.selected[_id] = nil
             end
         end
     end
