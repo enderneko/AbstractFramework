@@ -161,7 +161,7 @@ local frame = CreateFrame("Frame")
 frame:RegisterEvent("ADDON_LOADED")
 frame:SetScript("OnEvent", function(self, event, addon, containsBindings)
     if addonCallbacks[addon] then
-        for _, fn in pairs(addonCallbacks[addon]) do
+        for fn in pairs(addonCallbacks[addon]) do
             fn(addon, containsBindings)
         end
     end
@@ -171,5 +171,13 @@ end)
 ---@param func fun(addon:string, containsBindings:boolean) function to call when the addon is loaded
 function AF.RegisterAddonLoaded(addon, func)
     if not addonCallbacks[addon] then addonCallbacks[addon] = {} end
-    tinsert(addonCallbacks[addon], func)
+    addonCallbacks[addon][func] = true
+end
+
+---@param addon string
+---@param func function
+function AF.UnregisterAddonLoaded(addon, func)
+    if addonCallbacks[addon] then
+        addonCallbacks[addon][func] = nil
+    end
 end

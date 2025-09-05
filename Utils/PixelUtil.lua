@@ -299,6 +299,8 @@ function AF.SetPoint(region, ...)
     end
 end
 
+---@param region Region
+---@param relativeTo Region|nil
 function AF.SetOnePixelInside(region, relativeTo)
     relativeTo = relativeTo or region:GetParent()
     AF.ClearPoints(region)
@@ -306,6 +308,8 @@ function AF.SetOnePixelInside(region, relativeTo)
     AF.SetPoint(region, "BOTTOMRIGHT", relativeTo, "BOTTOMRIGHT", -1, 1)
 end
 
+---@param region Region
+---@param relativeTo Region|nil
 function AF.SetOnePixelOutside(region, relativeTo)
     relativeTo = relativeTo or region:GetParent()
     AF.ClearPoints(region)
