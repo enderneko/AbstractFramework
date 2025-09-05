@@ -679,6 +679,10 @@ function AF_ScrollListMixin:Select(id, skipCallback)
             end
         end
 
+        if not skipCallback and self.onSelect then
+            self.onSelect(self.selected)
+        end
+
     else
         for b in self.pool:EnumerateActive() do
             if id == b.id then
@@ -785,7 +789,7 @@ end
 --- use SetData to set each button's text and id, so each entry in data should be {text = (string), id = (string/number)}
 --- any other keys in data will be stored as button[k] = v
 ---@param color string|table
----@param onSelect fun(button:AF_Button, id:any) do not work under multi selection mode
+---@param onSelect fun(button:AF_Button, id:any) will pass "selected" table under multi-select mode
 ---@param onDeselect fun(button:AF_Button, id:any) do not work under multi selection mode
 ---@param onEnter fun(button:AF_Button, id:any)
 ---@param onLeave fun(button:AF_Button, id:any)
