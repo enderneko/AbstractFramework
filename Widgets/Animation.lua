@@ -540,6 +540,9 @@ end
 ---------------------------------------------------------------------
 -- blink
 ---------------------------------------------------------------------
+---@param region Region
+---@param duration number|nil default is 0.5
+---@param enableShowHideHook boolean|nil whether to hook OnShow/OnHide to control the animation
 function AF.CreateBlinkAnimation(region, duration, enableShowHideHook)
     local blink = region:CreateAnimationGroup()
     region.blink = blink

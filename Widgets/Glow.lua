@@ -28,7 +28,7 @@ end
 -- normal glow
 ---------------------------------------------------------------------
 ---@param parent Frame
----@param color? string
+---@param color? string|table
 ---@param size? number default is 5
 ---@param autoHide? boolean only available for the first call
 function AF.ShowNormalGlow(parent, color, size, autoHide)
@@ -87,7 +87,7 @@ end
 function AF.ShowCalloutGlow(parent, blink, autoHide, relativeFrameLevel)
     if not parent.calloutGlow then
         parent.calloutGlow = CreateFrame("Frame", nil, parent, "BackdropTemplate")
-        parent.calloutGlow:SetBackdrop({edgeFile = AF.GetTexture("CalloutGlow"), edgeSize = 7})
+        AF.SetBackdrop(parent.calloutGlow, {edgeFile = AF.GetTexture("CalloutGlow"), edgeSize = 7})
         parent.calloutGlow:SetBorderBlendMode("ADD")
         AF.SetOutside(parent.calloutGlow, parent, 4)
         AF.SetFrameLevel(parent.calloutGlow, relativeFrameLevel or -1)
