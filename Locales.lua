@@ -201,6 +201,10 @@ if LOCALE_zhCN then
     L["Mouse Wheel"] = "鼠标滚轮"
     L["Right Click"] = "右键单击"
     L["Right Drag"] = "右键拖动"
+
+    L["Slash Commands"] = "斜杠命令"
+    L["New version (%s) available!"] = "发现新版本（%s）！"
+    L["New version (%s) available! Please visit %s to get the latest version."] = "发现新版本（%s）！请访问 %s 下载最新版本。"
 end
 
 L["WIP_WITH_ICON"] = "|TInterface\\AddOns\\AbstractFramework\\Media\\Icons\\Fluent_Tools:16|t |cffffd300" .. L["WIP"] .. "|r"
