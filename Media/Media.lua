@@ -162,7 +162,7 @@ end
 ---@return string fontPath
 function AF.GetFont(font, addon)
     local suffix = ""
-    if not font:lower():find("%.ttf$") then
+    if not font:lower():find("%.[ot]tf$") then
         suffix = ".ttf"
     end
 

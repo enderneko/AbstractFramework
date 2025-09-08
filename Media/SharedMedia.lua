@@ -15,6 +15,7 @@ LSM:Register("font", "Dolphin", AF.GetFont("Dolphin"), 255)
 LSM:Register("font", "Emblem", AF.GetFont("Emblem"), 255)
 LSM:Register("font", "Expressway", AF.GetFont("Expressway"), 255)
 LSM:Register("font", "Visitor", AF.GetFont("Visitor"), 255)
+LSM:Register("font", "Unifont", AF.GetFont("unifont-16.0.04.otf"), 255)
 
 -- statusbar
 LSM:Register("statusbar", "AF Plain", AF.GetPlainTexture())
