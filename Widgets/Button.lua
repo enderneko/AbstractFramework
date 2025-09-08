@@ -868,7 +868,7 @@ function AF_SwitchMixin:GetSelectedValue()
     return self.selected
 end
 
----@param callback fun(value: any)
+---@param callback fun(value: any, labelData: table)
 function AF_SwitchMixin:SetOnSelect(callback)
     self.callback = callback
 end
@@ -980,7 +980,7 @@ function AF_SwitchMixin:SetLabels(labels)
                 if callback then
                     callback(self.value)
                 elseif switch.callback then
-                    switch.callback(self.value)
+                    switch.callback(self.value, switch.labels[i])
                 end
 
                 -- deselect others

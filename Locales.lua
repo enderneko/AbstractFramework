@@ -34,6 +34,9 @@ AF.L = setmetatable({
     ["Class"] = _G.CLASS,
     ["Custom"] = _G.CUSTOM,
     ["Edit"] = _G.EDIT,
+    ["High"] = _G.HIGH,
+    ["Medium"] = _G.LOAD_MEDIUM,
+    ["Low"] = _G.LOW,
 }, {
     __index = function(self, Key)
         if (Key ~= nil) then
@@ -128,8 +131,10 @@ if LOCALE_zhCN then
     L["Options"] = "选项"
     L["Profiles"] = "配置"
     L["Tips"] = "提示"
-    L["Translator"] = "翻译"
-    L["Translators"] = "翻译"
+    L["Translators"] = "翻译者"
+    L["Contributors"] = "贡献者"
+    L["Changelog"] = "更新日志"
+    L["Changelogs"] = "更新日志"
     L["Undo"] = "撤消"
     L["Version"] = "版本"
     L["WIP"] = "正在开发中"
@@ -152,6 +157,7 @@ if LOCALE_zhCN then
     L["Offset"] = "偏移"
     L["X Offset"] = "X 偏移"
     L["Y Offset"] = "Y 偏移"
+    L["Position"] = "位置"
     L["Anchor Point"] = "锚点"
     L["Relative Point"] = "相对锚点"
     L["Relative To"] = "相对于"
