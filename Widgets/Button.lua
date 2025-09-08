@@ -972,7 +972,7 @@ function AF_SwitchMixin:SetLabels(labels)
                 -- if self.isSelected or fill:IsPlaying() or empty:IsPlaying() then return end
                 if self.isSelected then return end
 
-                AF.AnimatedResize(self.highlight, nil, height - 2, 0.02, 5, function()
+                AF.AnimatedResize(self.highlight, nil, height - 2, 0.017, 5, function()
                     AF.ClearPoints(self.highlight)
                     AF.SetPoint(self.highlight, "BOTTOMLEFT", 1, 1)
                     AF.SetPoint(self.highlight, "BOTTOMRIGHT", -1, 1)
@@ -995,7 +995,7 @@ function AF_SwitchMixin:SetLabels(labels)
                 for j, b in next, buttons do
                     if j ~= i and b:IsVisible() then
                         if b.isSelected then
-                            AF.AnimatedResize(b.highlight, nil, 1, 0.02, 5, function()
+                            AF.AnimatedResize(b.highlight, nil, 1, 0.017, 5, function()
                                 AF.ClearPoints(b.highlight)
                                 AF.SetPoint(b.highlight, "BOTTOMLEFT", 1, 1)
                                 AF.SetPoint(b.highlight, "BOTTOMRIGHT", -1, 1)
