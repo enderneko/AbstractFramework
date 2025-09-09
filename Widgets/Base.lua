@@ -379,6 +379,12 @@ end
 ---------------------------------------------------------------------
 -- backdrops
 ---------------------------------------------------------------------
+function AF.ClearBackdrop(frame)
+    if frame.ClearBackdrop then
+        frame:ClearBackdrop()
+    end
+end
+
 function AF.ApplyDefaultBackdrop(frame, borderSize)
     if not frame.SetBackdrop then
         Mixin(frame, BackdropTemplateMixin)

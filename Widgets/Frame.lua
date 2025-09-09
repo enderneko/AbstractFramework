@@ -514,7 +514,7 @@ function AF.CreateFlipBookFrame(parent, createMask, template)
 end
 
 ---------------------------------------------------------------------
--- combat mask (+200 frame level)
+-- frame combat protection (+200 frame level)
 ---------------------------------------------------------------------
 local function CreateCombatMask(parent, tlX, tlY, brX, brY)
     parent.combatMask = AF.CreateFrame(parent)
@@ -588,6 +588,9 @@ function AF.RemoveCombatProtectionFromFrame(frame)
     protectedFrames[frame] = nil
 end
 
+---------------------------------------------------------------------
+-- widget combat protection
+---------------------------------------------------------------------
 local protectedWidgets = {}
 -- while in combat, protect the widget by SetEnabled(false).
 -- this function hooks OnShow/OnHide to track the frame visibility.
@@ -610,20 +613,45 @@ function AF.ApplyCombatProtectionToWidget(widget)
     end)
 end
 
+---------------------------------------------------------------------
+-- combat hidden frames
+---------------------------------------------------------------------
+local combatHiddenFrames = {}
+
+function AF.RegisterCombatHiddenFrame(frame)
+    combatHiddenFrames[frame] = true
+    if InCombatLockdown() then
+        frame:Hide()
+    end
+end
+
+function AF.UnregisterCombatHiddenFrame(frame)
+    combatHiddenFrames[frame] = nil
+end
+
+---------------------------------------------------------------------
+-- event handler
+---------------------------------------------------------------------
 AF.CreateBasicEventHandler(function(self, event)
     if event == "PLAYER_REGEN_DISABLED" then
-        for f in pairs(protectedFrames) do
+        for f in next, protectedFrames do
             f.combatMask:Show()
         end
-        for w in pairs(protectedWidgets) do
+        for w in next, protectedWidgets do
             w:SetEnabled(false)
         end
+        for f in next, combatHiddenFrames do
+            f:Hide()
+        end
     elseif event == "PLAYER_REGEN_ENABLED" then
-        for f in pairs(protectedFrames) do
+        for f in next, protectedFrames do
             f.combatMask:Hide()
         end
-        for w in pairs(protectedWidgets) do
+        for w in next, protectedWidgets do
             w:SetEnabled(true)
+        end
+        for f in next, combatHiddenFrames do
+            f:Show()
         end
     end
 end, "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED")

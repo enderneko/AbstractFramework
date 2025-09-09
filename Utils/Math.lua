@@ -8,6 +8,10 @@ local floor, ceil, abs, max, min = math.floor, math.ceil, math.abs, math.max, ma
 ---------------------------------------------------------------------
 AF.epsilon = 0.00001
 
+---@param a number
+---@param b number
+---@param epsilon number|nil default is AF.epsilon (0.00001)
+---@return boolean
 function AF.ApproxEqual(a, b, epsilon)
     return abs(a - b) <= (epsilon or AF.epsilon)
 end
