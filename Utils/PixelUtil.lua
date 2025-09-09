@@ -925,35 +925,35 @@ end
 ---------------------------------------------------------------------
 -- get anchor points
 ---------------------------------------------------------------------
----@param orientation "left_to_right"|"right_to_left"|"top_to_bottom"|"bottom_to_top"
+---@param arrangement "left_to_right"|"right_to_left"|"top_to_bottom"|"bottom_to_top"
 ---@param spacingX number
 ---@param spacingY number|nil if not provided, spacingY = spacingX
 ---@return string point, string relativePoint, number x, number y
-function AF.GetAnchorPoints_Simple(orientation, spacingX, spacingY)
+function AF.GetAnchorPoints_Simple(arrangement, spacingX, spacingY)
     local point, relativePoint, x, y
     -- headerPoint = point
 
     spacingY = spacingY or spacingX
 
-    if orientation == "left_to_right" then
+    if arrangement == "left_to_right" then
         point = "LEFT"
         relativePoint = "RIGHT"
         x = spacingX
         y = 0
 
-    elseif orientation == "right_to_left" then
+    elseif arrangement == "right_to_left" then
         point = "RIGHT"
         relativePoint = "LEFT"
         x = -spacingX
         y = 0
 
-    elseif orientation == "top_to_bottom" then
+    elseif arrangement == "top_to_bottom" then
         point = "TOP"
         relativePoint = "BOTTOM"
         x = 0
         y = -spacingY
 
-    elseif orientation == "bottom_to_top" then
+    elseif arrangement == "bottom_to_top" then
         point = "BOTTOM"
         relativePoint = "TOP"
         x = 0
@@ -963,17 +963,17 @@ function AF.GetAnchorPoints_Simple(orientation, spacingX, spacingY)
     return point, relativePoint, x, y
 end
 
----@param orientation "left_to_right_then_bottom"|"left_to_right_then_top"|"right_to_left_then_bottom"|"right_to_left_then_top"|"bottom_to_top_then_left"|"bottom_to_top_then_right"|"top_to_bottom_then_left"|"top_to_bottom_then_right"
+---@param arrangement "left_to_right_then_bottom"|"left_to_right_then_top"|"right_to_left_then_bottom"|"right_to_left_then_top"|"bottom_to_top_then_left"|"bottom_to_top_then_right"|"top_to_bottom_then_left"|"top_to_bottom_then_right"
 ---@param spacingX number
 ---@param spacingY number|nil if not provided, spacingY = spacingX
 ---@return string point, string relativePoint, string newLineRelativePoint, number x, number y, number newLineX, number newLineY
-function AF.GetAnchorPoints_Complex(orientation, spacingX, spacingY)
+function AF.GetAnchorPoints_Complex(arrangement, spacingX, spacingY)
     local point, relativePoint, newLineRelativePoint
     local x, y, newLineX, newLineY
 
     spacingY = spacingY or spacingX
 
-    if orientation == "bottom_to_top_then_left" then
+    if arrangement == "bottom_to_top_then_left" then
         point = "BOTTOMRIGHT"
         relativePoint = "TOPRIGHT"
         newLineRelativePoint = "BOTTOMLEFT"
@@ -981,7 +981,7 @@ function AF.GetAnchorPoints_Complex(orientation, spacingX, spacingY)
         y = spacingY
         newLineX = -spacingX
         newLineY = 0
-    elseif orientation == "bottom_to_top_then_right" then
+    elseif arrangement == "bottom_to_top_then_right" then
         point = "BOTTOMLEFT"
         relativePoint = "TOPLEFT"
         newLineRelativePoint = "BOTTOMRIGHT"
@@ -989,7 +989,7 @@ function AF.GetAnchorPoints_Complex(orientation, spacingX, spacingY)
         y = spacingY
         newLineX = spacingX
         newLineY = 0
-    elseif orientation == "top_to_bottom_then_left" then
+    elseif arrangement == "top_to_bottom_then_left" then
         point = "TOPRIGHT"
         relativePoint = "BOTTOMRIGHT"
         newLineRelativePoint = "TOPLEFT"
@@ -997,7 +997,7 @@ function AF.GetAnchorPoints_Complex(orientation, spacingX, spacingY)
         y = -spacingY
         newLineX = -spacingX
         newLineY = 0
-    elseif orientation == "top_to_bottom_then_right" then
+    elseif arrangement == "top_to_bottom_then_right" then
         point = "TOPLEFT"
         relativePoint = "BOTTOMLEFT"
         newLineRelativePoint = "TOPRIGHT"
@@ -1005,7 +1005,7 @@ function AF.GetAnchorPoints_Complex(orientation, spacingX, spacingY)
         y = -spacingY
         newLineX = spacingX
         newLineY = 0
-    elseif orientation == "left_to_right_then_bottom" then
+    elseif arrangement == "left_to_right_then_bottom" then
         point = "TOPLEFT"
         relativePoint = "TOPRIGHT"
         newLineRelativePoint = "BOTTOMLEFT"
@@ -1013,7 +1013,7 @@ function AF.GetAnchorPoints_Complex(orientation, spacingX, spacingY)
         y = 0
         newLineX = 0
         newLineY = -spacingY
-    elseif orientation == "left_to_right_then_top" then
+    elseif arrangement == "left_to_right_then_top" then
         point = "BOTTOMLEFT"
         relativePoint = "BOTTOMRIGHT"
         newLineRelativePoint = "TOPLEFT"
@@ -1021,7 +1021,7 @@ function AF.GetAnchorPoints_Complex(orientation, spacingX, spacingY)
         y = 0
         newLineX = 0
         newLineY = spacingY
-    elseif orientation == "right_to_left_then_bottom" then
+    elseif arrangement == "right_to_left_then_bottom" then
         point = "TOPRIGHT"
         relativePoint = "TOPLEFT"
         newLineRelativePoint = "BOTTOMRIGHT"
@@ -1029,7 +1029,7 @@ function AF.GetAnchorPoints_Complex(orientation, spacingX, spacingY)
         y = 0
         newLineX = 0
         newLineY = -spacingY
-    elseif orientation == "right_to_left_then_top" then
+    elseif arrangement == "right_to_left_then_top" then
         point = "BOTTOMRIGHT"
         relativePoint = "BOTTOMLEFT"
         newLineRelativePoint = "TOPRIGHT"
@@ -1042,11 +1042,11 @@ function AF.GetAnchorPoints_Complex(orientation, spacingX, spacingY)
     return point, relativePoint, newLineRelativePoint, x, y, newLineX, newLineY
 end
 
-function AF.GetAnchorPoints_GroupHeader(orientation, spacingX, spacingY)
+function AF.GetAnchorPoints_GroupHeader(arrangement, spacingX, spacingY)
     local point, relativePoint, x, y -- normal
     local headerPoint, columnAnchorPoint, columnSpacing -- SecureGroupHeader
 
-    if orientation == "bottom_to_top_then_left" then
+    if arrangement == "bottom_to_top_then_left" then
         point = "BOTTOMRIGHT"
         relativePoint = "TOPRIGHT"
         x = 0
@@ -1054,7 +1054,7 @@ function AF.GetAnchorPoints_GroupHeader(orientation, spacingX, spacingY)
         columnSpacing = -spacingX
         headerPoint = "BOTTOM"
         columnAnchorPoint = "RIGHT"
-    elseif orientation == "bottom_to_top_then_right" then
+    elseif arrangement == "bottom_to_top_then_right" then
         point = "BOTTOMLEFT"
         relativePoint = "TOPLEFT"
         x = 0
@@ -1062,7 +1062,7 @@ function AF.GetAnchorPoints_GroupHeader(orientation, spacingX, spacingY)
         columnSpacing = spacingX
         headerPoint = "BOTTOM"
         columnAnchorPoint = "LEFT"
-    elseif orientation == "top_to_bottom_then_left" then
+    elseif arrangement == "top_to_bottom_then_left" then
         point = "TOPRIGHT"
         relativePoint = "BOTTOMRIGHT"
         x = 0
@@ -1070,7 +1070,7 @@ function AF.GetAnchorPoints_GroupHeader(orientation, spacingX, spacingY)
         columnSpacing = -spacingX
         headerPoint = "TOP"
         columnAnchorPoint = "RIGHT"
-    elseif orientation == "top_to_bottom_then_right" then
+    elseif arrangement == "top_to_bottom_then_right" then
         point = "TOPLEFT"
         relativePoint = "BOTTOMLEFT"
         x = 0
@@ -1078,7 +1078,7 @@ function AF.GetAnchorPoints_GroupHeader(orientation, spacingX, spacingY)
         columnSpacing = spacingX
         headerPoint = "TOP"
         columnAnchorPoint = "LEFT"
-    elseif orientation == "left_to_right_then_bottom" then
+    elseif arrangement == "left_to_right_then_bottom" then
         point = "TOPLEFT"
         relativePoint = "TOPRIGHT"
         x = spacingX
@@ -1086,7 +1086,7 @@ function AF.GetAnchorPoints_GroupHeader(orientation, spacingX, spacingY)
         columnSpacing = spacingY
         headerPoint = "LEFT"
         columnAnchorPoint = "TOP"
-    elseif orientation == "left_to_right_then_top" then
+    elseif arrangement == "left_to_right_then_top" then
         point = "BOTTOMLEFT"
         relativePoint = "BOTTOMRIGHT"
         x = spacingX
@@ -1094,7 +1094,7 @@ function AF.GetAnchorPoints_GroupHeader(orientation, spacingX, spacingY)
         columnSpacing = spacingY
         headerPoint = "LEFT"
         columnAnchorPoint = "BOTTOM"
-    elseif orientation == "right_to_left_then_bottom" then
+    elseif arrangement == "right_to_left_then_bottom" then
         point = "TOPRIGHT"
         relativePoint = "TOPLEFT"
         x = -spacingX
@@ -1102,7 +1102,7 @@ function AF.GetAnchorPoints_GroupHeader(orientation, spacingX, spacingY)
         columnSpacing = spacingY
         headerPoint = "RIGHT"
         columnAnchorPoint = "TOP"
-    elseif orientation == "right_to_left_then_top" then
+    elseif arrangement == "right_to_left_then_top" then
         point = "BOTTOMRIGHT"
         relativePoint = "BOTTOMLEFT"
         x = -spacingX
