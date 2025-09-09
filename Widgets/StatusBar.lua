@@ -3,6 +3,35 @@ local AF = _G.AbstractFramework
 local CreateColor = CreateColor
 
 ---------------------------------------------------------------------
+-- status bar countdown
+---------------------------------------------------------------------
+---@param bar table
+---@param totalTime number
+---@param timeRemaining number|nil if nil then countdown will be used
+---@param onFinish? fun(self:AF_BlizzardStatusBar|AF_SimpleStatusBar)
+function AF.StartStatusBarCountdown(bar, totalTime, timeRemaining, onFinish)
+    bar._countdownTime = timeRemaining or totalTime
+
+    bar:SetMinMaxValues(0, totalTime)
+    bar:SetValue(bar._countdownTime)
+
+    bar:SetScript("OnUpdate", function(self, elapsed)
+        self._countdownTime = self._countdownTime - elapsed
+        if self._countdownTime <= 0 then
+            self:SetValue(0)
+            self:SetScript("OnUpdate", nil)
+            if onFinish then onFinish(self) end
+        else
+            self:SetValue(self._countdownTime)
+        end
+    end)
+end
+
+function AF.StopStatusBarCountdown(bar)
+    bar:SetScript("OnUpdate", nil)
+end
+
+---------------------------------------------------------------------
 -- blizzard
 ---------------------------------------------------------------------
 ---@class AF_BlizzardStatusBar:AF_SmoothStatusBar,Frame
