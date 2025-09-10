@@ -264,6 +264,7 @@ function AF.AddEventHandler(obj)
     obj.UnregisterAllEvents = UnregisterAllEvents
 end
 
+AF.AddEventHandler(AF)
 
 ---------------------------------------------------------------------
 -- simple event handler

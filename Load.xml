@@ -40,7 +40,6 @@
     <Script file="System\CallbackHandler.lua"/>
     <Script file="System\EventHandler.lua"/>
     <Script file="System\Communication.lua"/>
-    <Script file="System\Events.lua"/>
     <Script file="System\Hooks.lua"/>
 
     <!-- Executors -->
@@ -104,6 +103,9 @@
     <Script file="Spells\CrowdControls.lua"/>
     <Script file="Spells\Dispellables_Retail.lua"/>
     <Script file="Spells\Interrupts.lua"/>
+
+    <!-- system\events -->
+    <Script file="System\Events.lua"/>
 
     <!-- demo -->
     <Script file="Demo.lua"/>

@@ -1,8 +1,6 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 
-AF.AddEventHandler(AF)
-
 ---------------------------------------------------------------------
 -- login
 ---------------------------------------------------------------------
@@ -108,25 +106,54 @@ AF:RegisterEvent("PLAYER_REGEN_ENABLED", AF.GetFireFunc("AF_COMBAT_LEAVE"))
 ---------------------------------------------------------------------
 -- group
 ---------------------------------------------------------------------
+local IsInRaid = IsInRaid
+local IsInGroup = IsInGroup
 local GetNumGroupMembers = GetNumGroupMembers
+local UnitIsGroupLeader = UnitIsGroupLeader
+local UnitIsGroupAssistant = UnitIsGroupAssistant
+local IterateGroupPlayers = AF.IterateGroupPlayers
+local GetUnitName = GetUnitName
 
 --* AF_GROUP_UPDATE / AF_GROUP_SIZE_CHANGED / AF_GROUP_TYPE_CHANGED
 local groupType, lastGroupType, groupSize, lastGroupSize
+local hasPermission, lastHasPermission, hasMarkerPermission, lastHasMarkerPermission
+
+local nameToToken = {}
+AF.UnitNameToToken = nameToToken
 
 local function AF_GROUP_UPDATE(_, event)
     if event == "PLAYER_LOGIN" then
         AF:UnregisterEvent("PLAYER_LOGIN", AF_GROUP_UPDATE)
     end
 
+    wipe(nameToToken)
+
     if IsInRaid() then
         groupType = "raid"
+        hasPermission = UnitIsGroupLeader("player") or UnitIsGroupAssistant("player")
+        hasMarkerPermission = hasPermission
     elseif IsInGroup() then
         groupType = "party"
+        hasPermission = UnitIsGroupLeader("player")
+        hasMarkerPermission = true
     else
         groupType = "solo"
+        hasPermission = true
+        hasMarkerPermission = true
     end
 
     groupSize = GetNumGroupMembers()
+
+    -- build name to unit token map
+    for unit in IterateGroupPlayers() do
+        local name = GetUnitName(unit, true)
+        if name then
+            nameToToken[name] = unit
+            if not name:match(".+-.+") then
+                nameToToken[name .. "-" .. AF.player.normalizedRealm] = unit
+            end
+        end
+    end
 
     -- group size changed
     if groupSize ~= lastGroupSize then
@@ -138,10 +165,29 @@ local function AF_GROUP_UPDATE(_, event)
         AF.Fire("AF_GROUP_TYPE_CHANGED", groupType, lastGroupType)
     end
 
+    -- permission changed
+    if hasPermission ~= lastHasPermission then
+        AF.Fire("AF_GROUP_PERMISSION_CHANGED", hasPermission, lastHasPermission)
+    end
+
+    -- marker permission changed
+    if hasMarkerPermission ~= lastHasMarkerPermission then
+        AF.Fire("AF_MARKER_PERMISSION_CHANGED", hasMarkerPermission, lastHasMarkerPermission)
+    end
+
     AF.Fire("AF_GROUP_UPDATE", groupType, groupSize)
 
     lastGroupType = groupType
     lastGroupSize = groupSize
+    lastHasPermission = hasPermission
+    lastHasMarkerPermission = hasMarkerPermission
 end
 AF:RegisterEvent("GROUP_ROSTER_UPDATE", AF.GetDelayedInvoker(1, AF_GROUP_UPDATE))
 AF:RegisterEvent("PLAYER_LOGIN", AF_GROUP_UPDATE)
+
+-- only available for party/raid players
+---@param name string
+---@return string unitID
+function AF.UnitTokenFromName(name)
+    return nameToToken[name]
+end

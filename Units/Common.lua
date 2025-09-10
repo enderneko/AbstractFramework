@@ -169,7 +169,7 @@ function AF.IterateGroupPets()
     end
 end
 
----@return string groupType raid, party, solo
+---@return "raid"|"party"|"solo" groupType
 function AF.GetGroupType()
     if IsInRaid() then
         return "raid"
@@ -268,11 +268,10 @@ function AF.GetPetUnit(playerUnit)
 end
 
 function AF.HasGroupPermission()
-    if isPartyMarkPermission and IsInGroup() and not IsInRaid() then return true end
     return UnitIsGroupLeader("player") or (IsInRaid() and UnitIsGroupAssistant("player"))
 end
 
-function AF.HasMarkPermission()
+function AF.HasMarkerPermission()
     if IsInRaid() then
         return UnitIsGroupLeader("player") or UnitIsGroupAssistant("player")
     else -- party / solo
@@ -353,7 +352,7 @@ function AF.UnitFullName(unit)
     name = GetUnitName(unit, true)
 
     --? name might be nil in some cases?
-    if name and not string.find(name, "-") then
+    if name and not name:match(".+-.+") then
         local server = GetNormalizedRealmName()
         --? server might be nil in some cases?
         if server then
