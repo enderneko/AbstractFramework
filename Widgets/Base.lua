@@ -520,3 +520,40 @@ function AF.GetMouseFocus()
         return GetMouseFocus()
     end
 end
+
+---------------------------------------------------------------------
+-- toggle protected frames
+---------------------------------------------------------------------
+local frames = {}
+
+local function ToggleProtectedFrames()
+    for frame, action in next, frames do
+        if action == "show" then
+            frame:Show()
+        elseif action == "hide" then
+            frame:Hide()
+        end
+        frames[frame] = nil
+    end
+    AF.UnregisterCallback("AF_COMBAT_LEAVE", ToggleProtectedFrames)
+end
+
+function AF.ShowProtectedFrame(frame)
+    if not frame then return end
+    if InCombatLockdown() then
+        frames[frame] = "show"
+        AF.RegisterCallback("AF_COMBAT_LEAVE", ToggleProtectedFrames)
+    else
+        frame:Show()
+    end
+end
+
+function AF.HideProtectedFrame(frame)
+    if not frame then return end
+    if InCombatLockdown() then
+        frames[frame] = "hide"
+        AF.RegisterCallback("AF_COMBAT_LEAVE", ToggleProtectedFrames)
+    else
+        frame:Hide()
+    end
+end
