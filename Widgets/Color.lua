@@ -137,6 +137,16 @@ local COLORS = {
     ["aura_castbyme"] = {["hex"] = "ff00cc00", ["t"] = {0, 0.8, 0}},
     ["aura_dispellable"] = {["hex"] = "ffffff00", ["t"] = {1, 1, 0}},
 
+    -- markers
+    ["marker1"] = {["hex"] = "ffffff00", ["t"] = {1, 1, 0}},
+    ["marker2"] = {["hex"] = "ffff7f3f", ["t"] = {1, 0.5, 0.25}},
+    ["marker3"] = {["hex"] = "ffa335ee", ["t"] = {0.6, 0.2, 0.8}},
+    ["marker4"] = {["hex"] = "ff1eff00", ["t"] = {0.118, 1, 0}},
+    ["marker5"] = {["hex"] = "ffaaaadd", ["t"] = {0.67, 0.67, 0.87}},
+    ["marker6"] = {["hex"] = "ff0070dd", ["t"] = {0, 0.439, 0.867}},
+    ["marker7"] = {["hex"] = "ffff2020", ["t"] = {1, 0.125, 0.125}},
+    ["marker8"] = {["hex"] = "ffffffff", ["t"] = {1, 1, 1}},
+
     -- power color (color from PowerBarColor & ElvUI)
     ["MANA"] = {["hex"] = "ff007fff", ["t"] = {0, 0.5, 1}}, -- 0, 0, 1
     ["RAGE"] = {["hex"] = "ffff0000", ["t"] = {1, 0, 0}},
