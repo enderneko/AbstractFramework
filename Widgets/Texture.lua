@@ -167,7 +167,7 @@ function AF.CreateGradientTexture(parent, orientation, color1, color2, texture, 
 
     local tex = parent:CreateTexture(nil, drawLayer or "ARTWORK", nil, subLevel)
     tex:SetTexture(texture, nil, nil, filterMode)
-    tex:SetGradient(orientation, CreateColor(unpack(color1)), CreateColor(unpack(color2)))
+    tex:SetGradient(orientation:upper(), CreateColor(unpack(color1)), CreateColor(unpack(color2)))
 
     AF.AddToPixelUpdater_OnShow(tex)
 

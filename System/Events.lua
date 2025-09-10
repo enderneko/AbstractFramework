@@ -189,5 +189,5 @@ AF:RegisterEvent("PLAYER_LOGIN", AF_GROUP_UPDATE)
 ---@param name string
 ---@return string unitID
 function AF.UnitTokenFromName(name)
-    return nameToToken[name]
+    return name and nameToToken[name]
 end
