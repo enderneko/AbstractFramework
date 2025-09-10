@@ -116,7 +116,7 @@ local GetUnitName = GetUnitName
 
 --* AF_GROUP_UPDATE / AF_GROUP_SIZE_CHANGED / AF_GROUP_TYPE_CHANGED
 local groupType, lastGroupType, groupSize, lastGroupSize
-local hasPermission, lastHasPermission, hasMarkerPermission, lastHasMarkerPermission
+local groupPermission, lastGroupPermission, markerPermission, lastMarkerPermission
 
 local nameToToken = {}
 AF.UnitNameToToken = nameToToken
@@ -130,16 +130,16 @@ local function AF_GROUP_UPDATE(_, event)
 
     if IsInRaid() then
         groupType = "raid"
-        hasPermission = UnitIsGroupLeader("player") or UnitIsGroupAssistant("player")
-        hasMarkerPermission = hasPermission
+        groupPermission = (UnitIsGroupLeader("player") or UnitIsGroupAssistant("player")) and "raid" or false
+        markerPermission = groupPermission
     elseif IsInGroup() then
         groupType = "party"
-        hasPermission = UnitIsGroupLeader("player")
-        hasMarkerPermission = true
+        groupPermission = UnitIsGroupLeader("player") and "party" or false
+        markerPermission = "party"
     else
         groupType = "solo"
-        hasPermission = true
-        hasMarkerPermission = true
+        groupPermission = false
+        markerPermission = "solo"
     end
 
     groupSize = GetNumGroupMembers()
@@ -166,21 +166,21 @@ local function AF_GROUP_UPDATE(_, event)
     end
 
     -- permission changed
-    if hasPermission ~= lastHasPermission then
-        AF.Fire("AF_GROUP_PERMISSION_CHANGED", hasPermission, lastHasPermission)
+    if groupPermission ~= lastGroupPermission then
+        AF.Fire("AF_GROUP_PERMISSION_CHANGED", groupPermission, lastGroupPermission)
     end
 
     -- marker permission changed
-    if hasMarkerPermission ~= lastHasMarkerPermission then
-        AF.Fire("AF_MARKER_PERMISSION_CHANGED", hasMarkerPermission, lastHasMarkerPermission)
+    if markerPermission ~= lastMarkerPermission then
+        AF.Fire("AF_MARKER_PERMISSION_CHANGED", markerPermission, lastMarkerPermission)
     end
 
     AF.Fire("AF_GROUP_UPDATE", groupType, groupSize)
 
     lastGroupType = groupType
     lastGroupSize = groupSize
-    lastHasPermission = hasPermission
-    lastHasMarkerPermission = hasMarkerPermission
+    lastGroupPermission = groupPermission
+    lastMarkerPermission = markerPermission
 end
 AF:RegisterEvent("GROUP_ROSTER_UPDATE", AF.GetDelayedInvoker(1, AF_GROUP_UPDATE))
 AF:RegisterEvent("PLAYER_LOGIN", AF_GROUP_UPDATE)
