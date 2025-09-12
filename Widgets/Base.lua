@@ -557,3 +557,11 @@ function AF.HideProtectedFrame(frame)
         frame:Hide()
     end
 end
+
+function AF.SetProtectedFrameShown(frame, shown)
+    if shown then
+        AF.ShowProtectedFrame(frame)
+    else
+        AF.HideProtectedFrame(frame)
+    end
+end
