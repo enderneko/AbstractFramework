@@ -621,8 +621,8 @@ function AF.AnimatedResize(frame, targetWidth, targetHeight, frequency, steps, o
 
     if onStart then onStart() end
 
-    local currentHeight = frame._height or frame:GetHeight()
-    local currentWidth = frame._width or frame:GetWidth()
+    local currentHeight = frame:GetHeight()
+    local currentWidth = frame:GetWidth()
     targetWidth = targetWidth or currentWidth
     targetHeight = targetHeight or currentHeight
 
@@ -636,7 +636,7 @@ function AF.AnimatedResize(frame, targetWidth, targetHeight, frequency, steps, o
             else
                 currentWidth = max(currentWidth + diffW, targetWidth)
             end
-            AF.SetWidth(frame, currentWidth)
+            frame:SetWidth(currentWidth)
         end
 
         if not AF.ApproxZero(diffH) then
@@ -645,7 +645,7 @@ function AF.AnimatedResize(frame, targetWidth, targetHeight, frequency, steps, o
             else
                 currentHeight = max(currentHeight + diffH, targetHeight)
             end
-            AF.SetHeight(frame, currentHeight)
+            frame:SetHeight(currentHeight)
         end
 
         if onChange then
@@ -655,8 +655,8 @@ function AF.AnimatedResize(frame, targetWidth, targetHeight, frequency, steps, o
         if AF.ApproxEqual(currentWidth, targetWidth) and AF.ApproxEqual(currentHeight, targetHeight) then
             frame._animatedResizeTimer:Cancel()
             frame._animatedResizeTimer = nil
-            if targetWidth then AF.SetWidth(frame, targetWidth) end
-            if targetHeight then AF.SetHeight(frame, targetHeight) end
+            if targetWidth then frame:SetWidth(targetWidth) end
+            if targetHeight then frame:SetHeight(targetHeight) end
             if onFinish then onFinish() end
         end
     end)

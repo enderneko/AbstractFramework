@@ -84,7 +84,7 @@ function AF.TableToString(t, sep, useKey, useValue)
                 str = str .. v .. sep
             end
         end
-        return str:sub(1, -2)
+        return str:sub(1, -(#sep + 1))
     else
         return tconcat(t, sep)
     end

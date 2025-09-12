@@ -80,6 +80,8 @@ if LOCALE_zhCN then
     L["Left"] = "左"
     L["Right"] = "右"
 
+    L["Arrangement"] = "排列方式"
+
     L["Left to Right"] = "从左到右"
     L["Right to Left"] = "从右到左"
     L["Top to Bottom"] = "从上到下"
