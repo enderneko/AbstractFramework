@@ -1165,6 +1165,21 @@ function AF.SavePositionAsString(region, t, k)
 end
 
 ---------------------------------------------------------------------
+-- auto vertical anchor
+---------------------------------------------------------------------
+---@param frame Frame
+---@return string point, string relativePoint, number yMult
+function AF.GetAutoVerticalAnchor(frame)
+    local frameY = select(2, frame:GetCenter())
+    local centerY = select(2, AF.UIParent:GetCenter())
+    if frameY >= centerY then
+        return "TOP", "BOTTOM", -1
+    else
+        return "BOTTOM", "TOP", 1
+    end
+end
+
+---------------------------------------------------------------------
 -- pixel perfect (ElvUI)
 ---------------------------------------------------------------------
 local function CheckPixelSnap(region, snap)
