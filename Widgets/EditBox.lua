@@ -172,6 +172,22 @@ function AF_EditBoxMixin:SetLabel(label)
     self.label:SetText(label or "")
 end
 
+--- an outside label (title), just like dropdowns
+---@param label string
+function AF_EditBoxMixin:SetLabelAlt(label)
+    if not self.labelAlt then
+        self.labelAlt = AF.CreateFontString(self)
+        AF.SetPoint(self.labelAlt, "BOTTOMLEFT", self, "TOPLEFT", 0, 2)
+        self:HookOnEnable(function()
+            self.labelAlt:SetColor("white")
+        end)
+        self:HookOnDisable(function()
+            self.labelAlt:SetColor("disabled")
+        end)
+    end
+    self.labelAlt:SetText(label or "")
+end
+
 ---@param parent Frame
 ---@param label? string
 ---@param width? number
