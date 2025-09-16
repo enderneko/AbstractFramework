@@ -7,7 +7,7 @@ local abs, min, max = math.abs, math.min, math.max
 -----------------------------------------------------------------------------
 --                        manager based animations                         --
 -----------------------------------------------------------------------------
-local ANIMATION_INTERVAL = 0.025
+local ANIMATION_INTERVAL = 0.02
 
 ---------------------------------------------------------------------
 -- alpha - inspired by ElvUI
@@ -407,6 +407,172 @@ end
 function AF.FrameResizeHeight(frame, timeToSize, startHeight, endHeight)
     local currentWidth = frame:GetWidth()
     AF.FrameResizeTo(frame, timeToSize, currentWidth, startHeight, currentWidth, endHeight)
+end
+
+---------------------------------------------------------------------
+-- flash (optimization of UIFrameFlash & UIFrameFlashStop)
+---------------------------------------------------------------------
+local FLASHFRAMES, FLASHMANAGER = {}, CreateFrame("FRAME")
+local FlashTimers = {}
+local FlashTimerRefCount = {}
+
+local function Flashing(_, elapsed)
+    FLASHMANAGER.timer = (FLASHMANAGER.timer or 0) + elapsed
+
+    if FLASHMANAGER.timer > ANIMATION_INTERVAL then
+        FLASHMANAGER.timer = 0
+
+        -- Update timers for all synced frames
+        for syncId, timer in next, FlashTimers do
+            FlashTimers[syncId] = timer + (elapsed + ANIMATION_INTERVAL)
+        end
+
+        local flashTime
+
+        for frame, info in next, FLASHFRAMES do
+            info.flashTimer = (info.flashTimer or 0) + (elapsed + ANIMATION_INTERVAL)
+
+            if info.flashTimer < info.flashDuration or info.flashDuration == -1 then
+                flashTime = info.flashTimer
+
+                -- Use sync timer if syncId is set
+                if info.syncId then
+                    flashTime = FlashTimers[info.syncId] or flashTime
+                end
+
+                flashTime = flashTime % (info.fadeInTime + info.fadeOutTime + info.flashInHoldTime + info.flashOutHoldTime)
+
+                local alpha
+                if flashTime < info.fadeInTime then
+                    frame:SetAlpha(flashTime / info.fadeInTime)
+                elseif flashTime < info.fadeInTime + info.flashInHoldTime then
+                    frame:SetAlpha(1)
+                elseif flashTime < info.fadeInTime + info.flashInHoldTime + info.fadeOutTime then
+                    frame:SetAlpha(1 - ((flashTime - info.fadeInTime - info.flashInHoldTime) / info.fadeOutTime))
+                else
+                    frame:SetAlpha(0)
+                end
+            else
+                frame:SetAlpha(1.0)
+                if info.showWhenDone then
+                    if not frame:IsProtected() then frame:Show() end
+                else
+                    if not frame:IsProtected() then frame:Hide() end
+                end
+
+                -- NOTE: remove from FLASHFRAMES and cleanup sync
+                if frame and FLASHFRAMES[frame] then
+                    if info.syncId then
+                        FlashTimerRefCount[info.syncId] = FlashTimerRefCount[info.syncId] - 1
+                        if FlashTimerRefCount[info.syncId] <= 0 then
+                            FlashTimers[info.syncId] = nil
+                            FlashTimerRefCount[info.syncId] = nil
+                        end
+                    end
+                    if frame._flash then
+                        frame._flash.flashTimer = nil
+                    end
+                    FLASHFRAMES[frame] = nil
+                end
+            end
+        end
+
+        if not next(FLASHFRAMES) then
+            FLASHMANAGER:SetScript("OnUpdate", nil)
+        end
+    end
+end
+
+local function FrameFlash(frame, info)
+    if not frame:IsProtected() then
+        frame:Show()
+    end
+
+    if not FLASHFRAMES[frame] then
+        FLASHFRAMES[frame] = info
+        FLASHMANAGER:SetScript("OnUpdate", Flashing)
+    else
+        FLASHFRAMES[frame] = info
+    end
+end
+
+---@param fadeInTime number|nil time it takes to fade in, default is 0.25
+---@param fadeOutTime number|nil time it takes to fade out, default is fadeInTime
+---@param flashDuration number|nil how long to keep flashing, -1 means forever, default is -1
+---@param showWhenDone boolean|nil show the frame when flash ends
+---@param flashInHoldTime number|nil how long to hold the faded in state
+---@param flashOutHoldTime number|nil how long to hold the faded out state
+---@param syncId string|nil synchronization id for multiple frames
+function AF.FrameFlashStart(frame, fadeInTime, fadeOutTime, flashDuration, showWhenDone, flashInHoldTime, flashOutHoldTime, syncId)
+    if frame._flash then
+        -- Clean up old sync if exists
+        if frame._flash.syncId then
+            FlashTimerRefCount[frame._flash.syncId] = FlashTimerRefCount[frame._flash.syncId] - 1
+            if FlashTimerRefCount[frame._flash.syncId] <= 0 then
+                FlashTimers[frame._flash.syncId] = nil
+                FlashTimerRefCount[frame._flash.syncId] = nil
+            end
+        end
+        frame._flash.flashTimer = nil
+    else
+        frame._flash = {}
+    end
+
+    frame._flash.fadeInTime = fadeInTime or 0.5
+    frame._flash.fadeOutTime = fadeOutTime or frame._flash.fadeInTime
+    frame._flash.flashDuration = flashDuration or -1
+    frame._flash.showWhenDone = showWhenDone
+    frame._flash.flashTimer = 0
+    frame._flash.flashInHoldTime = flashInHoldTime or 0
+    frame._flash.flashOutHoldTime = flashOutHoldTime or 0
+    frame._flash.syncId = syncId
+
+    -- Setup sync timer if syncId is provided
+    if syncId then
+        if not FlashTimers[syncId] then
+            FlashTimers[syncId] = 0
+            FlashTimerRefCount[syncId] = 0
+        end
+        FlashTimerRefCount[syncId] = FlashTimerRefCount[syncId] + 1
+    end
+
+    FrameFlash(frame, frame._flash)
+end
+
+---@param forceVisible boolean|nil if true, show the frame when stopping flash, if false, hide the frame, if nil, show or hide according to showWhenDone
+function AF.FrameFlashStop(frame, forceVisible)
+    if frame._flash then
+        -- Clean up sync if exists
+        if frame._flash.syncId then
+            FlashTimerRefCount[frame._flash.syncId] = FlashTimerRefCount[frame._flash.syncId] - 1
+            if FlashTimerRefCount[frame._flash.syncId] <= 0 then
+                FlashTimers[frame._flash.syncId] = nil
+                FlashTimerRefCount[frame._flash.syncId] = nil
+            end
+            frame._flash.syncId = nil
+        end
+        frame._flash.flashTimer = nil
+    end
+
+    if FLASHFRAMES[frame] then
+        FLASHFRAMES[frame] = nil
+    end
+
+    frame:SetAlpha(1.0)
+
+    if frame:IsProtected() then return end
+
+    if forceVisible == true then
+        frame:Show()
+    elseif forceVisible == false then
+        frame:Hide()
+    elseif frame._flash then
+        if frame._flash.showWhenDone then
+            frame:Show()
+        else
+            frame:Hide()
+        end
+    end
 end
 
 
