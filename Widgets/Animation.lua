@@ -496,7 +496,7 @@ local function FrameFlash(frame, info)
     end
 end
 
----@param fadeInTime number|nil time it takes to fade in, default is 0.25
+---@param fadeInTime number|nil time it takes to fade in, default is 0.5
 ---@param fadeOutTime number|nil time it takes to fade out, default is fadeInTime
 ---@param flashDuration number|nil how long to keep flashing, -1 means forever, default is -1
 ---@param showWhenDone boolean|nil show the frame when flash ends
