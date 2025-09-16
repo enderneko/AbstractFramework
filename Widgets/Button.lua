@@ -652,8 +652,8 @@ end
 
 ---@param parent Frame
 ---@param icon string
----@param width number
----@param height number
+---@param width? number
+---@param height? number
 ---@param padding? number default is 0
 ---@param color? string|table
 ---@param hoverColor? string|table
@@ -670,7 +670,7 @@ function AF.CreateIconButton(parent, icon, width, height, padding, color, hoverC
     AF.SetInside(b.icon, b, padding)
 
     b.icon:SetTexture(icon, nil, nil, filterMode)
-    b._icon = icon
+    b._iconPath = icon
     b._filterMode = filterMode
 
     b._color = type(color) == "string" and AF.GetColorTable(color) or (color or AF.GetColorTable("white"))
