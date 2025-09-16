@@ -53,6 +53,24 @@ function AF.GetDateTable(sec)
     return t
 end
 
+---@param asRemaining boolean if true, return seconds remaining until next day 00:00:00, else return the timestamp of next day 00:00:00
+---@return number seconds
+function AF.GetNextDaySeconds(asRemaining)
+    local now = time()
+
+    local tomorrow = date("*t", now)
+    tomorrow.day = tomorrow.day + 1
+    tomorrow.hour = 0
+    tomorrow.min = 0
+    tomorrow.sec = 0
+
+    if asRemaining then
+        return time(tomorrow) - now
+    else
+        return time(tomorrow)
+    end
+end
+
 ---@param sec number
 ---@param useServerTime boolean
 ---@return boolean
