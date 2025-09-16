@@ -3,6 +3,9 @@ local AF = _G.AbstractFramework
 
 local format = string.format
 
+---@param path string relativePath inside "Media" folder
+---@param addon? string addonFolderName
+---@return string fullPath
 function AF.GetMedia(path, addon)
     if addon then
         return "Interface\\AddOns\\" .. addon .. "\\Media\\" .. path
@@ -195,6 +198,7 @@ local professions = {
 }
 
 ---@param profession number|string professionID or professionName(EN)
+---@return string iconPath
 function AF.GetProfessionIcon(profession)
     if type(profession) == "number" then
         profession = professions[profession]
@@ -203,5 +207,24 @@ function AF.GetProfessionIcon(profession)
         return AF.GetIcon("Profession_" .. profession)
     else
         return AF.GetIcon("QuestionMark")
+    end
+end
+
+---------------------------------------------------------------------
+-- get calendar icon
+---------------------------------------------------------------------
+local calendarPath = "Interface\\AddOns\\AbstractFramework\\Media\\Calendar\\Calendar_%s_%s"
+
+-- for "weekday", index: 1-7 (Sun to Sat, C_DateAndTime.GetCurrentCalendarTime or date("*t").wday)
+---@param iconType "day"|"month"|"weekday"
+---@param index number
+---@return string iconPath
+function AF.GetCalendarIcon(iconType, index)
+    if iconType == "day" then
+        return calendarPath:format("Day", index)
+    elseif iconType == "month" then
+        return calendarPath:format("Month", index)
+    elseif iconType == "weekday" then
+        return calendarPath:format("Weekday", index)
     end
 end
