@@ -108,6 +108,8 @@ if LOCALE_zhCN then
     L["Right Click the Anchor button to lock the anchor"] = "右键单击锚点按钮以锁定锚点"
 
     L["Accent Color"] = "强调色"
+    L["Solid"] = "纯色"
+    L["Gradient"] = "渐变"
 
     L["Dead"] = "死亡"
     L["DEAD"] = "死亡"

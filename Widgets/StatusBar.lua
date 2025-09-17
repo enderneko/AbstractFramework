@@ -139,10 +139,15 @@ end
 
 ---@class AF_SimpleStatusBar:AF_SmoothStatusBar,Frame
 local AF_SimpleStatusBarMixin = {}
--- appearance
-function AF_SimpleStatusBarMixin:SetTexture(texture, lossTexture)
-    self.fg:SetTexture(texture)
-    self.loss:SetTexture(lossTexture or texture)
+
+---@param texture string
+---@param lossTexture string|nil if nil then use texture
+---@param wrapModeHorizontal string|nil
+---@param wrapModeVertical string|nil
+---@param filterMode string|nil
+function AF_SimpleStatusBarMixin:SetTexture(texture, lossTexture, wrapModeHorizontal, wrapModeVertical, filterMode)
+    self.fg:SetTexture(texture, wrapModeHorizontal, wrapModeVertical, filterMode)
+    self.loss:SetTexture(lossTexture or texture, wrapModeHorizontal, wrapModeVertical, filterMode)
 end
 
 function AF_SimpleStatusBarMixin:SetColor(r, g, b, a)
