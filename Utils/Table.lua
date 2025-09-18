@@ -148,6 +148,7 @@ function AF.MergeExistingKeys(t, ...)
     end
 end
 
+-- for plain tables only
 ---@param t table
 ---@param ... table
 function AF.InsertAll(t, ...)
@@ -155,6 +156,30 @@ function AF.InsertAll(t, ...)
         local _t = select(i, ...)
         for _, v in next, _t do
             tinsert(t, v)
+        end
+    end
+end
+
+-- for plain tables only
+---@param t table
+---@param ... any simple values or tables
+function AF.InsertIfNotExists(t, ...)
+    local exists = AF.TransposeTable(t, true)
+
+    for i = 1, select("#", ...) do
+        local v = select(i, ...)
+        if type(v) == "table" then
+            for _, vv in ipairs(v) do
+                if not exists[vv] then
+                    tinsert(t, vv)
+                    exists[vv] = true
+                end
+            end
+        else
+            if not exists[v] then
+                tinsert(t, v)
+                exists[v] = true
+            end
         end
     end
 end
@@ -216,7 +241,7 @@ end
 ---@return table
 function AF.TransposeTable(t, value)
     local temp = {}
-    for k, v in ipairs(t) do
+    for k, v in next, t do
         temp[v] = value or k
     end
     return temp
