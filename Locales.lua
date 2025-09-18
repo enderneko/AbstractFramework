@@ -18,25 +18,42 @@ AF.L = setmetatable({
 
     ["Reload UI"] = _G.RELOADUI,
     ["Reset"] = _G.RESET,
+
     ["Okay"] = _G.OKAY,
     ["Cancel"] = _G.CANCEL,
     ["None"] = _G.NONE,
     ["All"] = _G.ALL,
     ["Yes"] = _G.YES,
     ["No"] = _G.NO,
+
     ["Delete"] = _G.DELETE,
     ["Rename"] = _G.BATTLE_PET_RENAME,
     ["Create"] = _G.CALENDAR_CREATE,
     ["New"] = _G.NEW,
-    ["Default"] = _G.DEFAULT,
     ["Save"] = _G.SAVE,
     ["Apply"] = _G.APPLY,
-    ["Class"] = _G.CLASS,
-    ["Custom"] = _G.CUSTOM,
     ["Edit"] = _G.EDIT,
+
+    ["Default"] = _G.DEFAULT,
+    ["Custom"] = _G.CUSTOM,
+    ["Class"] = _G.CLASS,
+
     ["High"] = _G.HIGH,
     ["Medium"] = _G.LOAD_MEDIUM,
     ["Low"] = _G.LOW,
+
+    ["Current"] = _G.REFORGE_CURRENT,
+    ["Total"] = _G.TOTAL,
+    ["Percentage"] = _G.STATUS_TEXT_PERCENT,
+    ["Progress"] = _G.PVP_PROGRESS_REWARDS_HEADER,
+
+    ["Completed"] = _G.ACCOUNT_COMPLETED_QUEST_NOTICE_LABEL,
+    ["Incomplete"] = _G.INCOMPLETE,
+
+    ["Level"] = _G.LEVEL,
+    ["Honor Level"] = _G.LFG_LIST_HONOR_LEVEL_INSTR_SHORT,
+    ["Reputation"] = _G.REPUTATION,
+    ["Rested"] = _G.TUTORIAL_TITLE26,
 }, {
     __index = function(self, Key)
         if (Key ~= nil) then
@@ -106,6 +123,8 @@ if LOCALE_zhCN then
     L["toggle Position Adjustment dialog"] = "打开/关闭微调窗口"
     L["Close this dialog to exit Edit Mode"] = "关闭此窗口以退出编辑模式"
     L["Right Click the Anchor button to lock the anchor"] = "右键单击锚点按钮以锁定锚点"
+
+    L["Remaining"] = "剩余"
 
     L["Accent Color"] = "强调色"
     L["Solid"] = "纯色"
