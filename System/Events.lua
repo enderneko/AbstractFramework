@@ -128,6 +128,8 @@ local function AF_GROUP_UPDATE(_, event)
 
     wipe(nameToToken)
 
+    --! NOTE: for PLAYER_LOGIN/PLAYER_ENTERING_WORLD(initial) event, IsInRaid/IsInGroup always return false
+
     if IsInRaid() then
         groupType = "raid"
         groupPermission = (UnitIsGroupLeader("player") or UnitIsGroupAssistant("player")) and "raid" or false
