@@ -54,6 +54,11 @@ AF.L = setmetatable({
     ["Honor Level"] = _G.LFG_LIST_HONOR_LEVEL_INSTR_SHORT,
     ["Reputation"] = _G.REPUTATION,
     ["Rested"] = _G.TUTORIAL_TITLE26,
+
+    ["Name"] = _G.NAME,
+    ["Description"] = _G.QUEST_DESCRIPTION,
+
+    ["Auto"] = _G.SELF_CAST_AUTO,
 }, {
     __index = function(self, Key)
         if (Key ~= nil) then
@@ -114,6 +119,13 @@ if LOCALE_zhCN then
 
     L["A UI reload is required\nDo it now?"] = "需要重载界面\n现在重载么？"
     L["A UI reload is required"] = "需要重载界面"
+
+    L["Addon Default"] = "插件默认"
+    L["Module"] = "模块"
+    L["Modules"] = "模块"
+
+    L["Always Show"] = "始终显示"
+    L["Always Hide"] = "始终隐藏"
 
     L["Anchor Locked"] = "锚点已锁定"
     L["hide mover"] = "隐藏移动框"
