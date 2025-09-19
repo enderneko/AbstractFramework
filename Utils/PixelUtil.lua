@@ -1165,17 +1165,39 @@ function AF.SavePositionAsString(region, t, k)
 end
 
 ---------------------------------------------------------------------
--- auto vertical anchor
+-- adaptive anchor
 ---------------------------------------------------------------------
 ---@param frame Frame
+---@param verticalThreshold number between 0 and 1, default is 2/3
 ---@return string point, string relativePoint, number yMult
-function AF.GetAutoVerticalAnchor(frame)
+function AF.GetAdaptiveAnchor_Vertical(frame, verticalThreshold)
+    verticalThreshold = verticalThreshold or (2 / 3)
+
+    local scale = frame:GetScale()
+    local height = AF.UIParent:GetTop() / scale
     local frameY = select(2, frame:GetCenter())
-    local centerY = select(2, AF.UIParent:GetCenter())
-    if frameY >= centerY then
+
+    if frameY > (height * verticalThreshold) then
         return "TOP", "BOTTOM", -1
     else
         return "BOTTOM", "TOP", 1
+    end
+end
+
+---@param frame Frame
+---@param horizontalThreshold number between 0 and 1, default is 2/3
+---@return string point, string relativePoint, number xMult
+function AF.GetAdaptiveAnchor_Horizontal(frame, horizontalThreshold)
+    horizontalThreshold = horizontalThreshold or (2 / 3)
+
+    local scale = frame:GetScale()
+    local width = AF.UIParent:GetRight() / scale
+    local frameX = frame:GetCenter()
+
+    if frameX > (width * horizontalThreshold) then
+        return "RIGHT", "LEFT", -1
+    else
+        return "LEFT", "RIGHT", 1
     end
 end
 
