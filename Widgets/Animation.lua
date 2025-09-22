@@ -821,8 +821,8 @@ function AF.AnimatedResize(frame, targetWidth, targetHeight, frequency, steps, o
         if AF.ApproxEqual(currentWidth, targetWidth) and AF.ApproxEqual(currentHeight, targetHeight) then
             frame._animatedResizeTimer:Cancel()
             frame._animatedResizeTimer = nil
-            if targetWidth then frame:SetWidth(targetWidth) end
-            if targetHeight then frame:SetHeight(targetHeight) end
+            if targetWidth then AF.SetWidth(frame, targetWidth) end
+            if targetHeight then AF.SetHeight(frame, targetHeight) end
             if onFinish then onFinish() end
         end
     end)
