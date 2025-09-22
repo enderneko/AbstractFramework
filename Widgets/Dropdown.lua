@@ -711,14 +711,14 @@ end
 
 function AF.GetDropdownItems_ComplexOrientation()
     return {
-        {text = L["Left to Right then Top"], value = "left_to_right_then_top"},
-        {text = L["Left to Right then Bottom"], value = "left_to_right_then_bottom"},
-        {text = L["Right to Left then Top"], value = "right_to_left_then_top"},
-        {text = L["Right to Left then Bottom"], value = "right_to_left_then_bottom"},
-        {text = L["Top to Bottom then Left"], value = "top_to_bottom_then_left"},
-        {text = L["Top to Bottom then Right"], value = "top_to_bottom_then_right"},
-        {text = L["Bottom to Top then Left"], value = "bottom_to_top_then_left"},
-        {text = L["Bottom to Top then Right"], value = "bottom_to_top_then_right"},
+        {text = L["Left to Right, then Up"], value = "left_to_right_then_up"},
+        {text = L["Left to Right, then Down"], value = "left_to_right_then_down"},
+        {text = L["Right to Left, then Up"], value = "right_to_left_then_up"},
+        {text = L["Right to Left, then Down"], value = "right_to_left_then_down"},
+        {text = L["Top to Bottom, then Left"], value = "top_to_bottom_then_left"},
+        {text = L["Top to Bottom, then Right"], value = "top_to_bottom_then_right"},
+        {text = L["Bottom to Top, then Left"], value = "bottom_to_top_then_left"},
+        {text = L["Bottom to Top, then Right"], value = "bottom_to_top_then_right"},
     }
 end
 
