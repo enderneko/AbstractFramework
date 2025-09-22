@@ -485,11 +485,11 @@ end
 function AF.GetClassColor(class, alpha, factor)
     factor = factor or 1
 
-    if COLORS[class] then
+    if class and COLORS[class] then
         return AF.GetColorRGB(class, alpha, factor)
     end
 
-    if RAID_CLASS_COLORS[class] then
+    if class and RAID_CLASS_COLORS[class] then
         local r, g, b = RAID_CLASS_COLORS[class]:GetRGB()
         return r * factor, g * factor, b * factor, alpha or 1
     end
