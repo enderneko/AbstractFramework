@@ -2,10 +2,14 @@
 local AF = _G.AbstractFramework
 
 AF.L = setmetatable({
+    ["Blizzard"] = string.gsub(_G.SLASH_TEXTTOSPEECH_BLIZZARD, "^%l", strupper),
+
     ["WIP"] = "Work In Progress",
+
     ["TANK"] = _G["TANK"],
     ["HEALER"] = _G["HEALER"],
     ["DAMAGER"] = _G["DAMAGER"],
+
     ["TOPLEFT"] = "Top Left",
     ["TOPRIGHT"] = "Top Right",
     ["BOTTOMLEFT"] = "Bottom Left",
