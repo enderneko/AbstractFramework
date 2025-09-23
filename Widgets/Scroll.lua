@@ -589,7 +589,11 @@ function AF_ScrollListMixin:GetWidgetAt(index)
 end
 
 function AF_ScrollListMixin:GetWidgets()
-    return self.widgets
+    if self.mode == "pre_created" then
+        return self.widgets
+    else -- pool_based or button_group
+        return self.pool:GetAllActives()
+    end
 end
 
 function AF_ScrollListMixin:GetScrollRange()

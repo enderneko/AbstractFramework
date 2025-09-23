@@ -731,3 +731,24 @@ function AF.GetDropdownItems_Class()
 
     return items
 end
+
+function AF.GetDropdownItems_FrameStrata(allStratas)
+    if allStratas then
+        return {
+            {text = "BACKGROUND"},
+            {text = "LOW"},
+            {text = "MEDIUM"},
+            {text = "HIGH"},
+            {text = "DIALOG"},
+            {text = "FULLSCREEN"},
+            {text = "FULLSCREEN_DIALOG"},
+            {text = "TOOLTIP"},
+        }
+    else
+        return {
+            {text = "LOW"},
+            {text = "MEDIUM"},
+            {text = "HIGH"},
+        }
+    end
+end

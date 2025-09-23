@@ -12,8 +12,8 @@ local callbacks = {
 
 ---@param event string
 ---@param callback fun(event:string, ...:any) function to call when event is fired
----@param priority string? "high"|"medium"|"low", default is "medium".
----@param tag string? for Unregister/Get
+---@param priority "high"|"medium"|"low"|nil default is "medium".
+---@param tag string|nil for Unregister/Get
 function AF.RegisterCallback(event, callback, priority, tag)
     assert(not priority or priority == "high" or priority == "medium" or priority == "low", "Priority must be high, medium, low or nil.")
     local t = callbacks[priority or "medium"]
