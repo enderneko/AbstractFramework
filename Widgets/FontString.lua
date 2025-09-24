@@ -278,7 +278,7 @@ function AF_ScrollingTextMixin:SetText(str, color)
 end
 
 ---@private
-function AF_ScrollingTextMixin.ShowUp(self)
+function AF_ScrollingTextMixin:ShowUp()
     self.fadeIn:Play()
     self:SetHorizontalScroll(0)
     self.scroll = 0
@@ -328,7 +328,7 @@ function AF_ScrollingTextMixin:UpdatePixels()
 end
 
 ---@param parent Frame
----@param frequency? number default 0.02
+---@param frequency? number default 0.01
 ---@param step? number default 1
 ---@param startDelay? number default 2
 ---@param endDelay? number default 2
@@ -338,7 +338,7 @@ function AF.CreateScrollingText(parent, frequency, step, startDelay, endDelay)
     AF.SetHeight(holder, 20)
 
     -- vars -------------------------------------
-    holder.frequency = frequency or 0.02
+    holder.frequency = frequency or 0.01
     holder.step = step or 1
     holder.startDelay = startDelay or 2
     holder.endDelay = endDelay or 2

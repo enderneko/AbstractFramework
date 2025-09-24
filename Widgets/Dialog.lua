@@ -161,8 +161,8 @@ dialogPool = AF.CreateObjectPool(function()
     -- text holder
     local textHolder = AF.CreateFrame(dialog)
     dialog.textHolder = textHolder
-    AF.SetPoint(textHolder, "TOPLEFT", 7, -7)
-    AF.SetPoint(textHolder, "TOPRIGHT", -7, -7)
+    AF.SetPoint(textHolder, "TOPLEFT", 7, -9)
+    AF.SetPoint(textHolder, "TOPRIGHT", -7, -9)
 
     local text = AF.CreateFontString(textHolder)
     dialog.text = text

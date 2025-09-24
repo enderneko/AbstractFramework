@@ -942,7 +942,7 @@ function AF_ScrollGridMixin:UpdateSlotPoint()
     for i = 1, self.slotNum do
         if i == 1 then
             AF.SetPoint(self.slots[i], "TOPLEFT")
-        elseif i % self.slotColumn == 1 then
+        elseif self.slotColumn == 1 or i % self.slotColumn == 1 then
             AF.SetPoint(self.slots[i], "TOPLEFT", self.slots[i - self.slotColumn], "BOTTOMLEFT", 0, -self.slotSpacing)
         else
             AF.SetPoint(self.slots[i], "TOPLEFT", self.slots[i - 1], "TOPRIGHT", self.slotSpacing, 0)

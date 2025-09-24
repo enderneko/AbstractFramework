@@ -667,7 +667,7 @@ function AF.ShowDemo()
     local bf3 = AF.CreateBorderedFrame(demo, nil, 530, 20)
     AF.SetPoint(bf3, "TOPLEFT", bf2, "BOTTOMLEFT", 0, -10)
 
-    local st = AF.CreateScrollingText(bf3, 0.01)
+    local st = AF.CreateScrollingText(bf3)
     AF.SetPoint(st, "TOPLEFT", 4, 0)
     AF.SetPoint(st, "TOPRIGHT", -4, 0)
     st:SetText("World of Warcraft, often abbreviated as WoW, is a massively multiplayer online roleplaying game (MMORPG) developed by Blizzard Entertainment and released on November 23, 2004, on the 10th anniversary of the Warcraft franchise, three years after its announcement on September 2, 2001. It is the fourth released game set in the Warcraft universe, and takes place four years after the events of Warcraft III: The Frozen Throne.", "gold")

@@ -29,6 +29,7 @@ AF.L = setmetatable({
     ["All"] = _G.ALL,
     ["Yes"] = _G.YES,
     ["No"] = _G.NO,
+    ["Apply"] = _G.APPLY,
 
     ["Delete"] = _G.DELETE,
     ["Rename"] = _G.BATTLE_PET_RENAME,
@@ -127,6 +128,9 @@ if LOCALE_zhCN then
     L["Addon Default"] = "插件默认"
     L["Module"] = "模块"
     L["Modules"] = "模块"
+
+    L["Reset all settings"] = "重置所有设置"
+    L["Reset to default settings?"] = "重置为默认设置？"
 
     L["Always Show"] = "始终显示"
     L["Always Hide"] = "始终隐藏"

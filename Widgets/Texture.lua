@@ -154,7 +154,7 @@ end
 ---------------------------------------------------------------------
 -- gradient texture
 ---------------------------------------------------------------------
----@param orientation string "HORIZONTAL"|"VERTICAL".
+---@param orientation "HORIZONTAL"|"VERTICAL"
 ---@param color1 table|string
 ---@param color2 table|string
 ---@return Texture tex
