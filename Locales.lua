@@ -4,6 +4,8 @@ local AF = _G.AbstractFramework
 AF.L = setmetatable({
     ["Blizzard"] = string.gsub(_G.SLASH_TEXTTOSPEECH_BLIZZARD, "^%l", strupper),
 
+    ["Shift Click"] = _G.WARDROBE_SHORTCUTS_TUTORIAL_2:match("%[(.+)%]"),
+
     ["WIP"] = "Work In Progress",
 
     ["TANK"] = _G["TANK"],
@@ -175,7 +177,10 @@ if LOCALE_zhCN then
     L["Options"] = "选项"
     L["Profile"] = "配置"
     L["Profiles"] = "配置"
+    L["Tip"] = "提示"
     L["Tips"] = "提示"
+    L["Link"] = "链接"
+    L["Links"] = "链接"
     L["Translators"] = "翻译者"
     L["Contributors"] = "贡献者"
     L["Changelog"] = "更新日志"
