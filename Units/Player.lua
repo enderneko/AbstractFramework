@@ -1,6 +1,7 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 
+local BNGetInfo = BNGetInfo
 local UnitName = UnitName
 local UnitClass = UnitClass
 local UnitLevel = UnitLevel
@@ -37,6 +38,9 @@ AF.player.localizedClass, AF.player.class, AF.player.classID = UnitClass("player
 -- payload: newSpecID number, lastSpecID number
 
 local function PLAYER_LOGIN()
+    local battleTag = select(2, BNGetInfo())
+    AF.player.battleTagMD5 = AF.MD5(battleTag or "")
+
     AF.player.name = UnitName("player")
     AF.player.fullName = AF.UnitFullName("player")
     AF.player.level = UnitLevel("player")
