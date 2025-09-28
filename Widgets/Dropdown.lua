@@ -700,7 +700,7 @@ function AF.GetDropdownItems_Modifier()
     }
 end
 
-function AF.GetDropdownItems_SimpleOrientation()
+function AF.GetDropdownItems_Arrangement_Simple()
     return {
         {text = L["Left to Right"], value = "left_to_right"},
         {text = L["Right to Left"], value = "right_to_left"},
@@ -709,7 +709,7 @@ function AF.GetDropdownItems_SimpleOrientation()
     }
 end
 
-function AF.GetDropdownItems_ComplexOrientation()
+function AF.GetDropdownItems_Arrangement_Complex()
     return {
         {text = L["Left to Right, then Up"], value = "left_to_right_then_up"},
         {text = L["Left to Right, then Down"], value = "left_to_right_then_down"},
