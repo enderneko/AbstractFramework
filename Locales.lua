@@ -66,6 +66,9 @@ AF.L = setmetatable({
     ["Description"] = _G.QUEST_DESCRIPTION,
 
     ["Auto"] = _G.SELF_CAST_AUTO,
+
+    ["Sort"] = _G.STABLE_FILTER_BUTTON_LABEL,
+    ["Sort By"] = _G.STABLE_FILTER_SORT_BY_LABEL,
 }, {
     __index = function(self, Key)
         if (Key ~= nil) then
@@ -111,6 +114,17 @@ if LOCALE_zhCN then
 
     L["Arrangement"] = "排列方式"
 
+    L["Max Displayed"] = "最大显示个数"
+    L["Max Lines"] = "最大行数/列数"
+    L["Displayed Per Line"] = "每行/列显示个数"
+    L["Max Rows"] = "最大行数"
+    L["Displayed Per Row"] = "每行显示个数"
+    L["Max Columns"] = "最大列数"
+    L["Displayed Per Column"] = "每列显示个数"
+
+    L["Sort Method"] = "排序方式"
+    L["Sort Direction"] = "排序方向"
+
     L["Left to Right"] = "从左到右"
     L["Right to Left"] = "从右到左"
     L["Top to Bottom"] = "从上到下"
@@ -151,6 +165,12 @@ if LOCALE_zhCN then
     L["Accent Color"] = "强调色"
     L["Solid"] = "纯色"
     L["Gradient"] = "渐变"
+
+    L["Buff"] = "增益"
+    L["Buffs"] = "增益"
+    L["Debuff"] = "减益"
+    L["Debuffs"] = "减益"
+    L["Private Auras"] = "个人光环"
 
     L["Dead"] = "死亡"
     L["DEAD"] = "死亡"
@@ -235,6 +255,11 @@ if LOCALE_zhCN then
     L["Border Color"] = "边框颜色"
     L["Text Color"] = "文本颜色"
     L["Texture"] = "材质"
+
+    L["Icon"] = "图标"
+    L["Icons"] = "图标"
+    L["Text"] = "文本"
+    L["Texts"] = "文本"
 
     L["Popups"] = "通知弹窗"
     L["Right Click the popup to dismiss"] = "右键单击可以关闭弹窗"
