@@ -233,6 +233,8 @@ if LOCALE_zhCN then
     L["Relative To"] = "相对于"
     L["Width"] = "宽度"
     L["Height"] = "高度"
+    L["Margin"] = "外边距"
+    L["Padding"] = "内边距"
     L["Scale"] = "缩放"
     L["Alpha"] = "透明度"
     L["Outline"] = "轮廓"
