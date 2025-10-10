@@ -5,7 +5,7 @@
 Libs/*
 
 # excluded
-!.release/release.sh
+!.release/*.sh
 !Libs/md5.lua
 !Libs/sha256.lua
 !Libs/base64.lua
