@@ -68,7 +68,7 @@ function AF.ShowTooltip(widget, anchor, x, y, lines)
 
     AF.Tooltip:SetFrameStrata("TOOLTIP")
     -- AF.Tooltip:SetCustomLineSpacing(5)
-    AF.Tooltip:SetCustomWordWrapMinWidth(300)
+    AF.Tooltip:SetCustomWordWrapMinWidth(widget._tooltipWordWrapMinWidth or 300)
     AF.Tooltip:Show()
 end
 
