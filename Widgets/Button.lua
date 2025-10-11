@@ -868,6 +868,14 @@ function AF_SwitchMixin:GetSelectedValue()
     return self.selected
 end
 
+function AF_SwitchMixin:GetSelectedButton()
+    for _, b in next, self.buttons do
+        if b.isSelected then
+            return b
+        end
+    end
+end
+
 ---@param callback fun(value: any, labelData: table)
 function AF_SwitchMixin:SetOnSelect(callback)
     self.callback = callback
@@ -976,13 +984,6 @@ function AF_SwitchMixin:SetLabels(labels)
                 self.isSelected = true
                 switch.selected = self.value
 
-                local callback = switch.labels[i].onClick or switch.labels[i].callback
-                if callback then
-                    callback(self.value)
-                elseif switch.callback then
-                    switch.callback(self.value, switch.labels[i])
-                end
-
                 -- deselect others
                 for j, b in next, buttons do
                     if j ~= i and b:IsVisible() then
@@ -991,6 +992,13 @@ function AF_SwitchMixin:SetLabels(labels)
                         end
                         b.isSelected = false
                     end
+                end
+
+                local callback = switch.labels[i].onClick or switch.labels[i].callback
+                if callback then
+                    callback(self.value)
+                elseif switch.callback then
+                    switch.callback(self.value, switch.labels[i])
                 end
             end)
 
