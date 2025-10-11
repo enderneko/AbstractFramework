@@ -125,6 +125,15 @@ if LOCALE_zhCN then
     L["Sort Method"] = "排序方式"
     L["Sort Direction"] = "排序方向"
 
+    L["Time"] = "时间"
+    L["Index"] = "索引"
+
+    L["Before"] = "前"
+    L["After"] = "后"
+
+    L["Ascending"] = "升序"
+    L["Descending"] = "降序"
+
     L["Left to Right"] = "从左到右"
     L["Right to Left"] = "从右到左"
     L["Top to Bottom"] = "从上到下"
