@@ -11,6 +11,7 @@ local tinsert, tconcat = table.insert, table.concat
 ---------------------------------------------------------------------
 -- fonts
 LSM:Register("font", "Accidental Presidency", AF.GetFont("Accidental_Presidency"), 255)
+LSM:Register("font", "Cal Sans", AF.GetFont("CalSans-Regular"), 255)
 LSM:Register("font", "Dolphin", AF.GetFont("Dolphin"), 255)
 LSM:Register("font", "Emblem", AF.GetFont("Emblem"), 255)
 LSM:Register("font", "Expressway", AF.GetFont("Expressway"), 255)
