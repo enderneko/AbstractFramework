@@ -25,12 +25,18 @@ end
 ---@param parent Frame
 ---@param text string
 ---@param color string color name defined in Color.lua
----@param font? string font string, default "AF_FONT_NORMAL"
+---@param font? string font name/file, default "AF_FONT_NORMAL"
 ---@param layer? string font string layer, default "OVERLAY"
 ---@return AF_FontString fs
 function AF.CreateFontString(parent, text, color, font, layer)
-    local fs = parent:CreateFontString(nil, layer or "OVERLAY", font or "AF_FONT_NORMAL")
+    local fs = parent:CreateFontString(nil, layer or "OVERLAY")
     Mixin(fs, AF_FontStringMixin)
+
+    if type(font) == "string" and font:find("%.ttf$") then
+        AF.SetFont(fs, AF.GetFontProps(font))
+    else
+        fs:SetFontObject(font or "AF_FONT_NORMAL")
+    end
 
     if color then AF.ColorFontString(fs, color) end
     fs:SetText(text)

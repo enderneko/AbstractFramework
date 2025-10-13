@@ -257,16 +257,16 @@ end
 
 function AF.GetFontProps(font)
     if font == "title" then
-        return font_title:GetFont(), FONT_TITLE_SIZE + AF.fontSizeDelta, ""
+        return font_title:GetFont(), FONT_TITLE_SIZE + AF.fontSizeDelta, "", true
     elseif font == "normal" then
-        return font_normal:GetFont(), FONT_NORMAL_SIZE + AF.fontSizeDelta, ""
+        return font_normal:GetFont(), FONT_NORMAL_SIZE + AF.fontSizeDelta, "", true
     elseif font == "chat" then
-        return font_chat:GetFont(), FONT_CHAT_SIZE + AF.fontSizeDelta, ""
+        return font_chat:GetFont(), FONT_CHAT_SIZE + AF.fontSizeDelta, "", true
     elseif font == "small" then
-        return font_small:GetFont(), FONT_SMALL_SIZE + AF.fontSizeDelta, ""
+        return font_small:GetFont(), FONT_SMALL_SIZE + AF.fontSizeDelta, "", true
     elseif font == "outline" then
-        return font_outline:GetFont(), FONT_OUTLINE_SIZE + AF.fontSizeDelta, "OUTLINE"
+        return font_outline:GetFont(), FONT_OUTLINE_SIZE + AF.fontSizeDelta, "OUTLINE", false
     else
-        return font, FONT_NORMAL_SIZE + AF.fontSizeDelta, ""
+        return font, FONT_NORMAL_SIZE + AF.fontSizeDelta, "", true
     end
 end
