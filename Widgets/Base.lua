@@ -267,6 +267,19 @@ function AF_BaseWidgetMixin:GetOnSizeChanged()
     end
 end
 
+-- BlockMouse
+---@param block boolean
+--- this function uses EnableMouse and SetScript("OnMouseWheel") to block mouse events
+function AF_BaseWidgetMixin:BlockMouse(block)
+    self:EnableMouse(block)
+    -- NOTE: EnableMouseWheel dose not work
+    if block then
+        self:SetScript("OnMouseWheel", AF.noop)
+    else
+        self:SetScript("OnMouseWheel", nil)
+    end
+end
+
 function AF_BaseWidgetMixin:SyncEnableDisableWith(frame)
     if not frame then return end
     frame:HookOnEnable(function()
