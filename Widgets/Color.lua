@@ -188,6 +188,15 @@ local COLORS = {
     ["WoWToken"] = {["hex"] = "ff00ccff", ["t"] = {0, 0.8000000715255737, 1, 1}}, -- ITEM_QUALITY8_DESC
 }
 
+-- update accent color
+AF.RegisterCallback("AF_LOADED", function()
+    if AFConfig.accentColor.type == "custom" then
+        COLORS["accent"] = AFConfig.accentColor.color
+    elseif AFConfig.accentColor.type == "class" then
+        COLORS["accent"] = AF.BuildAccentColorTable(AF.player.class)
+    end
+end, "high")
+
 ---@param color string
 ---@return boolean
 function AF.HasColor(color)
@@ -333,12 +342,6 @@ local function BuildColorTable(color)
         return {["hex"] = AF.ConvertRGBToHEX(AF.UnpackColor(color)), ["t"] = color}
     end
 end
-
-AF.RegisterCallback("AF_LOADED", function()
-    if AFConfig.accentColor.type == "custom" then
-        COLORS["accent"] = AFConfig.accentColor.color
-    end
-end, "high")
 
 ---@param color string|table colorName, colorHex, colorTable
 ---@param buttonNormalColor? string|table
