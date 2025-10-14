@@ -2,10 +2,10 @@
 local AF = _G.AbstractFramework
 
 AF.L = setmetatable({
+    ["AF_VERSION_REQUIRED"] = "AbstractFramework Version Mismatch\n%s requires: %s or higher\nCurrent: %s",
+
     ["Blizzard"] = string.gsub(_G.SLASH_TEXTTOSPEECH_BLIZZARD, "^%l", strupper),
-
     ["Shift Click"] = _G.WARDROBE_SHORTCUTS_TUTORIAL_2:match("%[(.+)%]"),
-
     ["WIP"] = "Work In Progress",
 
     ["TANK"] = _G["TANK"],
@@ -85,6 +85,8 @@ if L.DAMAGER == "Damage" then
 end
 
 if LOCALE_zhCN then
+    L["AF_VERSION_REQUIRED"] = "AbstractFramework 版本不匹配\n%s 需要：%s 及以上\n当前：%s"
+
     L["%d days"] = "%d天"
     L["%d hours"] = "%d小时"
     L["%d minutes"] = "%d分钟"

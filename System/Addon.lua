@@ -97,3 +97,20 @@ function AF.RegisterAddon(addonFolderName, alias)
     AF.REGISTERED_ADDONS[addonFolderName] = alias or true
     AF.SetAddonAccentColor(addonFolderName, "accent") -- setup with default accent color
 end
+
+---require AF version to meet the specified requirement, otherwise show an error dialog
+---@param versionNum number target version number
+function AF.RequireVersion(versionNum)
+    if AF.versionNum >= versionNum then return end
+    local addon = AF.GetAddon()
+    if addon then
+        AF.ShowGlobalDialog(
+            AF.L["AF_VERSION_REQUIRED"]:format(
+                AF.WrapTextInColor(addon, addon),
+                AF.WrapTextInColor("r" .. versionNum, "softlime"),
+                AF.WrapTextInColor(AF.version, "firebrick")
+            ),
+            nil, nil, true
+        )
+    end
+end
