@@ -44,8 +44,15 @@ end
 ---------------------------------------------------------------------
 -- show
 ---------------------------------------------------------------------
-local function ShowPopups(stopMoving)
+local function ShowPopups(stopMoving, reparent)
+    if not parent then return end
+
     for i, p in ipairs(popups) do
+        if reparent then
+            p:SetParent(parent)
+            p:UpdatePixels()
+        end
+
         if stopMoving then
             p:StopMoving()
         end
@@ -132,7 +139,7 @@ local function OnPopupShow(p)
 
     -- icon
     if p.icon then
-        p.iconTex:SetTexture(p.icon)
+        p.iconTex:SetTexture(p.icon:gsub("^!", ""))
 
         if type(p.icon) == "number" then
             AF.ApplyDefaultTexCoord(p.iconTex) -- for blizzard item/spell icons
@@ -140,7 +147,7 @@ local function OnPopupShow(p)
             AF.ClearTexCoord(p.iconTex)
         end
 
-        if strmatch(p.icon, "^!") then
+        if p.icon:find("^!") then
             AF.Show(p.iconTex)
         else
             AF.Show(p.iconTex, p.iconBGTex)
@@ -277,13 +284,13 @@ local npCreationFn = function()
     p:SetOnMouseUp(function(_, button)
         if button == "LeftButton" then
             if p.onClick then p:onClick(button, unpack(p.onClickArgs)) end
-        elseif button == "RightButton" then
-            if p.timer then
-                p.timer:Cancel()
-                p.timer = nil
-            end
-            AddToHidingQueue(p)
         end
+
+        if p.timer then
+            p.timer:Cancel()
+            p.timer = nil
+        end
+        AddToHidingQueue(p)
     end)
 
     -- OnHide -------------------------------------------------------
@@ -609,5 +616,5 @@ function AF.SetupPopups(config)
     AF.LoadPosition(parent, AFConfig.popups.position)
     parent.orientation = AFConfig.popups.orientation
 
-    ShowPopups(true)
+    ShowPopups(true, true)
 end
