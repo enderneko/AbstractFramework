@@ -49,7 +49,7 @@ font_chat:SetJustifyH("CENTER")
 
 local font_outline = CreateFont(FONT_OUTLINE_NAME)
 font_outline:SetFont(BASE_FONT_NORMAL, FONT_OUTLINE_SIZE, "OUTLINE")
-font_outline:SetTextColor(AF.GetColorRGB("accent"))
+font_outline:SetTextColor(1, 1, 1, 1)
 font_outline:SetShadowColor(0, 0, 0)
 font_outline:SetShadowOffset(0, 0)
 font_outline:SetJustifyH("CENTER")
