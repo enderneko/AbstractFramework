@@ -680,7 +680,7 @@ function AF.ShowDemo()
     AF.SetPoint(b10, "TOPLEFT", bf3, "BOTTOMLEFT", 0, -10)
 
     local bf4 = AF.CreateBorderedFrame(demo, nil, 120, 78, nil, "hotpink")
-    AF.SetFrameLevel(bf4, 50)
+    AF.SetFrameLevel(bf4, 150)
     bf4:Hide()
     AF.SetPoint(bf4, "BOTTOMLEFT", b10, "TOPLEFT", 0, 10)
 
@@ -702,7 +702,7 @@ function AF.ShowDemo()
             bf4:Hide()
         else
             AF.ShowMask(demo)
-            AF.SetFrameLevel(b10, 50)
+            AF.SetFrameLevel(b10, 150)
             bf4:Show()
         end
     end)
