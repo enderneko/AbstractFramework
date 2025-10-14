@@ -276,6 +276,29 @@ end
 ---@param r number [0, 1]
 ---@param g number [0, 1]
 ---@param b number [0, 1]
+---@param a? number [0, 1]
+---@return number r [0, 1]
+---@return number g [0, 1]
+---@return number b [0, 1]
+---@return number? a [0, 1]
+function AF.GetComplementColor(r, g, b, a)
+    local h, s, v = AF.ConvertRGBToHSB(r, g, b)
+    h = (h + 180) % 360
+    local cr, cg, cb = AF.ConvertHSBToRGB(h, s, v)
+    return cr, cg, cb, a
+end
+
+---@param hex string
+---@return string hexColor
+function AF.GetComplementColorHex(hex)
+    local r, g, b, a = AF.ConvertHEXToRGB(hex)
+    local cr, cg, cb, ca = AF.GetComplementColor(r, g, b, a)
+    return AF.ConvertRGBToHEX(cr, cg, cb, ca)
+end
+
+---@param r number [0, 1]
+---@param g number [0, 1]
+---@param b number [0, 1]
 ---@param saturation number [0, 1]
 ---@param brightness number [0, 1]
 ---@return number r [0, 1]
