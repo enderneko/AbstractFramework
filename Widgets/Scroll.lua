@@ -309,12 +309,32 @@ end
 local AF_ScrollListMixin = {}
 
 ---@private
+function AF_ScrollListMixin:UpdateSlotSize()
+    for i = 1, self.slotNum do
+        if self.slotHeight then
+            AF.SetHeight(self.slots[i], self.slotHeight)
+        else
+            local spacing = AF.ConvertPixelsForRegion(self.slotSpacing, self) * (self.slotNum - 1)
+            self.slots[i]:SetHeight((self.slotFrame:GetHeight() - spacing) / self.slotNum)
+        end
+    end
+end
+
+---@private
 function AF_ScrollListMixin:UpdateSlots()
+    if self.slotHeight then
+        if self.slotNum == 0 then
+            AF.SetHeight(self, 5)
+        else
+            AF.SetListHeight(self, self.slotNum, self.slotHeight, self.slotSpacing, self.verticalMargin, self.verticalMargin)
+        end
+    end
+
     for i = 1, self.slotNum do
         if not self.slots[i] then
             self.slots[i] = AF.CreateFrame(self.slotFrame)
             AF.RemoveFromPixelUpdater(self.slots[i])
-            AF.SetHeight(self.slots[i], self.slotHeight)
+
             AF.SetPoint(self.slots[i], "RIGHT")
             if i == 1 then
                 AF.SetPoint(self.slots[i], "TOPLEFT")
@@ -332,6 +352,7 @@ function AF_ScrollListMixin:UpdateSlots()
             end
         end
     end
+
     -- hide unused slots
     for i = self.slotNum + 1, #self.slots do
         self.slots[i]:Hide()
@@ -343,17 +364,12 @@ end
 
 function AF_ScrollListMixin:SetSlotNum(newSlotNum)
     self.slotNum = newSlotNum
-    if self.slotNum == 0 then
-        AF.SetHeight(self, 5)
-    else
-        AF.SetListHeight(self, self.slotNum, self.slotHeight, self.slotSpacing, self.verticalMargin, self.verticalMargin)
-    end
     self:UpdateSlots()
 end
 
 function AF_ScrollListMixin:SetSlotHeight(newHeight)
     self.slotHeight = newHeight
-    self:SetSlotNum(self.slotNum)
+    self:UpdateSlots()
 end
 
 local function ScrollList_UpdateScrollBar(self)
@@ -382,6 +398,7 @@ function AF_ScrollListMixin:SetWidgets(widgets)
         AF.RemoveFromPixelUpdater(w)
     end
 
+    self:UpdateSlotSize()
     self:SetScroll(1)
     ScrollList_UpdateScrollBar(self)
 end
@@ -393,26 +410,31 @@ function AF_ScrollListMixin:SetWidgetPool(pool)
     self.pool = pool
 end
 
+-- for button_group
 local function IdToIndexProcessor(k, v)
     return v.id or v.text, k
 end
 
 --- this method is only for SetWidgetPool/SetupButtonGroup
 --- load and scroll to the first item
----@param data table Keys must be consecutive integers starting from 1; each value will be used for widget.Load(value)
+---@param data table Keys must be consecutive integers starting from 1; each value will be used for widget:Load(value)
 function AF_ScrollListMixin:SetData(data)
     assert(self.pool, "AF_ScrollList:SetData requires a widget pool. Call SetWidgetPool/SetupButtonGroup first.")
 
     self:Reset()
     self.data = data
     self.widgetNum = #data
-    self.idToIndex = AF.ConvertTable(data, IdToIndexProcessor)
     self.lastClickedIndex = nil
+
+    if self.mode == "button_group" then
+        self.idToIndex = AF.ConvertTable(data, IdToIndexProcessor)
+    end
 
     if self.selected then
         wipe(self.selected)
     end
 
+    self:UpdateSlotSize()
     self:SetScroll(1)
     ScrollList_UpdateScrollBar(self)
 end
@@ -859,14 +881,14 @@ end
 ---@param verticalMargin number top/bottom margin
 ---@param horizontalMargin number left/right margin
 ---@param slotNum number number of slots
----@param slotHeight number height of each slot
+---@param slotHeight number|nil height of each slot, if not provided, you should manually set the height of the list
 ---@param slotSpacing number spacing between widgets next to each other
 ---@param color? string|table background color
 ---@param borderColor? string|table border color
 ---@return AF_ScrollList scrollList
 function AF.CreateScrollList(parent, name, verticalMargin, horizontalMargin, slotNum, slotHeight, slotSpacing, color, borderColor)
     local scrollList = AF.CreateBorderedFrame(parent, name, nil, nil, color, borderColor)
-    AF.SetListHeight(scrollList, slotNum, slotHeight, slotSpacing, verticalMargin, verticalMargin)
+    -- AF.SetListHeight(scrollList, slotNum, slotHeight, slotSpacing, verticalMargin, verticalMargin)
 
     scrollList.slotNum = slotNum
     scrollList.slotHeight = slotHeight
