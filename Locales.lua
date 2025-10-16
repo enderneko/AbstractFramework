@@ -25,6 +25,10 @@ AF.L = setmetatable({
     ["Reload UI"] = _G.RELOADUI,
     ["Reset"] = _G.RESET,
 
+    ["Home"] = _G.HOME,
+    ["Next"] = _G.NEXT,
+    ["Prev"] = _G.PREV,
+
     ["Okay"] = _G.OKAY,
     ["Cancel"] = _G.CANCEL,
     ["None"] = _G.NONE,
