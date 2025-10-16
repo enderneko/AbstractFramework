@@ -283,46 +283,63 @@ function AF_ScrollingTextMixin:SetText(str, color)
     end
 end
 
+local function AF_ScrollingText_OnUpdate_Scroll(self, elapsed)
+    -- NOTE: FPS significantly affects OnUpdate frequency
+    -- 60FPS  -> 0.0166667 (1/60)
+    -- 90FPS  -> 0.0111111 (1/90)
+    -- 120FPS -> 0.0083333 (1/120)
+
+    if self.paused then return end
+
+    self.sTime = self.sTime + elapsed
+    if self.eTime >= self.endDelay then
+        self.fadeOutIn:Play()
+    elseif self.sTime >= self.startDelay then
+        if self.scroll >= self.scrollRange then -- scroll at max
+            self.eTime = self.eTime + elapsed
+        else
+            self.elapsedTime = self.elapsedTime + elapsed
+            if self.elapsedTime >= self.frequency then -- scroll
+                self.elapsedTime = 0
+                self.scroll = self.scroll + self.step
+                self:SetHorizontalScroll(self.scroll)
+            end
+        end
+    end
+end
+
+local function AF_ScrollingText_OnUpdate_Check(self)
+    -- NOTE: self:GetWidth() is valid on next OnUpdate
+    if self:GetWidth() ~= 0 then
+        self:SetScript("OnUpdate", nil)
+
+        if self.text:GetStringWidth() <= self:GetWidth() then
+            self:SetScript("OnUpdate", nil)
+        else
+            self.scrollRange = self.text:GetStringWidth() - self:GetWidth()
+            self:SetScript("OnUpdate", AF_ScrollingText_OnUpdate_Scroll)
+        end
+    end
+end
+
 ---@private
-function AF_ScrollingTextMixin:ShowUp()
-    self.fadeIn:Play()
+function AF_ScrollingTextMixin:ShowUp(skipFadeIn)
+    if not skipFadeIn then
+        self.fadeIn:Play()
+    end
     self:SetHorizontalScroll(0)
     self.scroll = 0
     self.sTime, self.eTime, self.elapsedTime = 0, 0, 0
 
-    self:SetScript("OnUpdate", function()
-        -- NOTE: self:GetWidth() is valid on next OnUpdate
-        if self:GetWidth() ~= 0 then
-            self:SetScript("OnUpdate", nil)
+    self:SetScript("OnUpdate", AF_ScrollingText_OnUpdate_Check)
+end
 
-            if self.text:GetStringWidth() <= self:GetWidth() then
-                self:SetScript("OnUpdate", nil)
-            else
-                self.scrollRange = self.text:GetStringWidth() - self:GetWidth()
-                -- NOTE: FPS significantly affects OnUpdate frequency
-                -- 60FPS  -> 0.0166667 (1/60)
-                -- 90FPS  -> 0.0111111 (1/90)
-                -- 120FPS -> 0.0083333 (1/120)
-                self:SetScript("OnUpdate", function(self, elapsed)
-                    self.sTime = self.sTime + elapsed
-                    if self.eTime >= self.endDelay then
-                        self.fadeOutIn:Play()
-                    elseif self.sTime >= self.startDelay then
-                        if self.scroll >= self.scrollRange then -- scroll at max
-                            self.eTime = self.eTime + elapsed
-                        else
-                            self.elapsedTime = self.elapsedTime + elapsed
-                            if self.elapsedTime >= self.frequency then -- scroll
-                                self.elapsedTime = 0
-                                self.scroll = self.scroll + self.step
-                                self:SetHorizontalScroll(self.scroll)
-                            end
-                        end
-                    end
-                end)
-            end
-        end
-    end)
+function AF_ScrollingTextMixin:Pause()
+    self.paused = true
+end
+
+function AF_ScrollingTextMixin:Resume()
+    self.paused = nil
 end
 
 function AF_ScrollingTextMixin:UpdatePixels()

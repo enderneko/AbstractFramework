@@ -192,7 +192,7 @@ end
 ---@param label? string
 ---@param width? number
 ---@param height? number
----@param mode? string "multiline"|"number"|"trim"|nil
+---@param mode? "multiline"|"number"|"trim"|nil
 ---@param font? string|Font
 ---@return AF_EditBox
 function AF.CreateEditBox(parent, label, width, height, mode, font)
@@ -332,6 +332,10 @@ function AF_ScrollEditBoxMixin:GetText()
     return self.eb:GetText()
 end
 
+function AF_ScrollEditBoxMixin:GetValue()
+    return self.eb:GetValue()
+end
+
 function AF_ScrollEditBoxMixin:Clear()
     self:ResetScroll()
     self.eb:Clear()
@@ -463,6 +467,11 @@ end
 ---@param label string
 function AF_ScrollEditBoxMixin:SetLabel(label)
     self.eb:SetLabel(label)
+end
+
+---@param label string
+function AF_ScrollEditBoxMixin:SetLabelAlt(label)
+    self.eb.SetLabelAlt(self, label)
 end
 
 ---@param parent Frame

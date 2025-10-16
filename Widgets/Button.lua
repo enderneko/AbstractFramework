@@ -661,9 +661,10 @@ end
 ---@param noPushDownEffect? boolean
 ---@return AF_IconButton
 function AF.CreateIconButton(parent, icon, width, height, padding, color, hoverColor, filterMode, noPushDownEffect)
-
     local b = CreateFrame("Button", nil, parent)
     AF.SetSize(b, width, height)
+
+    b.accentColor = AF.GetAddonAccentColorName()
 
     b.icon = b:CreateTexture(nil, "ARTWORK")
     b.icon:SetPoint("CENTER")
@@ -734,6 +735,9 @@ end
 function AF.CreateTipsButton(parent)
     local tipsButton = AF.CreateIconButton(parent, AF.GetIcon("Info_Square"), 16, 16, 0, "gray", "white", "NEAREST", true)
     Mixin(tipsButton, AF_TipsButtonMixin)
+
+    tipsButton.accentColor = AF.GetAddonAccentColorName()
+
     tipsButton:SetTipsPosition("TOPRIGHT", 0, 0)
     tipsButton:HookOnEnter(TipsButton_OnEnter)
     tipsButton:HookOnLeave(TipsButton_OnLeave)

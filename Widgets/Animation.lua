@@ -177,6 +177,9 @@ local function FrameFadeInOut(frame, info)
     CONTINUAL_FADEMANAGER:SetScript("OnUpdate", ContinualFading)
 end
 
+---@param timeToFade number|nil default is 0.25
+---@param holdTime number|nil default is 0.5
+---@param startFromCurrentAlpha boolean|nil if true, start from current alpha, otherwise start from 0, default is false
 function AF.FrameFadeInOut(frame, timeToFade, holdTime, startFromCurrentAlpha)
     if frame._continualFade then
         frame._continualFade.fadeTimer = nil

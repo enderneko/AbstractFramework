@@ -336,6 +336,25 @@ end
 -- mask (+100 frame level)
 ---------------------------------------------------------------------
 ---@param parent Frame
+---@return Frame parent.mask
+function AF.CreateMask(parent)
+    local mask = AF.CreateFrame(parent)
+    parent.mask = mask
+
+    AF.ApplyDefaultBackdrop_NoBorder(mask)
+    mask:SetBackdropColor(AF.GetColorRGB("mask"))
+    mask:BlockMouse(true)
+
+    mask.text = AF.CreateFontString(mask, "", "firebrick")
+    AF.SetPoint(mask.text, "LEFT", 5, 0)
+    AF.SetPoint(mask.text, "RIGHT", -5, 0)
+
+    mask:Hide()
+
+    return mask
+end
+
+---@param parent Frame
 ---@param tlX number topleft x
 ---@param tlY number topleft y
 ---@param brX number bottomright x
@@ -343,19 +362,7 @@ end
 ---@return Frame
 function AF.ShowMask(parent, text, tlX, tlY, brX, brY)
     if not parent.mask then
-        parent.mask = AF.CreateFrame(parent)
-        AF.ApplyDefaultBackdrop_NoBorder(parent.mask)
-        parent.mask:SetBackdropColor(AF.GetColorRGB("mask"))
-        parent.mask:EnableMouse(true)
-        -- parent.mask:EnableMouseWheel(true) -- not enough
-        parent.mask:SetScript("OnMouseWheel", function(self, delta)
-            -- setting the OnMouseWheel script automatically implies EnableMouseWheel(true)
-            -- print("OnMouseWheel", delta)
-        end)
-
-        parent.mask.text = AF.CreateFontString(parent.mask, "", "firebrick")
-        AF.SetPoint(parent.mask.text, "LEFT", 5, 0)
-        AF.SetPoint(parent.mask.text, "RIGHT", -5, 0)
+        AF.CreateMask(parent)
     end
 
     parent.mask.text:SetText(text)
