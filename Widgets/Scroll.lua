@@ -322,14 +322,6 @@ end
 
 ---@private
 function AF_ScrollListMixin:UpdateSlots()
-    if self.slotHeight then
-        if self.slotNum == 0 then
-            AF.SetHeight(self, 5)
-        else
-            AF.SetListHeight(self, self.slotNum, self.slotHeight, self.slotSpacing, self.verticalMargin, self.verticalMargin)
-        end
-    end
-
     for i = 1, self.slotNum do
         if not self.slots[i] then
             self.slots[i] = AF.CreateFrame(self.slotFrame)
@@ -351,6 +343,18 @@ function AF_ScrollListMixin:UpdateSlots()
                 self.slots[i].widget:UpdatePixels()
             end
         end
+    end
+
+    if self.slotHeight then
+        if self.slotNum == 0 then
+            AF.SetHeight(self, 5)
+        else
+            AF.SetListHeight(self, self.slotNum, self.slotHeight, self.slotSpacing, self.verticalMargin, self.verticalMargin)
+        end
+    else
+        RunNextFrame(function()
+            self:UpdateSlotSize()
+        end)
     end
 
     -- hide unused slots
