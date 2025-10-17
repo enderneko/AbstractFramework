@@ -906,6 +906,16 @@ end
 --     -- end
 -- end
 
+function AF_SwitchMixin:SetLabel(label)
+    if not self.label then
+        self.label = AF.CreateFontString(self, label)
+        self.label:SetJustifyH("LEFT")
+        AF.SetPoint(self.label, "BOTTOMLEFT", self, "TOPLEFT", 2, 2)
+    else
+        self.label:SetText(label)
+    end
+end
+
 ---@param labels table {{["text"]=(string), ["value"]=(any), ["callback|onClick"]=(function), ["disabled"]= (boolean|nil)}, ...}
 function AF_SwitchMixin:SetLabels(labels)
     if type(labels) ~= "table" then return end
