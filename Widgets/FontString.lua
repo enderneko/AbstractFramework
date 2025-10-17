@@ -376,6 +376,7 @@ function AF.CreateScrollingText(parent, frequency, step, startDelay, endDelay)
     local text = AF.CreateFontString(content)
     holder.text = text
     text:SetWordWrap(false)
+    text:SetJustifyH("LEFT")
     text:SetPoint("LEFT")
 
     -- fade in ----------------------------------

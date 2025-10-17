@@ -25,6 +25,9 @@ AF.L = setmetatable({
     ["Reload UI"] = _G.RELOADUI,
     ["Reset"] = _G.RESET,
 
+    ["Options"] = _G.GAMEMENU_OPTIONS,
+    ["Settings"] = _G.SETTINGS,
+
     ["Home"] = _G.HOME,
     ["Next"] = _G.NEXT,
     ["Prev"] = _G.PREV,
@@ -209,7 +212,7 @@ if LOCALE_zhCN then
     L["Configs"] = "设置"
     L["Feedback & Suggestions"] = "反馈与建议"
     L["Option"] = "选项"
-    L["Options"] = "选项"
+    L["Setting"] = "设置"
     L["Profile"] = "配置"
     L["Profiles"] = "配置"
     L["Tip"] = "提示"

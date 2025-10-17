@@ -458,6 +458,10 @@ function AF_ScrollEditBoxMixin:IsAutoFocus()
     return self.eb:IsAutoFocus()
 end
 
+function AF_ScrollEditBoxMixin:SetTextColor(...)
+    self.eb:SetTextColor(...)
+end
+
 ---@param start? number
 ---@param stop? number
 function AF_ScrollEditBoxMixin:HighlightText(start, stop)
