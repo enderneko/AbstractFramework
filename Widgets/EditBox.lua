@@ -177,7 +177,7 @@ end
 function AF_EditBoxMixin:SetLabelAlt(label)
     if not self.labelAlt then
         self.labelAlt = AF.CreateFontString(self)
-        AF.SetPoint(self.labelAlt, "BOTTOMLEFT", self, "TOPLEFT", 0, 2)
+        AF.SetPoint(self.labelAlt, "BOTTOMLEFT", self, "TOPLEFT", 2, 2)
         self:HookOnEnable(function()
             self.labelAlt:SetColor("white")
         end)
