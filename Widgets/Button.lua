@@ -1087,9 +1087,8 @@ end
 ---@param parent Frame
 ---@param width? number if not set, will invoke AutoResizeLabels after SetLabels
 ---@param height? number default is 20
----@param labels? table {{["text"]=(string), ["value"]=(any), ["callback|onClick"]=(function)}, ...}
 ---@return AF_Switch switch
-function AF.CreateSwitch(parent, width, height, labels)
+function AF.CreateSwitch(parent, width, height)
     local switch = AF.CreateBorderedFrame(parent, nil, width, height or 20, "widget")
 
     switch.accentColor = AF.GetAddonAccentColorName()
@@ -1113,7 +1112,7 @@ function AF.CreateSwitch(parent, width, height, labels)
     Mixin(switch, AF_SwitchMixin)
     Mixin(switch, AF_BaseWidgetMixin)
 
-    switch:SetLabels(labels)
+    -- switch:SetLabels(labels)
 
     AF.AddToPixelUpdater_OnShow(switch)
 
