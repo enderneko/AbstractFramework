@@ -690,6 +690,14 @@ function AF.CreateIconButton(parent, icon, width, height, padding, color, hoverC
             b.border:Hide()
         end
     end)
+    b:SetScript("OnEnable", function()
+        b.icon:SetDesaturated(false)
+        b.icon:SetVertexColor(AF.UnpackColor(b._color))
+    end)
+    b:SetScript("OnDisable", function()
+        b.icon:SetDesaturated(true)
+        b.icon:SetVertexColor(AF.GetColorRGB("disabled"))
+    end)
 
     Mixin(b, AF_IconButtonMixin)
     Mixin(b, AF_BaseWidgetMixin)
