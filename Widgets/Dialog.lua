@@ -233,9 +233,6 @@ function AF.GetDialog(parent, text, width, noMask)
 
     dialog.text:SetText(text)
 
-    if yesText then dialog.yes:SetText(yesText) end
-    if noText then dialog.no:SetText(noText) end
-
     if not noMask then
         dialog.shownMask = AF.ShowMask(parent)
     end

@@ -875,10 +875,12 @@ function AF_SwitchMixin:SetSelectedValue(value, force)
         end
     end
 end
+AF_SwitchMixin.SetSelected = AF_SwitchMixin.SetSelectedValue
 
 function AF_SwitchMixin:GetSelectedValue()
     return self.selected
 end
+AF_SwitchMixin.GetSelected = AF_SwitchMixin.GetSelectedValue
 
 function AF_SwitchMixin:GetSelectedButton()
     for _, b in next, self.buttons do

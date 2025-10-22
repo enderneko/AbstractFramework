@@ -165,6 +165,8 @@ if LOCALE_zhCN then
 
     L["Reset all settings"] = "重置所有设置"
     L["Reset to default settings?"] = "重置为默认设置？"
+    L["Confirm deletion?"] = "确认删除？"
+    L["Also deletes sub-items"] = "将同时删除子项"
 
     L["Always Show"] = "始终显示"
     L["Always Hide"] = "始终隐藏"

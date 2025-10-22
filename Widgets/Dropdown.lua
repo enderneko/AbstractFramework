@@ -228,10 +228,11 @@ end
 ---@return any value
 ---@return string text
 function AF_DropdownMixin:GetSelected()
-    if self.selected then
+    if self.selected and self.items[self.selected] then
         return self.items[self.selected].value, self.items[self.selected].text
     end
 end
+AF_DropdownMixin.GetSelectedValue = AF_DropdownMixin.GetSelected
 -------------------------------------------------
 
 -- label
@@ -287,8 +288,15 @@ function AF_DropdownMixin:SetItems(items)
             item.callback = item.callback or item.onClick -- for backward compatibility
         end
     end
+
+    local selectedValue = self.selected and self.items and self.items[self.selected] and self.items[self.selected].value
     self.items = items
     self.reloadRequired = true
+
+    if selectedValue then
+        -- try re-setting selected item
+        SetSelected(self, "value", selectedValue)
+    end
 end
 
 ---@param item table
