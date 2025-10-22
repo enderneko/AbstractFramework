@@ -22,6 +22,7 @@ AF.L = setmetatable({
     ["TOP"] = "Top",
     ["BOTTOM"] = "Bottom",
 
+    ["Edit Mode"] = _G.HUD_EDIT_MODE_MENU,
     ["Reload UI"] = _G.RELOADUI,
     ["Reset"] = _G.RESET,
 

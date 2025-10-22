@@ -840,7 +840,7 @@ end
 -- re-anchor
 ---------------------------------------------------------------------
 -- region must have only one point set, relativeTo must be AF.UIParent
----@param anchor string "TOPLEFT", "TOPRIGHT", "BOTTOMLEFT", "BOTTOMRIGHT".
+---@param anchor "TOPLEFT"|"TOPRIGHT"|"BOTTOMLEFT"|"BOTTOMRIGHT"
 function AF.ReAnchorRegion(region, anchor)
     if region:GetNumPoints() ~= 1 then return end
 

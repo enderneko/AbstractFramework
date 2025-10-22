@@ -465,9 +465,9 @@ function AF.SetDraggable(frame, target, notUserPlaced, onDragStart, onDragStop)
     frame:RegisterForDrag("LeftButton")
     frame:SetMouseClickEnabled(true)
     frame:SetScript("OnDragStart", function()
-        target:StartMoving()
-        if notUserPlaced then target:SetUserPlaced(false) end
         if onDragStart then onDragStart(target) end
+        target:StartMoving(true) -- set to true to prevent weird behavior?
+        if notUserPlaced then target:SetUserPlaced(false) end
     end)
     frame:SetScript("OnDragStop", function()
         target:StopMovingOrSizing()
