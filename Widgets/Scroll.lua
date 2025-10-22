@@ -391,7 +391,8 @@ end
 --- this method cannot be used together with SetWidgetPool/SetupButtonGroup
 --- load and scroll to the first item
 ---@param widgets table
-function AF_ScrollListMixin:SetWidgets(widgets)
+---@param scrollTo number|nil index to scroll to, default is 1
+function AF_ScrollListMixin:SetWidgets(widgets, scrollTo)
     self.mode = "pre_created"
 
     self:Reset()
@@ -403,8 +404,8 @@ function AF_ScrollListMixin:SetWidgets(widgets)
     end
 
     self:UpdateSlotSize()
-    self:SetScroll(1)
     ScrollList_UpdateScrollBar(self)
+    self:SetScroll(scrollTo or 1)
 end
 
 --- this method cannot be used together with SetWidgets/SetupButtonGroup
@@ -422,7 +423,8 @@ end
 --- this method is only for SetWidgetPool/SetupButtonGroup
 --- load and scroll to the first item
 ---@param data table Keys must be consecutive integers starting from 1; each value will be used for widget:Load(value)
-function AF_ScrollListMixin:SetData(data)
+---@param scrollTo number|nil index to scroll to, default is 1
+function AF_ScrollListMixin:SetData(data, scrollTo)
     assert(self.pool, "AF_ScrollList:SetData requires a widget pool. Call SetWidgetPool/SetupButtonGroup first.")
 
     self:Reset()
@@ -439,8 +441,8 @@ function AF_ScrollListMixin:SetData(data)
     end
 
     self:UpdateSlotSize()
-    self:SetScroll(1)
     ScrollList_UpdateScrollBar(self)
+    self:SetScroll(scrollTo or 1)
 end
 
 -- reset
