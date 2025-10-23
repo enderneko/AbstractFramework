@@ -216,8 +216,6 @@ function AF.SetupAuraDurationText(aura, config)
     end
 end
 
-
-
 ---------------------------------------------------------------------
 -- AF_AuraButtonMixin
 ---------------------------------------------------------------------
@@ -228,11 +226,11 @@ local AF_AuraButtonMixin = {}
 ---------------------------------------------------------------------
 -- cooldown style: vertical progress
 ---------------------------------------------------------------------
-local function VerticalCooldown_OnUpdate(aura, elapsed)
-    aura.elapsed = aura.elapsed + elapsed
-    if aura.elapsed >= 0.1 then
-        aura:SetValue(aura:GetValue() + aura.elapsed)
-        aura.elapsed = 0
+local function VerticalCooldown_OnUpdate(cooldown, elapsed)
+    cooldown.elapsed = cooldown.elapsed + elapsed
+    if cooldown.elapsed >= 0.1 then
+        cooldown:SetValue(cooldown:GetValue() + cooldown.elapsed)
+        cooldown.elapsed = 0
     end
 end
 
@@ -241,20 +239,20 @@ local function VerticalCooldown_GetCooldownDuration()
     return 0
 end
 
-local function VerticalCooldown_ShowCooldown(aura, start, duration, _, icon, auraType)
+local function VerticalCooldown_ShowCooldown(cooldown, start, duration, _, icon, auraType)
     if auraType then
-        aura.spark:SetColorTexture(AF.GetAuraTypeColor(auraType))
+        cooldown.spark:SetColorTexture(AF.GetAuraTypeColor(auraType))
     else
-        aura.spark:SetColorTexture(0.5, 0.5, 0.5, 1)
+        cooldown.spark:SetColorTexture(0.5, 0.5, 0.5, 1)
     end
-    if aura.icon then
-    aura.icon:SetTexture(icon)
+    if cooldown.icon then
+        cooldown.icon:SetTexture(icon)
     end
 
-    aura.elapsed = 0.1 -- update immediately
-    aura:SetMinMaxValues(0, duration)
-    aura:SetValue(GetTime() - start)
-    aura:Show()
+    cooldown.elapsed = 0.1 -- update immediately
+    cooldown:SetMinMaxValues(0, duration)
+    cooldown:SetValue(GetTime() - start)
+    cooldown:Show()
 end
 
 local function CreateCooldown_Vertical(aura, hasIcon)
@@ -284,19 +282,19 @@ local function CreateCooldown_Vertical(aura, hasIcon)
     if hasIcon then
         texture:SetAlpha(0)
 
-    local mask = cooldown:CreateMaskTexture()
-    mask:SetTexture(AF.GetPlainTexture(), "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE", "NEAREST")
-    mask:SetPoint("TOPLEFT")
-    mask:SetPoint("BOTTOMRIGHT", texture)
+        local mask = cooldown:CreateMaskTexture()
+        mask:SetTexture(AF.GetPlainTexture(), "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE", "NEAREST")
+        mask:SetPoint("TOPLEFT")
+        mask:SetPoint("BOTTOMRIGHT", texture)
 
-    local icon = cooldown:CreateTexture(nil, "ARTWORK")
-    cooldown.icon = icon
-    -- icon:SetTexCoord(0.12, 0.88, 0.12, 0.88)
-    icon:SetDesaturated(true)
-    icon:SetAllPoints(aura.icon)
-    icon:SetVertexColor(0.5, 0.5, 0.5, 1)
-    icon:AddMaskTexture(mask)
-    cooldown:SetScript("OnSizeChanged", AF.ReCalcTexCoordForAura)
+        local icon = cooldown:CreateTexture(nil, "ARTWORK")
+        cooldown.icon = icon
+        -- icon:SetTexCoord(0.12, 0.88, 0.12, 0.88)
+        icon:SetDesaturated(true)
+        icon:SetAllPoints(aura.icon)
+        icon:SetVertexColor(0.5, 0.5, 0.5, 1)
+        icon:AddMaskTexture(mask)
+        cooldown:SetScript("OnSizeChanged", AF.ReCalcTexCoordForAura)
     else
         texture:SetVertexColor(0, 0, 0, 0.8)
     end
@@ -375,7 +373,6 @@ end
 function AF_AuraButtonMixin:SetCooldown(start, duration, count, icon, auraType, desaturated, glow, r, g, b, a)
     AF.SetAuraCooldown(self, start, duration, count, icon, auraType, desaturated, glow, r, g, b, a)
 end
-
 
 ---------------------------------------------------------------------
 -- tooltip
