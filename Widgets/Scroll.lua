@@ -186,7 +186,15 @@ function AF.CreateScrollFrame(parent, name, width, height, color, borderColor)
         local p = scrollFrame:GetHeight() / scrollContent:GetHeight()
         p = tonumber(string.format("%.3f", p))
         if p < 1 then -- can scroll
-            scrollThumb:SetHeight(max(scrollBar:GetHeight() * p, MIN_SCROLL_THUMB_HEIGHT))
+            local height = max(scrollBar:GetHeight() * p, MIN_SCROLL_THUMB_HEIGHT)
+
+            -- NOTE: prevent a visual issue
+            if height > scrollBar:GetHeight() - abs(select(5, scrollThumb:GetPoint())) then
+                scrollThumb:SetPoint("TOP", 0, -(scrollBar:GetHeight() - height))
+            end
+
+            scrollThumb:SetHeight(height)
+
             -- space for scrollBar
             AF.SetPoint(scrollFrame, "BOTTOMRIGHT", -7, 0)
             scrollBar:Show()
@@ -200,8 +208,8 @@ function AF.CreateScrollFrame(parent, name, width, height, color, borderColor)
     local function OnVerticalScroll(self, offset)
         if scrollParent:GetVerticalScrollRange() ~= 0 then
             local scrollP = scrollFrame:GetVerticalScroll() / scrollParent:GetVerticalScrollRange()
-            local yoffset = -((scrollBar:GetHeight() - scrollThumb:GetHeight()) * scrollP)
-            scrollThumb:SetPoint("TOP", 0, yoffset)
+            local offsetY = -((scrollBar:GetHeight() - scrollThumb:GetHeight()) * scrollP)
+            scrollThumb:SetPoint("TOP", 0, offsetY)
         else
             scrollThumb:SetPoint("TOP")
         end
