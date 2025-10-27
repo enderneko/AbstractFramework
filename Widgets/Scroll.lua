@@ -81,6 +81,18 @@ function AF_ScrollFrameMixin:SetScrollStep(step)
     self.step = step or 25
 end
 
+function AF_ScrollFrameMixin:GetScrollStep()
+    return self.step
+end
+
+function AF_ScrollFrameMixin:SetScroll(offset)
+    self.scrollFrame:SetVerticalScroll(offset)
+end
+
+function AF_ScrollFrameMixin:GetScroll()
+    return self.scrollFrame:GetVerticalScroll()
+end
+
 function AF_ScrollFrameMixin:Reset()
     local children = self.contentChildren or {self.scrollContent:GetChildren()}
     for _, c in pairs(children) do
