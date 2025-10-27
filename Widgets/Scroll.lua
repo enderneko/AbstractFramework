@@ -60,13 +60,15 @@ end
 
 ---@param height number
 ---@param useRawValue? boolean if true, set height directly, otherwise use AF.SetHeight
-function AF_ScrollFrameMixin:SetContentHeight(height, useRawValue)
+function AF_ScrollFrameMixin:SetContentHeight(height, useRawValue, skipScrollReset)
     if useRawValue then
         self.scrollContent:SetHeight(height)
     else
         AF.SetHeight(self.scrollContent, height)
     end
-    self:ResetScroll()
+    if not skipScrollReset then
+        self:ResetScroll()
+    end
 end
 
 ---@param heights table heights of each item
