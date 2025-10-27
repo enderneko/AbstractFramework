@@ -6,6 +6,8 @@ AF.L = setmetatable({
 
     ["Blizzard"] = string.gsub(_G.SLASH_TEXTTOSPEECH_BLIZZARD, "^%l", strupper),
     ["Shift Click"] = _G.WARDROBE_SHORTCUTS_TUTORIAL_2:match("%[(.+)%]"),
+    ["Ctrl Click"] = _G.WARDROBE_SHORTCUTS_TUTORIAL_2:match("%[(.+)%]"):gsub("Shift", "Ctrl"),
+    ["Alt Click"] = _G.WARDROBE_SHORTCUTS_TUTORIAL_2:match("%[(.+)%]"):gsub("Shift", "Alt"),
     ["WIP"] = "Work In Progress",
 
     ["TANK"] = _G["TANK"],
