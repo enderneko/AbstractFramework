@@ -934,7 +934,6 @@ function AF_SwitchMixin:SetLabels(labels)
         end
     end
 
-    local width = self._width and self._width / n
     local height = self._height
 
     for i, l in pairs(labels) do
@@ -1047,10 +1046,7 @@ function AF_SwitchMixin:SetLabels(labels)
         -- text
         buttons[i]:SetText(labels[i].text)
 
-        -- size
-        if width then
-            AF.SetWidth(buttons[i], width)
-        end
+        -- height
         AF.SetHeight(buttons[i], height)
 
         -- point
@@ -1068,14 +1064,12 @@ function AF_SwitchMixin:SetLabels(labels)
         buttons[i]:Show()
     end
 
-    if not width then
-        self:AutoResizeLabels()
-    end
+    self:AutoResizeLabels()
 end
 
 function AF_SwitchMixin:AutoResizeLabels()
-    local width = self:GetWidth()
     local n = #self.labels
+    local width = self:GetWidth() + AF.ConvertPixelsForRegion(1, self) * (n - 1)
 
     if n == 0 then return end
     local labelWidth = width / n
@@ -1087,7 +1081,7 @@ function AF_SwitchMixin:AutoResizeLabels()
 end
 
 ---@param parent Frame
----@param width? number if not set, will invoke AutoResizeLabels after SetLabels
+---@param width? number
 ---@param height? number default is 20
 ---@return AF_Switch switch
 function AF.CreateSwitch(parent, width, height)
