@@ -230,7 +230,9 @@ function AF.ShowDemo()
     -----------------------------------------------------------------------------
     --                                  switch                                 --
     -----------------------------------------------------------------------------
-    local sw1 = AF.CreateSwitch(demo, 150, 20, {
+    local sw1 = AF.CreateSwitch(demo, 150, 20)
+    AF.SetPoint(sw1, "TOPLEFT", sf1, "BOTTOMLEFT", 0, -10)
+    sw1:SetLabels({
         {
             ["text"] = "20",
             ["value"] = 20,
@@ -260,7 +262,6 @@ function AF.ShowDemo()
             end,
         }
     })
-    AF.SetPoint(sw1, "TOPLEFT", sf1, "BOTTOMLEFT", 0, -10)
     sw1:SetSelectedValue(20)
 
 
