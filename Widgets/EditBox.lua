@@ -188,6 +188,89 @@ function AF_EditBoxMixin:SetLabelAlt(label)
     self.labelAlt:SetText(label or "")
 end
 
+local function AF_EditBox_OnEditFocusGained(self)
+    if self.onEditFocusGained then self.onEditFocusGained(self) end
+    self:HighlightText()
+end
+
+local function AF_EditBox_OnEditFocusLost(self)
+    if self.onEditFocusLost then self.onEditFocusLost(self) end
+    self:HighlightText(0, 0)
+end
+
+local function AF_EditBox_OnEscapePressed(self)
+    if self.onEscapePressed then self.onEscapePressed(self) end
+    self:ClearFocus()
+end
+
+local function AF_EditBox_OnEnterPressed(self)
+    if self.onEnterPressed then self.onEnterPressed(self:GetValue(), self) end
+    self:ClearFocus()
+end
+
+local function AF_EditBox_OnDisable(self)
+    self:SetTextColor(AF.GetColorRGB("disabled"))
+    self:SetBackdropBorderColor(AF.GetColorRGB("border", 0.7))
+end
+
+local function AF_EditBox_OnEnable(self)
+    self:SetTextColor(1, 1, 1, 1)
+    if self._borderColor then
+        self:SetBackdropBorderColor(AF.UnpackColor(self._borderColor))
+    else
+        self:SetBackdropBorderColor(0, 0, 0, 1)
+    end
+end
+
+local function AF_EditBox_OnEnter(self)
+    if not self:IsEnabled() then return end
+    if self.highlight then self.highlight:Show() end
+end
+
+local function AF_EditBox_OnLeave(self)
+    if not self:IsEnabled() then return end
+    if self.highlight then self.highlight:Hide() end
+end
+
+local function AF_EditBox_OnTextChanged(self, userChanged)
+    -- NOTE: this is weird
+    -- OnTextChanged seems to be invoked immediately after this script is set & OnShow (if is hidden before)
+    --! be careful when using on a dialog
+
+    if self:GetText() == "" then
+        self.label:Show()
+    else
+        self.label:Hide()
+    end
+
+    local value = self:GetValue()
+
+    if self.onTextChanged then
+        self.onTextChanged(value, userChanged, self)
+    end
+
+    if userChanged then
+        if self.notUserChangable then
+            self:SetText(self.value or "") -- restore
+            return
+        end
+
+        if self.confirmBtn then
+            if self.value ~= value and (self.mode ~= "number" or value) then
+                self.confirmBtn:Show()
+            else
+                self.confirmBtn:Hide()
+            end
+        end
+    else
+        self.value = value -- update value
+    end
+end
+
+local function AF_EditBox_OnHide(self)
+    self:SetText(self.value or "") -- restore
+end
+
 ---@param parent Frame
 ---@param label? string
 ---@param width? number
@@ -222,94 +305,23 @@ function AF.CreateEditBox(parent, label, width, height, mode, font)
     eb:SetTextInsets(4, 4, 0, 0)
     eb:SetAutoFocus(false)
 
-    eb:SetScript("OnEditFocusGained", function()
-        if eb.onEditFocusGained then eb.onEditFocusGained(eb) end
-        eb:HighlightText()
-    end)
-
-    eb:SetScript("OnEditFocusLost", function()
-        if eb.onEditFocusLost then eb.onEditFocusLost(eb) end
-        eb:HighlightText(0, 0)
-    end)
-
-    eb:SetScript("OnEscapePressed", function()
-        if eb.onEscapePressed then eb.onEscapePressed(eb) end
-        eb:ClearFocus()
-    end)
-
-    eb:SetScript("OnEnterPressed", function()
-        if eb.onEnterPressed then eb.onEnterPressed(eb:GetValue(), eb) end
-        eb:ClearFocus()
-    end)
-
-    eb:SetScript("OnDisable", function()
-        eb:SetTextColor(AF.GetColorRGB("disabled"))
-        eb:SetBackdropBorderColor(AF.GetColorRGB("border", 0.7))
-    end)
-
-    eb:SetScript("OnEnable", function()
-        eb:SetTextColor(1, 1, 1, 1)
-        if eb._borderColor then
-            eb:SetBackdropBorderColor(AF.UnpackColor(eb._borderColor))
-        else
-            eb:SetBackdropBorderColor(0, 0, 0, 1)
-        end
-    end)
-
     eb.highlight = AF.CreateTexture(eb, nil, AF.GetColorTable(eb.accentColor, 0.07))
     AF.SetPoint(eb.highlight, "TOPLEFT", 1, -1)
     AF.SetPoint(eb.highlight, "BOTTOMRIGHT", -1, 1)
     eb.highlight:Hide()
 
-    eb:SetScript("OnEnter", function()
-        if not eb:IsEnabled() then return end
-        eb.highlight:Show()
-    end)
-
-    eb:SetScript("OnLeave", function()
-        if not eb:IsEnabled() then return end
-        eb.highlight:Hide()
-    end)
-
     eb.value = "" -- init value
 
-    -- NOTE: this is weird
-    -- OnTextChanged seems to be invoked immediately after this script is set & OnShow (if is hidden before)
-    --! be careful when using on a dialog
-    eb:SetScript("OnTextChanged", function(self, userChanged)
-        if eb:GetText() == "" then
-            eb.label:Show()
-        else
-            eb.label:Hide()
-        end
-
-        local value = eb:GetValue()
-
-        if eb.onTextChanged then
-            eb.onTextChanged(value, userChanged, self)
-        end
-
-        if userChanged then
-            if eb.notUserChangable then
-                eb:SetText(eb.value or "") -- restore
-                return
-            end
-
-            if eb.confirmBtn then
-                if eb.value ~= value and (self.mode ~= "number" or value) then
-                    eb.confirmBtn:Show()
-                else
-                    eb.confirmBtn:Hide()
-                end
-            end
-        else
-            eb.value = value -- update value
-        end
-    end)
-
-    eb:SetScript("OnHide", function()
-        eb:SetText(eb.value or "") -- restore
-    end)
+    eb:SetScript("OnTextChanged", AF_EditBox_OnTextChanged)
+    eb:SetScript("OnEditFocusGained", AF_EditBox_OnEditFocusGained)
+    eb:SetScript("OnEditFocusLost", AF_EditBox_OnEditFocusLost)
+    eb:SetScript("OnEscapePressed", AF_EditBox_OnEscapePressed)
+    eb:SetScript("OnEnterPressed", AF_EditBox_OnEnterPressed)
+    eb:SetScript("OnDisable", AF_EditBox_OnDisable)
+    eb:SetScript("OnEnable", AF_EditBox_OnEnable)
+    eb:SetScript("OnEnter", AF_EditBox_OnEnter)
+    eb:SetScript("OnLeave", AF_EditBox_OnLeave)
+    eb:SetScript("OnHide", AF_EditBox_OnHide)
 
     AF.AddToPixelUpdater_OnShow(eb)
 
