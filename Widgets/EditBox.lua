@@ -490,16 +490,73 @@ function AF_ScrollEditBoxMixin:SetLabelAlt(label)
     self.eb.SetLabelAlt(self, label)
 end
 
+local function AF_ScrollEditBox_ScrollFrame_OnEnter(scrollFrame)
+    if not scrollFrame:GetParent():IsEnabled() then return end
+    scrollFrame.highlight:Show()
+end
+
+local function AF_ScrollEditBox_ScrollFrame_OnLeave(scrollFrame)
+    if not scrollFrame:GetParent():IsEnabled() then return end
+    scrollFrame.highlight:Hide()
+end
+
+local function AF_ScrollEditBox_ScrollFrame_OnMouseDown(scrollFrame)
+    scrollFrame:GetParent().eb:SetFocus(true)
+end
+
+local function AF_ScrollEditBox_OnEnter(eb)
+    AF_ScrollEditBox_ScrollFrame_OnEnter(eb:GetParent():GetParent())
+end
+
+local function AF_ScrollEditBox_OnLeave(eb)
+    AF_ScrollEditBox_ScrollFrame_OnLeave(eb:GetParent():GetParent())
+end
+
+local function AF_ScrollEditBox_OnEnterPressed(eb)
+    eb:Insert("\n")
+end
+
+local function AF_ScrollEditBox_OnCursorChanged(eb, x, y, arg, lineHeight)
+    -- https://warcraft.wiki.gg/wiki/UIHANDLER_OnCursorChanged
+    local frame = eb:GetParent():GetParent():GetParent()
+    if not frame:IsEnabled() then return end
+
+    lineHeight = lineHeight + eb:GetSpacing()
+    frame:SetScrollStep(lineHeight)
+
+    local vs = frame.scrollFrame:GetVerticalScroll()
+    local h  = frame.scrollFrame:GetHeight()
+
+    if vs + y > 0 then
+        -- cursor above current view
+        frame.scrollFrame:SetVerticalScroll(-y)
+    elseif vs + y - lineHeight + h < 0 then
+        -- cursor below current view
+        -- insets + cursorHeight
+        local offset = AF.ConvertPixelsForRegion(4, eb) * 2 + lineHeight - y - h
+        if offset > frame.scrollFrame:GetVerticalScrollRange() then
+            frame:ScrollToBottom()
+        else
+            frame.scrollFrame:SetVerticalScroll(offset)
+        end
+    end
+end
+
+local function AF_ScrollEditBox_OnTextChanged(eb)
+    local frame = eb:GetParent():GetParent():GetParent()
+    frame:SetContentHeight(eb:GetHeight(), true, true)
+    if frame.scrollFrame:GetVerticalScroll() > frame.scrollFrame:GetVerticalScrollRange() then
+        frame:ScrollToBottom()
+    end
+end
+
 ---@param parent Frame
 ---@param name string
 ---@param label? string
 ---@param width? number
 ---@param height? number
----@param scrollStep? number default 1
 ---@return AF_ScrollEditBox frame
-function AF.CreateScrollEditBox(parent, name, label, width, height, scrollStep)
-    scrollStep = scrollStep or 1
-
+function AF.CreateScrollEditBox(parent, name, label, width, height)
     local frame = AF.CreateScrollFrame(parent, name, width, height, "none", "none")
     AF.ApplyDefaultBackdropWithColors(frame.scrollFrame, "widget")
     AF.ApplyDefaultBackdropWithColors(frame.scrollBar)
@@ -508,19 +565,13 @@ function AF.CreateScrollEditBox(parent, name, label, width, height, scrollStep)
 
     -- highlight
     local highlight = AF.CreateTexture(frame.scrollFrame, nil, AF.GetColorTable(frame.accentColor, 0.07))
+    frame.scrollFrame.highlight = highlight
     AF.SetPoint(highlight, "TOPLEFT", 1, -1)
     AF.SetPoint(highlight, "BOTTOMRIGHT", -1, 1)
     highlight:Hide()
 
-    frame.scrollFrame:SetScript("OnEnter", function()
-        if not frame:IsEnabled() then return end
-        highlight:Show()
-    end)
-
-    frame.scrollFrame:SetScript("OnLeave", function()
-        if not frame:IsEnabled() then return end
-        highlight:Hide()
-    end)
+    frame.scrollFrame:SetScript("OnEnter", AF_ScrollEditBox_ScrollFrame_OnEnter)
+    frame.scrollFrame:SetScript("OnLeave", AF_ScrollEditBox_ScrollFrame_OnLeave)
 
     -- edit box
     local eb = AF.CreateEditBox(frame.scrollContent, label, 10, 20, "multiline")
@@ -531,38 +582,12 @@ function AF.CreateScrollEditBox(parent, name, label, width, height, scrollStep)
     eb:SetPoint("RIGHT")
     eb:SetTextInsets(4, 4, 4, 4)
     eb:SetSpacing(2)
-    eb:SetScript("OnEnter", frame.scrollFrame:GetScript("OnEnter"))
-    eb:SetScript("OnLeave", frame.scrollFrame:GetScript("OnLeave"))
-
-    eb:SetScript("OnEnterPressed", function(self) self:Insert("\n") end)
-
-    -- https://warcraft.wiki.gg/wiki/UIHANDLER_OnCursorChanged
-    eb:SetScript("OnCursorChanged", function(self, x, y, arg, lineHeight)
-        if not frame:IsEnabled() then return end
-
-        frame:SetScrollStep((lineHeight + eb:GetSpacing()) * scrollStep)
-
-        local vs = frame.scrollFrame:GetVerticalScroll()
-        local h  = frame.scrollFrame:GetHeight()
-
-        local cursorHeight = lineHeight + abs(y) + 8 + eb:GetSpacing()
-
-        if vs + y > 0 then -- cursor above current view
-            frame.scrollFrame:SetVerticalScroll(-y)
-        elseif cursorHeight > h + vs then
-            frame.scrollFrame:SetVerticalScroll(cursorHeight-h)
-        end
-
-        if frame.scrollFrame:GetVerticalScroll() > frame.scrollFrame:GetVerticalScrollRange() then frame:ScrollToBottom() end
-    end)
-
-    eb:HookScript("OnTextChanged", function()
-        frame:SetContentHeight(eb:GetHeight(), true)
-    end)
-
-    frame.scrollFrame:SetScript("OnMouseDown", function()
-        eb:SetFocus(true)
-    end)
+    eb:SetScript("OnEnter", AF_ScrollEditBox_OnEnter)
+    eb:SetScript("OnLeave", AF_ScrollEditBox_OnLeave)
+    eb:SetScript("OnEnterPressed", AF_ScrollEditBox_OnEnterPressed)
+    eb:SetScript("OnCursorChanged", AF_ScrollEditBox_OnCursorChanged)
+    eb:HookScript("OnTextChanged", AF_ScrollEditBox_OnTextChanged)
+    frame.scrollFrame:SetScript("OnMouseDown", AF_ScrollEditBox_ScrollFrame_OnMouseDown)
 
     frame._isEnabled = true
     Mixin(frame, AF_ScrollEditBoxMixin)
