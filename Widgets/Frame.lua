@@ -323,7 +323,7 @@ function AF.CreateTitledPane(parent, title, width, height, color)
     local text = AF.CreateFontString(pane, title, color)
     pane.title = text
     text:SetJustifyH("LEFT")
-    AF.SetPoint(text, "BOTTOMLEFT", line, "TOPLEFT", 0, 2)
+    AF.SetPoint(text, "BOTTOMLEFT", line, "TOPLEFT", 1, 2)
 
     Mixin(pane, AF_TitledPaneMixin)
     Mixin(pane, AF_BaseWidgetMixin)

@@ -252,6 +252,7 @@ local function AF_EditBox_OnTextChanged(self, userChanged)
     if userChanged then
         if self.notUserChangable then
             self:SetText(self.value or "") -- restore
+            self:SetCursorPosition(0)
             return
         end
 

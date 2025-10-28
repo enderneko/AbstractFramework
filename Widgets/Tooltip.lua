@@ -36,8 +36,6 @@ function AF.ShowTooltip(widget, anchor, x, y, lines)
 
     AF.Tooltip:ClearLines()
 
-    local owner = widget._tooltipOwner or widget
-
     if widget._tooltipOwner then
         AF.Tooltip:SetOwner(widget._tooltipOwner, "ANCHOR_NONE")
         AF.Tooltip:SetPoint(anchorOverride[anchor], widget, anchor, x, y)
