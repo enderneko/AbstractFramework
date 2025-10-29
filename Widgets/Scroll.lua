@@ -28,6 +28,14 @@ local function UpdateSlotFrameAnchor(self)
     end
 end
 
+local function UpdateScrollFrameAnchor(self)
+    if self.disableScrollFrameReanchor or not self:CanScroll() then
+        AF.SetPoint(self.scrollFrame, "BOTTOMRIGHT")
+    else
+        AF.SetPoint(self.scrollFrame, "BOTTOMRIGHT", -7, 0)
+    end
+end
+
 ---------------------------------------------------------------------
 -- scroll frame
 ---------------------------------------------------------------------
@@ -48,6 +56,10 @@ end
 function AF_ScrollFrameMixin:GetVerticalScrollRange()
     local range = self.scrollContent:GetHeight() - self.scrollFrame:GetHeight()
     return range > 0 and range or 0
+end
+
+function AF_ScrollFrameMixin:CanScroll()
+    return self:GetVerticalScrollRange() > 0
 end
 
 -- for mouse wheel
@@ -96,7 +108,7 @@ function AF_ScrollFrameMixin:GetScrollStep()
 end
 
 function AF_ScrollFrameMixin:SetScroll(offset)
-    self.scrollFrame:SetVerticalScroll(offset)
+    self.scrollFrame:SetVerticalScroll(AF.Clamp(offset, 0, self:GetVerticalScrollRange()))
 end
 
 function AF_ScrollFrameMixin:GetScroll()
@@ -128,6 +140,11 @@ function AF_ScrollFrameMixin:UpdatePixels()
 
     -- reset scroll
     self:ResetScroll()
+end
+
+function AF_ScrollFrameMixin:DisableScrollFrameReanchor(disabled)
+    self.disableScrollFrameReanchor = disabled
+    UpdateScrollFrameAnchor(self)
 end
 
 local function ScrollFrame_OnSizeChanged(scrollFrame)
@@ -174,13 +191,15 @@ local function ScrollContent_OnSizeChanged(scrollContent)
         scrollThumb:SetHeight(height)
 
         -- space for scrollBar
-        AF.SetPoint(scrollFrame, "BOTTOMRIGHT", -7, 0)
+        -- AF.SetPoint(scrollFrame, "BOTTOMRIGHT", -7, 0)
         scrollBar:Show()
     else
-        AF.SetPoint(scrollFrame, "BOTTOMRIGHT")
+        -- AF.SetPoint(scrollFrame, "BOTTOMRIGHT")
         scrollBar:Hide()
         scrollFrame:SetVerticalScroll(0)
     end
+
+    UpdateScrollFrameAnchor(scrollParent)
 end
 
 local function ScrollThumb_OnMouseDown(scrollThumb, button)
@@ -253,7 +272,7 @@ function AF.CreateScrollFrame(parent, name, width, height, color, borderColor)
     -- scrollContent
     local scrollContent = CreateFrame("Frame", nil, scrollFrame)
     scrollParent.scrollContent = scrollContent
-    AF.SetHeight(scrollContent, 1)
+    scrollContent:SetHeight(1)
     scrollContent:SetWidth(scrollFrame:GetWidth())
     scrollFrame:SetScrollChild(scrollContent)
 
