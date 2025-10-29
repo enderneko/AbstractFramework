@@ -491,6 +491,11 @@ function AF_ScrollEditBoxMixin:SetLabelAlt(label)
     self.eb.SetLabelAlt(self, label)
 end
 
+--! NOTE: this may cause strange cursor and text misalignment issues
+function AF_ScrollEditBoxMixin:SetSpacing(spacing)
+    self.eb:SetSpacing(spacing)
+end
+
 local function AF_ScrollEditBox_ScrollFrame_OnEnter(scrollFrame)
     if not scrollFrame:GetParent():IsEnabled() then return end
     scrollFrame.highlight:Show()
@@ -582,7 +587,7 @@ function AF.CreateScrollEditBox(parent, name, label, width, height)
     eb:SetPoint("TOPLEFT")
     eb:SetPoint("RIGHT")
     eb:SetTextInsets(4, 4, 4, 4)
-    eb:SetSpacing(2)
+    -- eb:SetSpacing(2)
     eb:SetScript("OnEnter", AF_ScrollEditBox_OnEnter)
     eb:SetScript("OnLeave", AF_ScrollEditBox_OnLeave)
     eb:SetScript("OnEnterPressed", AF_ScrollEditBox_OnEnterPressed)
