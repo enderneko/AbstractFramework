@@ -13,7 +13,7 @@ function AF.ShowDemo()
     local demo = AF.CreateHeaderedFrame(AF.UIParent, "AF_DEMO",
         AF.GetIconString("AF", 16) .. AF.GetGradientText("AbstractFramework", "blazing_tangerine", "vivid_raspberry")
         .. " " .. AF.WrapTextInColor(AF.GetAddOnVersion(AF.name) .. " Demo", "white"), 710, 520)
-    AF.SetPoint(demo, "LEFT", 100, 0)
+    AF.SetPoint(demo, "CENTER")
     demo:SetFrameLevel(500)
     demo:SetTitleJustify("LEFT")
 
@@ -255,10 +255,10 @@ function AF.ShowDemo()
             end,
         },
         {
-            ["text"] = "400",
-            ["value"] = 400,
+            ["text"] = "700",
+            ["value"] = 700,
             ["onClick"] = function()
-                sf1:SetContentHeight(400)
+                sf1:SetContentHeight(700)
             end,
         }
     })

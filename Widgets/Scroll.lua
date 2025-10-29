@@ -130,6 +130,108 @@ function AF_ScrollFrameMixin:UpdatePixels()
     self:ResetScroll()
 end
 
+local function ScrollFrame_OnSizeChanged(scrollFrame)
+    -- update scrollContent width
+    scrollFrame:GetScrollChild():SetWidth(scrollFrame:GetWidth())
+end
+
+local function ScrollFrame_OnVerticalScroll(scrollFrame, offset)
+    local scrollParent = scrollFrame:GetParent()
+    local scrollBar = scrollParent.scrollBar
+    local scrollThumb = scrollParent.scrollThumb
+
+    if scrollParent:GetVerticalScrollRange() ~= 0 then
+        local scrollP = scrollFrame:GetVerticalScroll() / scrollParent:GetVerticalScrollRange()
+        local offsetY = -((scrollBar:GetHeight() - scrollThumb:GetHeight()) * scrollP)
+        scrollThumb:SetPoint("TOP", 0, offsetY)
+    else
+        scrollThumb:SetPoint("TOP")
+    end
+end
+
+local function ScrollContent_OnSizeChanged(scrollContent)
+    -- check if it can scroll
+    -- DO NOT USE OnScrollRangeChanged to check whether it can scroll.
+    -- "invisible" widgets should be hidden, then the scroll range is NOT accurate!
+    -- scrollFrame:SetScript("OnScrollRangeChanged", function(self, xOffset, yOffset) end)
+
+    local scrollFrame = scrollContent:GetParent()
+    local scrollParent = scrollFrame:GetParent()
+    local scrollBar = scrollParent.scrollBar
+    local scrollThumb = scrollParent.scrollThumb
+
+    -- set thumb height (%)
+    local p = scrollFrame:GetHeight() / scrollContent:GetHeight()
+    p = tonumber(string.format("%.3f", p))
+    if p < 1 then -- can scroll
+        local height = max(scrollBar:GetHeight() * p, MIN_SCROLL_THUMB_HEIGHT)
+
+        -- NOTE: prevent a visual issue
+        if height > scrollBar:GetHeight() - abs(select(5, scrollThumb:GetPoint())) then
+            scrollThumb:SetPoint("TOP", 0, -(scrollBar:GetHeight() - height))
+        end
+
+        scrollThumb:SetHeight(height)
+
+        -- space for scrollBar
+        AF.SetPoint(scrollFrame, "BOTTOMRIGHT", -7, 0)
+        scrollBar:Show()
+    else
+        AF.SetPoint(scrollFrame, "BOTTOMRIGHT")
+        scrollBar:Hide()
+        scrollFrame:SetVerticalScroll(0)
+    end
+end
+
+local function ScrollThumb_OnMouseDown(scrollThumb, button)
+    if button ~= "LeftButton" then return end
+
+    local scrollParent = scrollThumb:GetParent():GetParent()
+    local scrollFrame = scrollParent.scrollFrame
+    local scrollBar = scrollParent.scrollBar
+
+    -- scrollFrame:SetScript("OnVerticalScroll", nil) -- disable OnVerticalScroll
+
+    local offsetY = select(5, scrollThumb:GetPoint(1))
+    local mouseY = select(2, GetCursorPosition()) -- https://warcraft.wiki.gg/wiki/API_GetCursorPosition
+    local scale = scrollThumb:GetEffectiveScale()
+    -- local currentScroll = scrollFrame:GetVerticalScroll()
+    local maxOffsetY = scrollBar:GetHeight() - scrollThumb:GetHeight()
+
+    scrollThumb:SetScript("OnUpdate", function(self)
+        local newMouseY = select(2, GetCursorPosition())
+        ------------------ y offset before dragging + mouse offset
+        local newOffsetY = offsetY + (newMouseY - mouseY) / scale
+
+        if newOffsetY >= 0 then -- top
+            -- AF.SetPoint(self, "TOP")
+            newOffsetY = 0
+        elseif -newOffsetY >= maxOffsetY then -- bottom
+            -- AF.SetPoint(self, "TOP", 0, -maxOffsetY)
+            newOffsetY = -maxOffsetY
+        else
+            -- AF.SetPoint(self, "TOP", 0, newOffsetY)
+        end
+
+        local vs = (-newOffsetY / maxOffsetY) * scrollParent:GetVerticalScrollRange()
+        scrollFrame:SetVerticalScroll(vs)
+    end)
+end
+
+local function ScrollThumb_OnMouseUp(scrollThumb)
+    -- local scrollFrame = scrollThumb:GetParent():GetParent().scrollFrame
+    -- scrollFrame:SetScript("OnVerticalScroll", ScrollFrame_OnVerticalScroll) -- enable OnVerticalScroll
+    scrollThumb:SetScript("OnUpdate", nil)
+end
+
+local function ScrollParent_OnMouseWheel(self, delta)
+    if delta == 1 then -- scroll up
+        self:VerticalScroll(AF.ConvertPixelsForRegion(-self.step, self))
+    elseif delta == -1 then -- scroll down
+        self:VerticalScroll(AF.ConvertPixelsForRegion(self.step, self))
+    end
+end
+
 ---@param parent Frame
 ---@param name? string
 ---@param width? number
@@ -158,7 +260,7 @@ function AF.CreateScrollFrame(parent, name, width, height, color, borderColor)
     -- for debugging
     -- local tex = scrollContent:CreateTexture(nil, "ARTWORK")
     -- tex:SetAllPoints(scrollContent)
-    -- tex:SetColorTexture(0, 1, 0, 0.1)
+    -- tex:SetColorTexture(0, 1, 0, 0.5)
 
     -- scrollBar
     local scrollBar = AF.CreateBorderedFrame(scrollParent, nil, 5, nil, color, borderColor)
@@ -181,101 +283,23 @@ function AF.CreateScrollFrame(parent, name, width, height, color, borderColor)
 
     Mixin(scrollParent, AF_ScrollFrameMixin)
 
-    -- on width changed (scrollBar show/hide)
-    scrollFrame:SetScript("OnSizeChanged", function()
-        -- update scrollContent width
-        scrollContent:SetWidth(scrollFrame:GetWidth())
-    end)
-
-    -- check if it can scroll
-    -- DO NOT USE OnScrollRangeChanged to check whether it can scroll.
-    -- "invisible" widgets should be hidden, then the scroll range is NOT accurate!
-    -- scrollFrame:SetScript("OnScrollRangeChanged", function(self, xOffset, yOffset) end)
-    scrollContent:SetScript("OnSizeChanged", function()
-        -- set thumb height (%)
-        local p = scrollFrame:GetHeight() / scrollContent:GetHeight()
-        p = tonumber(string.format("%.3f", p))
-        if p < 1 then -- can scroll
-            local height = max(scrollBar:GetHeight() * p, MIN_SCROLL_THUMB_HEIGHT)
-
-            -- NOTE: prevent a visual issue
-            if height > scrollBar:GetHeight() - abs(select(5, scrollThumb:GetPoint())) then
-                scrollThumb:SetPoint("TOP", 0, -(scrollBar:GetHeight() - height))
-            end
-
-            scrollThumb:SetHeight(height)
-
-            -- space for scrollBar
-            AF.SetPoint(scrollFrame, "BOTTOMRIGHT", -7, 0)
-            scrollBar:Show()
-        else
-            AF.SetPoint(scrollFrame, "BOTTOMRIGHT")
-            scrollBar:Hide()
-            scrollFrame:SetVerticalScroll(0)
-        end
-    end)
-
-    local function OnVerticalScroll(self, offset)
-        if scrollParent:GetVerticalScrollRange() ~= 0 then
-            local scrollP = scrollFrame:GetVerticalScroll() / scrollParent:GetVerticalScrollRange()
-            local offsetY = -((scrollBar:GetHeight() - scrollThumb:GetHeight()) * scrollP)
-            scrollThumb:SetPoint("TOP", 0, offsetY)
-        else
-            scrollThumb:SetPoint("TOP")
-        end
-    end
-    scrollFrame:SetScript("OnVerticalScroll", OnVerticalScroll)
+    scrollFrame:SetScript("OnSizeChanged", ScrollFrame_OnSizeChanged)
+    scrollFrame:SetScript("OnVerticalScroll", ScrollFrame_OnVerticalScroll)
+    scrollContent:SetScript("OnSizeChanged", ScrollContent_OnSizeChanged)
 
     -- dragging and scrolling
-    scrollThumb:SetScript("OnMouseDown", function(self, button)
-        if button ~= "LeftButton" then return end
-        scrollFrame:SetScript("OnVerticalScroll", nil) -- disable OnVerticalScroll
-
-        local offsetY = select(5, scrollThumb:GetPoint(1))
-        local mouseY = select(2, GetCursorPosition()) -- https://warcraft.wiki.gg/wiki/API_GetCursorPosition
-        local scale = scrollThumb:GetEffectiveScale()
-        local currentScroll = scrollFrame:GetVerticalScroll()
-        self:SetScript("OnUpdate", function(self)
-            local newMouseY = select(2, GetCursorPosition())
-            ------------------ y offset before dragging + mouse offset
-            local newOffsetY = offsetY + (newMouseY - mouseY) / scale
-
-            -- even scrollThumb:SetPoint is already done in OnVerticalScroll, but it's useful in some cases.
-            if newOffsetY >= 0 then -- top
-                AF.SetPoint(scrollThumb, "TOP")
-                newOffsetY = 0
-            elseif (-newOffsetY) + scrollThumb:GetHeight() >= scrollBar:GetHeight() then -- bottom
-                AF.SetPoint(scrollThumb, "TOP", 0, -(scrollBar:GetHeight() - scrollThumb:GetHeight()))
-                newOffsetY = -(scrollBar:GetHeight() - scrollThumb:GetHeight())
-            else
-                AF.SetPoint(scrollThumb, "TOP", 0, newOffsetY)
-            end
-            local vs = (-newOffsetY / (scrollBar:GetHeight()-scrollThumb:GetHeight())) * scrollParent:GetVerticalScrollRange()
-            scrollFrame:SetVerticalScroll(vs)
-        end)
-    end)
-
-    scrollThumb:SetScript("OnMouseUp", function(self)
-        scrollFrame:SetScript("OnVerticalScroll", OnVerticalScroll) -- enable OnVerticalScroll
-        self:SetScript("OnUpdate", nil)
-    end)
+    scrollThumb:SetScript("OnMouseDown", ScrollThumb_OnMouseDown)
+    scrollThumb:SetScript("OnMouseUp", ScrollThumb_OnMouseUp)
 
     -- enable mouse wheel scroll
     scrollParent:SetScrollStep(25)
     scrollParent:EnableMouseWheel(true)
-    scrollParent:SetScript("OnMouseWheel", function(self, delta)
-        if delta == 1 then -- scroll up
-            scrollParent:VerticalScroll(AF.ConvertPixelsForRegion(-scrollParent.step, scrollFrame))
-        elseif delta == -1 then -- scroll down
-            scrollParent:VerticalScroll(AF.ConvertPixelsForRegion(scrollParent.step, scrollFrame))
-        end
-    end)
+    scrollParent:SetScript("OnMouseWheel", ScrollParent_OnMouseWheel)
 
     AF.AddToPixelUpdater_OnShow(scrollParent)
 
     return scrollParent
 end
-
 
 ---------------------------------------------------------------------
 -- ScrollListGrid shared
@@ -707,7 +731,6 @@ function AF_ScrollListMixin:Select(id, skipCallback)
                 ButtonGroup_Deselect(self, b, true)
             end
         end
-
     elseif self.multiSelect then
         if IsShiftKeyDown() and self.lastClickedIndex then
             local from = self.lastClickedIndex
@@ -748,7 +771,6 @@ function AF_ScrollListMixin:Select(id, skipCallback)
         if not skipCallback and self.onSelect then
             self.onSelect(self.selected)
         end
-
     else
         for b in self.pool:EnumerateActive() do
             if id == b.id then
@@ -991,7 +1013,6 @@ function AF.CreateScrollList(parent, name, verticalMargin, horizontalMargin, slo
 
     return scrollList
 end
-
 
 ---------------------------------------------------------------------
 -- scrol grid
