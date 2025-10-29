@@ -20,6 +20,14 @@ local function ScorllThumb_OnLeave(self)
     self:SetBackdropColor(self.r, self.g, self.b, 0.7)
 end
 
+local function UpdateSlotFrameAnchor(self)
+    if self.disableSlotFrameReanchor or not self:CanScroll() then
+        AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", -self.horizontalMargin, self.verticalMargin)
+    else
+        AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", self.scrollBar, "BOTTOMLEFT", -self.horizontalMargin, 0)
+    end
+end
+
 ---------------------------------------------------------------------
 -- scroll frame
 ---------------------------------------------------------------------
@@ -398,16 +406,20 @@ function AF_ScrollListMixin:SetSlotHeight(newHeight)
     self:UpdateSlots()
 end
 
+function AF_ScrollListMixin:DisableSlotFrameReanchor(disabled)
+    self.disableSlotFrameReanchor = disabled
+    UpdateSlotFrameAnchor(self)
+end
+
 local function ScrollList_UpdateScrollBar(self)
-    if self.widgetNum > self.slotNum then -- can scroll
+    if self:CanScroll() then
         self.scrollBar:Show()
         local p = self.slotNum / self.widgetNum
         self.scrollThumb:SetHeight(max(self.scrollBar:GetHeight() * p, MIN_SCROLL_THUMB_HEIGHT))
-        AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", self.scrollBar, "BOTTOMLEFT", -self.horizontalMargin, 0)
     else
         self.scrollBar:Hide()
-        AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", -self.horizontalMargin, self.verticalMargin)
     end
+    UpdateSlotFrameAnchor(self)
 end
 
 --- this method cannot be used together with SetWidgetPool/SetupButtonGroup
@@ -504,7 +516,7 @@ function AF_ScrollListMixin:Reset()
     end
 
     -- resize / repoint
-    AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", 0, self.verticalMargin)
+    AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", -self.horizontalMargin, self.verticalMargin)
     self.scrollBar:Hide()
 end
 
@@ -1064,6 +1076,11 @@ function AF_ScrollGridMixin:SetSlotSize(newWidth, newHeight)
     self:SetSlotRowsAndColumns(self.slotRow, self.slotColumn)
 end
 
+function AF_ScrollGridMixin:DisableSlotFrameReanchor(disabled)
+    self.disableSlotFrameReanchor = disabled
+    UpdateSlotFrameAnchor(self)
+end
+
 function AF_ScrollGridMixin:SetWidgets(widgets)
     self:Reset()
     self.widgets = widgets
@@ -1079,11 +1096,10 @@ function AF_ScrollGridMixin:SetWidgets(widgets)
         self.scrollBar:Show()
         local p = self.slotRow / ceil(self.widgetNum / self.slotColumn)
         self.scrollThumb:SetHeight(max(self.scrollBar:GetHeight() * p, MIN_SCROLL_THUMB_HEIGHT))
-        AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", self.scrollBar, "BOTTOMLEFT", -self.horizontalMargin, 0)
     else
         self.scrollBar:Hide()
-        AF.SetPoint(self.slotFrame, "BOTTOMRIGHT", -self.horizontalMargin, self.verticalMargin)
     end
+    UpdateSlotFrameAnchor(self)
 
     -- update slot size
     self:UpdateSlotSize()
