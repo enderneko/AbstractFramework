@@ -18,6 +18,17 @@ function AF_TextureMixin:SetColor(color)
     end
 end
 
+---@param texture string|number texture path/fileID or atlas
+-- - For path/fileID, "..." are wrapModeHorizontal, wrapModeVertical, filterMode
+-- - For atlas, "..." are useAtlasSize, filterMode, resetTexCoords
+function AF_TextureMixin:SetTextureOrAtlas(texture, ...)
+    if type(texture) == "string" and not texture:find("[/\\]") then
+        self:SetAtlas(texture, ...)
+    else
+        self:SetTexture(texture, ...)
+    end
+end
+
 ---@param parent Frame
 ---@param texture? string
 ---@param color? table|string
