@@ -81,7 +81,7 @@ end
 ---------------------------------------------------------------------
 local ceil = math.ceil
 
-local function ResizeToFitText(self, frame, fontString, hPadding, vPadding)
+local function ResizeToFitText(self, frame, fontString, hPadding, vPadding, callback)
     self.elapsed = 0
 
     hPadding = hPadding and hPadding * 2
@@ -98,6 +98,7 @@ local function ResizeToFitText(self, frame, fontString, hPadding, vPadding)
         self.elapsed = self.elapsed + elapsed
         if self.elapsed >= 0.5 or not frame:IsShown() then
             self:Hide()
+            if callback then callback(frame:GetSize()) end
         end
     end)
     self:Show()
@@ -117,8 +118,9 @@ end)
 ---@param fontString FontString
 ---@param hPadding number? horizontal padding, if omitted, will not change width
 ---@param vPadding number? vertical padding, if omitted, will not change height
-function AF.ResizeToFitText(frame, fontString, hPadding, vPadding)
-    pool:Acquire():ResizeToFitText(frame, fontString, hPadding, vPadding)
+---@param callback function? called after resize is done
+function AF.ResizeToFitText(frame, fontString, hPadding, vPadding, callback)
+    pool:Acquire():ResizeToFitText(frame, fontString, hPadding, vPadding, callback)
 end
 
 ---------------------------------------------------------------------
