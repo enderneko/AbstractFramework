@@ -337,8 +337,7 @@ function AF.ShowDemo()
 
     do
         local data = {
-            druid = {774, 8936, 190984},
-            monk = {119611, 124682, 450805},
+            druid = {774, 8936},
             priest = {139, 41635, 17},
         }
 

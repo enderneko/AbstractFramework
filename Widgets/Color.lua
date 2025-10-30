@@ -579,7 +579,7 @@ end
 ---@return number g
 ---@return number b
 function AF.GetLevelColor(unit)
-    if AF.isRetail and (UnitIsWildBattlePet(unit) or UnitIsBattlePetCompanion(unit)) then
+    if (AF.isRetail or AF.isMists) and (UnitIsWildBattlePet(unit) or UnitIsBattlePetCompanion(unit)) then
         local teamLevel = GetPetTeamAverageLevel()
         local level = UnitBattlePetLevel(unit)
         if teamLevel ~= level then

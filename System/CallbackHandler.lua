@@ -71,6 +71,7 @@ AF.DEBUG_EVENTS = {
     AF_LOADED = "blazing_tangerine",
     AF_POPUPS_READY = "blazing_tangerine",
     AF_PLAYER_DATA_UPDATE = "lightblue",
+    AF_PLAYER_SPEC_UPDATE = "lightblue",
     AF_INSTANCE_ENTER = "sand",
     AF_INSTANCE_LEAVE = "sand",
     AF_INSTANCE_STATE_CHANGE = "sand",

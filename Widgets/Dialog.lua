@@ -1,11 +1,12 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
+local L = AF.L
 
-local YES = _G.YES
-local NO = _G.NO
-local OKAY = _G.OKAY
-local CANCEL = _G.CANCEL
-local GOT_IT = _G.HELP_TIP_BUTTON_GOT_IT
+local YES = AF.L["Yes"]
+local NO = AF.L["No"]
+local OKAY = AF.L["Okay"]
+local CANCEL = AF.L["Cancel"]
+local GOT_IT = AF.L["Got It"]
 local GOT_IT_COUNTDOWN = GOT_IT .. " (%d)"
 
 ---------------------------------------------------------------------

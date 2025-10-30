@@ -17,12 +17,12 @@ local CanInspect = CanInspect
 local GetAverageItemLevel = GetAverageItemLevel
 local GetInventoryItemLink = GetInventoryItemLink
 local GetItemInfo = C_Item.GetItemInfo
-local GetTooltipData = C_TooltipInfo.GetInventoryItem
+local GetTooltipData = C_TooltipInfo and C_TooltipInfo.GetInventoryItem
 
 ---------------------------------------------------------------------
 -- update
 ---------------------------------------------------------------------
--- if GetTooltipData then
+if GetTooltipData then
     local SLOTS = {
         INVSLOT_HEAD,
         INVSLOT_NECK,
@@ -143,81 +143,86 @@ local GetTooltipData = C_TooltipInfo.GetInventoryItem
         end
     end
 
--- else
---     local GetDetailedItemLevelInfo = GetDetailedItemLevelInfo or C_Item.GetDetailedItemLevelInfo
+else
+    local GetDetailedItemLevelInfo = GetDetailedItemLevelInfo or C_Item.GetDetailedItemLevelInfo
 
---     local SLOTS = {
---         INVSLOT_HEAD,
---         INVSLOT_NECK,
---         INVSLOT_SHOULDER,
---         INVSLOT_CHEST,
---         INVSLOT_WAIST,
---         INVSLOT_LEGS,
---         INVSLOT_FEET,
---         INVSLOT_WRIST,
---         INVSLOT_HAND,
---         INVSLOT_FINGER1,
---         INVSLOT_FINGER2,
---         INVSLOT_TRINKET1,
---         INVSLOT_TRINKET2,
---         INVSLOT_BACK,
---         INVSLOT_RANGED,
---     }
+    local SLOTS = {
+        INVSLOT_HEAD,
+        INVSLOT_NECK,
+        INVSLOT_SHOULDER,
+        INVSLOT_CHEST,
+        INVSLOT_WAIST,
+        INVSLOT_LEGS,
+        INVSLOT_FEET,
+        INVSLOT_WRIST,
+        INVSLOT_HAND,
+        INVSLOT_FINGER1,
+        INVSLOT_FINGER2,
+        INVSLOT_TRINKET1,
+        INVSLOT_TRINKET2,
+        INVSLOT_BACK,
+        INVSLOT_RANGED,
+    }
 
---     local NUM_SLOTS = 17
+    local NUM_SLOTS
 
---     local function GetSlotLevel(unit, slot)
---         local link = GetInventoryItemLink(unit, slot)
---         local level = 0
---         if link then
---             -- level = select(4, GetItemInfo(link))
---             level = GetDetailedItemLevelInfo(link)
---         end
---         return level
---     end
+    if AF.isMists then
+        NUM_SLOTS = 16
+    else
+        tinsert(SLOTS, INVSLOT_RANGED)
+        NUM_SLOTS = 17
+    end
 
---     UpdateUnitItemLevel = function(unit)
---         local guid = UnitGUID(unit)
+    local function GetSlotLevel(unit, slot)
+        local link = GetInventoryItemLink(unit, slot)
+        local level = 0
+        if link then
+            level = GetDetailedItemLevelInfo(link)
+        end
+        return level
+    end
 
---         C_Timer.After(0.1, function()
---             local mainLevel, offLevel = 0, 0
---             local mainEquipLoc
+    -- REVIEW:
+    CalcItemLevel = function(unit, guid)
+        C_Timer.After(0.1, function()
+            local mainLevel, offLevel = 0, 0
+            local mainEquipLoc
 
---             local mainLink = GetInventoryItemLink(unit, INVSLOT_MAINHAND)
---             if mainLink then
---                 mainLevel = GetDetailedItemLevelInfo(mainLink)
---                 mainEquipLoc = select(9, GetItemInfo(mainLink))
---             end
+            local mainLink = GetInventoryItemLink(unit, INVSLOT_MAINHAND)
+            if mainLink then
+                mainLevel = GetDetailedItemLevelInfo(mainLink)
+                mainEquipLoc = select(9, GetItemInfo(mainLink))
+            end
 
---             local offLink = GetInventoryItemLink(unit, INVSLOT_OFFHAND)
---             if offLink then
---                 offLevel = GetDetailedItemLevelInfo(offLink)
---             end
+            local offLink = GetInventoryItemLink(unit, INVSLOT_OFFHAND)
+            if offLink then
+                offLevel = GetDetailedItemLevelInfo(offLink)
+            end
 
---             if mainLevel and offLevel then
---                 local total = 0
---                 if mainEquipLoc and mainEquipLoc == INVTYPE_2HWEAPON then
---                     total = total + mainLevel * 2
---                 else
---                     total = total + mainLevel + offLevel
---                 end
+            if mainLevel and offLevel then
+                local total = 0
+                if mainEquipLoc and mainEquipLoc == INVTYPE_2HWEAPON then
+                    total = total + mainLevel * 2
+                else
+                    total = total + mainLevel + offLevel
+                end
 
---                 for _, slot in pairs(SLOTS) do
---                     slot = GetSlotLevel(unit, slot)
---                     total = total + slot
---                 end
+                for _, slot in pairs(SLOTS) do
+                    slot = GetSlotLevel(unit, slot)
+                    total = total + slot
+                end
 
---                 if total and total ~= 0 then
---                     cache[guid] = {
---                         lastUpdate = GetTime(),
---                         itemLevel = AF.RoundToDecimal(total / NUM_SLOTS, 1)
---                     }
---                 end
-
---             end
---         end)
---     end
--- end
+                if total and total ~= 0 then
+                    cache[guid] = {
+                        lastUpdate = GetTime(),
+                        itemLevel = AF.RoundToDecimal(total / NUM_SLOTS, 1)
+                    }
+                    AF.Fire("AF_UNIT_ITEM_LEVEL_UPDATE", unit, guid)
+                end
+            end
+        end)
+    end
+end
 
 ---------------------------------------------------------------------
 -- inspect
@@ -250,6 +255,7 @@ function IL.UpdateCache(unit)
             itemLevel = AF.RoundToDecimal(select(2, GetAverageItemLevel()), 1)
         }
         AF.Fire("AF_UNIT_ITEM_LEVEL_UPDATE", unit, AF.player.guid)
+        return
     end
 
     local guid = UnitGUID(unit)

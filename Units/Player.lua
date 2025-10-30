@@ -12,8 +12,8 @@ local UnitSex = UnitSex
 local GetRealmName = GetRealmName
 local GetNormalizedRealmName = GetNormalizedRealmName
 local GetAutoCompleteRealms = GetAutoCompleteRealms
-local GetSpecialization = GetSpecialization
-local GetSpecializationInfo = GetSpecializationInfo
+local GetSpecialization = C_SpecializationInfo.GetSpecialization
+local GetSpecializationInfo = C_SpecializationInfo.GetSpecializationInfo
 
 ---------------------------------------------------------------------
 -- UnitClassBase --! fix wrong class for AI
@@ -51,7 +51,7 @@ local function PLAYER_LOGIN()
     AF.player.localizedRace, AF.englishRace, AF.player.raceID = UnitRace("player")
     AF.player.sex = UnitSex("player")
 
-    if AF.isRetail then
+    if AF.isRetail or AF.isMists then
         AF.player.specIndex = GetSpecialization()
         AF.player.specID, AF.player.specName, _, AF.player.specIcon, AF.player.specRole = GetSpecializationInfo(AF.player.specIndex)
     end
@@ -60,21 +60,23 @@ local function PLAYER_LOGIN()
     AF.connectedRealms = AF.TransposeTable(GetAutoCompleteRealms())
     AF.connectedRealms[AF.player.normalizedRealm] = true
 
-    AF.Fire("AF_PLAYER_SPEC_UPDATE")
+    AF.Fire("AF_PLAYER_SPEC_UPDATE", AF.player.specID)
     AF.Fire("AF_PLAYER_DATA_UPDATE", true)
     AF.Fire("AF_PLAYER_LOGIN_DELAYED")
 end
 AF.RegisterCallback("AF_PLAYER_LOGIN", PLAYER_LOGIN, "high")
 
-if AF.isRetail then
-    local function ACTIVE_TALENT_GROUP_CHANGED()
+if AF.isRetail or AF.isMists then
+    local function UpdateSpecData()
         local lastSpecID = AF.player.specID
         AF.player.specIndex = GetSpecialization()
         AF.player.specID, AF.player.specName, _, AF.player.specIcon, AF.player.specRole = GetSpecializationInfo(AF.player.specIndex)
-        AF.Fire("AF_PLAYER_SPEC_UPDATE", AF.player.specID, lastSpecID)
-        AF.Fire("AF_PLAYER_DATA_UPDATE")
+        if AF.player.specID ~= lastSpecID then
+            AF.Fire("AF_PLAYER_SPEC_UPDATE", AF.player.specID, lastSpecID)
+            AF.Fire("AF_PLAYER_DATA_UPDATE")
+        end
     end
-    AF.CreateBasicEventHandler(AF.GetDelayedInvoker(0.1, ACTIVE_TALENT_GROUP_CHANGED), "ACTIVE_TALENT_GROUP_CHANGED")
+    AF.CreateBasicEventHandler(AF.GetDelayedInvoker(0.1, UpdateSpecData), "ACTIVE_TALENT_GROUP_CHANGED", "PLAYER_SPECIALIZATION_CHANGED")
 end
 
 -- TODO: level, sex ... changed

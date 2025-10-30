@@ -3,7 +3,7 @@ local AF = _G.AbstractFramework
 
 AF.REGISTERED_ADDONS = {}
 
-local PATTERN = AF.isRetail and "\n%[Interface/AddOns/([^/]+)/" or "@Interface/AddOns/([^/]+)/"
+local PATTERN = (AF.isRetail or AF.isMists) and "\n%[Interface/AddOns/([^/]+)/" or "@Interface/AddOns/([^/]+)/"
 local strmatch = string.gmatch
 local debugstack, print, type = debugstack, print, type
 local tinsert, tconcat = table.insert, table.concat

@@ -78,7 +78,7 @@ function AF.CreateColorPicker(parent, label, alphaEnabled, onChange, onConfirm)
     cp.label = AF.CreateFontString(cp, label)
     AF.RemoveFromPixelUpdater(cp.label)
     AF.SetPoint(cp.label, "LEFT", cp, "RIGHT", 5, 0)
-    cp:SetHitRectInsets(0, -cp.label:GetStringWidth()-5, 0, 0)
+    cp:SetHitRectInsets(0, -cp.label:GetStringWidth() - 5, 0, 0)
 
     cp.accentColor = AF.GetAddonAccentColorName()
 
@@ -221,9 +221,9 @@ local function UpdateColor_HSBA(h, s, b, a, updateWidgetColor, updatePickerAndSl
     end
 
     if updatePickerAndSlider then
-        picker:SetPoint("CENTER", saturationBrightnessPane, "BOTTOMLEFT", Round(s*saturationBrightnessPane:GetWidth()), Round(b*saturationBrightnessPane:GetHeight()))
+        picker:SetPoint("CENTER", saturationBrightnessPane, "BOTTOMLEFT", Round(s * saturationBrightnessPane:GetWidth()), Round(b * saturationBrightnessPane:GetHeight()))
         hueSlider:SetValue(h)
-        alphaSlider:SetValue(1-a)
+        alphaSlider:SetValue(1 - a)
     end
 end
 
@@ -362,16 +362,16 @@ local function CreateEB(label, width, height, isNumeric, group)
                     b_EB:SetText(100)
                 end
 
-                H, S, B = h_EB:GetNumber(), s_EB:GetNumber()/100, b_EB:GetNumber()/100
+                H, S, B = h_EB:GetNumber(), s_EB:GetNumber() / 100, b_EB:GetNumber() / 100
                 UpdateAll("hsb", H, S, B, A, true, true)
 
             else -- alphaSlider
                 if aEB:GetNumber() > 100 then
                     aEB:SetText(100)
                 end
-                A = aEB:GetNumber()/100
+                A = aEB:GetNumber() / 100
 
-                alphaSlider:SetValue(1-A)
+                alphaSlider:SetValue(1 - A)
                 UpdateAll("hsb", H, S, B, A)
             end
 
@@ -401,7 +401,7 @@ local function CreateColorGrid(color)
     AF.RemoveFromPixelUpdater(grid)
 
     if type(color) == "table" then
-        AF.SetTooltip(grid, "TOPLEFT", 0, 2, "|c"..AF.GetColorHex(color[1])..color[2])
+        AF.SetTooltip(grid, "TOPLEFT", 0, 2, "|c" .. AF.GetColorHex(color[1]) .. (color[2] or color[1]) .. "|r")
         color = color[1]
     end
 
@@ -418,7 +418,13 @@ local function CreateColorGrid(color)
     return grid
 end
 
-local localizedClass = LocalizedClassList()
+local localizedClass
+if LocalizedClassList then
+    localizedClass = LocalizedClassList()
+else
+    localizedClass = {}
+    FillLocalizedClassList(localizedClass)
+end
 
 local preset1 = {
     {"DEATHKNIGHT", localizedClass["DEATHKNIGHT"]},
@@ -528,7 +534,7 @@ local function CreateColorPickerFrame()
     local colors = {"red", "yellow", "green", "cyan", "blue", "purple", "red"}
     local sectionSize = hueSlider:GetHeight() / 6
     for i = 1, 6 do
-        hueSlider[i] = AF.CreateGradientTexture(hueSlider, "VERTICAL", colors[i+1], colors[i])
+        hueSlider[i] = AF.CreateGradientTexture(hueSlider, "VERTICAL", colors[i + 1], colors[i])
 
         -- width
         hueSlider[i]:SetHeight(sectionSize)
@@ -537,7 +543,7 @@ local function CreateColorPickerFrame()
         if i == 1 then
             hueSlider[i]:SetPoint("TOPLEFT")
         else
-            hueSlider[i]:SetPoint("TOPLEFT", hueSlider[i-1], "BOTTOMLEFT")
+            hueSlider[i]:SetPoint("TOPLEFT", hueSlider[i - 1], "BOTTOMLEFT")
         end
         hueSlider[i]:SetPoint("RIGHT")
     end
@@ -654,11 +660,11 @@ local function CreateColorPickerFrame()
         local mouseX, mouseY = GetCursorPosition()
 
         local scale = picker:GetEffectiveScale()
-        mouseX, mouseY = mouseX/scale, mouseY/scale
+        mouseX, mouseY = mouseX / scale, mouseY / scale
 
         -- start dragging
         local x, y = select(4, picker:GetPoint(1))
-        picker:StartMoving(mouseX/scale-sbX, mouseY/scale-sbY, mouseX, mouseY)
+        picker:StartMoving(mouseX / scale - sbX, mouseY / scale - sbY, mouseX, mouseY)
     end)
 
     saturationBrightnessPane:SetScript("OnMouseUp", function(self, button)
@@ -724,38 +730,38 @@ local function CreateColorPickerFrame()
         grids[i] = CreateColorGrid(preset1[i])
         if i == 1 then
             AF.SetPoint(grids[i], "TOPLEFT", originalPane, "TOPRIGHT", 14, -1)
-        elseif (i-1) % 2 == 0 then
-            AF.SetPoint(grids[i], "TOPLEFT", grids[i-2], "BOTTOMLEFT", 0, -2)
+        elseif (i - 1) % 2 == 0 then
+            AF.SetPoint(grids[i], "TOPLEFT", grids[i - 2], "BOTTOMLEFT", 0, -2)
         else
-            AF.SetPoint(grids[i], "TOPLEFT", grids[i-1], "TOPRIGHT", 2, 0)
+            AF.SetPoint(grids[i], "TOPLEFT", grids[i - 1], "TOPRIGHT", 2, 0)
         end
     end
 
     local offset = #preset1
     for i = 1, #preset2 do
-        local index = i+offset
+        local index = i + offset
         grids[index] = CreateColorGrid(preset2[i])
 
         if i == 1 then
             AF.SetPoint(grids[index], "TOPLEFT", grids[offset], "BOTTOMLEFT", 0, -7)
-        elseif (i-1) % 2 == 0 then
-            AF.SetPoint(grids[index], "TOPLEFT", grids[index-2], "BOTTOMLEFT", 0, -2)
+        elseif (i - 1) % 2 == 0 then
+            AF.SetPoint(grids[index], "TOPLEFT", grids[index - 2], "BOTTOMLEFT", 0, -2)
         else
-            AF.SetPoint(grids[index], "TOPLEFT", grids[index-1], "TOPRIGHT", 2, 0)
+            AF.SetPoint(grids[index], "TOPLEFT", grids[index - 1], "TOPRIGHT", 2, 0)
         end
     end
 
     offset = #preset1 + #preset2
     for i = 1, #preset3 do
-        local index = i+offset
+        local index = i + offset
         grids[index] = CreateColorGrid(preset3[i])
 
         if i == 1 then
             AF.SetPoint(grids[index], "TOPLEFT", grids[offset], "BOTTOMLEFT", 0, -7)
-        elseif (i-1) % 2 == 0 then
-            AF.SetPoint(grids[index], "TOPLEFT", grids[index-2], "BOTTOMLEFT", 0, -2)
+        elseif (i - 1) % 2 == 0 then
+            AF.SetPoint(grids[index], "TOPLEFT", grids[index - 2], "BOTTOMLEFT", 0, -2)
         else
-            AF.SetPoint(grids[index], "TOPLEFT", grids[index-1], "TOPRIGHT", 2, 0)
+            AF.SetPoint(grids[index], "TOPLEFT", grids[index - 1], "TOPRIGHT", 2, 0)
         end
     end
 

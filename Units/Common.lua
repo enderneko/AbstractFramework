@@ -26,7 +26,7 @@ local UnitClassification = UnitClassification
 local UnitExists = UnitExists
 local UnitPlayerControlled = UnitPlayerControlled
 local UnitCreatureType = UnitCreatureType
-local GetUnitTooltipData = C_TooltipInfo.GetUnit
+local GetUnitTooltipData = C_TooltipInfo and C_TooltipInfo.GetUnit
 local GetCVarBool = C_CVar.GetCVarBool
 local UnitIsWildBattlePet = UnitIsWildBattlePet
 local UnitIsBattlePetCompanion = UnitIsBattlePetCompanion
@@ -454,6 +454,7 @@ local function UpdateNPCCache(unit)
         return name
     end
 
+    --- TODO: use a scanner tooltip to get data for classic
     local data = GetUnitTooltipData(unit)
     if not data then
         return

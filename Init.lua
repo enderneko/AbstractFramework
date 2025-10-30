@@ -55,12 +55,18 @@ AF.isAsian = LOCALE_zhCN or LOCALE_zhTW or LOCALE_koKR
 if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
     AF.isRetail = true
     AF.flavor = "retail"
+elseif WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC then
+    AF.isMists = true
+    AF.flavor = "mists"
 elseif WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC then
     AF.isCata = true
     AF.flavor = "cata"
 elseif WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC then
     AF.isWrath = true
     AF.flavor = "wrath"
+elseif WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC then
+    AF.isTBC = true
+    AF.flavor = "tbc"
 elseif WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
     AF.isVanilla = true
     AF.flavor = "vanilla"

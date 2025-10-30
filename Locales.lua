@@ -5,9 +5,9 @@ AF.L = setmetatable({
     ["AF_VERSION_REQUIRED"] = "AbstractFramework Version Mismatch\n%s requires: %s or higher\nCurrent: %s",
 
     ["Blizzard"] = string.gsub(_G.SLASH_TEXTTOSPEECH_BLIZZARD, "^%l", strupper),
-    ["Shift Click"] = _G.WARDROBE_SHORTCUTS_TUTORIAL_2:match("%[(.+)%]"),
-    ["Ctrl Click"] = _G.WARDROBE_SHORTCUTS_TUTORIAL_2:match("%[(.+)%]"):gsub("Shift", "Ctrl"),
-    ["Alt Click"] = _G.WARDROBE_SHORTCUTS_TUTORIAL_2:match("%[(.+)%]"):gsub("Shift", "Alt"),
+    -- ["Shift Click"] = _G.WARDROBE_SHORTCUTS_TUTORIAL_2:match("%[(.+)%]"),
+    -- ["Ctrl Click"] = _G.WARDROBE_SHORTCUTS_TUTORIAL_2:match("%[(.+)%]"):gsub("Shift", "Ctrl"),
+    -- ["Alt Click"] = _G.WARDROBE_SHORTCUTS_TUTORIAL_2:match("%[(.+)%]"):gsub("Shift", "Alt"),
     ["WIP"] = "Work In Progress",
 
     ["TANK"] = _G["TANK"],
@@ -42,6 +42,7 @@ AF.L = setmetatable({
     ["Yes"] = _G.YES,
     ["No"] = _G.NO,
     ["Apply"] = _G.APPLY,
+    -- ["Got It"] = _G.HELP_TIP_BUTTON_GOT_IT,
 
     ["Delete"] = _G.DELETE,
     ["Rename"] = _G.BATTLE_PET_RENAME,
@@ -96,6 +97,8 @@ end
 
 if LOCALE_zhCN then
     L["AF_VERSION_REQUIRED"] = "AbstractFramework 版本不匹配\n%s 需要：%s 及以上\n当前：%s"
+
+    L["Got It"] = "明白了"
 
     L["%d days"] = "%d天"
     L["%d hours"] = "%d小时"
@@ -302,6 +305,9 @@ if LOCALE_zhCN then
     L["Right Drag"] = "右键拖动"
     L["Mouse Wheel"] = "鼠标滚轮"
     L["Mouse wheel click"] = "鼠标滚轮按下"
+    L["Shift Click"] = "按住Shift点击"
+    L["Ctrl Click"] = "按住Ctrl点击"
+    L["Alt Click"] = "按住Alt点击"
 
     L["Left-click: "] = "左键单击："
     L["Left-drag: "] = "左键拖动："

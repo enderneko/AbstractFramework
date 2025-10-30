@@ -2,6 +2,7 @@
 local AF = _G.AbstractFramework
 
 local UnitClassBase = UnitClassBase
+local IsSpellKnown = IsSpellKnown
 
 local dispellable = {}
 
@@ -103,7 +104,6 @@ if UnitClassBase("player") == "WARLOCK" then
             dispellable["Magic"] = IsSpellKnown(89808, true)
             -- texplore(dispellable)
         end)
-
     end)
 else
     eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")

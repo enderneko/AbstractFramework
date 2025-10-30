@@ -66,7 +66,9 @@ function AF.ShowTooltip(widget, anchor, x, y, lines)
 
     AF.Tooltip:SetFrameStrata("TOOLTIP")
     -- AF.Tooltip:SetCustomLineSpacing(5)
-    AF.Tooltip:SetCustomWordWrapMinWidth(widget._tooltipWordWrapMinWidth or 300)
+    if AF.Tooltip.SetCustomWordWrapMinWidth then
+        AF.Tooltip:SetCustomWordWrapMinWidth(widget._tooltipWordWrapMinWidth or 300)
+    end
     AF.Tooltip:Show()
 end
 
@@ -168,19 +170,19 @@ local function GameTooltip_OnHide(self)
     GameTooltip_ClearStatusBars(self)
     GameTooltip_ClearProgressBars(self)
     GameTooltip_ClearWidgetSet(self)
-    TooltipComparisonManager:Clear(self)
-
     GameTooltip_HideBattlePetTooltip()
+    GameTooltip_ClearStatusBars(self)
 
     if self.ItemTooltip then
         EmbeddedItemTooltip_Hide(self.ItemTooltip)
     end
     self:SetPadding(0, 0, 0, 0)
-
     self:ClearHandlerInfo()
 
-    GameTooltip_ClearStatusBars(self)
-    GameTooltip_ClearStatusBarWatch(self)
+    if AF.isRetail then
+        TooltipComparisonManager:Clear(self)
+        GameTooltip_ClearStatusBarWatch(self)
+    end
 end
 
 ---@class AF_Tooltip:GameTooltip
@@ -338,9 +340,9 @@ local function CreateTooltip(name)
     Mixin(tooltip, AF_BaseWidgetMixin)
     Mixin(tooltip, AF_TooltipMixin)
 
-    if AF.isRetail then
+    -- if AF.isRetail then
         tooltip:RegisterEvent("TOOLTIP_DATA_UPDATE", TOOLTIP_DATA_UPDATE)
-    end
+    -- end
 
     -- tooltip:SetScript("OnTooltipSetItem", function()
     --     -- color border with item quality color
