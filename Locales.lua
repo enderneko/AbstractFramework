@@ -215,6 +215,7 @@ if LOCALE_zhCN then
     L["About"] = "关于"
     L["Author"] = "作者"
     L["Authors"] = "作者"
+    L["Title"] = "标题"
     L["General"] = "常规"
     L["Config"] = "设置"
     L["Configs"] = "设置"
