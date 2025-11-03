@@ -251,6 +251,15 @@ local function ScrollParent_OnMouseWheel(self, delta)
     end
 end
 
+---@private for ScrollEditBox
+function AF_ScrollFrameMixin:EnableScroll(enabled)
+    if enabled then
+        self:EnableMouseWheel(true)
+    else
+        self:EnableMouseWheel(false)
+    end
+end
+
 ---@param parent Frame
 ---@param name? string
 ---@param width? number

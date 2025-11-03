@@ -554,6 +554,7 @@ local function AF_ScrollEditBox_OnTextChanged(eb)
     if frame.scrollFrame:GetVerticalScroll() > frame.scrollFrame:GetVerticalScrollRange() then
         frame:ScrollToBottom()
     end
+    frame:EnableScroll(frame:CanScroll())
 end
 
 ---@param parent Frame
