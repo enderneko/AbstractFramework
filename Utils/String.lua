@@ -23,6 +23,12 @@ function AF.LowerFirst(str)
     return (str:gsub("^%u", strlower))
 end
 
+function AF.RemoveWhitespaces(str)
+    if type(str) == "string" then
+        return (str:gsub("%s+", ""))
+    end
+end
+
 local function CapitalizeWord(space, firstChar, rest)
     return space .. strupper(firstChar) .. rest
 end
