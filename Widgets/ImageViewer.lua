@@ -47,6 +47,13 @@ local function ImageViewer_OnClose(closeBtn)
     f.endIndex = nil
     f.currentIndex = nil
 
+    f.rows = nil
+    f.columns = nil
+    f.frames = nil
+    f.duration = nil
+    f.animation:Stop()
+    f.panel.image:SetTexCoord(0, 1, 0, 1)
+
     if f.loader then
         f.loader:Cancel()
         f.loader = nil
@@ -79,6 +86,14 @@ local function ImageViewer_PlaySequence(self)
 end
 
 ---------------------------------------------------------------------
+-- play flipbook
+---------------------------------------------------------------------
+local function ImageViewer_PlayFlipBook(self)
+    self.panel.image:SetTexCoord(0, 1, 0, 1)
+    self.animation:Play()
+end
+
+---------------------------------------------------------------------
 -- load image
 ---------------------------------------------------------------------
 local function ImageViewer_Load(loader)
@@ -89,7 +104,10 @@ local function ImageViewer_Load(loader)
     f.loader = nil
 
     local w, h = f.panel.image:GetSize()
+    w, h = AF.Round(w), AF.Round(h)
+
     if w == 0 or h == 0 then
+        f.panel.image:SetTexCoord(0, 1, 0, 1)
         f.panel.image:SetTexture(AF.GetIcon("NoImage"))
         f.panel.image:SetPoint("CENTER")
         f.panel.image:SetAlpha(0.5)
@@ -98,8 +116,15 @@ local function ImageViewer_Load(loader)
         return
     end
 
-    f.imageWidth = AF.Round(w)
-    f.imageHeight = AF.Round(h)
+    if f.mode == "flipbook" then
+        w = AF.Round(w / f.columns)
+        h = AF.Round(h / f.rows)
+        f.animation.flipbook:SetFlipBookFrameWidth(w)
+        f.animation.flipbook:SetFlipBookFrameHeight(h)
+    end
+
+    f.imageWidth = w
+    f.imageHeight = h
 
     -- resize
     local panelW, panelH = f.panel:GetSize()
@@ -119,7 +144,10 @@ local function ImageViewer_Load(loader)
     ImageViewer_UpdateTitle(f)
 
     if f.mode == "sequence" then
-        ImageViewer_PlaySequence(f)
+        -- give a bit more time for preloading
+        C_Timer.After(0.1, function()
+            ImageViewer_PlaySequence(f)
+        end)
     elseif f.mode == "flipbook" then
         ImageViewer_PlayFlipBook(f)
     end
@@ -260,14 +288,14 @@ end
 ---------------------------------------------------------------------
 -- LoadImage
 ---------------------------------------------------------------------
-function AF_ImageViewerMixin:LoadImage(path, frameWidth, frameHeight)
+function AF_ImageViewerMixin:LoadImage(path, windowWidth, windowHeight)
     assert(type(path) == "string", "path must be a string")
 
     self.path = path
     self.scale = 1.0
     self.fileName = path:match("([^\\/:]+)$")
 
-    self:SetSize(frameWidth or INITIAL_WIDTH, frameHeight or INITIAL_HEIGHT)
+    self:SetSize(windowWidth or INITIAL_WIDTH, windowHeight or INITIAL_HEIGHT)
     self:ClearAllPoints()
     self:SetPoint("CENTER")
     self:Show()
@@ -285,7 +313,16 @@ end
 ---------------------------------------------------------------------
 -- LoadImageSequence
 ---------------------------------------------------------------------
-function AF_ImageViewerMixin:LoadImageSequence(path, nameFormat, startIndex, endIndex, interval, frameWidth, frameHeight)
+local preloaderPool = AF.CreateObjectPool(function(pool)
+    local tex = AF.UIParent:CreateTexture(nil, "ARTWORK")
+    tex.Load = tex.SetTexture
+    C_Timer.After(0.5, function()
+        pool:Release(tex)
+    end)
+    return tex
+end)
+
+function AF_ImageViewerMixin:LoadImageSequence(path, nameFormat, startIndex, endIndex, interval, windowWidth, windowHeight)
     assert(type(path) == "string", "path must be a string")
     assert(type(nameFormat) == "string", "nameFormat must be a string")
     assert(type(startIndex) == "number", "startIndex must be a number")
@@ -298,19 +335,76 @@ function AF_ImageViewerMixin:LoadImageSequence(path, nameFormat, startIndex, end
     end
     path = path .. nameFormat
 
+    -- try preloading images
     for i = startIndex, endIndex do
-        self.panel.image:SetTexture(path:format(i))
+        preloaderPool:Acquire():Load(path:format(i))
     end
-
-    local first = path:format(startIndex)
-    self:LoadImage(first, frameWidth, frameHeight)
 
     self.mode = "sequence"
     self.path = path
+    self.scale = 1.0
+    self.fileName = path:format(startIndex):match("([^\\/:]+)$")
+
     self.startIndex = startIndex
     self.endIndex = endIndex
     self.interval = interval
     self.currentIndex = startIndex
+
+    self:SetSize(windowWidth or INITIAL_WIDTH, windowHeight or INITIAL_HEIGHT)
+    self:ClearAllPoints()
+    self:SetPoint("CENTER")
+    self:Show()
+
+    self.panel.image:SetAlpha(0)
+    self.panel.image:SetSize(0, 0)
+    self.panel.image:SetTexture(path:format(startIndex))
+
+    self.loader = C_Timer.NewTicker(0.1, ImageViewer_Load)
+    self.loader.owner = self
+
+    ImageViewer_UpdateTitle(self)
+end
+
+---------------------------------------------------------------------
+-- LoadFlipBook
+---------------------------------------------------------------------
+function AF_ImageViewerMixin:LoadFlipBook(path, rows, columns, frames, duration, windowWidth, windowHeight)
+    assert(type(path) == "string", "path must be a string")
+    assert(type(rows) == "number", "rows must be a number")
+    assert(type(columns) == "number", "columns must be a number")
+    assert(type(frames) == "number", "frames must be a number")
+    assert(type(duration) == "number", "duration must be a number")
+
+    self.mode = "flipbook"
+    self.path = path
+    self.scale = 1.0
+    self.fileName = path:match("([^\\/:]+)$")
+
+    self.rows = rows
+    self.columns = columns
+    self.frames = frames
+    self.duration = duration
+
+    self.animation.flipbook:SetDuration(duration)
+    self.animation.flipbook:SetFlipBookRows(rows)
+    self.animation.flipbook:SetFlipBookColumns(columns)
+    self.animation.flipbook:SetFlipBookFrames(frames)
+    self.animation:Stop()
+
+    self:SetSize(windowWidth or INITIAL_WIDTH, windowHeight or INITIAL_HEIGHT)
+    self:ClearAllPoints()
+    self:SetPoint("CENTER")
+    self:Show()
+
+    self.panel.image:SetAlpha(0)
+    self.panel.image:SetSize(0, 0)
+    self.panel.image:SetTexCoord(0, 1 / columns, 0, 1 / rows)
+    self.panel.image:SetTexture(path)
+
+    self.loader = C_Timer.NewTicker(0.1, ImageViewer_Load)
+    self.loader.owner = self
+
+    ImageViewer_UpdateTitle(self)
 end
 
 ---------------------------------------------------------------------
@@ -339,6 +433,16 @@ pool = AF.CreateObjectPool(function(pool)
     image:SetAlpha(0)
     image:SetSize(0, 0)
 
+    local animation = f:CreateAnimationGroup()
+    f.animation = animation
+    animation:SetLooping("REPEAT")
+
+    local flipbook = animation:CreateAnimation("FlipBook")
+    animation.flipbook = flipbook
+    flipbook:SetTarget(image)
+
+    animation:Stop()
+
     f.resizeBtn = AF.CreateResizeButton(f, 100, 100)
     AF.SetFrameLevel(f.resizeBtn, 10)
 
@@ -351,24 +455,32 @@ end)
 -- api
 ---------------------------------------------------------------------
 ---@param path string
----@param frameWidth number|nil
----@param frameHeight number|nil
-function AF.ImageViewer_LoadImage(path, frameWidth, frameHeight)
-    pool:Acquire():LoadImage(path, frameWidth, frameHeight)
+---@param windowWidth number|nil
+---@param windowHeight number|nil
+function AF.ImageViewer_LoadImage(path, windowWidth, windowHeight)
+    pool:Acquire():LoadImage(path, windowWidth, windowHeight)
 end
 
--- images may flicker when loading a sequence; this is normal; not recommended for large images
+-- NOT RECOMMENDED FOR LARGE IMAGES<br/>
+-- event with a preloader, images may flicker when loading a sequence
 ---@param path string
 ---@param nameFormat string
 ---@param startIndex number
 ---@param endIndex number
 ---@param interval number
----@param frameWidth number|nil
----@param frameHeight number|nil
-function AF.ImageViewer_LoadImageSequence(path, nameFormat, startIndex, endIndex, interval, frameWidth, frameHeight)
-    pool:Acquire():LoadImageSequence(path, nameFormat, startIndex, endIndex, interval, frameWidth, frameHeight)
+---@param windowWidth number|nil
+---@param windowHeight number|nil
+function AF.ImageViewer_LoadImageSequence(path, nameFormat, startIndex, endIndex, interval, windowWidth, windowHeight)
+    pool:Acquire():LoadImageSequence(path, nameFormat, startIndex, endIndex, interval, windowWidth, windowHeight)
 end
 
-function AF.ImageViewer_LoadFlipBook()
-
+---@param path string
+---@param rows number
+---@param columns number
+---@param frames number
+---@param duration number
+---@param windowWidth number|nil
+---@param windowHeight number|nil
+function AF.ImageViewer_LoadFlipBook(path, rows, columns, frames, duration, windowWidth, windowHeight)
+    pool:Acquire():LoadFlipBook(path, rows, columns, frames, duration, windowWidth, windowHeight)
 end
