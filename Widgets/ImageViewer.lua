@@ -34,24 +34,59 @@ local function ImageViewer_OnClose(closeBtn)
     f.panel.image:SetAlpha(0)
     f.panel.image:SetSize(0, 0)
 
+    f.mode = nil
+
     f.path = nil
     f.scale = 1.0
     f.fileName = nil
     f.imageWidth = nil
     f.imageHeight = nil
 
+    f.interval = nil
+    f.startIndex = nil
+    f.endIndex = nil
+    f.currentIndex = nil
+
+    if f.loader then
+        f.loader:Cancel()
+        f.loader = nil
+    end
+    if f.ticker then
+        f.ticker:Cancel()
+        f.ticker = nil
+    end
+
     pool:Release(f)
 end
 
 ---------------------------------------------------------------------
--- LoadImage
+-- play image sequence
 ---------------------------------------------------------------------
-local function ImageViewer_OnTick(ticker)
+local function ImageViewer_SequenceOnTick(ticker)
     local f = ticker.owner
+    f.currentIndex = f.currentIndex + 1
+    if f.currentIndex > f.endIndex then
+        f.currentIndex = f.startIndex
+    end
+
+    local imagePath = f.path:format(f.currentIndex)
+    f.panel.image:SetTexture(imagePath)
+end
+
+local function ImageViewer_PlaySequence(self)
+    self.ticker = C_Timer.NewTicker(self.interval, ImageViewer_SequenceOnTick)
+    self.ticker.owner = self
+end
+
+---------------------------------------------------------------------
+-- load image
+---------------------------------------------------------------------
+local function ImageViewer_Load(loader)
+    local f = loader.owner
 
     if not f.panel.image:IsObjectLoaded() then return end
-    ticker:Cancel()
-    f.ticker = nil
+    loader:Cancel()
+    f.loader = nil
 
     local w, h = f.panel.image:GetSize()
     if w == 0 or h == 0 then
@@ -82,20 +117,34 @@ local function ImageViewer_OnTick(ticker)
     f.scale = scale
 
     ImageViewer_UpdateTitle(f)
+
+    if f.mode == "sequence" then
+        ImageViewer_PlaySequence(f)
+    elseif f.mode == "flipbook" then
+        ImageViewer_PlayFlipBook(f)
+    end
 end
 
+---------------------------------------------------------------------
+-- resize & drag
+---------------------------------------------------------------------
 local function ImageViewerPanel_OnMouseWheel(panel, delta)
     local f = panel:GetParent()
-    if f.mode ~= "image" then return end
     if not f.imageWidth or not f.imageHeight then return end
     if panel.isDragging then return end
 
     local oldScale = f.scale
     local newScale = AF.Clamp(f.scale * (delta > 0 and 1.1 or 0.9), MIN_SCALE, MAX_SCALE)
+    if oldScale == newScale then return end
+
+    if (oldScale < 1.0 and newScale > 1.0) or (oldScale > 1.0 and newScale < 1.0) then
+        -- snap to 1.0
+        newScale = 1.0
+    end
     f.scale = newScale
 
-    local displayW = floor(f.imageWidth * newScale + 0.5)
-    local displayH = floor(f.imageHeight * newScale + 0.5)
+    local displayW = AF.Round(f.imageWidth * newScale)
+    local displayH = AF.Round(f.imageHeight * newScale)
     panel.image:SetSize(displayW, displayH)
 
     ImageViewer_UpdateTitle(f)
@@ -208,10 +257,12 @@ local function ImageViewerPanel_OnMouseUp(panel, button)
     panel:SetScript("OnUpdate", nil)
 end
 
+---------------------------------------------------------------------
+-- LoadImage
+---------------------------------------------------------------------
 function AF_ImageViewerMixin:LoadImage(path, frameWidth, frameHeight)
-    assert(type(path) == "string", "Path must be a string")
+    assert(type(path) == "string", "path must be a string")
 
-    self.mode = "image"
     self.path = path
     self.scale = 1.0
     self.fileName = path:match("([^\\/:]+)$")
@@ -225,10 +276,41 @@ function AF_ImageViewerMixin:LoadImage(path, frameWidth, frameHeight)
     self.panel.image:SetSize(0, 0)
     self.panel.image:SetTextureOrAtlas(path)
 
-    self.ticker = C_Timer.NewTicker(0.1, ImageViewer_OnTick)
-    self.ticker.owner = self
+    self.loader = C_Timer.NewTicker(0.1, ImageViewer_Load)
+    self.loader.owner = self
 
     ImageViewer_UpdateTitle(self)
+end
+
+---------------------------------------------------------------------
+-- LoadImageSequence
+---------------------------------------------------------------------
+function AF_ImageViewerMixin:LoadImageSequence(path, nameFormat, startIndex, endIndex, interval, frameWidth, frameHeight)
+    assert(type(path) == "string", "path must be a string")
+    assert(type(nameFormat) == "string", "nameFormat must be a string")
+    assert(type(startIndex) == "number", "startIndex must be a number")
+    assert(type(endIndex) == "number", "endIndex must be a number")
+    assert(endIndex > startIndex, "endIndex must be greater than startIndex")
+    assert(type(interval) == "number", "interval must be a number")
+
+    if path:sub(-1) ~= "/" and path:sub(-1) ~= "\\" then
+        path = path .. "\\"
+    end
+    path = path .. nameFormat
+
+    for i = startIndex, endIndex do
+        self.panel.image:SetTexture(path:format(i))
+    end
+
+    local first = path:format(startIndex)
+    self:LoadImage(first, frameWidth, frameHeight)
+
+    self.mode = "sequence"
+    self.path = path
+    self.startIndex = startIndex
+    self.endIndex = endIndex
+    self.interval = interval
+    self.currentIndex = startIndex
 end
 
 ---------------------------------------------------------------------
@@ -237,10 +319,8 @@ end
 pool = AF.CreateObjectPool(function(pool)
     local f = AF.CreateHeaderedFrame(AF.UIParent, "AFImageViewer" .. (pool:GetNumActive() + 1), nil, nil, nil, "HIGH", 777, true)
     f:Hide()
-    f:SetClampRectInsets(0, 0, 0, 0)
     f:SetTitleJustify("LEFT")
 
-    AF.SetFrameLevel(f.header, 5)
     f.header.closeBtn:SetOnClick(ImageViewer_OnClose)
     f.header.text:SetFontObject("AF_FONT_NORMAL")
 
@@ -268,22 +348,27 @@ pool = AF.CreateObjectPool(function(pool)
 end)
 
 ---------------------------------------------------------------------
--- image
+-- api
 ---------------------------------------------------------------------
+---@param path string
+---@param frameWidth number|nil
+---@param frameHeight number|nil
 function AF.ImageViewer_LoadImage(path, frameWidth, frameHeight)
     pool:Acquire():LoadImage(path, frameWidth, frameHeight)
 end
 
----------------------------------------------------------------------
--- image sequence
----------------------------------------------------------------------
-function AF.ImageViewer_LoadImageSequence()
-
+-- images may flicker when loading a sequence; this is normal; not recommended for large images
+---@param path string
+---@param nameFormat string
+---@param startIndex number
+---@param endIndex number
+---@param interval number
+---@param frameWidth number|nil
+---@param frameHeight number|nil
+function AF.ImageViewer_LoadImageSequence(path, nameFormat, startIndex, endIndex, interval, frameWidth, frameHeight)
+    pool:Acquire():LoadImageSequence(path, nameFormat, startIndex, endIndex, interval, frameWidth, frameHeight)
 end
 
----------------------------------------------------------------------
--- flipbook
----------------------------------------------------------------------
 function AF.ImageViewer_LoadFlipBook()
 
 end
