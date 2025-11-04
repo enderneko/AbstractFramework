@@ -420,7 +420,7 @@ function AF.CreateButton(parent, text, color, width, height, template, borderCol
         b:SetScript("PostClick", function(self, button, down)
             if self._noSound then return end
             local play
-            if b._isSecure then
+            if self._isSecure then
                 if down == GetCVarBool("ActionButtonUseKeyDown") then
                     play = true
                 end
@@ -428,11 +428,11 @@ function AF.CreateButton(parent, text, color, width, height, template, borderCol
                 play = true
             end
             if play then
-                if b._customSound then
-                    if strlower(b._customSound):find("^interface") then
-                        PlaySoundFile(b._customSound)
+                if self._customSound then
+                    if strlower(self._customSound):find("^interface") then
+                        PlaySoundFile(self._customSound)
                     else
-                        AF.PlaySound(b._customSound)
+                        AF.PlaySound(self._customSound)
                     end
                 else
                     PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
@@ -440,13 +440,13 @@ function AF.CreateButton(parent, text, color, width, height, template, borderCol
             end
         end)
     else
-        b:SetScript("PostClick", function()
+        b:SetScript("PostClick", function(self)
             if self._noSound then return end
-            if b._customSound then
-                if strlower(b._customSound):find("^interface") then
-                    PlaySoundFile(b._customSound)
+            if self._customSound then
+                if strlower(self._customSound):find("^interface") then
+                    PlaySoundFile(self._customSound)
                 else
-                    AF.PlaySound(b._customSound)
+                    AF.PlaySound(self._customSound)
                 end
             else
                 PlaySound(SOUNDKIT.U_CHAT_SCROLL_BUTTON)
@@ -1118,27 +1118,46 @@ end
 ---------------------------------------------------------------------
 -- resize button
 ---------------------------------------------------------------------
+---@param target Frame
+---@param minWidth number|nil default is 16
+---@param minHeight number|nil default is 16
+---@param maxWidth number|nil default is screen width
+---@param maxHeight number|nil default is screen height
 ---@return Button|AF_BaseWidgetMixin
 function AF.CreateResizeButton(target, minWidth, minHeight, maxWidth, maxHeight)
+    target:SetResizable(true)
+
     local b = CreateFrame("Button", nil, target)
     Mixin(b, PanelResizeButtonMixin)
     Mixin(b, AF_BaseWidgetMixin)
+
+    local screenW, screenH = GetPhysicalScreenSize()
+    maxWidth = maxWidth or screenW
+    maxHeight = maxHeight or screenH
+    minHeight = minHeight or 16
+    minWidth = minWidth or 16
 
     b:Init(target, minWidth, minHeight, maxWidth, maxHeight)
 
     AF.SetSize(b, 16, 16)
     AF.SetPoint(b, "BOTTOMRIGHT", -1, 1)
 
-
-    b:SetScript("OnEnter", b.OnEnter)
-    b:SetScript("OnLeave", b.OnLeave)
-    b:SetScript("OnMouseDown", b.OnMouseDown)
-    b:SetScript("OnMouseUp", b.OnMouseUp)
-
     local tex = b:CreateTexture(nil, "ARTWORK")
     b.tex = tex
     tex:SetAllPoints()
-    tex:SetTexture(AF.GetIcon("ResizeButton"))
+    tex:SetTexture(AF.GetIcon("ResizeButton2"))
+    tex:SetAlpha(0.5)
+
+    b:SetScript("OnEnter", function(self)
+        self:OnEnter()
+        self.tex:SetAlpha(1)
+    end)
+    b:SetScript("OnLeave", function(self)
+        self:OnLeave()
+        self.tex:SetAlpha(0.5)
+    end)
+    b:SetScript("OnMouseDown", b.OnMouseDown)
+    b:SetScript("OnMouseUp", b.OnMouseUp)
 
     return b
 end

@@ -61,7 +61,10 @@ function AF.Lerp(startValue, endValue, amount)
 end
 
 function AF.Clamp(value, minValue, maxValue)
-    maxValue = max(minValue, maxValue) -- to ensure maxValue >= minValue
+    if minValue > maxValue then
+        -- to ensure maxValue >= minValue
+        minValue, maxValue = maxValue, minValue
+    end
     if value > maxValue then
         return maxValue
     elseif value < minValue then

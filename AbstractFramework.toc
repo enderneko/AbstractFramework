@@ -97,6 +97,7 @@ Widgets\Aura.lua
 Widgets\Misc.lua
 Widgets\DataBroker.lua
 Widgets\DragSorter.lua
+Widgets\ImageViewer.lua
 
 # media/glyphs
 Media\Glyphs.lua

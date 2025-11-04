@@ -30,13 +30,17 @@ local AF_HeaderedFrameMixin = {}
 
 ---@param justify "LEFT" | "RIGHT" | "CENTER"
 function AF_HeaderedFrameMixin:SetTitleJustify(justify)
+    self.header.text:SetJustifyH(justify)
     AF.ClearPoints(self.header.text)
     if justify == "LEFT" then
         AF.SetPoint(self.header.text, "LEFT", 5, 0)
+        AF.SetPoint(self.header.text, "RIGHT", self.header.closeBtn, "LEFT", -5, 0)
     elseif justify == "RIGHT" then
+        AF.SetPoint(self.header.text, "LEFT", 5, 0)
         AF.SetPoint(self.header.text, "RIGHT", self.header.closeBtn, "LEFT", -5, 0)
     else
-        AF.SetPoint(self.header.text, "CENTER")
+        AF.SetPoint(self.header.text, "LEFT", 5, 0)
+        AF.SetPoint(self.header.text, "RIGHT", -5, 0)
     end
 end
 
@@ -98,7 +102,7 @@ end
 
 ---@param parent Frame
 ---@param name? string
----@param title string
+---@param title? string
 ---@param width? number
 ---@param height? number
 ---@param frameStrata? string default is "HIGH"
@@ -145,7 +149,7 @@ function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata,
     AF.ApplyDefaultBackdropWithColors(header, "header")
 
     header.text = AF.CreateFontString(header, title, AF.GetAddonAccentColorName(), "AF_FONT_TITLE")
-    header.text:SetPoint("CENTER")
+    header.text:SetWordWrap(false)
 
     header.closeBtn = AF.CreateCloseButton(header, f, 20, 20)
     header.closeBtn:SetPoint("TOPRIGHT")
@@ -187,6 +191,7 @@ function AF.CreateHeaderedFrame(parent, name, title, width, height, frameStrata,
     Mixin(f, AF_BaseWidgetMixin)
 
     f:SetMovable(true)
+    f:SetTitleJustify("CENTER")
 
     AF.AddToPixelUpdater_OnShow(f)
 

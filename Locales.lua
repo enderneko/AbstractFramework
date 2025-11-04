@@ -9,6 +9,7 @@ AF.L = setmetatable({
     -- ["Ctrl Click"] = _G.WARDROBE_SHORTCUTS_TUTORIAL_2:match("%[(.+)%]"):gsub("Shift", "Ctrl"),
     -- ["Alt Click"] = _G.WARDROBE_SHORTCUTS_TUTORIAL_2:match("%[(.+)%]"):gsub("Shift", "Alt"),
     ["WIP"] = "Work In Progress",
+    ["Loading..."] = _G.SEARCH_LOADING_TEXT,
 
     ["TANK"] = _G["TANK"],
     ["HEALER"] = _G["HEALER"],
