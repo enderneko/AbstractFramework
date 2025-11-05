@@ -9,6 +9,21 @@ local MIN_SCALE = 0.1
 local MAX_SCALE = 5.0
 
 ---------------------------------------------------------------------
+-- preload
+---------------------------------------------------------------------
+local preloaderPool = AF.CreateObjectPool(function(pool)
+    local tex = AF.UIParent:CreateTexture(nil, "ARTWORK")
+    C_Timer.After(0.5, function()
+        pool:Release(tex)
+    end)
+    return tex
+end)
+
+function AF.PreloadTexture(path)
+    preloaderPool:Acquire():SetTexture(path)
+end
+
+---------------------------------------------------------------------
 -- AF_ImageViewer
 ---------------------------------------------------------------------
 local pool
@@ -27,6 +42,16 @@ end
 local function ImageViewer_OnClose(closeBtn)
     local f = closeBtn:GetParent():GetParent()
     f:Hide()
+
+    if f.loader then
+        f.loader:Cancel()
+        f.loader = nil
+    end
+
+    if f.ticker then
+        f.ticker:Cancel()
+        f.ticker = nil
+    end
 
     f:SetTitle("")
     f.panel.image:SetTexture(nil)
@@ -54,15 +79,6 @@ local function ImageViewer_OnClose(closeBtn)
     f.animation:Stop()
     f.panel.image:SetTexCoord(0, 1, 0, 1)
 
-    if f.loader then
-        f.loader:Cancel()
-        f.loader = nil
-    end
-    if f.ticker then
-        f.ticker:Cancel()
-        f.ticker = nil
-    end
-
     pool:Release(f)
 end
 
@@ -81,6 +97,14 @@ local function ImageViewer_SequenceOnTick(ticker)
 end
 
 local function ImageViewer_PlaySequence(self)
+    if not self.startIndex or not self.endIndex then return end
+    if self.endIndex <= self.startIndex then return end
+
+    if self.ticker then
+        self.ticker:Cancel()
+        self.ticker = nil
+    end
+
     self.ticker = C_Timer.NewTicker(self.interval, ImageViewer_SequenceOnTick)
     self.ticker.owner = self
 end
@@ -89,8 +113,9 @@ end
 -- play flipbook
 ---------------------------------------------------------------------
 local function ImageViewer_PlayFlipBook(self)
+    self.animation:Stop()
     self.panel.image:SetTexCoord(0, 1, 0, 1)
-    self.animation:Play()
+    self.animation:Restart()
 end
 
 ---------------------------------------------------------------------
@@ -288,9 +313,13 @@ end
 ---------------------------------------------------------------------
 -- LoadImage
 ---------------------------------------------------------------------
+---@param path string
+---@param windowWidth number|nil
+---@param windowHeight number|nil
 function AF_ImageViewerMixin:LoadImage(path, windowWidth, windowHeight)
     assert(type(path) == "string", "path must be a string")
 
+    self.mode = "image"
     self.path = path
     self.scale = 1.0
     self.fileName = path:match("([^\\/:]+)$")
@@ -313,21 +342,19 @@ end
 ---------------------------------------------------------------------
 -- LoadImageSequence
 ---------------------------------------------------------------------
-local preloaderPool = AF.CreateObjectPool(function(pool)
-    local tex = AF.UIParent:CreateTexture(nil, "ARTWORK")
-    tex.Load = tex.SetTexture
-    C_Timer.After(0.5, function()
-        pool:Release(tex)
-    end)
-    return tex
-end)
-
+---@param path string
+---@param nameFormat string e.g. "image_%02d.png"
+---@param startIndex number
+---@param endIndex number
+---@param interval number seconds for each image
+---@param windowWidth number|nil
+---@param windowHeight number|nil
 function AF_ImageViewerMixin:LoadImageSequence(path, nameFormat, startIndex, endIndex, interval, windowWidth, windowHeight)
     assert(type(path) == "string", "path must be a string")
     assert(type(nameFormat) == "string", "nameFormat must be a string")
     assert(type(startIndex) == "number", "startIndex must be a number")
     assert(type(endIndex) == "number", "endIndex must be a number")
-    assert(endIndex > startIndex, "endIndex must be greater than startIndex")
+    -- assert(endIndex > startIndex, "endIndex must be greater than startIndex")
     assert(type(interval) == "number", "interval must be a number")
 
     if path:sub(-1) ~= "/" and path:sub(-1) ~= "\\" then
@@ -337,7 +364,7 @@ function AF_ImageViewerMixin:LoadImageSequence(path, nameFormat, startIndex, end
 
     -- try preloading images
     for i = startIndex, endIndex do
-        preloaderPool:Acquire():Load(path:format(i))
+        AF.PreloadTexture(path:format(i))
     end
 
     self.mode = "sequence"
@@ -368,6 +395,13 @@ end
 ---------------------------------------------------------------------
 -- LoadFlipBook
 ---------------------------------------------------------------------
+---@param path string
+---@param rows number
+---@param columns number
+---@param frames number
+---@param duration number total seconds to play all frames once
+---@param windowWidth number|nil
+---@param windowHeight number|nil
 function AF_ImageViewerMixin:LoadFlipBook(path, rows, columns, frames, duration, windowWidth, windowHeight)
     assert(type(path) == "string", "path must be a string")
     assert(type(rows) == "number", "rows must be a number")
