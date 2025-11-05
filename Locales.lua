@@ -236,6 +236,7 @@ if LOCALE_zhCN then
     L["Undo"] = "撤消"
     L["Version"] = "版本"
     L["WIP"] = "正在开发中"
+
     L["Button"] = "按钮"
 
     L["Enable"] = "启用"
@@ -285,6 +286,8 @@ if LOCALE_zhCN then
     L["Border Color"] = "边框颜色"
     L["Text Color"] = "文本颜色"
     L["Texture"] = "材质"
+    L["Path"] = "路径"
+    L["Format"] = "格式"
 
     L["Icon"] = "图标"
     L["Icons"] = "图标"
