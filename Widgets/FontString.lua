@@ -81,22 +81,24 @@ end
 ---------------------------------------------------------------------
 local ceil = math.ceil
 
-local function ResizeToFitText(self, frame, fontString, hPadding, vPadding, callback)
+local function ResizeToFitText(self, frame, fontString, hPadding, vPadding, callback, callbackDelay)
     self.elapsed = 0
+
 
     hPadding = hPadding and hPadding * 2
     vPadding = vPadding and vPadding * 2
+    callbackDelay = callbackDelay or 0.1
 
     self:SetScript("OnUpdate", function(self, elapsed)
         if hPadding then
-            frame:SetWidth(ceil(fontString:GetStringWidth() + hPadding))
+            frame:SetWidth(ceil(fontString:GetWidth() + hPadding))
         end
         if vPadding then
-            frame:SetHeight(ceil(fontString:GetStringHeight() + vPadding))
+            frame:SetHeight(ceil(fontString:GetHeight() + vPadding))
         end
 
         self.elapsed = self.elapsed + elapsed
-        if self.elapsed >= 0.5 or not frame:IsShown() then
+        if self.elapsed >= callbackDelay then
             self:Hide()
             if callback then callback(frame:GetSize()) end
         end
@@ -116,11 +118,12 @@ end)
 
 ---@param frame Frame
 ---@param fontString FontString
----@param hPadding number? horizontal padding, if omitted, will not change width
----@param vPadding number? vertical padding, if omitted, will not change height
----@param callback function? called after resize is done
-function AF.ResizeToFitText(frame, fontString, hPadding, vPadding, callback)
-    pool:Acquire():ResizeToFitText(frame, fontString, hPadding, vPadding, callback)
+---@param hPadding number|nil horizontal padding, if omitted, will not change width
+---@param vPadding number|nil vertical padding, if omitted, will not change height
+---@param callback function|nil called after resize is done
+---@param callbackDelay number|nil seconds to wait before invoking callback, default 0.1
+function AF.ResizeToFitText(frame, fontString, hPadding, vPadding, callback, callbackDelay)
+    pool:Acquire():ResizeToFitText(frame, fontString, hPadding, vPadding, callback, callbackDelay)
 end
 
 ---------------------------------------------------------------------
