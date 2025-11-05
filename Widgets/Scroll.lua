@@ -62,7 +62,21 @@ function AF_ScrollFrameMixin:CanScroll()
     return self:GetVerticalScrollRange() > 0
 end
 
--- for mouse wheel
+local function ScrollFrame_UpdateScrollThumb(scrollFrame)
+    local scrollParent = scrollFrame:GetParent()
+    local scrollBar = scrollParent.scrollBar
+    local scrollThumb = scrollParent.scrollThumb
+
+    if scrollParent:GetVerticalScrollRange() ~= 0 then
+        local scrollP = scrollFrame:GetVerticalScroll() / scrollParent:GetVerticalScrollRange()
+        local offsetY = -((scrollBar:GetHeight() - scrollThumb:GetHeight()) * scrollP)
+        scrollThumb:SetPoint("TOP", 0, offsetY)
+    else
+        scrollThumb:SetPoint("TOP")
+    end
+end
+
+---@private for mouse wheel
 function AF_ScrollFrameMixin:VerticalScroll(step)
     local scroll = self.scrollFrame:GetVerticalScroll() + step
     if scroll <= 0 then
@@ -72,6 +86,8 @@ function AF_ScrollFrameMixin:VerticalScroll(step)
     else
         self.scrollFrame:SetVerticalScroll(scroll)
     end
+
+    ScrollFrame_UpdateScrollThumb(self.scrollFrame)
 end
 
 function AF_ScrollFrameMixin:ScrollToBottom()
@@ -152,20 +168,6 @@ local function ScrollFrame_OnSizeChanged(scrollFrame)
     scrollFrame:GetScrollChild():SetWidth(scrollFrame:GetWidth())
 end
 
-local function ScrollFrame_OnVerticalScroll(scrollFrame, offset)
-    local scrollParent = scrollFrame:GetParent()
-    local scrollBar = scrollParent.scrollBar
-    local scrollThumb = scrollParent.scrollThumb
-
-    if scrollParent:GetVerticalScrollRange() ~= 0 then
-        local scrollP = scrollFrame:GetVerticalScroll() / scrollParent:GetVerticalScrollRange()
-        local offsetY = -((scrollBar:GetHeight() - scrollThumb:GetHeight()) * scrollP)
-        scrollThumb:SetPoint("TOP", 0, offsetY)
-    else
-        scrollThumb:SetPoint("TOP")
-    end
-end
-
 local function ScrollContent_OnSizeChanged(scrollContent)
     -- check if it can scroll
     -- DO NOT USE OnScrollRangeChanged to check whether it can scroll.
@@ -184,11 +186,12 @@ local function ScrollContent_OnSizeChanged(scrollContent)
         local height = max(scrollBar:GetHeight() * p, MIN_SCROLL_THUMB_HEIGHT)
 
         -- NOTE: prevent a visual issue
-        if height > scrollBar:GetHeight() - abs(select(5, scrollThumb:GetPoint())) then
-            scrollThumb:SetPoint("TOP", 0, -(scrollBar:GetHeight() - height))
-        end
+        -- if height > scrollBar:GetHeight() - abs(select(5, scrollThumb:GetPoint())) then
+        --     scrollThumb:SetPoint("TOP", 0, -(scrollBar:GetHeight() - height))
+        -- end
 
         scrollThumb:SetHeight(height)
+        ScrollFrame_UpdateScrollThumb(scrollFrame)
 
         -- space for scrollBar
         -- AF.SetPoint(scrollFrame, "BOTTOMRIGHT", -7, 0)
@@ -312,7 +315,7 @@ function AF.CreateScrollFrame(parent, name, width, height, color, borderColor)
     Mixin(scrollParent, AF_ScrollFrameMixin)
 
     scrollFrame:SetScript("OnSizeChanged", ScrollFrame_OnSizeChanged)
-    scrollFrame:SetScript("OnVerticalScroll", ScrollFrame_OnVerticalScroll)
+    scrollFrame:SetScript("OnVerticalScroll", ScrollFrame_UpdateScrollThumb)
     scrollContent:SetScript("OnSizeChanged", ScrollContent_OnSizeChanged)
 
     -- dragging and scrolling
