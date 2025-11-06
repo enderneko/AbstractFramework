@@ -50,6 +50,7 @@ System\CallbackHandler.lua
 System\EventHandler.lua
 System\Communication.lua
 System\Hooks.lua
+System\Scripts.lua
 
 # Executors
 Executors\OnUpdateExecutor.lua
