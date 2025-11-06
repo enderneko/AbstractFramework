@@ -175,22 +175,24 @@ function AF_ImagePaneMixin:LoadImage(path)
 end
 
 ---@param path string
----@param nameFormat string e.g. "image_%02d.png"
+---@param nameFormat string|nil e.g. "image_%02d.png", if nil, path is used directly with index formatting
 ---@param startIndex number
 ---@param endIndex number
 ---@param interval number seconds for each image
 function AF_ImagePaneMixin:LoadImageSequence(path, nameFormat, startIndex, endIndex, interval)
     assert(type(path) == "string", "path must be a string")
-    assert(type(nameFormat) == "string", "nameFormat must be a string")
+    -- assert(type(nameFormat) == "string", "nameFormat must be a string")
     assert(type(startIndex) == "number", "startIndex must be a number")
     assert(type(endIndex) == "number", "endIndex must be a number")
     -- assert(endIndex > startIndex, "endIndex must be greater than startIndex")
     assert(type(interval) == "number", "interval must be a number")
 
-    if path:sub(-1) ~= "/" and path:sub(-1) ~= "\\" then
-        path = path .. "\\"
+    if nameFormat then
+        if path:sub(-1) ~= "/" and path:sub(-1) ~= "\\" then
+            path = path .. "\\"
+        end
+        path = path .. nameFormat
     end
-    path = path .. nameFormat
 
     -- try preloading images
     for i = startIndex, endIndex do
@@ -256,6 +258,7 @@ function AF_ImagePaneMixin:Reload()
     elseif self.mode == "sequence" then
         self:LoadImageSequence(self.path, nil, self.startIndex, self.endIndex, self.interval)
     elseif self.mode == "flipbook" then
+        self:LoadFlipBook(self.path, self.rows, self.columns, self.frames, self.duration)
     end
 end
 
@@ -304,6 +307,44 @@ end
 ---@param callback fun(paneWidth: number, paneHeight: number, rawImageWidth: number, rawImageHeight: number)|nil
 function AF_ImagePaneMixin:SetLoadedCallback(callback)
     self.loadedCallback = callback
+end
+
+local function ImagePane_OnMouseUp(self, button, upInside)
+    if not self.imageViewerEnabled then return end
+    if button ~= "LeftButton" or not upInside then return end
+
+    local currentTime = GetTime()
+    if self._lastMouseUpTime and currentTime - self._lastMouseUpTime > 0.4 then
+        -- print("click interval too long, resetting")
+        self._lastMouseUpTime = nil
+    end
+    if not self._lastMouseUpTime then
+        -- print("first click, waiting for second click")
+        self._lastMouseUpTime = GetTime()
+        return
+    end
+
+    if self.mode == "image" then
+        AF.ImageViewer_LoadImage(self.path)
+    elseif self.mode == "sequence" then
+        AF.ImageViewer_LoadImageSequence(self.path, nil, self.startIndex, self.endIndex, self.interval)
+    elseif self.mode == "flipbook" then
+        AF.ImageViewer_LoadFlipBook(self.path, self.rows, self.columns, self.frames, self.duration)
+    end
+
+    -- print("double click detected, opening image viewer")
+    self._lastMouseUpTime = nil
+end
+
+function AF_ImagePaneMixin:EnableImageViewer(enabled)
+    self.imageViewerEnabled = enabled
+    if enabled then
+        self:SetScript("OnMouseUp", ImagePane_OnMouseUp)
+        self:EnableMouse(true)
+    else
+        self:SetScript("OnMouseUp", nil)
+        self:EnableMouse(false)
+    end
 end
 
 ---@param parent Frame

@@ -343,7 +343,7 @@ end
 -- LoadImageSequence
 ---------------------------------------------------------------------
 ---@param path string
----@param nameFormat string e.g. "image_%02d.png"
+---@param nameFormat string|nil e.g. "image_%02d.png", if nil, path is used directly with index formatting
 ---@param startIndex number
 ---@param endIndex number
 ---@param interval number seconds for each image
@@ -351,16 +351,18 @@ end
 ---@param windowHeight number|nil
 function AF_ImageViewerMixin:LoadImageSequence(path, nameFormat, startIndex, endIndex, interval, windowWidth, windowHeight)
     assert(type(path) == "string", "path must be a string")
-    assert(type(nameFormat) == "string", "nameFormat must be a string")
+    -- assert(type(nameFormat) == "string", "nameFormat must be a string")
     assert(type(startIndex) == "number", "startIndex must be a number")
     assert(type(endIndex) == "number", "endIndex must be a number")
     -- assert(endIndex > startIndex, "endIndex must be greater than startIndex")
     assert(type(interval) == "number", "interval must be a number")
 
-    if path:sub(-1) ~= "/" and path:sub(-1) ~= "\\" then
-        path = path .. "\\"
+    if nameFormat then
+        if path:sub(-1) ~= "/" and path:sub(-1) ~= "\\" then
+            path = path .. "\\"
+        end
+        path = path .. nameFormat
     end
-    path = path .. nameFormat
 
     -- try preloading images
     for i = startIndex, endIndex do
@@ -498,7 +500,7 @@ end
 -- NOT RECOMMENDED FOR LARGE IMAGES<br/>
 -- event with a preloader, images may flicker when loading a sequence
 ---@param path string
----@param nameFormat string
+---@param nameFormat string|nil e.g. "image_%02d.png", if nil, path is used directly with index formatting
 ---@param startIndex number
 ---@param endIndex number
 ---@param interval number
