@@ -130,6 +130,18 @@ function AF.Merge(t, ...)
     end
 end
 
+-- merge into the first table without copying sub-tables
+---@param t table
+---@param ... table
+function AF.MergeRaw(t, ...)
+    for i = 1, select("#", ...) do
+        local _t = select(i, ...)
+        for k, v in next, _t do
+            t[k] = v
+        end
+    end
+end
+
 -- merge into the first table, but only if the key already exists
 ---@param t table
 ---@param ... table
