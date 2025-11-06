@@ -309,6 +309,77 @@ function AF_ButtonMixin:HideTexture()
     AF.SetPoint(self.text, "RIGHT", -self.textPadding, 0)
 end
 
+local cooldownPool = AF.CreateObjectPool(function(pool)
+    local f = CreateFrame("Frame")
+    f:EnableMouse(true)
+    f:Hide()
+
+    f.texture = AF.CreateTexture(f, nil, AF.GetColorTable("disabled", 0.7), "BORDER", -1)
+    f.texture:SetPoint("TOPRIGHT", f)
+    f.texture:SetPoint("BOTTOMRIGHT", f)
+
+    function f:SetCooldown(btn, sec)
+        self.btn = btn
+        btn.cooldown = self
+
+        self.duration = sec
+        self.width = btn:GetWidth()
+        self.start = GetTimePreciseSec()
+
+        self:SetParent(btn)
+        self:SetAllPoints(btn)
+        self:SetFrameLevel(btn:GetFrameLevel() + 1)
+        self.texture:SetParent(btn)
+        self.texture:SetWidth(self.width)
+
+        self:Show()
+
+        self.ticker = C_Timer.NewTicker(0, function(ticker)
+            local owner = ticker.owner
+            owner.newWidth = owner.width * (1 - (GetTimePreciseSec() - owner.start) / owner.duration)
+
+            if owner.newWidth <= 0 then
+                pool:Release(owner)
+            else
+                owner.texture:SetWidth(owner.newWidth)
+            end
+        end)
+        self.ticker.owner = self
+    end
+
+    function f:Release()
+        pool:Release(self)
+    end
+
+    return f
+end, function(_, f)
+    if f.ticker then
+        f.ticker:Cancel()
+        f.ticker = nil
+    end
+    if f.btn then
+        f.btn.cooldown = nil
+        f.btn = nil
+    end
+    f.duration = nil
+    f.width = nil
+    f.start = nil
+    f.newWidth = nil
+    f:Hide()
+    f:ClearAllPoints()
+end)
+
+---@param sec number
+function AF_ButtonMixin:StartCooldown(sec)
+    cooldownPool:Acquire():SetCooldown(self, sec)
+end
+
+function AF_ButtonMixin:StopCooldown()
+    if self.cooldown then
+        self.cooldown:Release()
+    end
+end
+
 function AF_ButtonMixin:UpdatePixels()
     AF.ReSize(self)
     AF.RePoint(self)
