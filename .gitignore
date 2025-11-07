@@ -12,3 +12,4 @@ Libs/*
 !Libs/json.lua
 !Libs/utf8.lua
 !Libs/qrcode.lua
+!Libs/FAIAP.lua

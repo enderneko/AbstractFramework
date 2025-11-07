@@ -18,6 +18,7 @@ AF.Libs.LibSerialize = LibStub("LibSerialize")
 AF.Libs.Comm = LibStub("AceComm-3.0")
 AF.Libs.LibDataBroker = LibStub("LibDataBroker-1.1")
 AF.Libs.LibDBIcon = LibStub("LibDBIcon-1.0")
+AF.Libs.FAIAP = LibStub("AF_FAIAP")
 
 AF.Libs.MD5 = LibStub("AF_MD5")
 ---@type fun(str:string):string
