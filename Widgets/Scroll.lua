@@ -114,9 +114,9 @@ function AF_ScrollFrameMixin:SetContentHeights(heights, spacing)
     self:ResetScroll()
 end
 
----@param step number default is 25
+---@param step number default is 50
 function AF_ScrollFrameMixin:SetScrollStep(step)
-    self.step = step or 25
+    self.step = step or 50
 end
 
 function AF_ScrollFrameMixin:GetScrollStep()
@@ -323,7 +323,7 @@ function AF.CreateScrollFrame(parent, name, width, height, color, borderColor)
     scrollThumb:SetScript("OnMouseUp", ScrollThumb_OnMouseUp)
 
     -- enable mouse wheel scroll
-    scrollParent:SetScrollStep(25)
+    scrollParent:SetScrollStep()
     scrollParent:EnableMouseWheel(true)
     scrollParent:SetScript("OnMouseWheel", ScrollParent_OnMouseWheel)
 

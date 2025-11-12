@@ -4,6 +4,7 @@ local AF = _G.AbstractFramework
 local tonumber = tonumber
 local format, gsub, strlower, strupper, strsplit, strtrim = string.format, string.gsub, string.lower, string.upper, string.split, string.trim
 local utf8len, len, utf8sub = string.utf8len, string.len, string.utf8sub
+local strfind = string.find
 local tinsert, tconcat = table.insert, table.concat
 
 ---------------------------------------------------------------------
@@ -101,6 +102,20 @@ function AF.IsBlank(str)
         return true
     end
     return str == "" or strtrim(str) == ""
+end
+
+function AF.GetNumStringLines(str)
+    if str == "" then return 0 end
+
+    local count = 0
+    local i = 1
+    while true do
+        local start = strfind(str, "\n", i, true) -- plain search
+        if not start then break end
+        count = count + 1
+        i = start + 1
+    end
+    return count + 1
 end
 
 ---------------------------------------------------------------------

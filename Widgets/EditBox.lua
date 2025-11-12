@@ -496,6 +496,68 @@ function AF_ScrollEditBoxMixin:SetSpacing(spacing)
     self.eb:SetSpacing(spacing)
 end
 
+--! Blizzard's EditBox totally sucks!
+function AF_ScrollEditBoxMixin:EnableCodeIndentation()
+    if not self.gutter then
+        self.gutter = AF.CreateFrame(self)
+        self.gutter:SetPoint("TOPLEFT")
+        self.gutter:SetPoint("BOTTOMLEFT")
+        self.gutter:SetPoint("RIGHT", self.eb, "LEFT")
+        AF.ApplyDefaultBackdropWithColors(self.gutter, "widget_highlight", "none")
+        self:SetClipsChildren(true)
+
+        self.gutter.text = CreateFrame("EditBox", nil, self.gutter)
+        self.gutter.text:SetPoint("TOPRIGHT", self.eb, "TOPLEFT")
+        self.gutter.text:SetPoint("BOTTOMRIGHT", self.eb, "BOTTOMLEFT")
+        self.gutter.text:SetPoint("LEFT")
+        self.gutter.text:SetJustifyH("RIGHT")
+        self.gutter.text:SetTextInsets(0, 4, 4, 4)
+        self.gutter.text:SetFontObject(ChatFontNormal)
+        self.gutter.text:SetMultiLine(true)
+        self.gutter.text:SetEnabled(false)
+        self.gutter.text:SetTextColor(AF.GetColorRGB("darkgray"))
+        self.gutter.text:SetMaxLetters(0)
+        self.gutter.text:SetSpacing(0)
+
+        self.eb.lineTest = self.eb:CreateFontString(nil, "OVERLAY")
+        self.eb.lineTest:SetFontObject(ChatFontNormal)
+        self.eb.lineTest:Hide()
+
+        self.eb:SetFontObject(ChatFontNormal)
+        AF.Libs.FAIAP.enable(self.eb)
+
+        self.eb:HookScript("OnTextChanged", function()
+            self.gutter.text:SetText("")
+            local text = self.eb:GetText(true)
+            local linetext
+            local count = 1
+
+            local width = self.scrollFrame:GetWidth()
+            local gutterWidth = tostring(AF.GetNumStringLines(text)):len() * 7 + 10
+            self.eb:SetPoint("TOPLEFT", gutterWidth, 0)
+            width = width - gutterWidth - 8
+
+            for line in text:gmatch("([^\n]*\n?)") do
+                if #line > 0 then
+                    linetext = count .. "\n"
+                    count = count + 1
+
+                    -- WowLua
+                    self.eb.lineTest:SetText(line:gsub("|", "||"))
+                    local testwidth = self.eb.lineTest:GetWidth()
+                    if testwidth >= width then
+                        linetext = linetext .. string.rep("\n", testwidth / width)
+                    end
+
+                    self.gutter.text:Insert(linetext)
+                end
+            end
+        end)
+    end
+
+    self.gutter:Show()
+end
+
 local function AF_ScrollEditBox_ScrollFrame_OnEnter(scrollFrame)
     if not scrollFrame:GetParent():IsEnabled() then return end
     scrollFrame.highlight:Show()
@@ -528,7 +590,7 @@ local function AF_ScrollEditBox_OnCursorChanged(eb, x, y, arg, lineHeight)
     if not frame:IsEnabled() then return end
 
     lineHeight = lineHeight + eb:GetSpacing()
-    frame:SetScrollStep(lineHeight)
+    frame:SetScrollStep(lineHeight * 3)
 
     local vs = frame.scrollFrame:GetVerticalScroll()
     local h  = frame.scrollFrame:GetHeight()
@@ -586,9 +648,9 @@ function AF.CreateScrollEditBox(parent, name, label, width, height)
     eb.UpdatePixels = function() end
     eb:ClearBackdrop()
     eb:SetPoint("TOPLEFT")
-    eb:SetPoint("RIGHT")
+    eb:SetPoint("TOPRIGHT")
     eb:SetTextInsets(4, 4, 4, 4)
-    -- eb:SetSpacing(2)
+    eb:SetSpacing(0)
     eb:SetScript("OnEnter", AF_ScrollEditBox_OnEnter)
     eb:SetScript("OnLeave", AF_ScrollEditBox_OnLeave)
     eb:SetScript("OnEnterPressed", AF_ScrollEditBox_OnEnterPressed)

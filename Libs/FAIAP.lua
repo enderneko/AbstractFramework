@@ -972,6 +972,11 @@ end
 -- returns the padded code, and true if modified, false if unmodified
 local linebreak = stringbyte("\n")
 function lib.padWithLinebreaks(code)
+    do
+        --! disable this function
+        return code, false
+    end
+
     local len = stringlen(code)
     local linebreakcount = 0
     while len > 0 and linebreakcount < 2 do
