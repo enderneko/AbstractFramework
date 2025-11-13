@@ -100,6 +100,7 @@ function AF_ButtonMixin:GetFontString()
     return self.text
 end
 
+---@param color string
 function AF_ButtonMixin:SetTextColor(color)
     self.text:SetColor(color)
 end

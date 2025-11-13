@@ -720,26 +720,33 @@ end
 ---------------------------------------------------------------------
 -- blink
 ---------------------------------------------------------------------
----@param region Region
+---@param region Region will create a animation group: region.blink
 ---@param duration number|nil default is 0.5
----@param enableShowHideHook boolean|nil whether to hook OnShow/OnHide to control the animation
-function AF.CreateBlinkAnimation(region, duration, enableShowHideHook)
+---@param hook "scripts"|"functions"|nil determine whether to hook OnShow/OnHide scripts or Show/Hide functions, default is play immediately
+function AF.CreateBlinkAnimation(region, duration, hook)
     local blink = region:CreateAnimationGroup()
     region.blink = blink
 
     local alpha = blink:CreateAnimation("Alpha")
     blink.alpha = alpha
-    alpha:SetFromAlpha(0.25)
-    alpha:SetToAlpha(1)
+    alpha:SetFromAlpha(1)
+    alpha:SetToAlpha(0.25)
     alpha:SetDuration(duration or 0.5)
 
     blink:SetLooping("BOUNCE")
 
-    if enableShowHideHook then
+    if hook == "scripts" or hook == true then -- true for backward compatibility
         region:HookScript("OnShow", function()
-            blink:Play()
+            blink:Restart()
         end)
         region:HookScript("OnHide", function()
+            blink:Stop()
+        end)
+    elseif hook == "functions" then
+        hooksecurefunc(region, "Show", function()
+            blink:Restart()
+        end)
+        hooksecurefunc(region, "Hide", function()
             blink:Stop()
         end)
     else
