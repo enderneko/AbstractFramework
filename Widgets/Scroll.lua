@@ -196,10 +196,11 @@ local function ScrollContent_OnSizeChanged(scrollContent)
         -- space for scrollBar
         -- AF.SetPoint(scrollFrame, "BOTTOMRIGHT", -7, 0)
         scrollBar:Show()
+        scrollParent:SetScroll(scrollFrame:GetVerticalScroll()) -- re-check scroll position
     else
         -- AF.SetPoint(scrollFrame, "BOTTOMRIGHT")
         scrollBar:Hide()
-        scrollFrame:SetVerticalScroll(0)
+        scrollParent:SetScroll(0)
     end
 
     UpdateScrollFrameAnchor(scrollParent)

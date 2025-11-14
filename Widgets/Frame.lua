@@ -204,19 +204,23 @@ end
 ---@class AF_BorderedFrame:AF_Frame
 local AF_BorderedFrameMixin = {}
 
+---@param label text
+---@param fontColor string|nil only for the first call
+---@param font FontObject|string|nil only for the first call
+---@param isInside boolean|nil whether the label is inside the frame, only for the first call
 function AF_BorderedFrameMixin:SetLabel(label, fontColor, font, isInside)
     if not self.label then
         self.label = AF.CreateFontString(self, label, fontColor or self.accentColor, font)
         self.label:SetJustifyH("LEFT")
+
+        AF.ClearPoints(self.label)
+        if isInside then
+            AF.SetPoint(self.label, "TOPLEFT", 5, -5)
+        else
+            AF.SetPoint(self.label, "BOTTOMLEFT", self, "TOPLEFT", 2, 2)
+        end
     else
         self.label:SetText(label)
-    end
-
-    AF.ClearPoints(self.label)
-    if isInside then
-        AF.SetPoint(self.label, "TOPLEFT", 2, -2)
-    else
-        AF.SetPoint(self.label, "BOTTOMLEFT", self, "TOPLEFT", 2, 2)
     end
 end
 

@@ -520,11 +520,11 @@ function AF_DropdownMixin:SetTooltip(...)
 end
 
 ---@param parent Frame
----@param width? number
----@param maxSlots? number max shown items, not available for mini horizontal dropdown, default 10
----@param miniMode? string "vertical" or "horizontal", if set, dropdown will be mini mode
----@param textureAlpha? number default 0.75
----@param justify? string
+---@param width number|nil
+---@param maxSlots number|nil max shown items, not available for mini horizontal dropdown, default 10
+---@param miniMode "vertical"|"horizontal"|nil if set, dropdown will be mini mode
+---@param textureAlpha number|nil default 0.75
+---@param justify "LEFT"|"CENTER"|"RIGHT"|nil
 ---@return AF_Dropdown
 function AF.CreateDropdown(parent, width, maxSlots, miniMode, textureAlpha, justify)
     if not list then CreateListFrame() end

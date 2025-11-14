@@ -1241,6 +1241,45 @@ end
 
 defaultColorTable = {}
 lib.defaultColorTable = defaultColorTable
+
+-- defaultColorTable[tokens.TOKEN_SPECIAL] = "|c00F92672"  -- Monokai Pink
+-- defaultColorTable[tokens.TOKEN_KEYWORD] = "|c00F92672"  -- Monokai Pink
+-- defaultColorTable[tokens.TOKEN_COMMENT_SHORT] = "|c0075715E"  -- Monokai Comment Gray
+-- defaultColorTable[tokens.TOKEN_COMMENT_LONG] = "|c0075715E"   -- Monokai Comment Gray
+
+-- local stringColor = "|c00E6DB74"  -- Monokai Yellow-Green
+-- defaultColorTable[tokens.TOKEN_STRING] = stringColor
+-- defaultColorTable[".."] = stringColor
+
+-- local tableColor = "|c00AE81FF"  -- Monokai Purple
+-- defaultColorTable["..."] = tableColor
+-- defaultColorTable["{"] = tableColor
+-- defaultColorTable["}"] = tableColor
+-- defaultColorTable["["] = tableColor
+-- defaultColorTable["]"] = tableColor
+
+-- local arithmeticColor = "|c00AE81FF"  -- Monokai Purple
+-- defaultColorTable[tokens.TOKEN_NUMBER] = arithmeticColor
+-- defaultColorTable["+"] = arithmeticColor
+-- defaultColorTable["-"] = arithmeticColor
+-- defaultColorTable["/"] = arithmeticColor
+-- defaultColorTable["*"] = arithmeticColor
+
+-- local logicColor1 = "|c00F92672"  -- Monokai Pink
+-- defaultColorTable["=="] = logicColor1
+-- defaultColorTable["<"] = logicColor1
+-- defaultColorTable["<="] = logicColor1
+-- defaultColorTable[">"] = logicColor1
+-- defaultColorTable[">="] = logicColor1
+-- defaultColorTable["~="] = logicColor1
+
+-- local logicColor2 = "|c00F92672"  -- Monokai Pink
+-- defaultColorTable["and"] = logicColor2
+-- defaultColorTable["or"] = logicColor2
+-- defaultColorTable["not"] = logicColor2
+
+-- defaultColorTable[0] = "|r"
+
 defaultColorTable[tokens.TOKEN_SPECIAL] = "|c00ff99ff"
 defaultColorTable[tokens.TOKEN_KEYWORD] = "|c006666ff"
 defaultColorTable[tokens.TOKEN_COMMENT_SHORT] = "|c00999999"
