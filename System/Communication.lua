@@ -226,3 +226,129 @@ end)
 function AF.BlockChatConfigFrameInteractionForChannel(channelName)
     blockedChannels[channelName] = true
 end
+
+---------------------------------------------------------------------
+-- send to chat
+---------------------------------------------------------------------
+local MSG_INTERVAL = 0.25
+local MSG_MAX_LENGTH = 255
+
+local SendChatMessage = C_ChatInfo.SendChatMessage
+local IsInRaid = IsInRaid
+local IsInGroup = IsInGroup
+local min, max = math.min, math.max
+
+local messageQueue = AF.NewQueue()
+local chatTicker
+local validChatTypes = {
+    PARTY = true,
+    RAID = true,
+    RAID_WARNING = true,
+    INSTANCE_CHAT = true,
+    GUILD = true,
+    OFFICER = true,
+    WHISPER = true,
+}
+
+local function StartChatTicker()
+    if chatTicker then return end
+    chatTicker = C_Timer.NewTicker(MSG_INTERVAL, function()
+        if messageQueue:isEmpty() then
+            chatTicker:Cancel()
+            chatTicker = nil
+            return
+        end
+        local payload = messageQueue:pop()
+        if payload then
+            SendChatMessage(payload.text, payload.chatType, nil, payload.target)
+        end
+    end)
+end
+
+local function EnqueueLine(lineText, chatType, target)
+    if AF.IsBlank(lineText) then return end
+
+    local byteLen = #lineText
+    if byteLen <= MSG_MAX_LENGTH then
+        -- 整行可以发送
+        messageQueue:push({text = lineText, chatType = chatType, target = target})
+    else
+        -- 需要分块，按字节数分割但避免截断 UTF-8 字符和英文单词
+        local startByte = 1
+        while startByte <= byteLen do
+            local endByte = min(startByte + MSG_MAX_LENGTH - 1, byteLen)
+
+            -- 检查是否在 UTF-8 字符中间
+            if endByte < byteLen then
+                local nextByte = lineText:byte(endByte + 1)
+                -- 如果下一个字节是后续字节 [\128-\191]，说明当前位置在字符中间
+                while endByte > startByte and nextByte and nextByte >= 128 and nextByte <= 191 do
+                    endByte = endByte - 1
+                    nextByte = lineText:byte(endByte + 1)
+                end
+            end
+
+            -- 尝试在空白字符处分割，避免截断英文单词
+            if endByte < byteLen then
+                local originalEndByte = endByte
+                local char = lineText:sub(endByte, endByte)
+                local nextChar = lineText:sub(endByte + 1, endByte + 1)
+
+                -- 如果当前位置和下一个位置都不是空白字符，尝试向前查找空白字符
+                if not char:match("%s") and not nextChar:match("%s") then
+                    local found = false
+                    -- 向前最多查找 30 个字节（避免过度回退）
+                    for i = endByte, max(startByte, endByte - 30), -1 do
+                        local c = lineText:sub(i, i)
+                        if c:match("%s") then
+                            endByte = i
+                            found = true
+                            break
+                        end
+                    end
+                    -- 如果没找到空白字符，保持原位置（避免单词过长导致无法分割）
+                    if not found then
+                        endByte = originalEndByte
+                    end
+                end
+            end
+
+            local chunk = lineText:sub(startByte, endByte)
+            messageQueue:push({text = chunk, chatType = chatType, target = target})
+            startByte = endByte + 1
+        end
+    end
+end
+
+---@param message string
+---@param chatType "PARTY"|"RAID"|"RAID_WARNING"|"INSTANCE_CHAT"|"GUILD"|"OFFICER"|"WHISPER"
+function AF.SendChatMessage(message, chatType, target)
+    assert(not AF.IsBlank(message), "message cannot be blank")
+    chatType = type(chatType) == "string" and chatType or "RAID"
+    assert(validChatTypes[chatType], "invalid chatType: " .. chatType)
+
+    if chatType == "RAID" then
+        if IsInRaid() then
+            -- ok
+        elseif IsInGroup() then
+            chatType = "PARTY"
+        else
+            return
+        end
+    end
+
+    local lastPos = 1
+    while true do
+        local newLinePos = message:find("\n", lastPos, true)
+        if newLinePos then
+            EnqueueLine(message:sub(lastPos, newLinePos - 1), chatType, target)
+            lastPos = newLinePos + 1
+        else
+            EnqueueLine(message:sub(lastPos), chatType, target)
+            break
+        end
+    end
+
+    messageQueue:checkShrink()
+    StartChatTicker()
+end
