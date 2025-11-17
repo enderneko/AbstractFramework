@@ -268,6 +268,12 @@ end
 local function EnqueueLine(lineText, chatType, target)
     if AF.IsBlank(lineText) then return end
 
+    lineText = lineText:gsub("||?T.-||?t", "")
+    lineText = lineText:gsub("||?c%x%x%x%x%x%x%x%x(.-)||?r", "%1")
+    lineText = lineText:gsub("||?cn[%w_]+:(.-)||?r", "%1")
+    lineText = lineText:gsub("||?cnIQ%d:(.-)||?r", "%1")
+    lineText = strtrim(lineText)
+
     local byteLen = #lineText
     if byteLen <= MSG_MAX_LENGTH then
         -- 整行可以发送
