@@ -6,7 +6,7 @@ local bleedList
 function AF.GetDebuffType(auraData)
     if not auraData or auraData.isHelpful then return end
 
-    if not auraData.dispelName and bleedList[spellId] then
+    if not auraData.dispelName and bleedList[auraData.spellId] then
         return "Bleed"
     end
 

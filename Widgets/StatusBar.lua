@@ -296,7 +296,7 @@ function AF.CreateSimpleStatusBar(parent, name, noBackdrop)
         bar.SetBackgroundColor = nil
         bar.SetBorderColor = nil
     else
-        AF.ApplyDefaultBackdrop(bar)
+        AF.ApplyDefaultBackdropWithColors(bar)
     end
 
     -- default value

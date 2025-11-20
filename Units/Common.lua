@@ -206,7 +206,7 @@ function AF.GetBestUnitIDForTarget(target)
     if not AF.UnitInGroup(target) then return end
 
     if UnitIsPlayer(target) or UnitInPartyIsAI(target) then
-        for unit in AF.IterateGroupMembers() do
+        for unit in AF.IterateGroupPlayers() do
             if UnitIsUnit(target, unit) then
                 return unit
             end
