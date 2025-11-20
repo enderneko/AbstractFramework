@@ -11,7 +11,7 @@ local AF_TextureMixin = {}
 function AF_TextureMixin:SetColor(color)
     if type(color) == "string" then color = AF.GetColorTable(color) end
     color = color or {1, 1, 1, 1}
-    if self:GetTexture() or self:GetAtlas() then
+    if self:HasTexture() then
         self:SetVertexColor(AF.UnpackColor(color))
     else
         self:SetColorTexture(AF.UnpackColor(color))
@@ -29,6 +29,23 @@ function AF_TextureMixin:SetTextureOrAtlas(texture, ...)
     end
 end
 
+---@return boolean hasTexture
+---@return string|nil texType "texture"|"atlas"
+---@return string|number|nil tex texture path/fileID or atlas
+function AF_TextureMixin:HasTexture()
+    return self._tex ~= nil, self._texType, self._tex
+end
+
+local function SetTexture(tex, value)
+    tex._texType = value and "texture" or nil
+    tex._tex = value
+end
+
+local function SetAtlas(tex, value)
+    tex._texType = value and "atlas" or nil
+    tex._tex = value
+end
+
 ---@param parent Frame
 ---@param texture? string
 ---@param color? table|string
@@ -41,6 +58,9 @@ end
 function AF.CreateTexture(parent, texture, color, drawLayer, subLevel, wrapModeHorizontal, wrapModeVertical, filterMode)
     local tex = parent:CreateTexture(nil, drawLayer or "ARTWORK", nil, subLevel)
     Mixin(tex, AF_TextureMixin)
+
+    hooksecurefunc(tex, "SetTexture", SetTexture)
+    hooksecurefunc(tex, "SetAtlas", SetAtlas)
 
     if texture and texture ~= "" then
         if type(texture) == "string" and not texture:find("[/\\]") then
