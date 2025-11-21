@@ -121,18 +121,18 @@ end
 ---------------------------------------------------------------------
 -- number format
 ---------------------------------------------------------------------
-local symbol_1K, symbol_10K, symbol_1B = "千", "万", "亿"
+local abbr_1K, abbr_10K, abbr_100000K = "千", "万", "亿"
 if LOCALE_zhTW then
-    symbol_1K, symbol_10K, symbol_1B = "千", "萬", "億"
+    abbr_1K, abbr_10K, abbr_100000K = "千", "萬", "億"
 elseif LOCALE_koKR then
-    symbol_1K, symbol_10K, symbol_1B = "천", "만", "억"
+    abbr_1K, abbr_10K, abbr_100000K = "천", "만", "억"
 end
 
 function AF.FormatNumber_Asian(n)
     if abs(n) >= 100000000 then
-        return AF.RoundToDecimal(n / 100000000, 2) .. symbol_1B
+        return AF.RoundToDecimal(n / 100000000, 2) .. abbr_100000K
     elseif abs(n) >= 10000 then
-        return AF.RoundToDecimal(n / 10000, 1) .. symbol_10K
+        return AF.RoundToDecimal(n / 10000, 1) .. abbr_10K
     else
         return n
     end
@@ -148,6 +148,34 @@ function AF.FormatNumber(n)
     else
         return n
     end
+end
+
+---------------------------------------------------------------------
+-- number format (secret)
+---------------------------------------------------------------------
+local AbbreviateNumbers = AbbreviateNumbers
+
+local asianNumberAbbrevOptions = {
+   breakpointData = {
+      {breakpoint = 100000000, abbreviation = abbr_100000K, significandDivisor = 1000000, fractionDivisor = 100, abbreviationIsGlobal = false}, -- 1.23亿
+      {breakpoint = 10000, abbreviation = abbr_10K, significandDivisor = 1000, fractionDivisor = 10, abbreviationIsGlobal = false}, -- 1.2万
+   },
+}
+
+local westernNumberAbbrevOptions = {
+   breakpointData = {
+      {breakpoint = 1000000000, abbreviation = "B", significandDivisor = 10000000, fractionDivisor = 100, abbreviationIsGlobal = false}, -- 1.23B
+      {breakpoint = 1000000, abbreviation = "M", significandDivisor = 10000, fractionDivisor = 100, abbreviationIsGlobal = false}, -- 1.23M
+      {breakpoint = 1000, abbreviation = "K", significandDivisor = 100, fractionDivisor = 10, abbreviationIsGlobal = false}, -- 1.2K
+   },
+}
+
+function AF.FormatSecretNumber_Asian(n)
+    return AbbreviateNumbers(n, asianNumberAbbrevOptions)
+end
+
+function AF.FormatSecretNumber(n)
+    return AbbreviateNumbers(n, westernNumberAbbrevOptions)
 end
 
 ---------------------------------------------------------------------
