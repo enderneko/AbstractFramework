@@ -452,6 +452,46 @@ function AF.ApplyDefaultBackdropWithColors(frame, color, borderColor, borderSize
 end
 
 ---------------------------------------------------------------------
+-- backdrop highlight
+---------------------------------------------------------------------
+---@param frame Frame uses OnEnter and OnLeave to change the backdrop color
+---@param target Frame|nil if set then the target will be highlighted instead of the frame
+---@param borderHighlightColor string|table|nil color name defined in Color.lua or color table
+---@param backgroundHighlightColor string|table|nil color name defined in Color.lua or color table
+function AF.SetBackdropHighlight(frame, target, borderHighlightColor, backgroundHighlightColor)
+    target = target or frame
+    assert(frame and target and target.GetBackdrop, "AF.SetBackdropHighlight: target must have a backdrop.")
+
+    target._borderColor = {target:GetBackdropBorderColor()}
+    target._backgroundColor = {target:GetBackdropColor()}
+
+    if type(borderHighlightColor) == "string" then
+        target._borderHighlightColor = AF.GetColorTable(borderHighlightColor)
+    elseif type(borderHighlightColor) == "table" and #borderHighlightColor >= 3 then
+        target._borderHighlightColor = borderHighlightColor
+    end
+
+    if type(backgroundHighlightColor) == "string" then
+        target._backgroundHighlightColor = AF.GetColorTable(backgroundHighlightColor)
+    elseif type(backgroundHighlightColor) == "table" and #backgroundHighlightColor >= 3 then
+        target._backgroundHighlightColor = backgroundHighlightColor
+    end
+
+    frame:HookScript("OnEnter", function()
+        if target._borderHighlightColor then
+            target:SetBackdropBorderColor(AF.UnpackColor(target._borderHighlightColor))
+        end
+        if target._backgroundHighlightColor then
+            target:SetBackdropColor(AF.UnpackColor(target._backgroundHighlightColor))
+        end
+    end)
+    frame:HookScript("OnLeave", function()
+        target:SetBackdropBorderColor(AF.UnpackColor(target._borderColor))
+        target:SetBackdropColor(AF.UnpackColor(target._backgroundColor))
+    end)
+end
+
+---------------------------------------------------------------------
 -- drag
 ---------------------------------------------------------------------
 ---@param frame Frame draggable frame
