@@ -101,6 +101,7 @@ Widgets\DataBroker.lua
 Widgets\DragSorter.lua
 Widgets\ImageViewer.lua
 Widgets\ImagePane.lua
+Widgets\TimeFormat.lua
 
 # media/glyphs
 Media\Glyphs.lua

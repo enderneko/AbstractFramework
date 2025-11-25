@@ -101,6 +101,15 @@ if LOCALE_zhCN then
 
     L["Got It"] = "明白了"
 
+    L["Year"] = "年"
+    L["Month"] = "月"
+    L["Day"] = "日"
+    L["Weekday"] = "星期"
+    L["Hour"] = "小时"
+    L["Minute"] = "分钟"
+    L["Second"] = "秒"
+    L["Timezone"] = "时区"
+
     L["%d days"] = "%d天"
     L["%d hours"] = "%d小时"
     L["%d minutes"] = "%d分钟"

@@ -54,7 +54,7 @@ local function FillDays(year, month)
             b:SetEnabled(true)
             b:SetText(day)
 
-            b.accentColor = calendar.parent.accentColor -- for Tooltip
+            b.accentColor = calendar.owner.accentColor -- for Tooltip
             b._hoverColor = AF.GetButtonHoverColor(b.accentColor) -- for highlight
 
             -- date highlights
@@ -104,7 +104,7 @@ local function FillDays(year, month)
 end
 
 local function CreateCalendar()
-    calendar = AF.CreateBorderedFrame(AF.UIParent, nil, 185, 167, nil, "accent")
+    calendar = AF.CreateBorderedFrame(AF.UIParent, "AF_Calendar", 185, 167, nil, "accent")
     calendar:SetClampedToScreen(true)
     calendar:EnableMouse(true)
 
@@ -232,10 +232,10 @@ local function CreateCalendar()
 
     calendar.highlight = AF.CreateButtonGroup(days, nil, nil, function(b, d)
         calendar.date.day = d
-        calendar.parent:SetDate(calendar.date)
-        calendar.date.timestamp = calendar.parent.date.timestamp
-        if calendar.onDateChanged then
-            calendar.onDateChanged(calendar.date)
+        calendar.owner:SetDate(calendar.date)
+        calendar.date.timestamp = calendar.owner.date.timestamp
+        if calendar.callback then
+            calendar.callback(calendar.date)
         end
         calendar:Hide()
     end, function(self)
@@ -272,8 +272,6 @@ local function CreateCalendar()
         calendar:SetWidth(width1 + width2 - width3)
     end
 
-    calendar:UpdatePixels()
-
     -- set date
     calendar.date = {}
     function calendar:SetDate(date)
@@ -287,15 +285,15 @@ local function CreateCalendar()
     end
 end
 
-local function ShowCalendar(parent, date, marks, position, onDateChanged)
+local function ShowCalendar(parent, position, date, marks, callback)
     if not calendar then CreateCalendar() end
-    if calendar:IsShown() and calendar:GetParent() == parent then
+    if calendar:IsShown() and calendar.owner == parent then
         calendar:Hide()
         return
     end
 
-    calendar.parent = parent
-    calendar.onDateChanged = onDateChanged
+    calendar.owner = parent
+    calendar.callback = callback
     calendar.marks = marks
 
     -- accent color system
@@ -310,21 +308,22 @@ local function ShowCalendar(parent, date, marks, position, onDateChanged)
     calendar.year.reloadRequired = true
     calendar.month.reloadRequired = true
 
-    calendar:SetDate(date)
-    calendar:SetParent(parent)
-    AF.SetFrameLevel(calendar, 20)
-    calendar:Show()
-
     AF.ClearPoints(calendar)
     if position == "BOTTOMLEFT" then
         AF.SetPoint(calendar, "TOPLEFT", parent, "BOTTOMLEFT", 0, -5)
     elseif position == "BOTTOMRIGHT" then
         AF.SetPoint(calendar, "TOPRIGHT", parent, "BOTTOMRIGHT", 0, -5)
-    elseif position == "TOPLEFT" then
-        AF.SetPoint(calendar, "BOTTOMLEFT", parent, "TOPLEFT", 0, 5)
-    else -- TOPRIGHT
+    elseif position == "TOPRIGHT" then
         AF.SetPoint(calendar, "BOTTOMRIGHT", parent, "TOPRIGHT", 0, 5)
+    else -- TOPLEFT
+        AF.SetPoint(calendar, "BOTTOMLEFT", parent, "TOPLEFT", 0, 5)
     end
+
+    calendar:SetDate(date)
+    calendar:SetParent(parent)
+    AF.SetFrameLevel(calendar, 20)
+    calendar:UpdatePixels()
+    calendar:Show()
 end
 
 ---------------------------------------------------------------------
@@ -384,7 +383,7 @@ end
 -- }
 function AF_CalendarButtonMixin:SetMarks(marks)
     self.marks = marks
-    if calendar and calendar:IsShown() and calendar.parent == self then
+    if calendar and calendar:IsShown() and calendar.owner == self then
         calendar.marks = self.marks
         FillDays(self.date.year, self.date.month)
     end
@@ -392,41 +391,37 @@ end
 
 function AF_CalendarButtonMixin:ClearMarks()
     self.marks = nil
-    if calendar and calendar:IsShown() and calendar.parent == self then
+    if calendar and calendar:IsShown() and calendar.owner == self then
         calendar.marks = nil
         FillDays(self.date.year, self.date.month)
     end
 end
 
-function AF_CalendarButtonMixin:SetOnDateChanged(onDateChanged)
-    self.onDateChanged = onDateChanged
+function AF_CalendarButtonMixin:SetOnDateChanged(callback)
+    self.callback = callback
 end
 
----@param width? number default is 110
----@param calendarPosition? string "BOTTOMLEFT", "BOTTOMRIGHT", "TOPLEFT", "TOPRIGHT".
+---@param width number|nil default is 110
+---@param calendarPosition "BOTTOMLEFT"|"BOTTOMRIGHT"|"TOPLEFT"|"TOPRIGHT"|nil default is "TOPLEFT"
 ---@return AF_CalendarButton
 function AF.CreateCalendarButton(parent, width, calendarPosition)
-    local button = AF.CreateButton(parent, "", "accent", width or 110, 20)
-    button:SetTexture(AF.GetIcon("Calendar"), {16, 16}, {"LEFT", 2, 0})
+    local button = AF.CreateButton(parent, "", AF.GetAddonAccentColorName(), width or 110, 20)
+    Mixin(button, AF_CalendarButtonMixin)
 
-    button.accentColor = AF.GetAddonAccentColorName()
-    if button.accentColor then
-        button:SetColor(button.accentColor)
-    end
 
     button.date = {} -- save show date info
     button.marks = { -- store dates with extra marks
-        -- ["20240214"] = {
+    -- ["20240214"] = {
         --     ["tooltips"] = {strings},
         --     ["color"] = (string), -- in Color.lua
         -- },
     }
 
-    Mixin(button, AF_CalendarButtonMixin)
+    button:SetTexture(AF.GetIcon("Calendar"), {16, 16}, {"LEFT", 2, 0})
     button:SetDate(time())
 
     button:SetOnClick(function()
-        ShowCalendar(button, button.date, button.marks, calendarPosition, button.onDateChanged)
+        ShowCalendar(button, calendarPosition, button.date, button.marks, button.callback)
     end)
 
     return button
