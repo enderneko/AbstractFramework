@@ -64,6 +64,7 @@ function AF.UnregisterAllCallbacks(event)
 end
 
 AF.DEBUG_EVENTS = {
+    AF_FIRST_FRAME_RENDERED = false,
     AF_PIXEL_UPDATE = "blazing_tangerine",
     AF_SCALE_CHANGED = "blazing_tangerine",
     -- AF_PIXEL_UPDATE_START = false,

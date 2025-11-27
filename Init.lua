@@ -116,6 +116,7 @@ function AF.UIParent:FIRST_FRAME_RENDERED()
     AF.UIParent:UnregisterEvent("FIRST_FRAME_RENDERED")
     AF.UIParent:RegisterEvent("UI_SCALE_CHANGED")
     AF.SetupPopups(AFConfig.popups)
+    AF.Fire("AF_FIRST_FRAME_RENDERED")
     AF.Fire("AF_POPUPS_READY")
 end
 

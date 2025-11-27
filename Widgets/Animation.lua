@@ -337,6 +337,9 @@ local function Sizing(_, elapsed)
                 if frame and SIZEFRAMES[frame] then
                     if frame._size then
                         frame._size.sizeTimer = nil
+                        if frame._size.hideAfterResize and not frame:IsProtected() then
+                            frame:Hide()
+                        end
                     end
                     SIZEFRAMES[frame] = nil
                 end
@@ -376,7 +379,7 @@ end
 ---@param startHeight number|nil default is current height
 ---@param endWidth number|nil default is current width
 ---@param endHeight number|nil default is current height
-function AF.FrameResizeTo(frame, timeToSize, startWidth, startHeight, endWidth, endHeight)
+function AF.FrameResizeTo(frame, timeToSize, startWidth, startHeight, endWidth, endHeight, hideAfterResize)
     if frame._size then
         frame._size.sizeTimer = nil
     else
@@ -390,6 +393,7 @@ function AF.FrameResizeTo(frame, timeToSize, startWidth, startHeight, endWidth, 
     frame._size.endHeight = FixZero(endHeight or frame:GetHeight())
     frame._size.diffWidth = frame._size.endWidth - frame._size.startWidth
     frame._size.diffHeight = frame._size.endHeight - frame._size.startHeight
+    frame._size.hideAfterResize = hideAfterResize
 
     if frame._size.startWidth ~= frame._size.endWidth or frame._size.startHeight ~= frame._size.endHeight then
         FrameSize(frame, frame._size)
@@ -399,17 +403,17 @@ end
 ---@param timeToSize number|nil default is 0.25
 ---@param startWidth number|nil default is current width
 ---@param endWidth number|nil default is current width
-function AF.FrameResizeWidth(frame, timeToSize, startWidth, endWidth)
+function AF.FrameResizeWidth(frame, timeToSize, startWidth, endWidth, hideAfterResize)
     local currentHeight = frame:GetHeight()
-    AF.FrameResizeTo(frame, timeToSize, startWidth, currentHeight, endWidth, currentHeight)
+    AF.FrameResizeTo(frame, timeToSize, startWidth, currentHeight, endWidth, currentHeight, hideAfterResize)
 end
 
 ---@param timeToSize number|nil default is 0.25
 ---@param startHeight number|nil default is current height
 ---@param endHeight number|nil default is current height
-function AF.FrameResizeHeight(frame, timeToSize, startHeight, endHeight)
+function AF.FrameResizeHeight(frame, timeToSize, startHeight, endHeight, hideAfterResize)
     local currentWidth = frame:GetWidth()
-    AF.FrameResizeTo(frame, timeToSize, currentWidth, startHeight, currentWidth, endHeight)
+    AF.FrameResizeTo(frame, timeToSize, currentWidth, startHeight, currentWidth, endHeight, hideAfterResize)
 end
 
 ---------------------------------------------------------------------
