@@ -720,7 +720,7 @@ local function CreateColorPickerFrame()
     --------------------------------------------------
     -- color grids
     --------------------------------------------------
-    local sep = AF.CreateSeparator(colorPickerFrame, 269, 1, AF.GetColorTable("disabled", 0.25), true)
+    local sep = AF.CreateSeparator(colorPickerFrame, 269, 1, AF.GetColorTable("disabled", 0.25), nil, true)
     AF.SetPoint(sep, "TOPLEFT", originalPane, "TOPRIGHT", 7, -7)
     AF.RemoveFromPixelUpdater(sep)
 

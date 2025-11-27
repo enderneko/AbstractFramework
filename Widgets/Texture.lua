@@ -220,16 +220,24 @@ end
 ---@param parent Frame
 ---@param size number|nil
 ---@param thickness number
----@param color table|string
----@param isVertical? boolean
----@param noShadow? boolean
+---@param color1 table|string
+---@param color2 table|string|nil if provided, creates a gradient instead of solid
+---@param isVertical boolean|nil
+---@param noShadow boolean|nil
 ---@return Texture separator
-function AF.CreateSeparator(parent, size, thickness, color, isVertical, noShadow)
-    if type(color) == "string" then color = AF.GetColorTable(color) end
-    color = color or AF.GetAddonAccentColorTable()
+function AF.CreateSeparator(parent, size, thickness, color1, color2, isVertical, noShadow)
+    if type(color1) == "string" then color1 = AF.GetColorTable(color1) end
+    color1 = color1 or AF.GetAddonAccentColorTable()
+
+    if type(color2) == "string" then color2 = AF.GetColorTable(color2) end
 
     local separator = parent:CreateTexture(nil, "ARTWORK", nil, 0)
-    separator:SetColorTexture(AF.UnpackColor(color))
+    if color2 then
+        separator:SetTexture(AF.GetPlainTexture())
+        separator:SetGradient(isVertical and "VERTICAL" or "HORIZONTAL", CreateColor(AF.UnpackColor(color1)), CreateColor(AF.UnpackColor(color2)))
+    else
+        separator:SetColorTexture(AF.UnpackColor(color1))
+    end
     if isVertical then
         AF.SetSize(separator, thickness, size)
     else
@@ -239,7 +247,12 @@ function AF.CreateSeparator(parent, size, thickness, color, isVertical, noShadow
     if not noShadow then
         local shadow = parent:CreateTexture(nil, "ARTWORK", nil, -1)
         separator.shadow = shadow
-        shadow:SetColorTexture(AF.GetColorRGB("black", color[4])) -- use line alpha
+        if color2 then
+            shadow:SetTexture(AF.GetPlainTexture())
+            shadow:SetGradient(isVertical and "VERTICAL" or "HORIZONTAL", CreateColor(AF.GetColorRGB("border", color1[4])), CreateColor(AF.GetColorRGB("border", color2[4])))
+        else
+            shadow:SetColorTexture(AF.GetColorRGB("border", color1[4]))
+        end
         if isVertical then
             AF.SetWidth(shadow, thickness)
             AF.SetPoint(shadow, "TOPLEFT", separator, "TOPRIGHT", 0, -thickness)
@@ -274,8 +287,8 @@ local AF_IconMixin = {}
 
 ---@param color string|table
 function AF_IconMixin:SetBackgroundColor(color)
+    color = color or "border"
     if type(color) == "string" then color = AF.GetColorTable(color) end
-    color = color or {0, 0, 0, 1}
     self.bg:SetColorTexture(AF.UnpackColor(color))
 end
 
@@ -302,7 +315,7 @@ end
 ---@param parent Frame
 ---@param icon string|nil texture path or atlas
 ---@param size number|nil default is 16
----@param bgColor string|table|nil background color, defaults to "black"
+---@param bgColor string|table|nil background color, defaults to "border"
 ---@return AF_Icon
 function AF.CreateIcon(parent, icon, size, bgColor)
     local frame = CreateFrame("Frame", nil, parent)
