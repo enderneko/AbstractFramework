@@ -160,6 +160,24 @@ function AF.MergeExistingKeys(t, ...)
     end
 end
 
+-- merge into the first table, but only if the key does not already exist
+---@param t table
+---@param ... table
+function AF.MergeMissingKeys(t, ...)
+    for i = 1, select("#", ...) do
+        local _t = select(i, ...)
+        for k, v in next, _t do
+            if type(t[k]) == "nil" then
+                if type(v) == "table" then
+                    t[k] = AF.Copy(v)
+                else
+                    t[k] = v
+                end
+            end
+        end
+    end
+end
+
 -- for plain tables only
 ---@param t table
 ---@param ... table
