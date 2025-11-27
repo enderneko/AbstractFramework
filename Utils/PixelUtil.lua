@@ -758,7 +758,7 @@ end
 
 ---@param group string
 ---@return table|nil
-function AF.GetPixelUpdaterCustomGroup(group)
+function AF.GetPixelUpdater_CustomGroupComponents(group)
     return group and customGroupComponents[group]
 end
 
