@@ -185,20 +185,32 @@ end
 ---------------------------------------------------------------------
 -- gradient texture
 ---------------------------------------------------------------------
+---@class AF_GradientTexture:Texture
+local AF_GradientTextureMixin = {}
+
 ---@param orientation "HORIZONTAL"|"VERTICAL"
----@param color1 table|string
----@param color2 table|string
----@return Texture tex
-function AF.CreateGradientTexture(parent, orientation, color1, color2, texture, drawLayer, subLevel, filterMode)
-    texture = texture or AF.GetPlainTexture()
+---@param color1 string|table|nil
+---@param color2 string|table|nil
+function AF_GradientTextureMixin:SetColor(orientation, color1, color2)
     if type(color1) == "string" then color1 = AF.GetColorTable(color1) end
     if type(color2) == "string" then color2 = AF.GetColorTable(color2) end
     color1 = color1 or {0, 0, 0, 0}
     color2 = color2 or {0, 0, 0, 0}
+    self:SetGradient(orientation:upper(), CreateColor(AF.UnpackColor(color1)), CreateColor(AF.UnpackColor(color2)))
+end
+
+---@param orientation "HORIZONTAL"|"VERTICAL"
+---@param color1 table|string
+---@param color2 table|string
+---@return AF_GradientTexture tex
+function AF.CreateGradientTexture(parent, orientation, color1, color2, texture, drawLayer, subLevel, filterMode)
+    texture = texture or AF.GetPlainTexture()
 
     local tex = parent:CreateTexture(nil, drawLayer or "ARTWORK", nil, subLevel)
+    Mixin(tex, AF_GradientTextureMixin)
+
     tex:SetTexture(texture, nil, nil, filterMode)
-    tex:SetGradient(orientation:upper(), CreateColor(unpack(color1)), CreateColor(unpack(color2)))
+    tex:SetColor(orientation, color1, color2)
 
     AF.AddToPixelUpdater_OnShow(tex)
 
@@ -206,8 +218,36 @@ function AF.CreateGradientTexture(parent, orientation, color1, color2, texture, 
 end
 
 ---------------------------------------------------------------------
--- line
+-- separator
 ---------------------------------------------------------------------
+---@class AF_Separator:Texture
+local AF_SeparatorMixin = {}
+
+---@param color1 table|string
+---@param color2 table|string|nil if provided, creates a gradient instead of solid
+function AF_SeparatorMixin:SetColor(color1, color2)
+    if type(color1) == "string" then color1 = AF.GetColorTable(color1) end
+    color1 = color1 or AF.GetAddonAccentColorTable()
+
+    if type(color2) == "string" then color2 = AF.GetColorTable(color2) end
+
+    if color2 then
+        self:SetTexture(AF.GetPlainTexture())
+        self:SetGradient(self.isVertical and "VERTICAL" or "HORIZONTAL", CreateColor(AF.UnpackColor(color1)), CreateColor(AF.UnpackColor(color2)))
+    else
+        self:SetColorTexture(AF.UnpackColor(color1))
+    end
+
+    if self.shadow then
+        if color2 then
+            self.shadow:SetTexture(AF.GetPlainTexture())
+            self.shadow:SetGradient(self.isVertical and "VERTICAL" or "HORIZONTAL", CreateColor(AF.GetColorRGB("border", color1[4])), CreateColor(AF.GetColorRGB("border", color2[4])))
+        else
+            self.shadow:SetColorTexture(AF.GetColorRGB("border", color1[4]))
+        end
+    end
+end
+
 local function Separator_UpdatePixels(self)
     AF.ReSize(self)
     AF.RePoint(self)
@@ -224,20 +264,12 @@ end
 ---@param color2 table|string|nil if provided, creates a gradient instead of solid
 ---@param isVertical boolean|nil
 ---@param noShadow boolean|nil
----@return Texture separator
+---@return AF_Separator separator
 function AF.CreateSeparator(parent, size, thickness, color1, color2, isVertical, noShadow)
-    if type(color1) == "string" then color1 = AF.GetColorTable(color1) end
-    color1 = color1 or AF.GetAddonAccentColorTable()
-
-    if type(color2) == "string" then color2 = AF.GetColorTable(color2) end
-
     local separator = parent:CreateTexture(nil, "ARTWORK", nil, 0)
-    if color2 then
-        separator:SetTexture(AF.GetPlainTexture())
-        separator:SetGradient(isVertical and "VERTICAL" or "HORIZONTAL", CreateColor(AF.UnpackColor(color1)), CreateColor(AF.UnpackColor(color2)))
-    else
-        separator:SetColorTexture(AF.UnpackColor(color1))
-    end
+    Mixin(separator, AF_SeparatorMixin)
+
+    separator.isVertical = isVertical or false
     if isVertical then
         AF.SetSize(separator, thickness, size)
     else
@@ -247,12 +279,6 @@ function AF.CreateSeparator(parent, size, thickness, color1, color2, isVertical,
     if not noShadow then
         local shadow = parent:CreateTexture(nil, "ARTWORK", nil, -1)
         separator.shadow = shadow
-        if color2 then
-            shadow:SetTexture(AF.GetPlainTexture())
-            shadow:SetGradient(isVertical and "VERTICAL" or "HORIZONTAL", CreateColor(AF.GetColorRGB("border", color1[4])), CreateColor(AF.GetColorRGB("border", color2[4])))
-        else
-            shadow:SetColorTexture(AF.GetColorRGB("border", color1[4]))
-        end
         if isVertical then
             AF.SetWidth(shadow, thickness)
             AF.SetPoint(shadow, "TOPLEFT", separator, "TOPRIGHT", 0, -thickness)
@@ -273,6 +299,8 @@ function AF.CreateSeparator(parent, size, thickness, color1, color2, isVertical,
             shadow:SetShown(shown)
         end)
     end
+
+    separator:SetColor(color1, color2)
 
     AF.AddToPixelUpdater_OnShow(separator, nil, Separator_UpdatePixels)
 
