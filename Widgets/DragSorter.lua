@@ -9,7 +9,7 @@ local sort = table.sort
 local moverTip
 
 local function MoverTip_SetData(widget)
-    moverTip.text:SetText(widget.tipText)
+    moverTip.text:SetText(widget.tipText or tostring(widget.value))
 
     if widget.tipIcon then
         moverTip.icon:SetIcon(widget.tipIcon, widget.tipIconIsAtlas)
@@ -152,6 +152,10 @@ function AF_DragSorterMixin:Refresh()
             self.widgets[i]:SetAllPoints(slot)
             RegisterDragAndDrop(self.widgets[i])
 
+            if self.widgets[i].update then
+                self.widgets[i]:update(i)
+            end
+
             slot.widget = self.widgets[i]
             slot:Show()
         else
@@ -169,8 +173,8 @@ end
     widget.value = (any)
             └─ the value associated with the widget, it's the same value in the config table
 
-    widget.tipText = (string)
-            └─ text to display in the mover tip
+    widget.tipText = (string|nil)
+            └─ text to display in the mover tip, if not set, will use widget.value
 
     widget.tipIcon = (string|nil)
             └─ icon to display in the mover tip
@@ -188,17 +192,20 @@ end
             ├─ if true, it will not respond to drag and drop events
             └─ if widget:IsEnabled() exists, it will use that to determine whether the widget is draggable
 
+    widget.update = function(widget, index) | widget:update(index) | nil
+            └─ called when the widget is positioned/updated, index is the current index in the sorted list
+
     widget.index
             ├─ the index of the widget in the sorted list, set by the sorter
             └─ do not modify this value directly
 ]]
-function AF_DragSorterMixin:SetWidgets(widgets)
+function AF_DragSorterMixin:SetWidgets(widgets, skipRefresh)
     assert(type(widgets) == "table", "AF_DragSorter:SetWidgets expects a table of widgets.")
 
     -- check required fields
     for i, widget in next, widgets do
         assert(widget.value ~= nil, "AF_DragSorter:SetWidgets widget at index " .. i .. " is missing 'value'.")
-        assert(widget.tipText, "AF_DragSorter:SetWidgets widget at index " .. i .. " is missing 'tipText'.")
+        -- assert(widget.tipText, "AF_DragSorter:SetWidgets widget at index " .. i .. " is missing 'tipText'.")
 
         if not widget.defaultOrder then
             widget.defaultOrder = i
@@ -222,16 +229,29 @@ function AF_DragSorterMixin:SetWidgets(widgets)
         if i == 1 then
             AF.SetPoint(self.slots[i], "TOPLEFT")
         else
-            AF.SetPoint(self.slots[i], "TOPLEFT", self.slots[i - 1], "TOPRIGHT", self.slotSpacing, 0)
+            if self.orientation == "HORIZONTAL" then
+                AF.SetPoint(self.slots[i], "TOPLEFT", self.slots[i - 1], "TOPRIGHT", self.slotSpacing, 0)
+            else
+                AF.SetPoint(self.slots[i], "TOPLEFT", self.slots[i - 1], "BOTTOMLEFT", 0, -self.slotSpacing)
+            end
         end
 
         self.widgets[i].accentColor = self.accentColor
         RegisterDragAndDrop(self.widgets[i])
     end
-    AF.SetListWidth(self, n, self.slotWidth, self.slotSpacing)
 
-    self:Refresh()
+    if self.orientation == "HORIZONTAL" then
+        AF.SetListWidth(self, n, self.slotWidth, self.slotSpacing)
+    else
+        AF.SetListHeight(self, n, self.slotHeight, self.slotSpacing)
+    end
+
+    if not skipRefresh then
+        self:Refresh()
+    end
 end
+
+-- TODO: SetWidgetPool
 
 function AF_DragSorterMixin:SetConfigTable(configTable)
     self.configTable = configTable
@@ -246,19 +266,25 @@ end
 -- Do not forget to dragSorter:SetConfigTable(t)
 ---@param parent Frame
 ---@param name? string
----@param slotSpacing? number default 3
----@param slotWidth? number default 20
----@param slotHeight? number default 20
+---@param slotSpacing number|nil default 3
+---@param slotWidth number|nil default 20
+---@param slotHeight number|nil default 20
+---@param orientation "HORIZONTAL"|"VERTICAL"|nil default "HORIZONTAL"
 ---@return AF_DragSorter dragSorter
-function AF.CreateDragSorter(parent, name, slotSpacing, slotWidth, slotHeight)
+function AF.CreateDragSorter(parent, name, slotSpacing, slotWidth, slotHeight, orientation)
     local dragSorter = CreateFrame("Frame", name, parent)
     dragSorter.accentColor = AF.GetAddonAccentColorName()
 
     dragSorter.slotSpacing = slotSpacing or 3
     dragSorter.slotWidth = slotWidth or 20
     dragSorter.slotHeight = slotHeight or 20
+    dragSorter.orientation = orientation or "HORIZONTAL"
 
-    AF.SetHeight(dragSorter, dragSorter.slotHeight)
+    if orientation == "VERTICAL" then
+        AF.SetWidth(dragSorter, dragSorter.slotWidth)
+    else
+        AF.SetHeight(dragSorter, dragSorter.slotHeight)
+    end
 
     dragSorter.slots = {}
 

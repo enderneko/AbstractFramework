@@ -149,6 +149,7 @@ if LOCALE_zhCN then
 
     L["Sort Method"] = "排序方式"
     L["Sort Direction"] = "排序方向"
+    L["Drag to reorder"] = "拖动以重新排序"
 
     L["Time"] = "时间"
     L["Index"] = "索引"
