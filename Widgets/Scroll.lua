@@ -163,11 +163,6 @@ function AF_ScrollFrameMixin:DisableScrollFrameReanchor(disabled)
     UpdateScrollFrameAnchor(self)
 end
 
-local function ScrollFrame_OnSizeChanged(scrollFrame)
-    -- update scrollContent width
-    scrollFrame:GetScrollChild():SetWidth(scrollFrame:GetWidth())
-end
-
 local function ScrollContent_OnSizeChanged(scrollContent)
     -- check if it can scroll
     -- DO NOT USE OnScrollRangeChanged to check whether it can scroll.
@@ -204,6 +199,20 @@ local function ScrollContent_OnSizeChanged(scrollContent)
     end
 
     UpdateScrollFrameAnchor(scrollParent)
+end
+
+local function ScrollFrame_OnSizeChanged(scrollFrame)
+    -- update scrollContent width
+    local scrollContent = scrollFrame:GetScrollChild()
+    local oldWidth = scrollContent:GetWidth()
+    local newWidth = scrollFrame:GetWidth()
+    if AF.ApproxEqual(oldWidth, newWidth, 0.01) then
+        -- height changed
+        ScrollContent_OnSizeChanged(scrollContent)
+    else
+        -- width changed
+        scrollContent:SetWidth(newWidth)
+    end
 end
 
 local function ScrollThumb_OnMouseDown(scrollThumb, button)
