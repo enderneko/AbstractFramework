@@ -128,6 +128,20 @@ local function UnregisterAllEvents(self)
     _UnregisterAllEvents(self._eventHandler)
 end
 
+local function RegisterEventOnce(self, event, ...)
+    local func = {...}
+    local function OneTimeCallback(obj, event, ...)
+        UnregisterEvent(obj, event, OneTimeCallback)
+        for _, fn in next, func do
+            fn(obj, event, ...)
+        end
+    end
+    RegisterEvent(self, event, OneTimeCallback)
+end
+
+local function IsEventRegistered(self, event)
+    return self._eventHandler:IsEventRegistered(event)
+end
 
 ---------------------------------------------------------------------
 -- process events
@@ -262,8 +276,13 @@ function AF.AddEventHandler(obj)
     obj.RegisterUnitEvent = RegisterUnitEvent
     obj.UnregisterEvent = UnregisterEvent
     obj.UnregisterAllEvents = UnregisterAllEvents
+    obj.RegisterEventOnce = RegisterEventOnce
+    obj.IsEventRegistered = IsEventRegistered
 end
 
+---------------------------------------------------------------------
+-- AF
+---------------------------------------------------------------------
 AF.AddEventHandler(AF)
 
 ---------------------------------------------------------------------
