@@ -226,6 +226,7 @@ function AF_ButtonMixin:SetTexture(tex, size, point, isAtlas, bgColor, justifyH,
         self:HookScript("OnDisable", function()
             self.realTexture:SetDesaturated(true)
             self.realTexture:SetVertexColor(AF.GetColorRGB("disabled"))
+            AF.RePoint(self.texture)
         end)
 
         size = size or {16, 16}
@@ -453,6 +454,7 @@ function AF.CreateButton(parent, text, color, width, height, template, borderCol
 
     b:SetScript("OnDisable", function()
         b.text:SetColor("disabled")
+        AF.RePoint(b.text)
         -- UnregisterMouseDownUp(b)
     end)
 
