@@ -167,6 +167,19 @@ function AF_ButtonMixin:SetBorderColor(color)
     self:SetBackdropBorderColor(AF.UnpackColor(self._borderColor))
 end
 
+local function Button_OnEnter(self)
+    self:SetBackdropColor(AF.UnpackColor(self._hoverColor))
+    if self.highlightText then self.highlightText() end
+    if self.highlightBorder then self.highlightBorder() end
+end
+
+local function Button_OnLeave(self)
+    if self._highlightLocked then return end
+    self:SetBackdropColor(AF.UnpackColor(self._color))
+    if self.unhighlightText then self.unhighlightText() end
+    if self.unhighlightBorder then self.unhighlightBorder() end
+end
+
 ---@param color string|table if table, color[1] is normal color, color[2] is hover color
 function AF_ButtonMixin:SetColor(color)
     if not color then return end
@@ -184,16 +197,18 @@ function AF_ButtonMixin:SetColor(color)
     self:SetBackdropColor(AF.UnpackColor(self._color))
 
     -- OnEnter / OnLeave ------------------------
-    self:SetScript("OnEnter", function()
-        self:SetBackdropColor(AF.UnpackColor(self._hoverColor))
-        if self.highlightText then self.highlightText() end
-        if self.highlightBorder then self.highlightBorder() end
-    end)
-    self:SetScript("OnLeave", function()
-        self:SetBackdropColor(AF.UnpackColor(self._color))
-        if self.unhighlightText then self.unhighlightText() end
-        if self.unhighlightBorder then self.unhighlightBorder() end
-    end)
+    self:SetScript("OnEnter", Button_OnEnter)
+    self:SetScript("OnLeave", Button_OnLeave)
+end
+
+function AF_ButtonMixin:LockHighlight()
+    self._highlightLocked = true
+    Button_OnEnter(self)
+end
+
+function AF_ButtonMixin:UnlockHighlight()
+    self._highlightLocked = nil
+    Button_OnLeave(self)
 end
 
 function AF_ButtonMixin:GetOnClick()
