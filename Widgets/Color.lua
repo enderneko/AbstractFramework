@@ -32,10 +32,11 @@ local COLORS = {
 
     -- for regions
     ["background"] = {["hex"] = "d91a1a1a", ["t"] = {0.1, 0.1, 0.1, 0.85}},
-    ["background2"] = {["hex"] = "d9333333", ["t"] = {0.2, 0.2, 0.2, 0.85}},
+    ["background_lighter"] = {["hex"] = "d9333333", ["t"] = {0.2, 0.2, 0.2, 0.85}},
     ["border"] = {["hex"] = "ff000000", ["t"] = {0, 0, 0, 1}},
     ["header"] = {["hex"] = "ff202020", ["t"] = {0.127, 0.127, 0.127, 1}}, -- header background
     ["widget"] = {["hex"] = "ff262626", ["t"] = {0.15, 0.15, 0.15, 1}}, -- widget background
+    ["widget_darker"] = {["hex"] = "ff202020", ["t"] = {0.127, 0.127, 0.127, 1}},
     ["widget_highlight"] = {["hex"] = "ff333333", ["t"] = {0.2, 0.2, 0.2, 1}},
     ["mask"] = {["hex"] = "b3333333", ["t"] = {0.2, 0.2, 0.2, 0.7}},
     ["combat_mask"] = {["hex"] = "bf332b2b", ["t"] = {0.2, 0.17, 0.17, 0.75}},
