@@ -45,6 +45,7 @@ local COLORS = {
     ["yellow_text"] = {["hex"] = "ffffd100", ["t"] = {1, 0.82, 0, 1}},
     ["shadow"] = {["hex"] = "3f000000", ["t"] = {0, 0, 0, 0.25}},
     ["tip"] = {["hex"] = "ffb2b2b2", ["t"] = {0.7, 0.7, 0.7, 1}},
+    ["highlight"] = {["hex"] = "40ffffff", ["t"] = {1, 1, 1, 0.25}},
 
     -- sheet
     ["sheet_normal"] = {["t"] = {0.15, 0.15, 0.15, 0.9}}, -- row/column normal

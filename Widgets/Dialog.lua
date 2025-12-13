@@ -507,7 +507,7 @@ local function CreateGlobalDialog()
     globalDialog:SetPoint("BOTTOM", AF.UIParent, "CENTER", 0, 15)
     globalDialog:SetFrameStrata("FULLSCREEN_DIALOG")
     globalDialog:SetFrameLevel(7)
-    -- globalDialog:SetBackdropColor(AF.GetColorRGB("background", 0.95))
+    globalDialog:SetBackdropColor(AF.GetColorRGB("background", 0.95))
     globalDialog:EnableMouse(true)
 
     -- mask

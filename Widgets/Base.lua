@@ -12,7 +12,8 @@ do
     -- AF.FrameGetSize = f.GetSize
     -- AF.FrameGetHeight = f.GetHeight
     -- AF.FrameGetWidth = f.GetWidth
-    -- AF.FrameSetPoint = f.SetPoint
+    AF.FrameSetPoint = f.SetPoint
+    AF.FrameClearAllPoints = f.ClearAllPoints
     -- AF.FrameSetFrameLevel = f.SetFrameLevel
     AF.FrameShow = f.Show
     AF.FrameHide = f.Hide

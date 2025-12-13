@@ -105,9 +105,11 @@ end
 -- calc texcoord
 ---------------------------------------------------------------------
 ---calculates texture coordinates with adjustments for aspect ratio and cropping
----@param crop? number cropping percentage
----@param targetAspectRatio? number target aspect ratio (targetWidth / targetHeight), defaults to 1
----@param originalAspectRatio? number original texture aspect ratio (width/height), defaults to 1
+---@param crop number|nil cropping percentage
+---@param targetAspectRatio number|nil target aspect ratio (targetWidth / targetHeight), defaults to 1
+---@param originalAspectRatio number|nil original texture aspect ratio (width/height), defaults to 1
+---@param anchor FramePoint|nil defaults to "CENTER"
+---@param unpack boolean|nil if true, returns 8 separate values instead of a table
 ---@return table coordinates {ULx, ULy, LLx, LLy, URx, URy, LRx, LRy}
 function AF.CalcTexCoordPreCrop(crop, targetAspectRatio, originalAspectRatio, anchor, unpack)
     crop = crop or 0
