@@ -2,7 +2,8 @@
 local AF = _G.AbstractFramework
 local L = AF.L
 
-local ceil = math.ceil
+local ceil, max = math.ceil, math.max
+local strgsub, strfind = string.gsub, string.find
 
 local parent, mover
 local popups = {}
@@ -139,7 +140,7 @@ local function OnPopupShow(p)
 
     -- icon
     if p.icon then
-        p.iconTex:SetTexture(p.icon:gsub("^!", ""))
+        p.iconTex:SetTexture(strgsub(p.icon, "^!", ""))
 
         if type(p.icon) == "number" then
             AF.ApplyDefaultTexCoord(p.iconTex) -- for blizzard item/spell icons
@@ -147,7 +148,7 @@ local function OnPopupShow(p)
             AF.ClearTexCoord(p.iconTex)
         end
 
-        if p.icon:find("^!") then
+        if strfind(p.icon, "^!") then
             AF.Show(p.iconTex)
         else
             AF.Show(p.iconTex, p.iconBGTex)
