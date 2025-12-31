@@ -6,15 +6,15 @@ local AF = _G.AbstractFramework
 ---------------------------------------------------------------------
 do
     local f = CreateFrame("Frame")
-    -- AF.FrameSetSize = f.SetSize
-    -- AF.FrameSetHeight = f.SetHeight
-    -- AF.FrameSetWidth = f.SetWidth
-    -- AF.FrameGetSize = f.GetSize
-    -- AF.FrameGetHeight = f.GetHeight
-    -- AF.FrameGetWidth = f.GetWidth
+    AF.FrameSetSize = f.SetSize
+    AF.FrameSetHeight = f.SetHeight
+    AF.FrameSetWidth = f.SetWidth
+    AF.FrameGetSize = f.GetSize
+    AF.FrameGetHeight = f.GetHeight
+    AF.FrameGetWidth = f.GetWidth
     AF.FrameSetPoint = f.SetPoint
     AF.FrameClearAllPoints = f.ClearAllPoints
-    -- AF.FrameSetFrameLevel = f.SetFrameLevel
+    AF.FrameSetFrameLevel = f.SetFrameLevel
     AF.FrameShow = f.Show
     AF.FrameHide = f.Hide
 

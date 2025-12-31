@@ -37,7 +37,7 @@ end
 ---@param data any
 ---@param target string
 ---@param priority string "BULK", "NORMAL", "ALERT".
----@param callbackFn fun(callbackArg: any?, sentBytes: number, totalBytes: number)
+---@param callbackFn fun(callbackArg: any?, sentBytes: number, totalBytes: number, didSend: boolean)
 ---@param callbackArg any? any data you want to pass to the callback function
 ---@param isSerializedData boolean if true, data is already serialized
 function AF.SendCommMessage_Whisper(prefix, data, target, priority, callbackFn, callbackArg, isSerializedData)
@@ -51,7 +51,7 @@ end
 ---@param prefix string max 16 characters
 ---@param data any
 ---@param priority string "BULK", "NORMAL", "ALERT".
----@param callbackFn fun(callbackArg: any?, sentBytes: number, totalBytes: number)
+---@param callbackFn fun(callbackArg: any?, sentBytes: number, totalBytes: number, didSend: boolean)
 ---@param callbackArg any? any data you want to pass to the callback function
 ---@param isSerializedData boolean if true, data is already serialized
 function AF.SendCommMessage_Group(prefix, data, priority, callbackFn, callbackArg, isSerializedData)
@@ -78,7 +78,7 @@ end
 ---@param data any
 ---@param isOfficer boolean if true, send to officer chat, otherwise guild chat
 ---@param priority string "BULK", "NORMAL", "ALERT".
----@param callbackFn fun(callbackArg: any?, sentBytes: number, totalBytes: number)
+---@param callbackFn fun(callbackArg: any?, sentBytes: number, totalBytes: number, didSend: boolean)
 ---@param callbackArg any? any data you want to pass to the callback function
 ---@param isSerializedData boolean if true, data is already serialized
 function AF.SendCommMessage_Guild(prefix, data, isOfficer, priority, callbackFn, callbackArg, isSerializedData)
@@ -97,7 +97,7 @@ end
 ---@param data any
 ---@param channelName string
 ---@param priority string "BULK", "NORMAL", "ALERT".
----@param callbackFn? fun(callbackArg: any?, sentBytes: number, totalBytes: number)
+---@param callbackFn? fun(callbackArg: any?, sentBytes: number, totalBytes: number, didSend: boolean)
 ---@param callbackArg? any any data you want to pass to the callback function
 ---@param isSerializedData? boolean if true, data is already serialized
 function AF.SendCommMessage_Channel(prefix, data, channelName, priority, callbackFn, callbackArg, isSerializedData)
