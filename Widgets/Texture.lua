@@ -1,6 +1,11 @@
 ---@class AbstractFramework
 local AF = _G.AbstractFramework
 
+local GetAtlasExists = C_Texture.GetAtlasExists or AF.noop_true
+function AF.IsAtlas(atlas)
+    return type(atlas) == "string" and not atlas:find("[/\\.]") and GetAtlasExists(atlas)
+end
+
 ---------------------------------------------------------------------
 -- texture
 ---------------------------------------------------------------------
@@ -22,7 +27,7 @@ end
 -- - For path/fileID, "..." are wrapModeHorizontal, wrapModeVertical, filterMode
 -- - For atlas, "..." are useAtlasSize, filterMode, resetTexCoords
 function AF_TextureMixin:SetTextureOrAtlas(texture, ...)
-    if type(texture) == "string" and not texture:find("[/\\]") then
+    if AF.IsAtlas(texture) then
         self:SetAtlas(texture, ...)
     else
         self:SetTexture(texture, ...)
@@ -63,7 +68,7 @@ function AF.CreateTexture(parent, texture, color, drawLayer, subLevel, wrapModeH
     hooksecurefunc(tex, "SetAtlas", SetAtlas)
 
     if texture and texture ~= "" then
-        if type(texture) == "string" and not texture:find("[/\\]") then
+        if AF.IsAtlas(texture) then
             tex:SetAtlas(texture, nil, filterMode)
         else
             tex:SetTexture(texture, wrapModeHorizontal, wrapModeVertical, filterMode)
