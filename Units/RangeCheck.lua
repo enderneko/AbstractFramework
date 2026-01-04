@@ -7,11 +7,17 @@ local UnitInRange = UnitInRange
 local UnitCanAssist = UnitCanAssist
 local UnitCanAttack = UnitCanAttack
 local UnitCanCooperate = UnitCanCooperate
-local IsSpellInRange = (C_Spell and C_Spell.IsSpellInRange) and C_Spell.IsSpellInRange or IsSpellInRange
-local IsItemInRange = (C_Spell and C_Item.IsItemInRange) and C_Item.IsItemInRange or IsItemInRange
+local IsSpellInRange = C_Spell.IsSpellInRange -- or IsSpellInRange
+local IsItemInRange = C_Item.IsItemInRange -- or IsItemInRange
 local CheckInteractDistance = CheckInteractDistance
 local UnitIsDead = UnitIsDead
 local IsSpellKnownOrOverridesKnown = IsSpellKnownOrOverridesKnown
+local IsSpellBookKnown = C_SpellBook.IsSpellKnown
+
+local function IsSpellKnown(spellId)
+    return IsSpellKnownOrOverridesKnown(spellId) or IsSpellBookKnown(spellId)
+end
+
 -- local GetSpellTabInfo = GetSpellTabInfo
 -- local GetNumSpellTabs = GetNumSpellTabs
 -- local GetSpellBookItemName = GetSpellBookItemName
@@ -128,62 +134,48 @@ local harmItems = {
 --     end
 -- end
 
----@type function
-local UnitInSpellRange
-if C_Spell and C_Spell.IsSpellInRange then
-    UnitInSpellRange = function(spellName, unit)
-        return IsSpellInRange(spellName, unit)
-    end
-else
-    UnitInSpellRange = function(spellName, unit)
-        return IsSpellInRange(spellName, unit) == 1
-    end
-end
-
 local rc = CreateFrame("Frame")
 rc:RegisterEvent("SPELLS_CHANGED")
 
 local spell_friend, spell_pet, spell_harm, spell_dead
 AF_RANGE_CHECK_FRIENDLY = {}
+AF_RANGE_CHECK_PET = {}
 AF_RANGE_CHECK_HOSTILE = {}
 AF_RANGE_CHECK_DEAD = {}
-AF_RANGE_CHECK_PET = {}
+
+local function LoadSpellName(spellID, callback)
+    if spellID and IsSpellKnown(spellID) then
+        local spell = Spell:CreateFromSpellID(spellID)
+        spell:ContinueOnSpellLoad(function()
+            callback(spell:GetSpellName())
+            -- print("Loaded spell for range check:", spellID, spell:GetSpellName())
+        end)
+    else
+        callback(nil)
+    end
+end
 
 local function SPELLS_CHANGED()
-    spell_friend = AF_RANGE_CHECK_FRIENDLY[playerClass] or friendSpells[playerClass]
-    spell_harm = AF_RANGE_CHECK_HOSTILE[playerClass] or harmSpells[playerClass]
-    spell_dead = AF_RANGE_CHECK_DEAD[playerClass] or deadSpells[playerClass]
-    spell_pet = AF_RANGE_CHECK_PET[playerClass] or petSpells[playerClass]
+    local friend_id = AF_RANGE_CHECK_FRIENDLY[playerClass] or friendSpells[playerClass]
+    local pet_id = AF_RANGE_CHECK_PET[playerClass] or petSpells[playerClass]
+    local harm_id = AF_RANGE_CHECK_HOSTILE[playerClass] or harmSpells[playerClass]
+    local dead_id = AF_RANGE_CHECK_DEAD[playerClass] or deadSpells[playerClass]
 
-    if spell_friend and IsSpellKnownOrOverridesKnown(spell_friend) then
-        spell_friend = AF.GetSpellInfo(spell_friend)
-    else
-        spell_friend = nil
-    end
-    if spell_harm and IsSpellKnownOrOverridesKnown(spell_harm) then
-        spell_harm = AF.GetSpellInfo(spell_harm)
-    else
-        spell_harm = nil
-    end
-    if spell_dead and IsSpellKnownOrOverridesKnown(spell_dead) then
-        spell_dead = AF.GetSpellInfo(spell_dead)
-    else
-        spell_dead = nil
-    end
-    if spell_pet and IsSpellKnownOrOverridesKnown(spell_pet) then
-        spell_pet = AF.GetSpellInfo(spell_pet)
-    else
-        spell_pet = nil
-    end
+    LoadSpellName(friend_id, function(name) spell_friend = name end)
+    LoadSpellName(pet_id, function(name) spell_pet = name end)
+    LoadSpellName(harm_id, function(name) spell_harm = name end)
+    LoadSpellName(dead_id, function(name) spell_dead = name end)
+
+    AF.Debug(
+        "[RANGE CHECK]",
+        "\nfriend:", spell_friend or "nil",
+        "\npet:", spell_pet or "nil",
+        "\nharm:", spell_harm or "nil",
+        "\ndead:", spell_dead or "nil"
+    )
 end
 
-local timer
-local function DELAYED_SPELLS_CHANGED()
-    if timer then timer:Cancel() end
-    timer = C_Timer.NewTimer(1, SPELLS_CHANGED)
-end
-
-rc:SetScript("OnEvent", DELAYED_SPELLS_CHANGED)
+rc:SetScript("OnEvent", AF.GetDelayedInvoker(1, SPELLS_CHANGED))
 
 function AF.IsInRange(unit, check)
     if not UnitIsVisible(unit) then
@@ -210,10 +202,10 @@ function AF.IsInRange(unit, check)
 
             if UnitIsDead(unit) then
                 if spell_dead then
-                    return UnitInSpellRange(spell_dead, unit)
+                    return IsSpellInRange(spell_dead, unit)
                 end
             elseif spell_friend then
-                return UnitInSpellRange(spell_friend, unit)
+                return IsSpellInRange(spell_friend, unit)
             end
 
             local inRange, checked = UnitInRange(unit)
@@ -223,14 +215,14 @@ function AF.IsInRange(unit, check)
 
             if UnitIsUnit(unit, "pet") and spell_pet then
                 -- no spell_friend, use spell_pet
-                return UnitInSpellRange(spell_pet, unit)
+                return IsSpellInRange(spell_pet, unit)
             end
 
         elseif UnitCanAttack("player", unit) then
             if UnitIsDead(unit) then
                 return CheckInteractDistance(unit, 4) -- 28 yards
             elseif spell_harm then
-                return UnitInSpellRange(spell_harm, unit)
+                return IsSpellInRange(spell_harm, unit)
             end
             return IsItemInRange(harmItems[playerClass], unit)
         end
@@ -268,10 +260,10 @@ local function GetResult1()
         "\n\nUnitIsConnected: " .. (UnitIsConnected("target") and "true" or "false") ..
         "\nUnitInSamePhase: " .. (UnitInSamePhase("target") and "true" or "false") ..
         "\nUnitIsDead: " .. (UnitIsDead("target") and "true" or "false") ..
-        "\n\nspell_friend: " .. (spell_friend and (spell_friend .. " " .. (UnitInSpellRange(spell_friend, "target") and "true" or "false")) or "none") ..
-        "\nspell_dead: " .. (spell_dead and (spell_dead .. " " .. (UnitInSpellRange(spell_dead, "target") and "true" or "false")) or "none") ..
-        "\nspell_pet: " .. (spell_pet and (spell_pet .. " " .. (UnitInSpellRange(spell_pet, "target") and "true" or "false")) or "none") ..
-        "\nspell_harm: " .. (spell_harm and (spell_harm .. " " .. (UnitInSpellRange(spell_harm, "target") and "true" or "false")) or "none")
+        "\n\nspell_friend: " .. (spell_friend and (spell_friend .. " " .. (IsSpellInRange(spell_friend, "target") and "true" or "false")) or "none") ..
+        "\nspell_pet: " .. (spell_pet and (spell_pet .. " " .. (IsSpellInRange(spell_pet, "target") and "true" or "false")) or "none") ..
+        "\nspell_harm: " .. (spell_harm and (spell_harm .. " " .. (IsSpellInRange(spell_harm, "target") and "true" or "false")) or "none") ..
+        "\nspell_dead: " .. (spell_dead and (spell_dead .. " " .. (IsSpellInRange(spell_dead, "target") and "true" or "false")) or "none")
 end
 
 local function GetResult2()
