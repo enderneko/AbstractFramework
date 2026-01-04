@@ -91,6 +91,19 @@ function AF.LastIndexOf(t, v)
     return nil
 end
 
+-- returns the last value and its index for sequence-style tables (1-based, contiguous, no nil gaps)
+---@param t table sequence-style table (array part only)
+---@return any? value the last value
+---@return number? key the index of the last value
+function AF.GetLast(t)
+    local lastIndex = #t
+    if lastIndex == 0 then
+        return nil, nil
+    end
+
+    return t[lastIndex], lastIndex
+end
+
 -- insert into the first empty slot
 function AF.Insert(t, v)
     local i, done = 1
