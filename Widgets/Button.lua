@@ -6,7 +6,7 @@ local PlaySound = PlaySound
 
 local function RegisterMouseDownUp(b)
     b:SetScript("OnMouseDown", function()
-        if b:IsEnabled() and b._pushEffectEnabled then
+        if b:IsEnabled() and b._pushEffectEnabled and not b._pushed then
             b._pushed = true
             b:HandleMouseDownText()
             b:HandleMouseDownTexture()
