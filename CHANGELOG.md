@@ -1,23 +1,37 @@
-[View Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r15...e4d851b26e01b4144ec9ce22a257ecb47367c235)
+[View Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r16...a574e1881035d026bd73e9f1f22ceb9243854993)
 
-- Add MoP support
-- Add AF_ScrollEditBoxMixin:SetSpacing
-- Add AF_ScrollFrameMixin:DisableScrollFrameReanchor
-- Add AF_Switch.SetLabel
-- Add AF_TextureMixin:SetTextureOrAtlas
-- Add auto slot height support for AF_ScrollList
-- Add DisableSlotFrameReanchor for AF_ScrollList/Grid
-- Add callback to AF.ResizeToFitText
-- Add GetScrollStep/SetScroll/GetScroll for AF_ScrollFrameMixin
-- Add scrollTo param to AF_ScrollList.SetWidgets/SetData
-- Add skipScrollReset arg to AF_ScrollFrame:SetContentHeight
-- Fix scroll thumb positioning and height logic
-- Refactor AF_EditBox script handlers into local functions
-- Refactor AF_ScrollEditBox script handling
-- Refactor AF_ScrollFrame script handling
-- Refactor label sizing in AF_SwitchMixin
-- Remove labels parameter from AF.CreateSwitch
-- Update enable/disable states for AF_IconButton
-- Update icons
-- Update list slot height handling
-- Update spell rank related functions
+- Add AF_ButtonMixin:StartCooldown/StopCooldown
+- Add AF_ScrollEditBoxMixin:EnableCodeIndentation
+- Add AF.CompileWithEnv, AF.CompileWithGlobalEnv
+- Add AF.GetLast
+- Add AF.IsAtlas
+- Add AF.IsSameFaction
+- Add AF.Libs.FAIAP
+- Add AF.MergeMissingKeys, AF.MergeRaw
+- Add AF.RemoveWhitespaces
+- Add AF.SendChatMessage
+- Add AF.SetBackdropHighlight
+- Add callbackDelay to AF.ResizeToFitText
+- Add double-click image viewer
+- Add gradient support to AF.CreateSeparator
+- Add highlight lock function to AF_Button
+- Add secret number formatting functions
+- Allow font parameter overrides in AF.SetFont
+- Change AF.GetPixelUpdaterCustomGroup to AF.GetPixelUpdater_CustomGroupComponents
+- Enhance DragSorter with vertical orientation support
+- Fix a color issue for AF_Texture
+- Fix string handling in Popup when icon is numeric
+- Implement AF_ImagePane
+- Implement AF.ImageViewer_LoadFlipBook
+- Implement AF.ImageViewer_LoadImage
+- Implement AF.ImageViewer_LoadImageSequence
+- Improve AF_ImageViewer
+- Improve scroll behavior for AF_ScrollEditBox
+- Improve scroll frame resize handling
+- Improve scroll thumb update logic
+- Introduce AF.CreateTimeFormatBox
+- Minor / trivial updates (several entries merged)
+- Prevent duplicate mouse down effect on button
+- Refactor gradient texture and separator creation
+- Refactor range check to async spell name loading
+- Update icons and textures
