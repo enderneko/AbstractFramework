@@ -31,6 +31,7 @@ local GetCVarBool = C_CVar.GetCVarBool
 local UnitIsWildBattlePet = UnitIsWildBattlePet
 local UnitIsBattlePetCompanion = UnitIsBattlePetCompanion
 local UnitBattlePetLevel = UnitBattlePetLevel
+local UnitFactionGroup = UnitFactionGroup
 
 ---------------------------------------------------------------------
 -- group
@@ -399,6 +400,18 @@ function AF.IsConnectedRealm(name)
     -- normalizedRealm
     name = name:gsub(" ", ""):gsub("-", "")
     return AF.connectedRealms[name] or false
+end
+
+---------------------------------------------------------------------
+-- faction
+---------------------------------------------------------------------
+
+---@param unit1 string
+---@param unit2 string|nil default "player"
+function AF.IsSameFaction(unit1, unit2)
+    local faction1 = UnitFactionGroup(unit1)
+    local faction2 = UnitFactionGroup(unit2 or "player")
+    return faction1 == faction2
 end
 
 ---------------------------------------------------------------------
