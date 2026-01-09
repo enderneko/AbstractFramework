@@ -230,7 +230,7 @@ end
 ---------------------------------------------------------------------
 -- send to chat
 ---------------------------------------------------------------------
-local MSG_INTERVAL = 0.25
+local MSG_INTERVAL = 0.5
 local MSG_MAX_LENGTH = 255
 
 local SendChatMessage = C_ChatInfo.SendChatMessage

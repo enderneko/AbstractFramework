@@ -46,6 +46,7 @@ local COLORS = {
     ["shadow"] = {["hex"] = "3f000000", ["t"] = {0, 0, 0, 0.25}},
     ["tip"] = {["hex"] = "ffb2b2b2", ["t"] = {0.7, 0.7, 0.7, 1}},
     ["highlight"] = {["hex"] = "40ffffff", ["t"] = {1, 1, 1, 0.25}},
+    ["highlight_add"] = {["hex"] = "ff1a1a1a", ["t"] = {0.1, 0.1, 0.1, 1}}, -- for "ADD" blend mode
 
     -- sheet
     ["sheet_normal"] = {["t"] = {0.15, 0.15, 0.15, 0.9}}, -- row/column normal
@@ -765,12 +766,14 @@ end
 -- button colors
 ---------------------------------------------------------------------
 local BUTTON_COLOR_NORMAL = COLORS.widget.t
+local BUTTON_COLOR_HOVER = COLORS.widget_highlight.t
 local BUTTON_COLOR_TRANSPARENT = COLORS.none.t
 local BUTTON_COLORS = {
     -- ["accent"] = {["normal"] = COLORS["accent"]["normal"], ["hover"] = COLORS["accent"]["hover"]},
     -- ["accent_hover"] = {["normal"] = BUTTON_COLOR_NORMAL, ["hover"] = COLORS["accent"]["hover"]},
     -- ["accent_transparent"] = {["normal"] = BUTTON_COLOR_TRANSPARENT, ["hover"] = COLORS["accent"]["hover"]},
     ["static"] = {["normal"] = BUTTON_COLOR_NORMAL, ["hover"] = BUTTON_COLOR_NORMAL},
+    ["widget"] = {["normal"] = BUTTON_COLOR_NORMAL, ["hover"] = BUTTON_COLOR_HOVER},
     ["none"] = {["normal"] = BUTTON_COLOR_TRANSPARENT, ["hover"] = BUTTON_COLOR_TRANSPARENT},
     ["gray_hover"] = {["normal"] = BUTTON_COLOR_TRANSPARENT, ["hover"] = {1, 1, 1, 0.1}},
     ["red"] = {["normal"] = {0.6, 0.1, 0.1, 0.6}, ["hover"] = {0.6, 0.1, 0.1, 1}},
