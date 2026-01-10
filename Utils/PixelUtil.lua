@@ -371,6 +371,21 @@ function AF.ClearPoints(region)
     if region._points then wipe(region._points) end
 end
 
+function AF.AdjustPointsOffset(region, offsetX, offsetY)
+    offsetX = offsetX or 0
+    offsetY = offsetY or 0
+
+    if region._points then
+        for _, point in pairs(region._points) do
+            point[4] = point[4] + offsetX
+            point[5] = point[5] + offsetY
+        end
+        AF.RePoint(region)
+    else
+        region:AdjustPointsOffset(AF.ConvertPixelsForRegion(offsetX, region), AF.ConvertPixelsForRegion(offsetY, region))
+    end
+end
+
 ---------------------------------------------------------------------
 -- backdrop
 ---------------------------------------------------------------------
