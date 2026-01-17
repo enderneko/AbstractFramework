@@ -57,8 +57,9 @@ System\Scripts.lua
 Executors\OnUpdateExecutor.lua
 Executors\ItemLoadExecutor.lua
 
-# utils/pixel
+# utils (others)
 Utils\PixelUtil.lua
+Utils\AsyncLoaders.lua
 
 # units/player
 Units\Player.lua
