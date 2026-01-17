@@ -36,7 +36,7 @@ local COLORS = {
     ["border"] = {["hex"] = "ff000000", ["t"] = {0, 0, 0, 1}},
     ["header"] = {["hex"] = "ff202020", ["t"] = {0.127, 0.127, 0.127, 1}}, -- header background
     ["widget"] = {["hex"] = "ff262626", ["t"] = {0.15, 0.15, 0.15, 1}}, -- widget background
-    ["widget_darker"] = {["hex"] = "ff202020", ["t"] = {0.127, 0.127, 0.127, 1}},
+    ["widget_dark"] = {["hex"] = "ff202020", ["t"] = {0.127, 0.127, 0.127, 1}},
     ["widget_highlight"] = {["hex"] = "ff333333", ["t"] = {0.2, 0.2, 0.2, 1}},
     ["mask"] = {["hex"] = "b3333333", ["t"] = {0.2, 0.2, 0.2, 0.7}},
     ["combat_mask"] = {["hex"] = "bf332b2b", ["t"] = {0.2, 0.17, 0.17, 0.75}},
@@ -314,15 +314,26 @@ function AF.GetAuraTypeColor(auraType, alpha)
 end
 
 local GetItemQualityColor = C_Item.GetItemQualityColor
+local QUALITY_MAP = AF.TransposeTable(Enum.ItemQuality)
+
 ---@param quality number
+---@param useDefault boolean use default color from C_Item.GetItemQualityColor
 ---@return number r
 ---@return number g
 ---@return number b
-function AF.GetItemQualityColor(quality)
+function AF.GetItemQualityColor(quality, useDefault)
     if not quality then
         return 0, 0, 0
     end
-    local r, g, b = GetItemQualityColor(quality)
+
+    local r, g, b
+
+    if useDefault then
+        r, g, b = GetItemQualityColor(quality)
+    else
+        r, g, b = AF.GetColorRGB(QUALITY_MAP[quality] or "none")
+    end
+
     return r, g, b
 end
 
