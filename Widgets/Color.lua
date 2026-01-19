@@ -44,6 +44,7 @@ local COLORS = {
     ["none"] = {["hex"] = "00000000", ["t"] = {0, 0, 0, 0}},
     ["yellow_text"] = {["hex"] = "ffffd100", ["t"] = {1, 0.82, 0, 1}},
     ["shadow"] = {["hex"] = "3f000000", ["t"] = {0, 0, 0, 0.25}},
+    ["font_shadow"] = {["hex"] = "ff000000", ["t"] = {0, 0, 0, 1}},
     ["tip"] = {["hex"] = "ffb2b2b2", ["t"] = {0.7, 0.7, 0.7, 1}},
     ["highlight"] = {["hex"] = "40ffffff", ["t"] = {1, 1, 1, 0.25}},
     ["highlight_add"] = {["hex"] = "ff1a1a1a", ["t"] = {0.1, 0.1, 0.1, 1}}, -- for "ADD" blend mode

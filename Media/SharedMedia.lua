@@ -142,15 +142,13 @@ end
 
 -- Update the font object with new values, nil values will remain unchanged
 ---@param size number|string if a string, represents the font size delta for fontObj, e.g. "-1", "+2"
-function AF.UpdateFont(fontObj, font, size, outline, shadow)
+function AF.UpdateFont(fontObj, font, size, outline)
     local _font, _size, _flags = fontObj:GetFont()
 
     font = font and AF.LSM_GetFont(font) or _font
     size = size or _size
     outline = outline or _flags
 
-    local shadowX, shadowY = fontObj:GetShadowOffset()
-    local shadowR, shadowG, shadowB, shadowA = fontObj:GetShadowColor()
 
     if type(size) == "string" then
         size = tonumber(size) + _size
@@ -158,6 +156,30 @@ function AF.UpdateFont(fontObj, font, size, outline, shadow)
 
     AF.SetFont(fontObj, font, size, outline)
 
+    -- restore shadow
+    local shadowX, shadowY = fontObj:GetShadowOffset()
+    local shadowR, shadowG, shadowB, shadowA = fontObj:GetShadowColor()
+
     fontObj:SetShadowOffset(shadowX or 0, shadowY or 0)
     fontObj:SetShadowColor(shadowR or 0, shadowG or 0, shadowB or 0, shadowA or 0)
+end
+
+---@param shadowPos table|nil default {1, -1}
+---@param shadowColor table|string|nil default "font_shadow"
+function AF.SetFontShadow(fontObj, shadowPos, shadowColor)
+    shadowPos = shadowPos or {1, -1}
+    shadowColor = shadowColor or "font_shadow"
+
+    fontObj:SetShadowOffset(AF.Unpack2(shadowPos))
+
+    if type(shadowColor) == "string" then
+        fontObj:SetShadowColor(AF.GetColorRGB(shadowColor))
+    elseif type(shadowColor) == "table" then
+        fontObj:SetShadowColor(AF.UnpackColor(shadowColor))
+    end
+end
+
+function AF.RemoveFontShadow(fontObj)
+    fontObj:SetShadowOffset(0, 0)
+    fontObj:SetShadowColor(0, 0, 0, 0)
 end
