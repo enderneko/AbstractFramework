@@ -415,19 +415,25 @@ function AF_CooldownMixin:SetOnCooldownDone(func)
 end
 
 ---@param parent Frame
----@param name? string
+---@param name string|nil
 ---@param texture string
----@param color? string default is white
+---@param color string|table|nil default is "white"
 ---@param reverse? boolean
 ---@return AF_Cooldown
 function AF.CreateCooldown(parent, name, texture, color, reverse)
     local cd = CreateFrame("Cooldown", name, parent)
     cd:SetSwipeTexture(texture)
-    cd:SetSwipeColor(AF.GetColorRGB(color or "white"))
     cd:SetDrawEdge(false)
     cd:SetDrawSwipe(true)
     cd:SetDrawBling(false)
     cd:SetReverse(reverse)
+
+    color = color or "white"
+    if type(color) == "string" then
+        cd:SetSwipeColor(AF.GetColorRGB(color))
+    elseif type(color) == "table" then
+        cd:SetSwipeColor(AF.UnpackColor(color))
+    end
 
     -- disable omnicc
     cd.noCooldownCount = true
