@@ -280,6 +280,13 @@ function AF.HasMarkerPermission()
     end
 end
 
+-- only available for party/raid players
+---@param name string
+---@return string|nil unitID
+function AF.UnitTokenFromName(name)
+    return name and AF.UnitNameToToken[name]
+end
+
 ---------------------------------------------------------------------
 -- unit type
 ---------------------------------------------------------------------
