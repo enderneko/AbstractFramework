@@ -680,7 +680,12 @@ function AF_IconButtonMixin:SetIcon(icon, filterMode)
         self._filterMode = filterMode
     end
     self._iconPath = icon
-    self.icon:SetTexture(icon, nil, nil, self._filterMode)
+
+    if AF.IsAtlas(icon) then
+        self.icon:SetAtlas(icon, nil, self._filterMode)
+    else
+        self.icon:SetTexture(icon, nil, nil, self._filterMode)
+    end
 end
 
 ---@param color string|table
@@ -749,8 +754,8 @@ end
 ---@param filterMode? string
 ---@param noPushDownEffect? boolean
 ---@return AF_IconButton
-function AF.CreateIconButton(parent, icon, width, height, padding, color, hoverColor, filterMode, noPushDownEffect)
-    local b = CreateFrame("Button", nil, parent)
+function AF.CreateIconButton(parent, icon, width, height, padding, color, hoverColor, filterMode, noPushDownEffect, template)
+    local b = CreateFrame("Button", nil, parent, template)
     AF.SetSize(b, width, height)
 
     b.accentColor = AF.GetAddonAccentColorName()
@@ -759,7 +764,12 @@ function AF.CreateIconButton(parent, icon, width, height, padding, color, hoverC
     b.icon:SetPoint("CENTER")
     AF.SetInside(b.icon, b, padding)
 
-    b.icon:SetTexture(icon, nil, nil, filterMode)
+    if AF.IsAtlas(icon) then
+        b.icon:SetAtlas(icon, nil, filterMode)
+    else
+        b.icon:SetTexture(icon, nil, nil, filterMode)
+    end
+
     b._iconPath = icon
     b._filterMode = filterMode
 
