@@ -85,14 +85,37 @@ function AF.IsToday(sec, useServerTime)
     return today == dateStr
 end
 
-local SEC = gsub(_G.SPELL_DURATION_SEC, "%%%.%df", "%%s")
-local MIN = gsub(_G.SPELL_DURATION_MIN, "%%%.%df", "%%s")
+local SEC = _G.SPELL_DURATION_SEC -- _G.INT_SPELL_DURATION_SEC, gsub(_G.SPELL_DURATION_SEC, "%%%.%df", "%%s")
+local MIN = _G.SPELL_DURATION_MIN -- _G.INT_SPELL_DURATION_MIN, gsub(_G.SPELL_DURATION_MIN, "%%%.%df", "%%s")
+local HOURS = _G.SPELL_DURATION_HOURS -- _G.INT_SPELL_DURATION_HOURS, gsub(_G.SPELL_DURATION_HOURS, "%%%.%df", "%%s")
+local DAYS = _G.SPELL_DURATION_DAYS -- _G.INT_SPELL_DURATION_DAYS, gsub(_G.SPELL_DURATION_DAYS, "%%%.%df", "%%s")
 
-function AF.GetLocalizedSeconds(sec)
-    if sec > 60 then
-        return format(MIN, AF.Round(sec / 60, 1))
+local INT_SEC = _G.INT_SPELL_DURATION_SEC -- gsub(_G.SPELL_DURATION_SEC, "%%%.%df", "%%s")
+local INT_MIN = _G.INT_SPELL_DURATION_MIN -- gsub(_G.SPELL_DURATION_MIN, "%%%.%df", "%%s")
+local INT_HOURS = _G.INT_SPELL_DURATION_HOURS -- gsub(_G.SPELL_DURATION_HOURS, "%%%.%df", "%%s")
+local INT_DAYS = _G.INT_SPELL_DURATION_DAYS -- gsub(_G.SPELL_DURATION_DAYS, "%%%.%df", "%%s")
+
+function AF.FormatDuration(sec)
+    if sec > 86400 then
+        return format(DAYS, AF.RoundToDecimal(sec / 86400, 1))
+    elseif sec > 3600 then
+        return format(HOURS, AF.RoundToDecimal(sec / 3600, 1))
+    elseif sec > 60 then
+        return format(MIN, AF.RoundToDecimal(sec / 60, 1))
     else
-        return format(SEC, AF.Round(sec, 1))
+        return format(SEC, AF.RoundToDecimal(sec, 1))
+    end
+end
+
+function AF.FormatDurationInt(sec)
+    if sec > 86400 then
+        return format(INT_DAYS, AF.Round(sec / 86400))
+    elseif sec > 3600 then
+        return format(INT_HOURS, AF.Round(sec / 3600))
+    elseif sec > 60 then
+        return format(INT_MIN, AF.Round(sec / 60))
+    else
+        return format(INT_SEC, AF.Round(sec))
     end
 end
 
