@@ -343,14 +343,18 @@ end
 function AF.Show(...)
     for i = 1, select("#", ...) do
         local w = select(i, ...)
-        w:Show()
+        if w then
+            w:Show()
+        end
     end
 end
 
 function AF.Hide(...)
     for i = 1, select("#", ...) do
         local w = select(i, ...)
-        w:Hide()
+        if w then
+            w:Hide()
+        end
     end
 end
 
