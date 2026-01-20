@@ -18,35 +18,39 @@ function AF.RegisterCallback(event, callback, priority, tag)
     assert(not priority or priority == "high" or priority == "medium" or priority == "low", "Priority must be high, medium, low or nil.")
     local t = callbacks[priority or "medium"]
     if not t[event] then t[event] = {} end
-    t[event][callback] = tag or true
+    t[event][callback] = tag or "_no_tag_"
 end
 
----@param event string
----@param tag string
----@return table callbacks list of functions, can be empty
-function AF.GetCallback(event, tag)
-    local result = {}
-    for _, t in pairs(callbacks) do
-        if t[event] then
-            for fn, v in pairs(t[event]) do
-                if v == tag then
-                    tinsert(result, fn)
-                end
+local function GetCallback(_callbacks, result, event, tag)
+    if _callbacks[event] then
+        for fn, v in next, _callbacks[event] do
+            if not tag or v == tag then
+                tinsert(result, fn)
             end
         end
     end
+end
+
+---@param event string
+---@param tag string|nil if nil, returns all callbacks for the event
+---@return table callbacks list of functions
+function AF.GetCallbacks(event, tag)
+    local result = {}
+    GetCallback(callbacks.high, result, event, tag)
+    GetCallback(callbacks.medium, result, event, tag)
+    GetCallback(callbacks.low, result, event, tag)
     return result
 end
 
 ---@param event string
 ---@param callback function|string function or tag
 function AF.UnregisterCallback(event, callback)
-    for _, t in pairs(callbacks) do
+    for _, t in next, callbacks do
         if t[event] then
             if type(callback) == "function" then
                 t[event][callback] = nil
             elseif type(callback) == "string" then
-                for fn, tag in pairs(t[event]) do
+                for fn, tag in next, t[event] do
                     if tag == callback then
                         t[event][fn] = nil
                         break
@@ -57,12 +61,40 @@ function AF.UnregisterCallback(event, callback)
     end
 end
 
+---@param event string
 function AF.UnregisterAllCallbacks(event)
-    for _, t in pairs(callbacks) do
+    for _, t in next, callbacks do
         t[event] = nil
     end
 end
 
+---@param event string
+---@param callback fun(event:string, ...:any)
+---@param priority "high"|"medium"|"low"|nil default is "medium"
+function AF.RegisterCallbackOnce(event, callback, priority)
+    local function wrapper(...)
+        AF.UnregisterCallback(event, wrapper)
+        callback(event, ...)
+    end
+    AF.RegisterCallback(event, wrapper, priority)
+end
+
+-- ---@param event string
+-- ---@param callback function
+-- ---@return boolean
+-- --- invalid for one time callbacks
+-- function AF.IsCallbackRegistered(event, callback)
+--     for _, t in next, callbacks do
+--         if t[event] and t[event][callback] then
+--             return true
+--         end
+--     end
+--     return false
+-- end
+
+---------------------------------------------------------------------
+-- debug events
+---------------------------------------------------------------------
 AF.DEBUG_EVENTS = {
     AF_FIRST_FRAME_RENDERED = false,
     AF_PIXEL_UPDATE = "blazing_tangerine",
@@ -91,6 +123,9 @@ AF.DEBUG_EVENTS = {
     AF_UNIT_ITEM_LEVEL_UPDATE = false,
 }
 
+---------------------------------------------------------------------
+-- fire
+---------------------------------------------------------------------
 function AF.Fire(event, ...)
     if AFConfig then
         local addon = AF.GetAddon()
@@ -166,7 +201,7 @@ local frame = CreateFrame("Frame")
 frame:RegisterEvent("ADDON_LOADED")
 frame:SetScript("OnEvent", function(self, event, addon, containsBindings)
     if addonCallbacks[addon] then
-        for fn in pairs(addonCallbacks[addon]) do
+        for fn in next, addonCallbacks[addon] do
             fn(addon, containsBindings)
         end
     end
