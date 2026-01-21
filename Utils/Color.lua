@@ -111,21 +111,24 @@ function AF.ConvertHEXToRGB(hex)
 end
 
 -- https://warcraft.wiki.gg/wiki/ColorGradient
----@param perc number current percentage
----@param r1 number start r
----@param g1 number start g
----@param b1 number start b
----@param r2 number middle r
----@param g2 number middle g
----@param b2 number middle b
----@param r3 number end r
----@param g3 number end g
----@param b3 number end b
+---@param perc number|nil current percentage
+---@param c1 table start color {r, g, b}
+---@param c2 table middle color {r, g, b}
+---@param c3 table end color {r, g, b}
+---@param lowBound number|nil low bound (default 0)
+---@param highBound number|nil high bound (default 1)
 ---@return number r
 ---@return number g
 ---@return number b
-function AF.ColorGradient(perc, r1, g1, b1, r2, g2, b2, r3, g3, b3)
+function AF.ColorGradient(perc, c1, c2, c3, lowBound, highBound)
+    local r1, g1, b1 = c1[1], c1[2], c1[3]
+    local r2, g2, b2 = c2[1], c2[2], c2[3]
+    local r3, g3, b3 = c3[1], c3[2], c3[3]
+
+    lowBound = lowBound or 0
+    highBound = highBound or 1
     perc = perc or 1
+
     if perc >= 1 then
         return r3, g3, b3
     elseif perc <= 0 then
