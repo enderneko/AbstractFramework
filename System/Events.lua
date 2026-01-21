@@ -113,13 +113,16 @@ local UnitIsGroupLeader = UnitIsGroupLeader
 local UnitIsGroupAssistant = UnitIsGroupAssistant
 local IterateGroupPlayers = AF.IterateGroupPlayers
 local GetUnitName = GetUnitName
+local wipe = wipe
 
 --* AF_GROUP_UPDATE / AF_GROUP_SIZE_CHANGED / AF_GROUP_TYPE_CHANGED
 local groupType, lastGroupType, groupSize, lastGroupSize
 local groupPermission, lastGroupPermission, markerPermission, lastMarkerPermission
 
 local nameToToken = {}
-AF.UnitNameToToken = nameToToken
+-- AF.UnitNameToToken = nameToToken
+-- local guidToToken = {} -- NOTE: use UnitTokenFromGUID instead
+-- AF.UnitGUIDToToken = guidToToken
 
 local function AF_GROUP_UPDATE(_, event)
     if event == "PLAYER_LOGIN" then
