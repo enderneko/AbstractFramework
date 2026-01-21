@@ -46,6 +46,7 @@ function AF_BlizzardStatusBarMixin:SetMinMaxValues(minValue, maxValue)
     self.minValue = minValue
     self.maxValue = maxValue
 end
+AF_BlizzardStatusBarMixin.SetBarMinMaxValues = AF_BlizzardStatusBarMixin.SetMinMaxValues
 
 function AF_BlizzardStatusBarMixin:UpdatePixels()
     AF.ReSize(self)
@@ -122,18 +123,33 @@ end
 local ClampedPercentageBetween = AF.ClampedPercentageBetween
 local ApproxEqual = AF.ApproxEqual
 
-local function UpdateValue(self)
+local function UpdateValue_Horizontal(self)
     self.progress = ClampedPercentageBetween(self.value, self.min, self.max)
 
     if ApproxEqual(self.progress, 0.0) then
-        self.fg.mask:SetWidth(0.00001)
-        self.fg:Hide()
+        self.fill.mask:SetWidth(0.00001)
+        self.fill:Hide()
     elseif ApproxEqual(self.progress, 1.0) then
-        self.fg.mask:SetWidth(self:GetBarWidth())
-        self.fg:Show()
+        self.fill.mask:SetWidth(self:GetBarWidth())
+        self.fill:Show()
     else
-        self.fg.mask:SetWidth(self.progress * self:GetBarWidth())
-        self.fg:Show()
+        self.fill.mask:SetWidth(self.progress * self:GetBarWidth())
+        self.fill:Show()
+    end
+end
+
+local function UpdateValue_Vertical(self)
+    self.progress = ClampedPercentageBetween(self.value, self.min, self.max)
+
+    if ApproxEqual(self.progress, 0.0) then
+        self.fill.mask:SetHeight(0.00001)
+        self.fill:Hide()
+    elseif ApproxEqual(self.progress, 1.0) then
+        self.fill.mask:SetHeight(self:GetBarHeight())
+        self.fill:Show()
+    else
+        self.fill.mask:SetHeight(self.progress * self:GetBarHeight())
+        self.fill:Show()
     end
 end
 
@@ -146,12 +162,12 @@ local AF_SimpleStatusBarMixin = {}
 ---@param wrapModeVertical string|nil
 ---@param filterMode string|nil
 function AF_SimpleStatusBarMixin:SetTexture(texture, lossTexture, wrapModeHorizontal, wrapModeVertical, filterMode)
-    self.fg:SetTexture(texture, wrapModeHorizontal, wrapModeVertical, filterMode)
+    self.fill:SetTexture(texture, wrapModeHorizontal, wrapModeVertical, filterMode)
     self.loss:SetTexture(lossTexture or texture, wrapModeHorizontal, wrapModeVertical, filterMode)
 end
 
 function AF_SimpleStatusBarMixin:SetColor(r, g, b, a)
-    self.fg:SetVertexColor(r, g, b, a)
+    self.fill:SetVertexColor(r, g, b, a)
 end
 
 ---@param orientation Orientation|nil
@@ -159,10 +175,10 @@ end
 function AF_SimpleStatusBarMixin:SetGradientColor(orientation, ...)
     if select("#", ...) == 2 then
         local startColor, endColor = ...
-        self.fg:SetGradient(orientation or "HORIZONTAL", CreateColor(AF.UnpackColor(startColor)), CreateColor(AF.UnpackColor(endColor)))
+        self.fill:SetGradient(orientation or "HORIZONTAL", CreateColor(AF.UnpackColor(startColor)), CreateColor(AF.UnpackColor(endColor)))
     else
         local r1, g1, b1, a1, r2, g2, b2, a2 = ...
-        self.fg:SetGradient(orientation or "HORIZONTAL", CreateColor(r1, g1, b1, a1), CreateColor(r2, g2, b2, a2))
+        self.fill:SetGradient(orientation or "HORIZONTAL", CreateColor(r1, g1, b1, a1), CreateColor(r2, g2, b2, a2))
     end
 end
 
@@ -190,35 +206,52 @@ function AF_SimpleStatusBarMixin:SetBorderColor(r, g, b, a)
     self:SetBackdropBorderColor(r, g, b, a)
 end
 
-function AF_SimpleStatusBarMixin:SnapTextureToEdge(noInset)
-    self.noInset = noInset
-    AF.ClearPoints(self.fg)
-    AF.ClearPoints(self.loss)
-    if noInset then
-        AF.SetPoint(self.bg, "TOPLEFT")
-        AF.SetPoint(self.bg, "BOTTOMRIGHT")
-        AF.SetPoint(self.fg, "TOPLEFT")
-        AF.SetPoint(self.fg, "BOTTOMRIGHT")
-        AF.SetPoint(self.fg.mask, "TOPLEFT")
-        AF.SetPoint(self.fg.mask, "BOTTOMLEFT")
-        AF.SetPoint(self.loss, "TOPLEFT")
-        AF.SetPoint(self.loss, "BOTTOMRIGHT")
-        AF.SetPoint(self.loss.mask, "TOPRIGHT")
-        AF.SetPoint(self.loss.mask, "BOTTOMRIGHT")
+function AF_SimpleStatusBarMixin:EnableBorder(enabled)
+    if enabled then
+        AF.ApplyDefaultBackdrop(self)
+        AF.SetOnePixelInside(self.inner)
+        AF.SetOnePixelInside(self.fill)
+        AF.SetOnePixelInside(self.loss)
     else
-        AF.SetPoint(self.bg, "TOPLEFT", 1, -1)
-        AF.SetPoint(self.bg, "BOTTOMRIGHT", -1, 1)
-        AF.SetPoint(self.fg, "TOPLEFT", 1, -1)
-        AF.SetPoint(self.fg, "BOTTOMRIGHT", -1, 1)
-        AF.SetPoint(self.fg.mask, "TOPLEFT", 1, -1)
-        AF.SetPoint(self.fg.mask, "BOTTOMLEFT", 1, 1)
-        AF.SetPoint(self.loss, "TOPLEFT", 1, -1)
-        AF.SetPoint(self.loss, "BOTTOMRIGHT", -1, 1)
-        AF.SetPoint(self.loss.mask, "TOPRIGHT", -1, -1)
-        AF.SetPoint(self.loss.mask, "BOTTOMRIGHT", -1, 1)
+        AF.ApplyDefaultBackdrop_NoBorder(self)
+        AF.SetAllPoints(self.inner)
+        AF.SetAllPoints(self.fill)
+        AF.SetAllPoints(self.loss)
     end
-    AF.SetPoint(self.loss.mask, "TOPLEFT", self.fg.mask, "TOPRIGHT")
-    AF.SetPoint(self.loss.mask, "BOTTOMLEFT", self.fg.mask, "BOTTOMRIGHT")
+end
+
+---@param orientation "left_to_right"|"right_to_left"|"bottom_to_top"|"top_to_bottom"
+function AF_SimpleStatusBarMixin:SetOrientation(orientation)
+    self.fill.mask:ClearAllPoints()
+    self.loss.mask:ClearAllPoints()
+
+    if orientation == "left_to_right" then
+        self.UpdateValue = UpdateValue_Horizontal
+        AF.SetPoint(self.fill.mask, "TOPLEFT")
+        AF.SetPoint(self.fill.mask, "BOTTOMLEFT")
+        AF.SetPoint(self.loss.mask, "TOPLEFT", self.fill.mask, "TOPRIGHT")
+        AF.SetPoint(self.loss.mask, "BOTTOMRIGHT")
+    elseif orientation == "right_to_left" then
+        self.UpdateValue = UpdateValue_Horizontal
+        AF.SetPoint(self.fill.mask, "TOPRIGHT")
+        AF.SetPoint(self.fill.mask, "BOTTOMRIGHT")
+        AF.SetPoint(self.loss.mask, "BOTTOMRIGHT", self.fill.mask, "BOTTOMLEFT")
+        AF.SetPoint(self.loss.mask, "TOPLEFT")
+    elseif orientation == "bottom_to_top" then
+        self.UpdateValue = UpdateValue_Vertical
+        AF.SetPoint(self.fill.mask, "BOTTOMLEFT")
+        AF.SetPoint(self.fill.mask, "BOTTOMRIGHT")
+        AF.SetPoint(self.loss.mask, "BOTTOMRIGHT", self.fill.mask, "TOPRIGHT")
+        AF.SetPoint(self.loss.mask, "TOPLEFT")
+    elseif orientation == "top_to_bottom" then
+        self.UpdateValue = UpdateValue_Vertical
+        AF.SetPoint(self.fill.mask, "TOPLEFT")
+        AF.SetPoint(self.fill.mask, "TOPRIGHT")
+        AF.SetPoint(self.loss.mask, "TOPLEFT", self.fill.mask, "BOTTOMLEFT")
+        AF.SetPoint(self.loss.mask, "BOTTOMRIGHT")
+    end
+
+    self:UpdateValue()
 end
 
 -- smooth
@@ -247,27 +280,27 @@ function AF_SimpleStatusBarMixin:GetRemainingValue()
 end
 
 function AF_SimpleStatusBarMixin:GetBarSize()
-    return self.bg:GetSize()
+    return self.inner:GetSize()
 end
 
 function AF_SimpleStatusBarMixin:GetBarWidth()
-    return self.bg:GetWidth()
+    return self.inner:GetWidth()
 end
 
 function AF_SimpleStatusBarMixin:GetBarHeight()
-    return self.bg:GetHeight()
+    return self.inner:GetHeight()
 end
 
 -- set
 function AF_SimpleStatusBarMixin:SetMinMaxValues(min, max)
     self.min = min
     self.max = max
-    UpdateValue(self)
+    self:UpdateValue()
 end
 
 function AF_SimpleStatusBarMixin:SetValue(value)
     self.value = value
-    UpdateValue(self)
+    self:UpdateValue()
 end
 
 -- dim
@@ -280,8 +313,9 @@ function AF_SimpleStatusBarMixin:DefaultUpdatePixels()
     AF.ReSize(self)
     AF.RePoint(self)
     AF.ReBorder(self)
-    AF.RePoint(self.fg)
-    AF.RePoint(self.fg.mask)
+    AF.RePoint(self.inner)
+    AF.RePoint(self.fill)
+    AF.RePoint(self.fill.mask)
     AF.RePoint(self.loss)
     AF.RePoint(self.loss.mask)
 end
@@ -308,16 +342,16 @@ function AF.CreateSimpleStatusBar(parent, name, noBackdrop)
     Mixin(bar, AF_SmoothStatusBarMixin)
     bar:SetSmoothing(false)
 
-    -- foreground texture
-    local fg = bar:CreateTexture(nil, "BORDER", nil, -1)
-    bar.fg = fg
-    fg.mask = bar:CreateMaskTexture()
-    fg.mask:SetTexture(AF.GetPlainTexture(), "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE", "NEAREST")
-    fg:AddMaskTexture(fg.mask)
+    -- fill texture
+    local fill = bar:CreateTexture(nil, "BORDER", nil, -1)
+    bar.fill = fill
+    fill.mask = bar:CreateMaskTexture()
+    fill.mask:SetTexture(AF.GetPlainTexture(), "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE", "NEAREST")
+    fill:AddMaskTexture(fill.mask)
 
     -- already done in PixelUtil
-    -- fg:SetTexelSnappingBias(0)
-    -- fg:SetSnapToPixelGrid(false)
+    -- fill:SetTexelSnappingBias(0)
+    -- fill:SetSnapToPixelGrid(false)
 
     -- loss texture
     local loss = bar:CreateTexture(nil, "BORDER", nil, -1)
@@ -326,20 +360,21 @@ function AF.CreateSimpleStatusBar(parent, name, noBackdrop)
     loss.mask:SetTexture(AF.GetPlainTexture(), "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE", "NEAREST")
     loss:AddMaskTexture(loss.mask)
 
-    -- bg texture NOTE: currently only for GetBarSize/Width/Height
-    local bg = bar:CreateTexture(nil, "BORDER", nil, -2)
-    bar.bg = bg
+    -- inner texture NOTE: for getting bar size/width/height
+    local inner = bar:CreateTexture(nil, "BORDER", nil, -2)
+    bar.inner = inner
 
     -- dim
     local mod = bar:CreateTexture(nil, "ARTWORK", nil, 1)
     bar.mod = mod
-    mod:SetAllPoints(fg.mask)
+    mod:SetAllPoints(fill.mask)
     mod:SetColorTexture(0.6, 0.6, 0.6)
     mod:SetBlendMode("MOD")
     mod:Hide()
 
-    -- setup default texture points
-    bar:SnapTextureToEdge(noBackdrop)
+    -- setup border and orientation
+    bar:EnableBorder(not noBackdrop)
+    bar:SetOrientation("left_to_right")
 
     -- pixel perfect
     AF.AddToPixelUpdater_Auto(bar, bar.DefaultUpdatePixels)
