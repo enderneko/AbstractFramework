@@ -114,3 +114,27 @@ function AF.RequireVersion(versionNum)
         )
     end
 end
+
+---------------------------------------------------------------------
+-- secret shits
+---------------------------------------------------------------------
+---@type fun(value:any):boolean
+local issecretvalue = issecretvalue
+
+function AF.PrintIsSecret(...)
+    print("-- " .. GetTime() .. " ---------------")
+    for i = 1, select("#", ...) do
+        local arg = select(i, ...)
+        print(i .. ": " .. tostring(issecretvalue(arg)))
+    end
+end
+
+function AF.ToggleSecretTesting()
+    local enabled = not GetCVarBool("secretCombatRestrictionsForced")
+    print("Secret Testing:", enabled and AF.WrapTextInColor("Enabled", "softlime") or AF.WrapTextInColor("Disabled", "disabled"))
+    SetCVar("secretCombatRestrictionsForced", enabled)
+    SetCVar("secretEncounterRestrictionsForced", enabled)
+    SetCVar("secretChallengeModeRestrictionsForced", enabled)
+    SetCVar("secretPvPMatchRestrictionsForced", enabled)
+    SetCVar("secretMapRestrictionsForced", enabled)
+end
