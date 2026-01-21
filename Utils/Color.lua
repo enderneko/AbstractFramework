@@ -144,6 +144,29 @@ function AF.ColorGradient(perc, c1, c2, c3, lowBound, highBound)
     end
 end
 
+---@param perc number|nil current percentage
+---@param c1 table start color {r, g, b}
+---@param c2 table middle color {r, g, b}
+---@param c3 table end color {r, g, b}
+---@param lowBound number|nil low bound (default 0)
+---@param highBound number|nil high bound (default 1)
+---@return number r
+---@return number g
+---@return number b
+function AF.ColorThreshold(perc, c1, c2, c3, lowBound, highBound)
+    lowBound = lowBound or 0
+    highBound = highBound or 1
+    perc = perc or 1
+
+    if perc >= highBound then
+        return c3[1], c3[2], c3[3]
+    elseif perc >= lowBound then
+        return c2[1], c2[2], c2[3]
+    else
+        return c1[1], c1[2], c1[3]
+    end
+end
+
 -- From ColorPickerAdvanced by Feyawen-Llane
 ---@param r number [0, 1]
 ---@param g number [0, 1]
