@@ -186,3 +186,10 @@ local function AF_GROUP_UPDATE(_, event)
 end
 AF:RegisterEvent("GROUP_ROSTER_UPDATE", AF.GetDelayedInvoker(1, AF_GROUP_UPDATE))
 AF:RegisterEvent("PLAYER_LOGIN", AF_GROUP_UPDATE)
+
+-- only available for party/raid players
+---@param name string
+---@return string unitID
+function AF.UnitTokenFromName(name)
+    return name and nameToToken[name]
+end
