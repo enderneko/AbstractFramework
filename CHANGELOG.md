@@ -1,37 +1,18 @@
-[View Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r16...a574e1881035d026bd73e9f1f22ceb9243854993)
+[View Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r17...03ef4a74b1a31909dc913bf910e82a9332062345)
 
-- Add AF_ButtonMixin:StartCooldown/StopCooldown
-- Add AF_ScrollEditBoxMixin:EnableCodeIndentation
-- Add AF.CompileWithEnv, AF.CompileWithGlobalEnv
-- Add AF.GetLast
-- Add AF.IsAtlas
-- Add AF.IsSameFaction
-- Add AF.Libs.FAIAP
-- Add AF.MergeMissingKeys, AF.MergeRaw
-- Add AF.RemoveWhitespaces
-- Add AF.SendChatMessage
-- Add AF.SetBackdropHighlight
-- Add callbackDelay to AF.ResizeToFitText
-- Add double-click image viewer
-- Add gradient support to AF.CreateSeparator
-- Add highlight lock function to AF_Button
-- Add secret number formatting functions
-- Allow font parameter overrides in AF.SetFont
-- Change AF.GetPixelUpdaterCustomGroup to AF.GetPixelUpdater_CustomGroupComponents
-- Enhance DragSorter with vertical orientation support
-- Fix a color issue for AF_Texture
-- Fix string handling in Popup when icon is numeric
-- Implement AF_ImagePane
-- Implement AF.ImageViewer_LoadFlipBook
-- Implement AF.ImageViewer_LoadImage
-- Implement AF.ImageViewer_LoadImageSequence
-- Improve AF_ImageViewer
-- Improve scroll behavior for AF_ScrollEditBox
-- Improve scroll frame resize handling
-- Improve scroll thumb update logic
-- Introduce AF.CreateTimeFormatBox
-- Minor / trivial updates (several entries merged)
-- Prevent duplicate mouse down effect on button
-- Refactor gradient texture and separator creation
-- Refactor range check to async spell name loading
+- Add AF.AdjustPointsOffset
+- Add AF.ColorThreshold
+- Add AF.SetFontShadow/RemoveFontShadow
+- Add and document AF_Locale keys for localization
+- Add AsyncLoaders
+- Add atlas and template support for AF_IconButton
+- Add nil checks to AF.Show/Hide
+- Enhance AF.CreateCooldown color parameter handling
+- Enhance callback handler functions
+- Refactor AF_SimpleStatusBar
+- Refactor AF.ColorGradient
+- Refactor and modularize locale files
+- Refactor duration formatting functions
+- Refactor: use select(2, ...) for AF declaration
+- Update AF.GetItemQualityColor
 - Update icons and textures
