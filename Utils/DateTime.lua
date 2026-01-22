@@ -1,5 +1,5 @@
 ---@class AbstractFramework
-local AF = _G.AbstractFramework
+local AF = select(2, ...)
 local L = AF.L
 
 local format = string.format

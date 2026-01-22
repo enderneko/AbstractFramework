@@ -1,5 +1,5 @@
 ---@class AbstractFramework
-local AF = _G.AbstractFramework
+local AF = select(2, ...)
 
 local GROUP_1_LABEL = "ItemGroup1"
 local GROUP_2_LABEL = "ItemGroup2"

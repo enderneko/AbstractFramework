@@ -1,5 +1,5 @@
 ---@class AbstractFramework
-local AF = {}
+local AF = select(2, ...)
 _G.AbstractFramework = AF
 AF.name = "AbstractFramework"
 

@@ -1,5 +1,5 @@
 ---@class AbstractFramework
-local AF = _G.AbstractFramework
+local AF = select(2, ...)
 
 local strmatch, strsub, strgsub, strfind, strlower = string.match, string.sub, string.gsub, string.find, string.lower
 

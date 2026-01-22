@@ -1,5 +1,5 @@
 ---@class AbstractFramework
-local AF = _G.AbstractFramework
+local AF = select(2, ...)
 
 AF.REGISTERED_ADDONS = {}
 

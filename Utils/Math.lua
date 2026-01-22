@@ -1,5 +1,5 @@
 ---@class AbstractFramework
-local AF = _G.AbstractFramework
+local AF = select(2, ...)
 
 local floor, ceil, abs, max, min = math.floor, math.ceil, math.abs, math.max, math.min
 

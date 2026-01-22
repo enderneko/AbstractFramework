@@ -1,5 +1,5 @@
 ---@class AbstractFramework
-local AF = _G.AbstractFramework
+local AF = select(2, ...)
 
 -- NOTE: it's highly recommended to use a unique prefix for every event
 

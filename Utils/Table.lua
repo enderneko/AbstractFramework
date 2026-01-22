@@ -1,5 +1,5 @@
 ---@class AbstractFramework
-local AF = _G.AbstractFramework
+local AF = select(2, ...)
 
 local select, type, tonumber = select, type, tonumber
 local next, pairs, ipairs = next, pairs, ipairs

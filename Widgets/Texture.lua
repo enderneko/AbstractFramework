@@ -1,5 +1,5 @@
 ---@class AbstractFramework
-local AF = _G.AbstractFramework
+local AF = select(2, ...)
 
 local GetAtlasExists = C_Texture.GetAtlasExists or AF.noop_true
 function AF.IsAtlas(atlas)

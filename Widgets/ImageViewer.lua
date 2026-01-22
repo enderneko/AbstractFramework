@@ -1,5 +1,5 @@
 ---@class AbstractFramework
-local AF = _G.AbstractFramework
+local AF = select(2, ...)
 
 local INITIAL_WIDTH = 720
 local INITIAL_HEIGHT = 480

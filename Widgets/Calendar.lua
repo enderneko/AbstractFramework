@@ -1,5 +1,5 @@
 ---@class AbstractFramework
-local AF = _G.AbstractFramework
+local AF = select(2, ...)
 
 if LOCALE_zhCN then
     AF.WEEKDAY_NAMES = {"一", "二", "三", "四", "五", "六", "日"}

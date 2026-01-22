@@ -1,5 +1,5 @@
 ---@class AbstractFramework
-local AF = _G.AbstractFramework
+local AF = select(2, ...)
 
 local LibDBIcon = AF.Libs.LibDBIcon
 local LibDataBroker = AF.Libs.LibDataBroker

@@ -1,5 +1,5 @@
 ---@class AbstractFramework
-local AF = _G.AbstractFramework
+local AF = select(2, ...)
 
 local type, select = type, select
 local NewTimer = C_Timer.NewTimer

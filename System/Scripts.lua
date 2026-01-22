@@ -1,5 +1,5 @@
 ---@class AbstractFramework
-local AF = _G.AbstractFramework
+local AF = select(2, ...)
 
 ---@param script string lua code to compile
 ---@param env table|nil optional environment table to merge with global env

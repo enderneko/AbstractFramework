@@ -1,5 +1,5 @@
 ---@class AbstractFramework
-local AF = _G.AbstractFramework
+local AF = select(2, ...)
 
 ---@class AF_ImagePane:AF_BorderedFrame
 local AF_ImagePaneMixin = {}

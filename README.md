@@ -39,5 +39,5 @@ Demo: `/abstract` or `/afw` or `/af`
 
     ```lua
     ---@type AbstractFramework
-    local AF = _G.AbstractFramework
+    local AF = select(2, ...)
     ```

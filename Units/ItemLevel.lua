@@ -1,6 +1,6 @@
 ---@class AbstractFramework
 ---@field ItemLevel AF_ItemLevel
-local AF = _G.AbstractFramework
+local AF = select(2, ...)
 
 AF.ItemLevel = {}
 

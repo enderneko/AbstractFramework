@@ -1,5 +1,5 @@
 ---@class AbstractFramework
-local AF = _G.AbstractFramework
+local AF = select(2, ...)
 
 AF.L = setmetatable({
     ["AF_VERSION_REQUIRED"] = "AbstractFramework Version Mismatch\n%s requires: %s or higher\nCurrent: %s",

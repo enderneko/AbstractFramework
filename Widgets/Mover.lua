@@ -1,5 +1,5 @@
 ---@class AbstractFramework
-local AF = _G.AbstractFramework
+local AF = select(2, ...)
 local L = AF.L
 
 local MOVER_PARENT_FRAME_LEVEL = 700
