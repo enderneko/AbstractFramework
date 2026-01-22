@@ -103,7 +103,7 @@ local function CreateAlignmentGrid()
 end
 
 local function CreateMoverDialog()
-    moverDialog = AF.CreateHeaderedFrame(moverParent, "AFMoverDialog", "AF " .. _G.HUD_EDIT_MODE_MENU, 300, 180, "FULLSCREEN", nil, true)
+    moverDialog = AF.CreateHeaderedFrame(moverParent, "AFMoverDialog", "AF " .. L["Edit Mode"], 300, 180, "FULLSCREEN", nil, true)
     moverDialog:Hide()
 
     anchorLockedText = AF.CreateFontString(moverDialog, L["Anchor Locked"], "accent", "AF_FONT_OUTLINE")

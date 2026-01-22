@@ -30,7 +30,18 @@ Libs\LibDBIcon-1.0\lib.xml
 
 # init
 Init.lua
-Locales.lua
+Locales\enUS.lua
+Locales\zhCN.lua
+Locales\zhTW.lua
+Locales\deDE.lua
+Locales\esES.lua
+Locales\esMX.lua
+Locales\frFR.lua
+Locales\itIT.lua
+Locales\koKR.lua
+Locales\ptBR.lua
+Locales\ruRU.lua
+Locales\Post.lua
 
 # data
 Data\ObjectPool.lua
