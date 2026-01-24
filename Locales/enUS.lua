@@ -1,4 +1,5 @@
 ---@class AbstractFramework
+---@field L AF_Locale
 local AF = select(2, ...)
 
 ---@class AF_Locale
@@ -30,6 +31,10 @@ local AF = select(2, ...)
 ---@field ["Apply"] string
 ---@field ["Arrangement"] string
 ---@field ["Ascending"] string
+---@field ["Linear"] string
+---@field ["Step"] string
+---@field ["Cosine"] string
+---@field ["Cubic"] string
 ---@field ["Author"] string
 ---@field ["Authors"] string
 ---@field ["Auto"] string
@@ -243,6 +248,7 @@ local AF = select(2, ...)
 ---@field ["TOPRIGHT"] string
 ---@field ["Total"] string
 ---@field ["Translators"] string
+---@field ["Type"] string
 ---@field ["Undo"] string
 ---@field ["Up"] string
 ---@field ["Version"] string
@@ -310,6 +316,7 @@ AF.L = setmetatable({
     ["Default"] = _G.DEFAULT,
     ["Custom"] = _G.CUSTOM,
     ["Class"] = _G.CLASS,
+    ["Type"] = _G.TYPE,
 
     ["High"] = _G.HIGH,
     ["Medium"] = _G.LOAD_MEDIUM,

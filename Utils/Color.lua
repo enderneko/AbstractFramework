@@ -110,63 +110,6 @@ function AF.ConvertHEXToRGB(hex)
     return AF.ConvertToRGB(AF.ConvertHEXToRGB256(hex))
 end
 
--- https://warcraft.wiki.gg/wiki/ColorGradient
----@param perc number|nil current percentage
----@param c1 table start color {r, g, b}
----@param c2 table middle color {r, g, b}
----@param c3 table end color {r, g, b}
----@param lowBound number|nil low bound (default 0)
----@param highBound number|nil high bound (default 1)
----@return number r
----@return number g
----@return number b
-function AF.ColorGradient(perc, c1, c2, c3, lowBound, highBound)
-    local r1, g1, b1 = c1[1], c1[2], c1[3]
-    local r2, g2, b2 = c2[1], c2[2], c2[3]
-    local r3, g3, b3 = c3[1], c3[2], c3[3]
-
-    lowBound = lowBound or 0
-    highBound = highBound or 1
-    perc = perc or 1
-
-    if perc >= 1 then
-        return r3, g3, b3
-    elseif perc <= 0 then
-        return r1, g1, b1
-    end
-
-    local segment, relperc = math.modf(perc * 2)
-    -- local rr1, rg1, rb1, rr2, rg2, rb2 = select((segment * 3) + 1, r1, g1, b1, r2, g2, b2, r3, g3, b3)
-    if segment == 0 then
-        return r1 + (r2 - r1) * relperc, g1 + (g2 - g1) * relperc, b1 + (b2 - b1) * relperc
-    else
-        return r2 + (r3 - r2) * relperc, g2 + (g3 - g2) * relperc, b2 + (b3 - b2) * relperc
-    end
-end
-
----@param perc number|nil current percentage
----@param c1 table start color {r, g, b}
----@param c2 table middle color {r, g, b}
----@param c3 table end color {r, g, b}
----@param lowBound number|nil low bound (default 0)
----@param highBound number|nil high bound (default 1)
----@return number r
----@return number g
----@return number b
-function AF.ColorThreshold(perc, c1, c2, c3, lowBound, highBound)
-    lowBound = lowBound or 0
-    highBound = highBound or 1
-    perc = perc or 1
-
-    if perc >= highBound then
-        return c3[1], c3[2], c3[3]
-    elseif perc >= lowBound then
-        return c2[1], c2[2], c2[3]
-    else
-        return c1[1], c1[2], c1[3]
-    end
-end
-
 -- From ColorPickerAdvanced by Feyawen-Llane
 ---@param r number [0, 1]
 ---@param g number [0, 1]
@@ -340,4 +283,61 @@ end
 function AF.ConvertToGrayscale(r, g, b, a)
     local v = 0.299 * r + 0.587 * g + 0.114 * b
     return v, v, v, a
+end
+
+-- https://warcraft.wiki.gg/wiki/ColorGradient
+---@param perc number|nil current percentage
+---@param c1 table start color {r, g, b}
+---@param c2 table middle color {r, g, b}
+---@param c3 table end color {r, g, b}
+---@param lowBound number|nil low bound (default 0)
+---@param highBound number|nil high bound (default 1)
+---@return number r
+---@return number g
+---@return number b
+function AF.ColorGradient(perc, c1, c2, c3, lowBound, highBound)
+    local r1, g1, b1 = c1[1], c1[2], c1[3]
+    local r2, g2, b2 = c2[1], c2[2], c2[3]
+    local r3, g3, b3 = c3[1], c3[2], c3[3]
+
+    lowBound = lowBound or 0
+    highBound = highBound or 1
+    perc = perc or 1
+
+    if perc >= highBound then
+        return r3, g3, b3
+    elseif perc <= lowBound then
+        return r1, g1, b1
+    end
+
+    local segment, relperc = math.modf(perc * 2)
+    -- local rr1, rg1, rb1, rr2, rg2, rb2 = select((segment * 3) + 1, r1, g1, b1, r2, g2, b2, r3, g3, b3)
+    if segment == 0 then
+        return r1 + (r2 - r1) * relperc, g1 + (g2 - g1) * relperc, b1 + (b2 - b1) * relperc
+    else
+        return r2 + (r3 - r2) * relperc, g2 + (g3 - g2) * relperc, b2 + (b3 - b2) * relperc
+    end
+end
+
+---@param perc number|nil current percentage
+---@param c1 table start color {r, g, b}
+---@param c2 table middle color {r, g, b}
+---@param c3 table end color {r, g, b}
+---@param lowBound number|nil low bound (default 0)
+---@param highBound number|nil high bound (default 1)
+---@return number r
+---@return number g
+---@return number b
+function AF.ColorThreshold(perc, c1, c2, c3, lowBound, highBound)
+    lowBound = lowBound or 0
+    highBound = highBound or 1
+    perc = perc or 1
+
+    if perc >= highBound then
+        return c3[1], c3[2], c3[3]
+    elseif perc >= lowBound then
+        return c2[1], c2[2], c2[3]
+    else
+        return c1[1], c1[2], c1[3]
+    end
 end

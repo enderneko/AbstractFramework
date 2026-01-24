@@ -55,6 +55,7 @@ Utils\DateTime.lua
 Utils\Delay.lua
 Utils\Serialization.lua
 Utils\Color.lua
+Utils\Curve.lua
 
 # system
 System\Addon.lua

@@ -73,6 +73,11 @@ L["To"] = "到"
 L["Ascending"] = "升序"
 L["Descending"] = "降序"
 
+L["Linear"] = "线性"
+L["Step"] = "阶梯"
+L["Cosine"] = "余弦"
+L["Cubic"] = "三次"
+
 L["Left to Right"] = "从左到右"
 L["Right to Left"] = "从右到左"
 L["Top to Bottom"] = "从上到下"
