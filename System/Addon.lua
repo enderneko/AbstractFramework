@@ -125,7 +125,7 @@ function AF.PrintIsSecret(...)
     print("-- " .. GetTime() .. " ---------------")
     for i = 1, select("#", ...) do
         local arg = select(i, ...)
-        print(i .. ": " .. tostring(issecretvalue(arg)))
+        print(i .. ": " .. arg .. ", " .. tostring(issecretvalue(arg)))
     end
 end
 

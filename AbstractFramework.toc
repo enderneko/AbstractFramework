@@ -99,7 +99,6 @@ Widgets\EditBox.lua
 Widgets\Slider.lua
 Widgets\SmoothStatusBarMixin.lua
 Widgets\StatusBar.lua
-Widgets\StatusBar_Secret.lua [AllowLoadGameType mainline]
 Widgets\Dropdown.lua
 Widgets\CascadingMenu.lua
 Widgets\ColorPicker.lua

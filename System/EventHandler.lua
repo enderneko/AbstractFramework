@@ -148,7 +148,7 @@ end
 ---------------------------------------------------------------------
 local function HandleEvent(eventHandler, event, ...)
     if eventHandler.eventCallbacks[event] then -- wipe on hide
-        for fn in pairs(eventHandler.eventCallbacks[event]) do
+        for fn in next, eventHandler.eventCallbacks[event] do
             fn(eventHandler.owner, event, ...)
         end
     end
