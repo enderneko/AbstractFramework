@@ -31,10 +31,6 @@ local AF = select(2, ...)
 ---@field ["Apply"] string
 ---@field ["Arrangement"] string
 ---@field ["Ascending"] string
----@field ["Linear"] string
----@field ["Step"] string
----@field ["Cosine"] string
----@field ["Cubic"] string
 ---@field ["Author"] string
 ---@field ["Authors"] string
 ---@field ["Auto"] string
@@ -43,6 +39,7 @@ local AF = select(2, ...)
 ---@field ["Bleed"] string
 ---@field ["Blizzard"] string
 ---@field ["Border Color"] string
+---@field ["Border"] string
 ---@field ["Bottom to Top, then Left"] string
 ---@field ["Bottom to Top, then Right"] string
 ---@field ["Bottom to Top"] string
@@ -66,8 +63,10 @@ local AF = select(2, ...)
 ---@field ["Confirm deletion?"] string
 ---@field ["Contributors"] string
 ---@field ["Copy"] string
+---@field ["Cosine"] string
 ---@field ["Create"] string
 ---@field ["Ctrl Click"] string
+---@field ["Cubic"] string
 ---@field ["Current"] string
 ---@field ["Curse"] string
 ---@field ["Custom"] string
@@ -95,6 +94,7 @@ local AF = select(2, ...)
 ---@field ["Enabled"] string
 ---@field ["Export"] string
 ---@field ["Feedback & Suggestions"] string
+---@field ["Fill"] string
 ---@field ["Font Size"] string
 ---@field ["Font"] string
 ---@field ["Fonts"] string
@@ -133,6 +133,7 @@ local AF = select(2, ...)
 ---@field ["LEFT"] string
 ---@field ["Length"] string
 ---@field ["Level"] string
+---@field ["Linear"] string
 ---@field ["Link"] string
 ---@field ["Links"] string
 ---@field ["Loading..."] string
@@ -167,6 +168,7 @@ local AF = select(2, ...)
 ---@field ["Next"] string
 ---@field ["No"] string
 ---@field ["None"] string
+---@field ["Normal"] string
 ---@field ["Offline"] string
 ---@field ["OFFLINE"] string
 ---@field ["Offset"] string
@@ -175,6 +177,7 @@ local AF = select(2, ...)
 ---@field ["Options"] string
 ---@field ["Orientation"] string
 ---@field ["Outline"] string
+---@field ["Overlay"] string
 ---@field ["Padding"] string
 ---@field ["Parent"] string
 ---@field ["Paste"] string
@@ -225,6 +228,7 @@ local AF = select(2, ...)
 ---@field ["Sort Method"] string
 ---@field ["Sort"] string
 ---@field ["Spacing"] string
+---@field ["Step"] string
 ---@field ["Style"] string
 ---@field ["TANK"] string
 ---@field ["Text Color"] string

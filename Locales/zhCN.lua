@@ -214,6 +214,11 @@ L["Texture"] = "材质"
 L["Path"] = "路径"
 L["Format"] = "格式"
 
+L["Overlay"] = "覆盖"
+L["Fill"] = "填充"
+L["Border"] = "边框"
+L["Normal"] = "正常"
+
 L["Button"] = "按钮"
 L["Icon"] = "图标"
 L["Icons"] = "图标"
