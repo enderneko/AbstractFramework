@@ -20,6 +20,8 @@ LSM:Register("font", "Unifont", AF.GetFont("Unifont.otf"), 255)
 
 -- statusbar
 LSM:Register("statusbar", "AF Plain", AF.GetPlainTexture())
+LSM:Register("statusbar", "AF Plain Half Top", AF.GetTexture("White_Half_Top"))
+LSM:Register("statusbar", "AF Plain Half Bottom", AF.GetTexture("White_Half_Bottom"))
 LSM:Register("statusbar", "AF", AF.GetTexture("Bar_AF"))
 LSM:Register("statusbar", "AF Underline", AF.GetTexture("Bar_Underline"))
 -- https://github.com/mrrosh/pfUI-CustomMedia
