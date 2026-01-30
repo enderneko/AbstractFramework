@@ -341,3 +341,19 @@ function AF.ColorThreshold(perc, c1, c2, c3, lowBound, highBound)
         return c1[1], c1[2], c1[3]
     end
 end
+
+---------------------------------------------------------------------
+-- fill color into table
+---------------------------------------------------------------------
+
+---@param colorTable table index 1~4 for r,g,b,a
+---@param r number
+---@param g number
+---@param b number
+---@param a number|nil
+function AF.FillColorTable(colorTable, r, g, b, a)
+    colorTable[1] = r
+    colorTable[2] = g
+    colorTable[3] = b
+    colorTable[4] = a
+end
