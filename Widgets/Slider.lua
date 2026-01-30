@@ -184,6 +184,8 @@ local function Slider_EB_OnShow(self)
     if slider.value then
         RunNextFrame(function()
             eb:SetText(slider.value * (slider.isPercentage and 100 or 1))
+            -- try to fix text invisible issue
+            eb:SetCursorPosition(1)
             eb:SetCursorPosition(0)
         end)
     else
