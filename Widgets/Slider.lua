@@ -110,23 +110,25 @@ function AF_SliderMixin:EnableMouseWheel(enabled)
     end
 end
 
----@private
-function AF_SliderMixin:OnEnter()
+function AF_SliderMixin:SetTooltip(...)
+    AF.SetTooltip(self, "TOPLEFT", 0, 20, ...)
+end
+
+local function Slider_OnEnter(self)
     if not self:IsEnabled() then return end
     self.thumb:SetColor(self.accentColor)
     self.highlight:Show()
     self.valueBeforeClick = self.value
 end
 
----@private
-function AF_SliderMixin:OnLeave()
+local function Slider_OnLeave(self)
     if not self:IsEnabled() then return end
     self.thumb:SetColor(AF.GetColorTable(self.accentColor, 0.7))
     self.highlight:Hide()
 end
 
----@private
-function AF_SliderMixin:OnDisable()
+
+local function Slider_OnDisable(self)
     self.label:SetColor("disabled")
     self.eb:SetEnabled(false)
     self.thumb:SetColor(AF.GetColorTable("disabled", 0.7))
@@ -138,8 +140,7 @@ function AF_SliderMixin:OnDisable()
     self:SetBackdropBorderColor(AF.GetColorRGB("black", 0.7))
 end
 
----@private
-function AF_SliderMixin:OnEnable()
+local function Slider_OnEnable(self)
     self.label:SetColor("white")
     self.eb:SetEnabled(true)
     self.thumb:SetColor(AF.GetColorTable(self.accentColor, 0.7))
@@ -151,8 +152,68 @@ function AF_SliderMixin:OnEnable()
     self:SetBackdropBorderColor(AF.GetColorRGB("black", 1))
 end
 
-function AF_SliderMixin:SetTooltip(...)
-    AF.SetTooltip(self, "TOPLEFT", 0, 20, ...)
+local function Slider_EB_OnEnterPressed(self)
+    local eb = self
+    local slider = eb:GetParent()
+
+    eb:ClearFocus()
+    local value = eb:GetValue()
+
+    if value then
+        value = value / (slider.isPercentage and 100 or 1)
+        value = AF.RoundToNearestMultiple(value, slider.step)
+        value = AF.Clamp(value, slider.low, slider.high)
+
+        if slider.value ~= value then
+            if slider.onValueChanged then slider.onValueChanged(value) end
+            if slider.afterValueChanged then slider.afterValueChanged(value) end
+        end
+
+        slider.value = value
+        slider:_SetValue(value) -- update thumb position
+        eb:SetText(value * (slider.isPercentage and 100 or 1))
+    else
+        eb:SetText(slider.value * (slider.isPercentage and 100 or 1))
+    end
+end
+
+local function Slider_EB_OnShow(self)
+    local eb = self
+    local slider = eb:GetParent()
+
+    if slider.value then
+        RunNextFrame(function()
+            eb:SetText(slider.value * (slider.isPercentage and 100 or 1))
+            eb:SetCursorPosition(0)
+        end)
+    else
+        eb:SetText("")
+    end
+end
+
+local function Slider_OnValueChanged(self, value, userChanged)
+    value = AF.RoundToNearestMultiple(value, self.step)
+    if self.value == value then return end
+
+    if userChanged then -- IsDraggingThumb()
+        self.value = value
+        if self.eb then
+            self.eb:SetText(value * (self.isPercentage and 100 or 1))
+        end
+        if self.onValueChanged then
+            self.onValueChanged(value)
+        end
+    end
+end
+
+local function Slider_OnMouseUp(self, button, isMouseOver)
+    if not self:IsEnabled() then return end
+
+    -- slider.value here == newValue, OnMouseUp called after OnValueChanged
+    if self.valueBeforeClick ~= self.value and self.afterValueChanged then
+        self.valueBeforeClick = self.value
+        self.afterValueChanged(self.value)
+    end
 end
 
 ---@param parent Frame
@@ -227,34 +288,8 @@ function AF.CreateSlider(parent, text, width, low, high, step, isPercentage, sho
     eb:SetJustifyH("CENTER")
     eb:SetMode("decimal")
 
-    eb:SetScript("OnEnterPressed", function()
-        eb:ClearFocus()
-        local value = eb:GetValue()
-
-        if value then
-            value = value / (slider.isPercentage and 100 or 1)
-            value = AF.RoundToNearestMultiple(value, slider.step)
-            value = AF.Clamp(value, slider.low, slider.high)
-
-            if slider.value ~= value then
-                if slider.onValueChanged then slider.onValueChanged(value) end
-                if slider.afterValueChanged then slider.afterValueChanged(value) end
-            end
-
-            slider.value = value
-            slider:_SetValue(value) -- update thumb position
-            eb:SetText(value * (slider.isPercentage and 100 or 1))
-        else
-            eb:SetText(slider.value * (slider.isPercentage and 100 or 1))
-        end
-    end)
-
-    eb:SetScript("OnShow", function(self)
-        if slider.value then
-            self:SetText(slider.value * (slider.isPercentage and 100 or 1))
-            self:SetCursorPosition(0)
-        end
-    end)
+    eb:SetScript("OnEnterPressed", Slider_EB_OnEnterPressed)
+    eb:SetScript("OnShow", Slider_EB_OnShow)
 
     eb.highlight:SetColor(AF.GetColorTable(slider.accentColor, 0.07))
     -----------------------------------------------------------------
@@ -290,40 +325,12 @@ function AF.CreateSlider(parent, text, width, low, high, step, isPercentage, sho
     Mixin(slider, AF_SliderMixin)
     slider:SetMinMaxValues(low, high)
 
-    -- OnEnter ------------------------------------------------------
-    slider:SetScript("OnEnter", slider.OnEnter)
-    slider:SetScript("OnLeave", slider.OnLeave)
-    -----------------------------------------------------------------
-
-    -- OnValueChanged -----------------------------------------------
-    slider:SetScript("OnValueChanged", function(self, value, userChanged)
-        value = AF.RoundToNearestMultiple(value, slider.step)
-        if slider.value == value then return end
-
-        if userChanged then -- IsDraggingThumb()
-            slider.value = value
-            eb:SetText(value * (slider.isPercentage and 100 or 1))
-            if slider.onValueChanged then
-                slider.onValueChanged(value)
-            end
-        end
-    end)
-    -----------------------------------------------------------------
-
-    -- OnMouseUp ----------------------------------------------------
-    slider:SetScript("OnMouseUp", function(self, button, isMouseOver)
-        if not slider:IsEnabled() then return end
-
-        -- slider.value here == newValue, OnMouseUp called after OnValueChanged
-        if self.valueBeforeClick ~= slider.value and slider.afterValueChanged then
-            self.valueBeforeClick = slider.value
-            slider.afterValueChanged(slider.value)
-        end
-    end)
-    -----------------------------------------------------------------
-
-    slider:SetScript("OnEnable", slider.OnEnable)
-    slider:SetScript("OnDisable", slider.OnDisable)
+    slider:SetScript("OnEnter", Slider_OnEnter)
+    slider:SetScript("OnLeave", Slider_OnLeave)
+    slider:SetScript("OnValueChanged", Slider_OnValueChanged)
+    slider:SetScript("OnMouseUp", Slider_OnMouseUp)
+    slider:SetScript("OnEnable", Slider_OnEnable)
+    slider:SetScript("OnDisable", Slider_OnDisable)
 
     slider:SetValue(low)
     AF.AddToPixelUpdater_OnShow(slider)
@@ -371,6 +378,43 @@ local function VerticalSlider_UpdatePixels(self)
     self:UpdateWordWrap(self.label._wordWrapWidth)
 end
 
+local function VerticalSlider_OnValueChanged(self, value, userChanged)
+    value = AF.RoundToNearestMultiple(self.high - value + self.low, self.step)
+    if self.value == value then return end
+
+    if userChanged then -- IsDraggingThumb()
+        self.value = value
+        if self.onValueChanged then
+            self.onValueChanged(value)
+        end
+    end
+
+    if self:IsDraggingThumb() then
+        self.thumbText:SetText(self.value .. self.unit)
+    end
+end
+
+local function VerticalSlider_OnMouseUp(self, button, isMouseOver)
+    if not self:IsEnabled() then return end
+
+    self.thumbText.fadeOut:Play()
+    if self.showLowHighText then
+        self.lowText.fadeOut:Play()
+        self.highText.fadeOut:Play()
+    end
+end
+
+local function VerticalSlider_OnMouseDown(self, button, isMouseOver)
+    if not self:IsEnabled() then return end
+
+    self.thumbText:SetText(self:GetValue() .. self.unit)
+    self.thumbText.fadeIn:Play()
+    if self.showLowHighText then
+        self.lowText.fadeIn:Play()
+        self.highText.fadeIn:Play()
+    end
+end
+
 ---@param parent Frame
 ---@param text string
 ---@param height number
@@ -395,6 +439,7 @@ function AF.CreateVerticalSlider(parent, text, height, low, high, step, isPercen
     slider.isPercentage = isPercentage
     slider.step = step
     slider.accentColor = AF.GetAddonAccentColorName()
+    slider.showLowHighText = showLowHighText
 
     -- label --------------------------------------------------------
     AF.ClearPoints(slider.label)
@@ -419,6 +464,7 @@ function AF.CreateVerticalSlider(parent, text, height, low, high, step, isPercen
     AF.SetPoint(slider.thumbBG2, "BOTTOMRIGHT", -1, 1)
 
     local thumbText = AF.CreateFontString(slider, nil, slider.accentColor)
+    slider.thumbText = thumbText
     AF.SetPoint(thumbText, "RIGHT", slider.thumbBG, "LEFT", -2, 0)
     thumbText:Hide()
     AF.CreateFadeInOutAnimation(thumbText)
@@ -426,45 +472,9 @@ function AF.CreateVerticalSlider(parent, text, height, low, high, step, isPercen
 
     Mixin(slider, AF_VerticalSliderMixin)
 
-    -- OnValueChanged -----------------------------------------------
-    slider:SetScript("OnValueChanged", function(self, value, userChanged)
-        value = AF.RoundToNearestMultiple(self.high - value + self.low, step)
-        if slider.value == value then return end
-
-        if userChanged then -- IsDraggingThumb()
-            slider.value = value
-            if slider.onValueChanged then
-                slider.onValueChanged(value)
-            end
-        end
-
-        if slider:IsDraggingThumb() then
-            thumbText:SetText(slider.value .. slider.unit)
-        end
-    end)
-    -----------------------------------------------------------------
-
-    -- OnMouseUp/OnMouseDown ----------------------------------------
-    slider:HookScript("OnMouseUp", function(self, button, isMouseOver)
-        if not slider:IsEnabled() then return end
-
-        thumbText.fadeOut:Play()
-        if showLowHighText then
-            slider.lowText.fadeOut:Play()
-            slider.highText.fadeOut:Play()
-        end
-    end)
-
-    slider:SetScript("OnMouseDown", function(self, button, isMouseOver)
-        if not slider:IsEnabled() then return end
-
-        thumbText:SetText(slider:GetValue() .. slider.unit)
-        thumbText.fadeIn:Play()
-        if showLowHighText then
-            slider.lowText.fadeIn:Play()
-            slider.highText.fadeIn:Play()
-        end
-    end)
+    slider:SetScript("OnValueChanged", VerticalSlider_OnValueChanged)
+    slider:HookScript("OnMouseUp", VerticalSlider_OnMouseUp)
+    slider:SetScript("OnMouseDown", VerticalSlider_OnMouseDown)
     -----------------------------------------------------------------
 
     AF.AddToPixelUpdater_OnShow(slider, nil, VerticalSlider_UpdatePixels)
