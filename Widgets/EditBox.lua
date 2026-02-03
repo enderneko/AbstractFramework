@@ -496,6 +496,10 @@ function AF_ScrollEditBoxMixin:SetSpacing(spacing)
     self.eb:SetSpacing(spacing)
 end
 
+function AF_ScrollEditBoxMixin:Insert(text)
+    self.eb:Insert(text)
+end
+
 --! Blizzard's EditBox totally sucks!
 function AF_ScrollEditBoxMixin:EnableCodeIndentation()
     if not self.gutter then

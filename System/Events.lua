@@ -106,6 +106,7 @@ AF:RegisterEvent("PLAYER_REGEN_ENABLED", AF.GetFireFunc("AF_COMBAT_LEAVE"))
 ---------------------------------------------------------------------
 -- group
 ---------------------------------------------------------------------
+local issecretvalue = issecretvalue or AF.noop_false
 local IsInRaid = IsInRaid
 local IsInGroup = IsInGroup
 local GetNumGroupMembers = GetNumGroupMembers
@@ -152,7 +153,7 @@ local function AF_GROUP_UPDATE(_, event)
     -- build name to unit token map
     for unit in IterateGroupPlayers() do
         local name = GetUnitName(unit, true)
-        if name then
+        if not issecretvalue(name) and name then
             nameToToken[name] = unit
             if not name:match(".+-.+") then
                 nameToToken[name .. "-" .. AF.player.normalizedRealm] = unit

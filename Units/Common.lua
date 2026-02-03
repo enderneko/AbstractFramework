@@ -1,6 +1,7 @@
 ---@class AbstractFramework
 local AF = select(2, ...)
 
+local issecretvalue = issecretvalue or AF.noop_false
 local strfind = strfind
 local strlower = strlower
 local bitband = bit.band
@@ -353,7 +354,7 @@ function AF.UnitFullName(unit)
     name = GetUnitName(unit, true)
 
     --? name might be nil in some cases?
-    if name and not name:match(".+-.+") then
+    if not issecretvalue(name) and name and not name:match(".+-.+") then
         local server = GetNormalizedRealmName()
         --? server might be nil in some cases?
         if server then
