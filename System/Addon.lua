@@ -120,12 +120,23 @@ end
 ---------------------------------------------------------------------
 ---@type fun(value:any):boolean
 local issecretvalue = issecretvalue
+local COLON, ARROW
 
 function AF.PrintIsSecret(...)
+    if not COLON then
+        COLON = AF.WrapTextInColor(": ", "darkgray")
+        ARROW = AF.WrapTextInColor(" -> ", "darkgray")
+    end
+
     print("-- " .. GetTime() .. " ---------------")
     for i = 1, select("#", ...) do
         local arg = select(i, ...)
-        print(i .. ": " .. arg .. ", " .. tostring(issecretvalue(arg)))
+        if issecretvalue(arg) then
+            arg = AF.WrapTextInColor(tostring(arg), "lightred")
+        else
+            arg = AF.WrapTextInColor(tostring(arg), "softlime")
+        end
+        print(i .. COLON .. arg)
     end
 end
 

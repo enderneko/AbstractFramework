@@ -94,11 +94,11 @@ function AF.LSM_GetFontOutlineDropdownItems()
 end
 
 -- if font is a table, non-nil size/outline/shadow values will override those in the table
+---@param fs FontString|EditBox
 ---@param font string|table fontName/fontFile or fontTable {font, size, outline, shadow}
 ---@param size number|nil
 ---@param outline string|nil
 ---@param shadow boolean|nil
----@param fs FontString|EditBox
 function AF.SetFont(fs, font, size, outline, shadow)
     if type(font) == "table" then
         local _font, _size, _outline, _shadow = unpack(font)

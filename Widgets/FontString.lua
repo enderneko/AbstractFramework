@@ -437,10 +437,10 @@ end
 ---@param length? number
 ---@param prefix? string|number
 ---@param suffix? string|number
-function AF.SetText(fs, text, length, prefix, suffix)
+function AF.SetText(fs, text, length, prefix, suffix, relativeTo)
     if length and length > 0 then
         if length <= 1 then
-            local width = fs:GetParent():GetWidth() - 2
+            local width = (relativeTo or fs:GetParent()):GetWidth() - 2
             for i = utf8len(text), 0, -1 do
                 fs:SetText(utf8sub(text, 1, i))
                 if fs:GetWidth() / width <= length then
