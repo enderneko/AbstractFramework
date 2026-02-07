@@ -154,20 +154,30 @@ end
 -- number format (secret)
 ---------------------------------------------------------------------
 local AbbreviateNumbers = AbbreviateNumbers
+local CreateAbbreviateConfig = CreateAbbreviateConfig
 
 local asianNumberAbbrevOptions = {
-   breakpointData = {
-      {breakpoint = 100000000, abbreviation = abbr_100000K, significandDivisor = 1000000, fractionDivisor = 100, abbreviationIsGlobal = false}, -- 1.23亿
-      {breakpoint = 10000, abbreviation = abbr_10K, significandDivisor = 1000, fractionDivisor = 10, abbreviationIsGlobal = false}, -- 1.2万
-   },
+    -- breakpointData = {
+    --     {breakpoint = 100000000, abbreviation = abbr_100000K, significandDivisor = 1000000, fractionDivisor = 100, abbreviationIsGlobal = false}, -- 1.23亿
+    --     {breakpoint = 10000, abbreviation = abbr_10K, significandDivisor = 1000, fractionDivisor = 10, abbreviationIsGlobal = false}, -- 1.2万
+    -- },
+    config = CreateAbbreviateConfig({ -- use a cached config for optimal performance
+        {breakpoint = 100000000, abbreviation = abbr_100000K, significandDivisor = 1000000, fractionDivisor = 100, abbreviationIsGlobal = false}, -- 1.23亿
+        {breakpoint = 10000, abbreviation = abbr_10K, significandDivisor = 1000, fractionDivisor = 10, abbreviationIsGlobal = false}, -- 1.2万
+    })
 }
 
 local westernNumberAbbrevOptions = {
-   breakpointData = {
-      {breakpoint = 1000000000, abbreviation = "B", significandDivisor = 10000000, fractionDivisor = 100, abbreviationIsGlobal = false}, -- 1.23B
-      {breakpoint = 1000000, abbreviation = "M", significandDivisor = 10000, fractionDivisor = 100, abbreviationIsGlobal = false}, -- 1.23M
-      {breakpoint = 1000, abbreviation = "K", significandDivisor = 100, fractionDivisor = 10, abbreviationIsGlobal = false}, -- 1.2K
-   },
+    -- breakpointData = {
+    --     {breakpoint = 1000000000, abbreviation = "B", significandDivisor = 10000000, fractionDivisor = 100, abbreviationIsGlobal = false}, -- 1.23B
+    --     {breakpoint = 1000000, abbreviation = "M", significandDivisor = 10000, fractionDivisor = 100, abbreviationIsGlobal = false}, -- 1.23M
+    --     {breakpoint = 1000, abbreviation = "K", significandDivisor = 100, fractionDivisor = 10, abbreviationIsGlobal = false}, -- 1.2K
+    -- },
+    config = CreateAbbreviateConfig({ -- use a cached config for optimal performance
+        {breakpoint = 1000000000, abbreviation = "B", significandDivisor = 10000000, fractionDivisor = 100, abbreviationIsGlobal = false}, -- 1.23B
+        {breakpoint = 1000000, abbreviation = "M", significandDivisor = 10000, fractionDivisor = 100, abbreviationIsGlobal = false}, -- 1.23M
+        {breakpoint = 1000, abbreviation = "K", significandDivisor = 100, fractionDivisor = 10, abbreviationIsGlobal = false}, -- 1.2K
+    })
 }
 
 function AF.FormatSecretNumber_Asian(n)
@@ -179,13 +189,28 @@ function AF.FormatSecretNumber(n)
 end
 
 ---------------------------------------------------------------------
+-- percentage format (secret)
+---------------------------------------------------------------------
+local percentageAbbrevOptions = {
+    config = CreateAbbreviateConfig({ -- use a cached config for optimal performance
+        {breakpoint = 0.0000000000001, abbreviation = "", significandDivisor = 0.1, fractionDivisor = 10, abbreviationIsGlobal = false}, -- 1.2%
+    })
+}
+
+-- this function produces percentages with one decimal place.
+-- format("%.1f%%", n) would produce "1.0%" for 1.0, but AbbreviateNumbers would produce "1%".
+function AF.FormatSecretPercentage(n)
+    return AbbreviateNumbers(n, percentageAbbrevOptions)
+end
+
+---------------------------------------------------------------------
 -- money format
 ---------------------------------------------------------------------
 local BreakUpLargeNumbers = BreakUpLargeNumbers
 local GOLD_SYMBOL, SILVER_SYMBOL, COPPER_SYMBOL
 local GOLD_ICON, SILVER_ICON, COPPER_ICON
 
----@param style string? "icon"|"symbol"|"nosuffix", default is "icon".
+---@param style "icon"|"symbol"|"nosuffix" default is "icon".
 ---@param goldOnly boolean?
 function AF.FormatMoney(copper, style, useCommas, goldOnly)
     local gold = floor(copper / 10000)
