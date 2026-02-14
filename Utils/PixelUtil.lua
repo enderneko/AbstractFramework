@@ -906,6 +906,7 @@ end
 ---------------------------------------------------------------------
 -- load widget position
 ---------------------------------------------------------------------
+---@param pos table {point, relativePoint, offsetX, offsetY}
 function AF.LoadWidgetPosition(widget, pos, relativeTo)
     AF.ClearPoints(widget)
     AF.SetPoint(widget, pos[1], relativeTo or widget:GetParent(), pos[2], pos[3], pos[4])
@@ -914,6 +915,7 @@ end
 ---------------------------------------------------------------------
 -- load text position
 ---------------------------------------------------------------------
+---@param pos table {point, relativePoint, offsetX, offsetY}
 function AF.LoadTextPosition(text, pos, relativeTo)
     if strfind(pos[1], "LEFT$") then
         text:SetJustifyH("LEFT")

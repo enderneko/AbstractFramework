@@ -3,6 +3,7 @@ local AF = select(2, ...)
 
 local DEFAULT_TIMEOUT = 2
 
+local Spell = Spell
 local IsSpellCached = C_Spell.IsSpellDataCached
 local IsItemCached = C_Item.IsItemDataCachedByID
 local NewTimer = C_Timer.NewTimer
@@ -14,31 +15,45 @@ local pcall = pcall
 ---@param resolve fun(obj: SpellMixin|ItemMixin): any
 ---@param callback fun(result: any)
 local function HandleGeneric(mixinObj, isCached, continueWithCancel, resolve, callback)
-    local function safeResolve()
+    local called = false
+
+    local function tryResolveOnce()
+        if called then return end
+        called = true
         local ok, result = pcall(resolve, mixinObj)
-        if ok then
-            callback(result)
-        else
-            callback(nil)
-        end
+        callback(ok and result or nil)
     end
 
     if isCached then
-        safeResolve()
+        tryResolveOnce()
         return
     end
 
-    local timer, cancel
+    local timer
+    local cancel = AF.noop -- default to noop so timer callback can safely call it
 
     timer = NewTimer(DEFAULT_TIMEOUT, function()
         cancel()
-        callback(nil)
+        if not called then
+            called = true
+            callback(nil)
+        end
     end)
 
     cancel = continueWithCancel(mixinObj, function()
         timer:Cancel()
-        safeResolve()
+        tryResolveOnce()
     end)
+end
+
+local function ContinueWithCancel_Spell(spell, onLoad)
+    if spell:IsSpellEmpty() then
+        -- empty spell: immediately trigger onLoad
+        pcall(onLoad)
+        return AF.noop
+    else
+        return spell:ContinueWithCancelOnSpellLoad(onLoad)
+    end
 end
 
 ---@param id number
@@ -48,10 +63,20 @@ local function HandleSpell(id, resolve, callback)
     HandleGeneric(
         Spell:CreateFromSpellID(id),
         IsSpellCached(id),
-        function(spell, onLoad) return spell:ContinueWithCancelOnSpellLoad(onLoad) end,
+        ContinueWithCancel_Spell,
         resolve,
         callback
     )
+end
+
+local function ContinueWithCancel_Item(item, onLoad)
+    if item:IsItemEmpty() then
+        -- empty item: immediately trigger onLoad
+        pcall(onLoad)
+        return AF.noop
+    else
+        return item:ContinueWithCancelOnItemLoad(onLoad)
+    end
 end
 
 ---@param id number
@@ -61,7 +86,7 @@ local function HandleItem(id, resolve, callback)
     HandleGeneric(
         Item:CreateFromItemID(id),
         IsItemCached(id),
-        function(item, onLoad) return item:ContinueWithCancelOnItemLoad(onLoad) end,
+        ContinueWithCancel_Item,
         resolve,
         callback
     )

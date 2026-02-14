@@ -590,7 +590,7 @@ end
 --                         self managed animations                         --
 -----------------------------------------------------------------------------
 ---------------------------------------------------------------------
--- fade-in/out animation group
+-- fade-in/out
 ---------------------------------------------------------------------
 local fade_in_out = {
     FadeIn = function(region)
@@ -618,8 +618,17 @@ local fade_in_out = {
         region:SetAlpha(0)
         region:Hide()
     end,
+
+    SetFadeDuration = function(region, duration)
+        if not (duration and region.fadeIn and region.fadeOut) then return end
+
+        region.fadeIn.alpha:SetDuration(duration)
+        region.fadeOut.alpha:SetDuration(duration)
+    end
 }
 
+-- add serveral methods to region for fade-in-out animation
+-- methods: FadeIn, FadeOut, ShowNow, HideNow, SetFadeDuration
 function AF.CreateFadeInOutAnimation(region, duration, noHide)
     duration = duration or 0.25
 
@@ -671,12 +680,12 @@ function AF.CreateFadeInOutAnimation(region, duration, noHide)
     -----------------------------------------------------------------
 end
 
-function AF.SetFadeInOutAnimationDuration(region, duration)
-    if not (duration and region.fadeIn and region.fadeOut) then return end
+-- function AF.SetFadeInOutAnimationDuration(region, duration)
+--     if not (duration and region.fadeIn and region.fadeOut) then return end
 
-    region.fadeIn.alpha:SetDuration(duration)
-    region.fadeOut.alpha:SetDuration(duration)
-end
+--     region.fadeIn.alpha:SetDuration(duration)
+--     region.fadeOut.alpha:SetDuration(duration)
+-- end
 
 ---------------------------------------------------------------------
 -- continual fade-in-out
@@ -685,6 +694,7 @@ local function FadeInOut(region)
     region.fade:Restart()
 end
 
+-- add a "FadeInOut" method to region, which plays fade in and out animation continually with a delay between them
 function AF.CreateContinualFadeInOutAnimation(region, duration, delay)
     duration = duration or 0.25
     delay = delay or 1

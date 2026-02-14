@@ -242,9 +242,11 @@ end
 ---@param obj table
 --@param squashEvents boolean
 function AF.AddEventHandler(obj)
-    obj.RegisterCLEU = RegisterCLEU
-    obj.UnregisterCLEU = UnregisterCLEU
-    obj.UnregisterAllCLEU = UnregisterAllCLEU
+    if not AF.isRetail then
+        obj.RegisterCLEU = RegisterCLEU
+        obj.UnregisterCLEU = UnregisterCLEU
+        obj.UnregisterAllCLEU = UnregisterAllCLEU
+    end
 
     obj._eventHandler = CreateFrame("Frame")
     obj._eventHandler.owner = obj
