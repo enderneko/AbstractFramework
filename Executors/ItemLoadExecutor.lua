@@ -130,7 +130,11 @@ function AF_ItemLoadExecutorMixin:ProcessNextItem()
     self:StartTimeout()
 
     self.itemMixinInstance:SetItemID(self.currentItemID)
-    self.currentCancelFunc = self.itemMixinInstance:ContinueWithCancelOnItemLoad(self.onItemLoadedCallback)
+    if self.itemMixinInstance:IsItemEmpty() then
+        self:OnItemLoadFailed()
+    else
+        self.currentCancelFunc = self.itemMixinInstance:ContinueWithCancelOnItemLoad(self.onItemLoadedCallback)
+    end
 end
 
 ---@private
