@@ -117,6 +117,34 @@ function AF.FrameFadeOut(frame, timeToFade, startAlpha, endAlpha, hideAfterFade)
     end
 end
 
+---@param timeToFade number|nil default is 0.25
+---@param targetAlpha number target alpha value (0~1)
+function AF.FrameFadeTo(frame, timeToFade, targetAlpha)
+    if frame._fade then
+        frame._fade.fadeTimer = nil
+    else
+        frame._fade = {}
+    end
+
+    local startAlpha = frame:GetAlpha()
+    frame._fade.timeToFade = timeToFade or 0.25
+    frame._fade.startAlpha = startAlpha
+    frame._fade.endAlpha = targetAlpha
+    frame._fade.hideAfterFade = nil
+
+    if targetAlpha >= startAlpha then
+        frame._fade.mode = "IN"
+        frame._fade.diffAlpha = targetAlpha - startAlpha
+    else
+        frame._fade.mode = "OUT"
+        frame._fade.diffAlpha = startAlpha - targetAlpha
+    end
+
+    if frame._fade.startAlpha ~= frame._fade.endAlpha then
+        FrameFade(frame, frame._fade)
+    end
+end
+
 ---------------------------------------------------------------------
 -- continual fade in and out
 ---------------------------------------------------------------------

@@ -17,7 +17,7 @@ local pcall = pcall
 local function HandleGeneric(mixinObj, isCached, continueWithCancel, resolve, callback)
     local called = false
 
-    local function tryResolveOnce()
+    local function TryResolveOnce()
         if called then return end
         called = true
         local ok, result = pcall(resolve, mixinObj)
@@ -25,7 +25,7 @@ local function HandleGeneric(mixinObj, isCached, continueWithCancel, resolve, ca
     end
 
     if isCached then
-        tryResolveOnce()
+        TryResolveOnce()
         return
     end
 
@@ -42,7 +42,7 @@ local function HandleGeneric(mixinObj, isCached, continueWithCancel, resolve, ca
 
     cancel = continueWithCancel(mixinObj, function()
         timer:Cancel()
-        tryResolveOnce()
+        TryResolveOnce()
     end)
 end
 

@@ -1135,23 +1135,27 @@ end
 -- load position
 ---------------------------------------------------------------------
 ---@param region Frame
----@param pos table|string {point, x, y} or "point,x,y"
+---@param pos table|string {point, x, y} | {point, relativePoint, x, y} | "point,x,y" | "point,relativePoint,x,y"
 function AF.LoadPosition(region, pos, relativeTo)
     region._useOriginalPoints = true
+    relativeTo = relativeTo or region:GetParent()
 
     if type(pos) == "string" then
         if AF.IsBlank(pos) then return end
         AF.ClearPoints(region)
-        pos = string.gsub(pos, " ", "")
-        local point, x, y = strsplit(",", pos)
-        x = tonumber(x)
-        y = tonumber(y)
-        AF.SetPoint(region, point, relativeTo or region:GetParent(), x, y)
+        pos = pos:gsub(" ", "")
+
+        local point, v2, v3, v4 = strsplit(",", pos)
+        if v4 then
+            AF.SetPoint(region, point, relativeTo, v2, tonumber(v3), tonumber(v4))
+        else
+            AF.SetPoint(region, point, relativeTo, tonumber(v2), tonumber(v3))
+        end
 
     elseif type(pos) == "table" then
         if AF.IsEmpty(pos) then return end
         AF.ClearPoints(region)
-        AF.SetPoint(region, pos[1], relativeTo or region:GetParent(), pos[2], pos[3])
+        AF.SetPoint(region, pos[1], relativeTo, pos[2], pos[3], pos[4])
     end
 end
 
@@ -1163,6 +1167,7 @@ local tconcat = table.concat
 -- the region must have only one point set, and relativeTo must be AF.UIParent
 ---@param region Frame
 ---@param t table|nil if provided, will save the position to the table, otherwise returns a new table
+---@return table|nil ret if t is not provided, a table containing {point, x, y}
 function AF.SavePositionAsTable(region, t)
     local point, x, y = AF.CalcPoint(region)
     if t then
@@ -1175,10 +1180,16 @@ end
 
 -- the region must have only one point set, and relativeTo must be AF.UIParent
 ---@param region Frame
----@param t table
----@param k any key to save the position under
+---@param t table|nil if provided, will save the position to the table, otherwise returns a new string
+---@param k any|nil key to save the position under, if t is provided
+---@return string|nil ret if t is not provided, a string in the format of "point,x,y"
 function AF.SavePositionAsString(region, t, k)
-    t[k] = tconcat(AF.SavePositionAsTable(region), ",")
+    local pos = tconcat(AF.SavePositionAsTable(region), ",")
+    if t and k then
+        t[k] = pos
+    else
+        return pos
+    end
 end
 
 ---------------------------------------------------------------------

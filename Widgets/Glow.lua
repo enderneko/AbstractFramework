@@ -9,9 +9,10 @@ local AF = select(2, ...)
 ---@param size? number default is 3
 ---@return Frame parent.glow
 function AF.CreateGlow(parent, color, size)
+    size = size or 4
     parent.glow = parent.glow or CreateFrame("Frame", nil, parent, "BackdropTemplate")
-    AF.SetBackdrop(parent.glow, {edgeFile = AF.GetTexture("StaticGlow"), edgeSize = size or 5})
-    AF.SetOutside(parent.glow, parent, size or 3)
+    AF.SetBackdrop(parent.glow, {edgeFile = AF.GetTexture("StaticGlow"), edgeSize = size})
+    AF.SetOutside(parent.glow, parent, size)
 
     color = color or AF.GetAddonAccentColorName()
 
