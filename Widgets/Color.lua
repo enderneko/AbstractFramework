@@ -632,7 +632,7 @@ function AF.GetPowerColor(power, unit, alpha, factor)
     if unit then
         local r, g, b = select(3, UnitPowerType(unit))
         if r then
-            return r, g, b, alpha
+            return r * factor, g * factor, b * factor, alpha
         end
     end
 
