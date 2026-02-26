@@ -2,6 +2,7 @@
 local AF = select(2, ...)
 
 local format = string.format
+local unpack = unpack
 
 ---@param path string relativePath inside "Media" folder
 ---@param addon? string addonFolderName
@@ -226,5 +227,32 @@ function AF.GetCalendarIcon(iconType, index)
         return calendarPath:format("Month", index)
     elseif iconType == "weekday" then
         return calendarPath:format("Weekday", index)
+    end
+end
+
+---------------------------------------------------------------------
+-- get role icon
+---------------------------------------------------------------------
+local roleIcons = {}
+for i = 1, 7 do
+    roleIcons[i] = AF.GetIcon("RoleIcons" .. i)
+end
+
+local roleTexCoords = {
+    TANK = {0, 0.25, 0, 1},
+    HEALER = {0.25, 0.5, 0, 1},
+    DAMAGER = {0.5, 0.75, 0, 1},
+    NONE = {0.75, 1, 0, 1},
+}
+
+---@param texture Texture
+---@param style number 1-7
+---@param role "TANK"|"HEALER"|"DAMAGER"|"NONE"
+function AF.SetRoleIcon(texture, style, role)
+    if roleIcons[style] and roleTexCoords[role] then
+        texture:SetTexture(roleIcons[style])
+        texture:SetTexCoord(unpack(roleTexCoords[role]))
+    else
+        texture:SetTexture(nil)
     end
 end
