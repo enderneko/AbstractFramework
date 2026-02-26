@@ -30,3 +30,6 @@ https://pixabay.com/sound-effects/notification-alert-10-331721/
 
 alert2.ogg
 https://pixabay.com/sound-effects/level-up-3-199576/
+
+error.ogg
+https://pixabay.com/sound-effects/film-special-effects-error-011-352286/

@@ -1,6 +1,8 @@
 ---@class AbstractFramework
 local AF = select(2, ...)
 
+local pcall, tinsert, next, unpack, type = pcall, tinsert, next, unpack, type
+
 -- NOTE: it's highly recommended to use a unique prefix for every event
 
 local callbacks = {
@@ -142,21 +144,35 @@ function AF.Fire(event, ...)
         end
     end
 
+    local success, result
+
     if callbacks.high[event] then
         for fn in next, callbacks.high[event] do
-            fn(event, ...)
+            success, result = pcall(fn, event, ...)
+            if not success then
+                AF.Print("Error in callback for event " .. AF.WrapTextInColor(event, "red") .. ": " .. tostring(result))
+                AF.PlaySound("error")
+            end
         end
     end
 
     if callbacks.medium[event] then
         for fn in next, callbacks.medium[event] do
-            fn(event, ...)
+            success, result = pcall(fn, event, ...)
+            if not success then
+                AF.Print("Error in callback for event " .. AF.WrapTextInColor(event, "red") .. ": " .. tostring(result))
+                AF.PlaySound("error")
+            end
         end
     end
 
     if callbacks.low[event] then
         for fn in next, callbacks.low[event] do
-            fn(event, ...)
+            success, result = pcall(fn, event, ...)
+            if not success then
+                AF.Print("Error in callback for event " .. AF.WrapTextInColor(event, "red") .. ": " .. tostring(result))
+                AF.PlaySound("error")
+            end
         end
     end
 end
