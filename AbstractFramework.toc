@@ -73,7 +73,7 @@ Executors\ItemLoadExecutor.lua
 Utils\PixelUtil.lua
 Utils\AsyncLoaders.lua
 
-# units/player
+# units\player
 Units\Player.lua
 
 # media
@@ -116,7 +116,7 @@ Widgets\ImageViewer.lua
 Widgets\ImagePane.lua
 Widgets\TimeFormat.lua
 
-# media/glyphs
+# media\glyphs
 Media\Glyphs.lua
 
 # units
@@ -124,6 +124,7 @@ Units\Common.lua
 Units\Class.lua
 Units\RangeCheck.lua
 Units\ItemLevel.lua
+Units\StatusTimer.lua
 
 # spells
 Spells\Common.lua
