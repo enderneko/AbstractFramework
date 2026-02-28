@@ -88,7 +88,7 @@ function AF.CreateBlizzardStatusBar(parent, minValue, maxValue, width, height, c
     bar:SetStatusBarColor(AF.GetColorRGB(color, 0.7))
     bar:GetStatusBarTexture():SetDrawLayer("BORDER", -7)
 
-    bar.tex = AF.CreateGradientTexture(bar, "HORIZONTAL", "none", AF.GetColorTable(color, 0.2), nil, "BORDER", -6)
+    bar.tex = AF.CreateTexture(bar, AF.GetTexture("Gradient_Linear_Right"), AF.GetColorTable(color, 0.2), "BORDER", -2)
     bar.tex:SetBlendMode("ADD")
     bar.tex:SetPoint("TOPLEFT", bar:GetStatusBarTexture())
     bar.tex:SetPoint("BOTTOMRIGHT", bar:GetStatusBarTexture())
@@ -204,6 +204,57 @@ function AF_BaseStatusBarMixin:EnableBorder(enabled)
         AF.ApplyDefaultBackdrop_NoBorder(self)
         AF.SetAllPoints(self.innerBar)
     end
+end
+
+---@param orientation "left_to_right"|"right_to_left"|"bottom_to_top"|"top_to_bottom"
+function AF_BaseStatusBarMixin:SetOrientation(orientation)
+    local innerBar = self.innerBar
+    local fillMask = self.fill.mask
+    local unfillMask = self.unfill.mask
+
+    unfillMask:ClearAllPoints()
+
+    if orientation == "left_to_right" then
+        innerBar:SetOrientation("HORIZONTAL")
+        innerBar:SetReverseFill(false)
+
+        unfillMask:SetPoint("TOPLEFT", fillMask, "TOPRIGHT")
+        unfillMask:SetPoint("BOTTOMRIGHT")
+
+    elseif orientation == "right_to_left" then
+        innerBar:SetOrientation("HORIZONTAL")
+        innerBar:SetReverseFill(true)
+
+        unfillMask:SetPoint("TOPLEFT")
+        unfillMask:SetPoint("BOTTOMRIGHT", fillMask, "BOTTOMLEFT")
+
+    elseif orientation == "bottom_to_top" then
+        innerBar:SetOrientation("VERTICAL")
+        innerBar:SetReverseFill(false)
+
+        unfillMask:SetPoint("TOPLEFT")
+        unfillMask:SetPoint("BOTTOMRIGHT", fillMask, "TOPRIGHT")
+
+    elseif orientation == "top_to_bottom" then
+        innerBar:SetOrientation("VERTICAL")
+        innerBar:SetReverseFill(true)
+
+        unfillMask:SetPoint("TOPLEFT", fillMask, "BOTTOMLEFT")
+        unfillMask:SetPoint("BOTTOMRIGHT")
+    end
+end
+
+function AF_BaseStatusBarMixin:SetTextureQuarterRotations(quarterRotations)
+    local rotations = (quarterRotations or 0) % 4
+    local angle = (-PI / 2) * rotations
+
+    -- REVIEW:
+    self.fill:SetRotation(angle)
+    self.unfill:SetRotation(angle)
+end
+
+function AF_BaseStatusBarMixin:Reset()
+    self:SetValue(0)
 end
 
 function AF_BaseStatusBarMixin:GetBarSize()
@@ -364,14 +415,14 @@ function AF.CreateSimpleStatusBar(parent, name, noBackdrop)
     frame.value = 0
 
     -- innerBar
-    local bar = CreateFrame("Frame", nil, frame)
-    frame.innerBar = bar
-    AF.SetFrameLevel(bar, 0)
+    local innerBar = CreateFrame("Frame", nil, frame)
+    frame.innerBar = innerBar
+    AF.SetFrameLevel(innerBar, 0)
 
     -- fill texture
     local fill = frame:CreateTexture(nil, "BORDER", nil, -1)
     frame.fill = fill
-    fill:SetAllPoints(bar)
+    fill:SetAllPoints(innerBar)
 
     fill.mask = frame:CreateMaskTexture()
     fill.mask:SetTexture(AF.GetPlainTexture(), "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE", "NEAREST")
@@ -384,7 +435,7 @@ function AF.CreateSimpleStatusBar(parent, name, noBackdrop)
     -- unfill texture
     local unfill = frame:CreateTexture(nil, "BORDER", nil, -1)
     frame.unfill = unfill
-    unfill:SetAllPoints(bar)
+    unfill:SetAllPoints(innerBar)
 
     unfill.mask = frame:CreateMaskTexture()
     unfill.mask:SetTexture(AF.GetPlainTexture(), "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE", "NEAREST")
