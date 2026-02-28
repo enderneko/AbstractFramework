@@ -915,28 +915,36 @@ end
 ---------------------------------------------------------------------
 -- load text position
 ---------------------------------------------------------------------
----@param pos table {point, relativePoint, offsetX, offsetY}
-function AF.LoadTextPosition(text, pos, relativeTo)
-    if strfind(pos[1], "LEFT$") then
-        text:SetJustifyH("LEFT")
-    elseif strfind(pos[1], "RIGHT$") then
-        text:SetJustifyH("RIGHT")
+---@param fs FontString
+---@param point string
+function AF.AlignTextBasedOnPoint(fs, point)
+    if point:find("LEFT$") then
+        fs:SetJustifyH("LEFT")
+    elseif point:find("RIGHT$") then
+        fs:SetJustifyH("RIGHT")
     else
-        text:SetJustifyH("CENTER")
+        fs:SetJustifyH("CENTER")
     end
 
-    if strfind(pos[1], "^TOP") then
-        text:SetJustifyV("TOP")
-    elseif strfind(pos[1], "^BOTTOM") then
-        text:SetJustifyV("BOTTOM")
+    if point:find("^TOP") then
+        fs:SetJustifyV("TOP")
+    elseif point:find("^BOTTOM") then
+        fs:SetJustifyV("BOTTOM")
     else
-        text:SetJustifyV("MIDDLE")
+        fs:SetJustifyV("MIDDLE")
     end
+end
+
+---@param fs FontString
+---@param pos table {point, relativePoint, offsetX, offsetY}
+---@param relativeTo Region|nil if not provided, relativeTo = fs:GetParent()
+function AF.LoadTextPosition(fs, pos, relativeTo)
+    AF.AlignTextBasedOnPoint(fs, pos[1])
 
     -- NOTE: text positioning is a pain!
-    text._useOriginalPoints = true
-    AF.ClearPoints(text)
-    AF.SetPoint(text, pos[1], relativeTo or text:GetParent(), pos[2], pos[3], pos[4])
+    fs._useOriginalPoints = true
+    AF.ClearPoints(fs)
+    AF.SetPoint(fs, pos[1], relativeTo or fs:GetParent(), pos[2], pos[3], pos[4])
 end
 
 ---------------------------------------------------------------------
