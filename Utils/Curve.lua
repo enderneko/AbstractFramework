@@ -326,9 +326,10 @@ function AF_ColorCurveMixin:EvaluateUnpacked(x)
 end
 
 ---------------------------------------------------------------------
--- Blizzard ColorCurve
+-- Blizzard Curve
 ---------------------------------------------------------------------
 if C_CurveUtil then
+    local CreateCurve = C_CurveUtil.CreateCurve
     local CreateColorCurve = C_CurveUtil.CreateColorCurve
     local LuaCurveType = Enum.LuaCurveType
 
@@ -354,5 +355,31 @@ if C_CurveUtil then
         end
 
         return curve
+    end
+
+    function AF.GetAlphaCurve_HideWhenFull()
+        local alphaCurve = CreateCurve()
+        alphaCurve:SetType(LuaCurveType.Step)
+        alphaCurve:AddPoint(0, 1)
+        alphaCurve:AddPoint(1, 0)
+        return alphaCurve
+    end
+
+    function AF.GetAlphaCurve_HideWhenEmpty()
+        local alphaCurve = CreateCurve()
+        alphaCurve:SetType(LuaCurveType.Step)
+        alphaCurve:AddPoint(0, 0)
+        alphaCurve:AddPoint(0.00000000000001, 1)
+        return alphaCurve
+    end
+
+    function AF.GetAlphaCurve_HideWhenFullOrEmpty()
+        local alphaCurve = CreateCurve()
+        alphaCurve:SetType(LuaCurveType.Step)
+        alphaCurve:AddPoint(0, 0)
+        alphaCurve:AddPoint(0.00000000000001, 1)
+        alphaCurve:AddPoint(0.99999999999999, 1)
+        alphaCurve:AddPoint(1, 0)
+        return alphaCurve
     end
 end
