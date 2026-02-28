@@ -7,35 +7,6 @@ AF.Glyphs = {}
 ---@class AF_Glyphs
 local G = AF.Glyphs
 
----@param fs FontString
----@param size number
----@param outline "none" | "outline" | "monochrome_outline" | "monochrome"
-function G.SetFont(fs, size, outline)
-    local flags
-    if outline == "none" then
-        flags = ""
-    elseif outline == "outline" then
-        flags = "OUTLINE"
-    elseif outline == "monochrome_outline" then
-        flags = "OUTLINE,MONOCHROME"
-    elseif outline == "monochrome" then
-        flags = "MONOCHROME"
-    end
-
-    fs:SetFont(AF.GetFont("Glyphs"), size, flags)
-end
-
----@param fs FontString
----@param glyph table AF.Glyphs.Faction.Horde | AF.Glyphs.Role.TANK | AF.Glyphs.Group.leader | AF.Glyphs.Marker[1] | AF.Glyphs.Combat | etc.
-function G.SetGlyph(fs, glyph)
-    if type(glyph) == "table" then
-        fs:SetText(glyph.char)
-        fs:SetTextColor(AF.UnpackColor(glyph.color))
-    else
-        fs:SetText("")
-    end
-end
-
 ---------------------------------------------------------------------
 -- glyphs
 ---------------------------------------------------------------------
@@ -70,3 +41,59 @@ G.Marker = {
 }
 
 G.Combat = {char = "\238\128\143", color = {0.85, 0.85, 0.85}}
+
+---------------------------------------------------------------------
+-- functions
+---------------------------------------------------------------------
+
+---@param fs FontString
+---@param size number
+---@param outline "none" | "outline" | "monochrome_outline" | "monochrome"
+function G.SetFont(fs, size, outline)
+    local flags
+    if outline == "none" then
+        flags = ""
+    elseif outline == "outline" then
+        flags = "OUTLINE"
+    elseif outline == "monochrome_outline" then
+        flags = "OUTLINE,MONOCHROME"
+    elseif outline == "monochrome" then
+        flags = "MONOCHROME"
+    end
+
+    fs:SetFont(AF.GetFont("Glyphs"), size, flags)
+end
+
+---@param fs FontString
+---@param glyph table AF.Glyphs.Faction.Horde | AF.Glyphs.Role.TANK | AF.Glyphs.Group.leader | AF.Glyphs.Marker[1] | AF.Glyphs.Combat | etc.
+function G.SetGlyph(fs, glyph)
+    if type(glyph) == "table" then
+        fs:SetText(glyph.char)
+        fs:SetTextColor(AF.UnpackColor(glyph.color))
+    else
+        fs:SetText("")
+    end
+end
+
+---------------------------------------------------------------------
+-- secret markers
+-- NOTE: not usable, cause we can't color text by marker types
+---------------------------------------------------------------------
+function G.SetSecretMarkerFont(fs, size, outline)
+    local flags
+    if outline == "none" then
+        flags = ""
+    elseif outline == "outline" then
+        flags = "OUTLINE"
+    elseif outline == "monochrome_outline" then
+        flags = "OUTLINE,MONOCHROME"
+    elseif outline == "monochrome" then
+        flags = "MONOCHROME"
+    end
+
+    fs:SetFont(AF.GetFont("Markers"), size, flags)
+end
+
+function G.SetSecretMarker(fs, index)
+    fs:SetText(index)
+end
