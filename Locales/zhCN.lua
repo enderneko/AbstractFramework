@@ -126,6 +126,8 @@ L["Debuff"] = "减益"
 L["Debuffs"] = "减益"
 L["Private Auras"] = "个人光环"
 
+L["Feign"] = "假死"
+L["FEIGN"] = "假死"
 L["Dead"] = "死亡"
 L["DEAD"] = "死亡"
 L["Ghost"] = "鬼魂"

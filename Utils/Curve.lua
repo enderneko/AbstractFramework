@@ -377,8 +377,8 @@ if C_CurveUtil then
         local alphaCurve = CreateCurve()
         alphaCurve:SetType(LuaCurveType.Step)
         alphaCurve:AddPoint(0, 0)
-        alphaCurve:AddPoint(0.00000000000001, 1)
-        alphaCurve:AddPoint(0.99999999999999, 1)
+        alphaCurve:AddPoint(0.0000001, 1)
+        alphaCurve:AddPoint(0.9999999, 1)
         alphaCurve:AddPoint(1, 0)
         return alphaCurve
     end

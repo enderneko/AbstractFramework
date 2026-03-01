@@ -94,6 +94,8 @@ local AF = select(2, ...)
 ---@field ["Enabled"] string
 ---@field ["Export"] string
 ---@field ["Feedback & Suggestions"] string
+---@field ["Feign"] string
+---@field ["FEIGN"] string
 ---@field ["Fill"] string
 ---@field ["Font Size"] string
 ---@field ["Font"] string
