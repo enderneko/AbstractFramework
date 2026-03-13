@@ -948,7 +948,7 @@ function AF.LoadTextPosition(fs, pos, relativeTo)
 end
 
 ---------------------------------------------------------------------
--- get anchor points
+-- arrangements
 ---------------------------------------------------------------------
 ---@param arrangement "left_to_right"|"right_to_left"|"top_to_bottom"|"bottom_to_top"
 ---@param spacingX number
@@ -1137,6 +1137,22 @@ function AF.GetAnchorPoints_GroupHeader(arrangement, spacingX, spacingY)
         columnAnchorPoint = "BOTTOM"
     end
     return point, relativePoint, x, y, columnSpacing, headerPoint, columnAnchorPoint
+end
+
+local ceil, min = math.ceil, math.min
+
+function AF.UpdateContainerSizeForArrangement(container, arrangement, numItems, numItemsPerLine, itemWidth, itemHeight, spacingX, spacingY)
+    local columns, rows
+
+    if arrangement == "left_to_right_then_top" or arrangement == "right_to_left_then_top" or arrangement == "left_to_right_then_down" or arrangement == "right_to_left_then_down" then
+        columns = min(numItems, numItemsPerLine)
+        rows = ceil(numItems / numItemsPerLine)
+    else
+        columns = ceil(numItems / numItemsPerLine)
+        rows = min(numItems, numItemsPerLine)
+    end
+
+    AF.SetGridSize(container, itemWidth, itemHeight, spacingX, spacingY or spacingX, columns, rows)
 end
 
 ---------------------------------------------------------------------
