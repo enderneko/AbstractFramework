@@ -1,18 +1,23 @@
-[View Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r17...03ef4a74b1a31909dc913bf910e82a9332062345)
+[View Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r18...e4e38689f3101c12353e26ba393001b1c1856c18)
 
-- Add AF.AdjustPointsOffset
-- Add AF.ColorThreshold
-- Add AF.SetFontShadow/RemoveFontShadow
-- Add and document AF_Locale keys for localization
-- Add AsyncLoaders
-- Add atlas and template support for AF_IconButton
-- Add nil checks to AF.Show/Hide
-- Enhance AF.CreateCooldown color parameter handling
-- Enhance callback handler functions
-- Refactor AF_SimpleStatusBar
-- Refactor AF.ColorGradient
-- Refactor and modularize locale files
-- Refactor duration formatting functions
-- Refactor: use select(2, ...) for AF declaration
-- Update AF.GetItemQualityColor
-- Update icons and textures
+- Add AF_BaseStatusBarMixin
+- Add AF_ColorCurve utility
+- Add AF_SecretStatusBar
+- Add AF_StatusTimer
+- Add AF.DelayedInvokeForObj/GetDelayedInvokerForObj
+- Add AF.FillColorTable
+- Add AF.SetRoleIcon
+- Add AF.UpdateContainerSizeForArrangement
+- Fix AF.GetPowerColor
+- Fix invisible text issue in slider edit box
+- Fix ItemLoadExecutor for empty items
+- Handle callback errors and add error sound
+- Move Noto fonts from BFI to AF
+- Refactor slider event handlers to local functions
+- Remove Aura widget
+- Update curves
+- Update locales
+- Update secret formatter
+- Update status bar widgets
+- Update texture assets
+- Wrap secret number formatting in AF.isRetail check
