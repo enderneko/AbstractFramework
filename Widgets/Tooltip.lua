@@ -177,9 +177,9 @@ local function GameTooltip_OnHide(self)
         EmbeddedItemTooltip_Hide(self.ItemTooltip)
     end
     self:SetPadding(0, 0, 0, 0)
-    self:ClearHandlerInfo()
 
     if AF.isRetail then
+        -- self:ClearHandlerInfo()
         TooltipComparisonManager:Clear(self)
         GameTooltip_ClearStatusBarWatch(self)
     end

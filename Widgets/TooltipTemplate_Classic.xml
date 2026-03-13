@@ -1,7 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.blizzard.com/wow/ui/ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/FrameXML/UI_shared.xsd">
 
-    <GameTooltip name="AFTooltipTemplate" mixin="TooltipDataHandlerMixin" frameStrata="TOOLTIP" clampedToScreen="true" hidden="true" virtual="true">
+    <GameTooltip name="AFTooltipTemplate" frameStrata="TOOLTIP" clampedToScreen="true" hidden="true" virtual="true">
         <!-- <KeyValues>
             <KeyValue key="textLeft1Font" value="AF_FONT_TITLE" type="string"/>
             <KeyValue key="textRight1Font" value="AF_FONT_TITLE" type="string"/>
