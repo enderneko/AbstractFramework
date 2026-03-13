@@ -206,6 +206,28 @@ if AF.isRetail then
     function AF.FormatSecretPercentage(n)
         return AbbreviateNumbers(n, percentageAbbrevOptions)
     end
+
+    --------------------------------------------------
+    -- duration format (secret)
+    --------------------------------------------------
+    -- local durationAbbrevOptions_WithSeconds = {
+    --     config = CreateAbbreviateConfig({
+    --         {breakpoint = 86400, abbreviation = "d", significandDivisor = 86400, fractionDivisor = 1, abbreviationIsGlobal = false},
+    --         {breakpoint = 3600, abbreviation = "h", significandDivisor = 3600, fractionDivisor = 1, abbreviationIsGlobal = false},
+    --         {breakpoint = 60, abbreviation = "m", significandDivisor = 60, fractionDivisor = 1, abbreviationIsGlobal = false},
+    --         {breakpoint = 6, abbreviation = "s", significandDivisor = 1, fractionDivisor = 1, abbreviationIsGlobal = false},
+    --         {breakpoint = 0, abbreviation = "s", significandDivisor = 0.1, fractionDivisor = 10, abbreviationIsGlobal = false},
+    --     })
+    -- }
+
+    -- local durationAbbrevOptions_WithoutSeconds = {
+    --     config = CreateAbbreviateConfig({
+    --         {breakpoint = 86400, abbreviation = "d", significandDivisor = 86400, fractionDivisor = 1, abbreviationIsGlobal = false},
+    --         {breakpoint = 3600, abbreviation = "h", significandDivisor = 3600, fractionDivisor = 1, abbreviationIsGlobal = false},
+    --         {breakpoint = 60, abbreviation = "m", significandDivisor = 60, fractionDivisor = 1, abbreviationIsGlobal = false},
+    --         -- {breakpoint = 0, abbreviation = "", significandDivisor = 0.1, fractionDivisor = 10, abbreviationIsGlobal = false},
+    --     })
+    -- }
 end
 
 ---------------------------------------------------------------------

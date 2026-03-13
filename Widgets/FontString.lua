@@ -91,10 +91,10 @@ local function ResizeToFitText(self, frame, fontString, hPadding, vPadding, call
 
     self:SetScript("OnUpdate", function(self, elapsed)
         if hPadding then
-            frame:SetWidth(ceil(fontString:GetWidth() + hPadding))
+            frame:SetWidth(ceil(fontString:GetStringWidth() + hPadding))
         end
         if vPadding then
-            frame:SetHeight(ceil(fontString:GetHeight() + vPadding))
+            frame:SetHeight(ceil(fontString:GetStringHeight() + vPadding))
         end
 
         self.elapsed = self.elapsed + elapsed
