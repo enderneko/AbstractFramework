@@ -1,23 +1,3 @@
-[View Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r18...e4e38689f3101c12353e26ba393001b1c1856c18)
+[View Full Changelog](https://github.com/enderneko/AbstractWidgets/compare/r19...83bd2eb1a4ea2be3776b3f9366990a6836de39eb)
 
-- Add AF_BaseStatusBarMixin
-- Add AF_ColorCurve utility
-- Add AF_SecretStatusBar
-- Add AF_StatusTimer
-- Add AF.DelayedInvokeForObj/GetDelayedInvokerForObj
-- Add AF.FillColorTable
-- Add AF.SetRoleIcon
-- Add AF.UpdateContainerSizeForArrangement
-- Fix AF.GetPowerColor
-- Fix invisible text issue in slider edit box
-- Fix ItemLoadExecutor for empty items
-- Handle callback errors and add error sound
-- Move Noto fonts from BFI to AF
-- Refactor slider event handlers to local functions
-- Remove Aura widget
-- Update curves
-- Update locales
-- Update secret formatter
-- Update status bar widgets
-- Update texture assets
-- Wrap secret number formatting in AF.isRetail check
+- Remove TooltipDataHandlerMixin and ClearHandlerInfo call
