@@ -141,7 +141,8 @@ local COLORS = {
     ["aura_magic"] = {["hex"] = "ff3399ff", ["t"] = {0.2, 0.6, 1}},
     ["aura_poison"] = {["hex"] = "ff009900", ["t"] = {0, 0.6, 0}},
     ["aura_bleed"] = {["hex"] = "ffff3399", ["t"] = {1, 0.2, 0.6}},
-    ["aura_none"] = {["hex"] = "ffcc0000", ["t"] = {0.8, 0, 0}},
+    ["aura_debuff"] = {["hex"] = "ffcc0000", ["t"] = {0.8, 0, 0}},
+    ["aura_none"] = {["hex"] = "ff000000", ["t"] = {0, 0, 0}},
     ["aura_castbyme"] = {["hex"] = "ff00cc00", ["t"] = {0, 0.8, 0}},
     ["aura_dispellable"] = {["hex"] = "ffffff00", ["t"] = {1, 1, 0}},
 

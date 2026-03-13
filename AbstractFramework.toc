@@ -107,8 +107,6 @@ Widgets\Popup.lua
 Widgets\Calendar.lua
 Widgets\Sheet.lua
 Widgets\HelpTip.lua
-Widgets\AuraCooldown.xml
-Widgets\Aura.lua
 Widgets\Misc.lua
 Widgets\DataBroker.lua
 Widgets\DragSorter.lua
