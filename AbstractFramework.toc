@@ -131,21 +131,21 @@ Spells\CrowdControls.lua
 Spells\Dispellables.lua [AllowLoadGameType mainline]
 Spells\Dispellables_Mists.lua [AllowLoadGameType mists]
 Spells\Interrupts.lua
-Spells\Dispels.lua [AllowLoadGameType mainline]
-Spells\Casts.lua
+# Spells\Dispels.lua [AllowLoadGameType mainline]
+# Spells\Casts.lua
 
 # system\events
 System\Events.lua
 
 # secret widgets
-Widgets_UnitFrames\AuraCooldown.xml
-Widgets_UnitFrames\Aura.lua
-Widgets_UnitFrames\SecretHealthBar.lua [AllowLoadGameType mainline]
-Widgets_UnitFrames\SecretPowerBar.lua [AllowLoadGameType mainline]
-Widgets_UnitFrames\SecretCastBar.lua [AllowLoadGameType mainline]
-Widgets_UnitFrames\SecretNameText.lua [AllowLoadGameType mainline]
-Widgets_UnitFrames\SecretHealthText.lua [AllowLoadGameType mainline]
-Widgets_UnitFrames\SecretPowerText.lua [AllowLoadGameType mainline]
+# Widgets_UnitFrames\AuraCooldown.xml
+# Widgets_UnitFrames\Aura.lua
+# Widgets_UnitFrames\SecretHealthBar.lua [AllowLoadGameType mainline]
+# Widgets_UnitFrames\SecretPowerBar.lua [AllowLoadGameType mainline]
+# Widgets_UnitFrames\SecretCastBar.lua [AllowLoadGameType mainline]
+# Widgets_UnitFrames\SecretNameText.lua [AllowLoadGameType mainline]
+# Widgets_UnitFrames\SecretHealthText.lua [AllowLoadGameType mainline]
+# Widgets_UnitFrames\SecretPowerText.lua [AllowLoadGameType mainline]
 
 # demo
 Demo.lua
