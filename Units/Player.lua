@@ -48,12 +48,13 @@ local function PLAYER_LOGIN()
     AF.player.realm = GetRealmName()
     AF.player.normalizedRealm = GetNormalizedRealmName()
     AF.player.faction = UnitFactionGroup("player")
-    AF.player.localizedRace, AF.englishRace, AF.player.raceID = UnitRace("player")
+    AF.player.localizedRace, AF.player.race, AF.player.raceID = UnitRace("player")
     AF.player.sex = UnitSex("player")
 
     if AF.isRetail or AF.isMists then
         AF.player.specIndex = GetSpecialization()
-        AF.player.specID, AF.player.specName, _, AF.player.specIcon, AF.player.specRole = GetSpecializationInfo(AF.player.specIndex)
+        AF.player.specID, AF.player.localizedSpec, _, AF.player.specIcon, AF.player.specRole = GetSpecializationInfo(AF.player.specIndex)
+        AF.player.spec = AF.GetSpecName(AF.player.specID)
     end
 
     -- connected realms
@@ -70,7 +71,8 @@ if AF.isRetail or AF.isMists then
     local function UpdateSpecData()
         local lastSpecID = AF.player.specID
         AF.player.specIndex = GetSpecialization()
-        AF.player.specID, AF.player.specName, _, AF.player.specIcon, AF.player.specRole = GetSpecializationInfo(AF.player.specIndex)
+        AF.player.specID, AF.player.localizedSpec, _, AF.player.specIcon, AF.player.specRole = GetSpecializationInfo(AF.player.specIndex)
+        AF.player.spec = AF.GetSpecName(AF.player.specID)
         if AF.player.specID ~= lastSpecID then
             AF.Fire("AF_PLAYER_SPEC_UPDATE", AF.player.specID, lastSpecID)
             AF.Fire("AF_PLAYER_DATA_UPDATE")
